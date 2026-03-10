@@ -1994,6 +1994,7 @@ input[type=number] { -moz-appearance:textfield; }
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(246,187,78,0.2),rgba(231,129,97,0.15));border:1px solid rgba(246,187,78,0.4);color:#f6bb4e;font-weight:800" onclick="admSwitchTab('liveupdater',this)">🔄 Updater</button>
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(160,136,250,0.2),rgba(252,119,144,0.15));border:1px solid rgba(160,136,250,0.35);color:#c0b9f5;font-weight:800" onclick="admSwitchTab('claw',this)">🦾 Claw</button>
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(78,223,208,0.15),rgba(160,136,250,0.1));border:1px solid rgba(78,223,208,0.3);color:#4edfd0;font-weight:800" onclick="admSwitchTab('plinko',this)">🎯 Plinko</button>
+        <button class="adm-tab" style="background:linear-gradient(135deg,rgba(78,223,208,0.2),rgba(86,110,227,0.2));border:1px solid rgba(78,223,208,0.4);color:#4edfd0;font-weight:800" onclick="admSwitchTab('marbleadmin',this)">🔮 Marble</button>
       </div>
     </div>
     <div class="adm-body" id="admin-content"></div>
@@ -9125,6 +9126,18 @@ function mrGenMap() {
   const W = MR_W, H = MR_H;
   const rng = () => Math.random();
 
+  // Check for admin-assigned rotation level or live push override
+  const rotLv = typeof _mrGetRotationLevel === 'function' ? _mrGetRotationLevel() : null;
+  if (rotLv && rotLv.obstacles && rotLv.obstacles.length > 0) {
+    mrTheme = rotLv.theme || 'space';
+    mrObstacles = JSON.parse(JSON.stringify(rotLv.obstacles));
+    mrObstacles.push({ type:'ramp',   x: 30,   y: H - 60, w: 90,  angle:  0.55, _theme: mrTheme });
+    mrObstacles.push({ type:'ramp',   x: W-30, y: H - 60, w: 90,  angle: -0.55, _theme: mrTheme });
+    mrObstacles.push({ type:'funnel', cx: W/2, cy: H - 28, w: W * 0.65 });
+    mrGoals.push({ y: H - 14 });
+    return;
+  }
+
   // Pick a random theme for this level
   const themeKeys = Object.keys(MR_THEMES);
   mrTheme = themeKeys[Math.floor(rng() * themeKeys.length)];
@@ -9193,7 +9206,18 @@ function mrGenMap() {
     }
 
     // ── One interactive hazard per zone — placed near gate but not IN it ──
-    const hazardPool = ['springboard','fan','gear','stickyzone','bridge','conveyor','seesaw','bouncywall','slide','rollerchain'];
+    const baseHazards = ['springboard','fan','gear','stickyzone','bridge','conveyor','seesaw','bouncywall','slide','rollerchain'];
+    // Add theme-specific hazards when the theme matches
+    const themeHazards = {
+      forest: ['buzzsaw','fallenTree','string'],
+      ice:    ['icePatch','icicle','icyBoulder','snowMachine'],
+      sakura: ['sakuraPetal','leafPile'],
+    };
+    const extraHazards = themeHazards[mrTheme] || [];
+    // Theme hazards get 40% of picks when available, else pure base pool
+    const hazardPool = extraHazards.length > 0 && rng() < 0.4
+      ? extraHazards
+      : baseHazards;
     const pick = hazardPool[Math.floor(rng() * hazardPool.length)];
     // Place hazard on the opposite side of the track from the gate
     const hx = gate.x > W / 2
@@ -9231,6 +9255,36 @@ function mrGenMap() {
         break;
       case 'rollerchain':
         mrObstacles.push({ type:'rollerchain', x: hx, y: hy, w: 44, phase:0 });
+        break;
+      // ── Forest theme ──
+      case 'buzzsaw':
+        mrObstacles.push({ type:'buzzsaw', x: hx, y: hy, r: 16, angle:0, speed: rng()>0.5?0.06:-0.06, _theme:'forest' });
+        break;
+      case 'fallenTree':
+        mrObstacles.push({ type:'fallenTree', cx: hx, y: hy, w: 64 + rng()*20, angle:0, angV:0, split:false, splitT:0, _theme:'forest' });
+        break;
+      case 'string':
+        mrObstacles.push({ type:'string', x: hx, y: hy, len: 45 + rng()*20, swing:0, swingV:0, _theme:'forest' });
+        break;
+      // ── Ice theme ──
+      case 'icePatch':
+        mrObstacles.push({ type:'icePatch', x: hx, y: hy, w: 50 + rng()*30, h:6, _theme:'ice' });
+        break;
+      case 'icicle':
+        mrObstacles.push({ type:'icicle', x: hx, y: hy - 10, h: 18 + rng()*12, fallen:false, fallY: hy - 10, patchX:null, patchY:null, _theme:'ice' });
+        break;
+      case 'icyBoulder':
+        mrObstacles.push({ type:'icyBoulder', x: hx, y: hy, r: 16 + rng()*6, vx:0, vy:0, rolling:false, breakT:0, broken:false, pieces:[], _theme:'ice' });
+        break;
+      case 'snowMachine':
+        mrObstacles.push({ type:'snowMachine', x: hx, y: hy, balls:[], lastSpawn:0, _theme:'ice' });
+        break;
+      // ── Sakura theme ──
+      case 'sakuraPetal':
+        mrObstacles.push({ type:'sakuraPetal', cx: hx, y: hy, w: 40 + rng()*20, angle:0, angV:0, flopped:false, _theme:'sakura' });
+        break;
+      case 'leafPile':
+        mrObstacles.push({ type:'leafPile', x: hx, y: hy, w: 50 + rng()*20, particles:[], _theme:'sakura' });
         break;
     }
   }
@@ -9306,6 +9360,34 @@ function mrStepPhysics() {
       o.angV *= 0.96;
       o.angle += o.angV;
       o.angle = Math.max(-0.6, Math.min(0.6, o.angle));
+    }
+    // Forest theme
+    if (o.type === 'buzzsaw')    o.angle = (o.angle||0) + (o.speed||0.06);
+    if (o.type === 'fallenTree') {
+      if (!o.split) {
+        o.angV += -o.angle * 0.004; o.angV *= 0.95; o.angle += o.angV;
+        o.angle = Math.max(-0.5, Math.min(0.5, o.angle));
+      } else if (o.splitT > 0) { o.splitT--; }
+    }
+    if (o.type === 'string') {
+      o.swingV = (o.swingV||0) * 0.98;
+      o.swingV += -(o.swing||0) * 0.03;
+      o.swing = (o.swing||0) + o.swingV;
+    }
+    // Ice theme
+    if (o.type === 'icyBoulder' && o.rolling && !o.broken) {
+      o.breakT = (o.breakT||0) + 1;
+      o.vx = (o.vx||0)*0.99; o.vy = (o.vy||0) + 0.06;
+      o.x += o.vx; o.y += o.vy;
+      if (o.x < (o.r||18)) { o.x = o.r||18; o.vx = Math.abs(o.vx)*0.5; }
+      if (o.x > MR_W-(o.r||18)) { o.x = MR_W-(o.r||18); o.vx = -Math.abs(o.vx)*0.5; }
+      if (o.breakT > 360) o.broken = true;
+    }
+    // Sakura theme
+    if (o.type === 'sakuraPetal' && !o.flopped) {
+      o.angV += -o.angle * 0.003; o.angV *= 0.94; o.angle += o.angV;
+      o.angle = Math.max(-Math.PI/2, Math.min(Math.PI/2, o.angle));
+      if (Math.abs(o.angle) > 1.3) o.flopped = true;
     }
   });
 
@@ -9463,8 +9545,199 @@ function mrStepPhysics() {
           if (chainHit) { m.vx += (Math.random()-0.5)*0.8; mrPlayHazardSound('rollerchain', o, 400); }
           break;
         }
-      }
-    });
+
+        // ── FOREST THEME OBSTACLES ──────────────────────────────
+        case 'buzzsaw': {
+          // Repels marble aggressively in opposite direction
+          const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
+          const effectiveR = (o.r||16)+m.r;
+          if (d < effectiveR && d > 0) {
+            const nx=dx/d, ny=dy/d;
+            m.x += nx*(effectiveR-d+2); m.y += ny*(effectiveR-d+2);
+            const spd = Math.max(4, Math.hypot(m.vx,m.vy)*1.8);
+            m.vx = nx*spd + (Math.random()-0.5)*2;
+            m.vy = ny*spd - 1;
+            mrPlayHazardSound('buzzsaw', o, 300);
+          }
+          break;
+        }
+        case 'fallenTree': {
+          // Like seesaw but splits in half when marble hits hard enough
+          if (!o.split) {
+            mrRampCollide(m, o.cx, o.y, o.w/2, 5, o.angle, 1);
+            const localX = m.x - o.cx;
+            if (Math.abs(m.y - o.y) < 22 && Math.abs(localX) < o.w/2) {
+              o.angV += localX * 0.00018;
+              const impact = Math.hypot(m.vx, m.vy);
+              if (impact > 4.5 && !o.split) {
+                o.split = true; o.splitT = 30;
+                mrPlayHazardSound('fallenTree', o, 200);
+              }
+            }
+            o.angV += -o.angle * 0.004; o.angV *= 0.95; o.angle += o.angV;
+            o.angle = Math.max(-0.5, Math.min(0.5, o.angle));
+          } else {
+            if (o.splitT > 0) o.splitT--;
+          }
+          break;
+        }
+        case 'string': {
+          // Light obstacle: marble pushes it, creates slight resistance
+          const sx = o.x + Math.sin(o.swing) * 12;
+          const sy = o.y;
+          const dx=m.x-sx, dy=m.y-sy, d=Math.hypot(dx,dy);
+          if (d < m.r + 4) {
+            const nx=dx/d||0, ny=dy/d||0;
+            m.x += nx*(m.r+4-d); m.y += ny*(m.r+4-d);
+            m.vx -= m.vx * 0.12; m.vy -= m.vy * 0.08;
+            o.swingV += (m.x - o.x) * 0.004;
+            mrPlayHazardSound('string', o, 600);
+          }
+          // String physics
+          o.swingV += -o.swing * 0.05;
+          o.swingV *= 0.92;
+          o.swing += o.swingV;
+          break;
+        }
+
+        // ── ICE THEME OBSTACLES ──────────────────────────────────
+        case 'icePatch': {
+          // Slippery: if marble is on top, reduce friction dramatically
+          const px = (o.x||0), py = (o.y||0), pw2 = (o.w||50)/2;
+          if (m.x > px-pw2 && m.x < px+pw2 && Math.abs(m.y - py) < m.r+5 && m.y < py) {
+            m.y = py - m.r - 3;
+            m.vy = Math.min(m.vy, 0);
+            m.vx *= 1.018; // extra slide
+            if (!o._friction) { o._friction = true; }
+          }
+          break;
+        }
+        case 'icicle': {
+          if (o.fallen) {
+            // Fallen icicle creates an ice patch where it landed
+            if (o.patchX !== null && !o._patchCreated) {
+              o._patchCreated = true;
+              mrObstacles.push({ type:'icePatch', x:o.patchX, y:o.patchY, w:30 });
+            }
+          } else {
+            // Detect marble on the platform above (within 20px above icicle tip)
+            const dx = m.x - o.x, dy = m.y - (o.y - 5);
+            if (Math.abs(dx) < 12 && dy < 0 && dy > -30) {
+              const impact = Math.abs(m.vy);
+              if (impact > 2) {
+                o.fallen = true;
+                o.fallY = o.y;
+                o.patchX = o.x;
+                o.patchY = o.y + (o.h||20) + 10;
+              }
+            }
+          }
+          // Falling animation
+          if (o.fallen && !o._patchCreated) {
+            o.fallY = (o.fallY||o.y) + 5;
+            o.y = o.fallY;
+            // Check if it hits a platform (ramp/bridge)
+            for (const p of mrObstacles) {
+              if ((p.type==='ramp'||p.type==='bridge') && Math.abs(o.x - (p.x||p.cx||0)) < 40) {
+                o.patchX = o.x; o.patchY = o.y;
+                o._patchCreated = false;
+                break;
+              }
+            }
+            if (o.y > MR_H + 30) { o.patchX = null; o._patchCreated = true; } // shattered mid-air
+          }
+          break;
+        }
+        case 'icyBoulder': {
+          if (o.broken) break;
+          const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
+          if (!o.rolling && d < m.r + (o.r||18) && d > 0) {
+            o.rolling = true; o.breakT = 0;
+            o.vx = m.vx * 0.5; o.vy = Math.abs(m.vy) * 0.3;
+            m.vx -= (m.x-o.x)/d*2; m.vy -= 1;
+          }
+          if (o.rolling) {
+            // Marble collision while rolling
+            const d2 = Math.hypot(m.x-o.x, m.y-o.y);
+            if (d2 < m.r + (o.r||18) && d2 > 0) {
+              const nx2=(m.x-o.x)/d2, ny2=(m.y-o.y)/d2;
+              m.x += nx2*(m.r+(o.r||18)-d2); m.y += ny2*(m.r+(o.r||18)-d2);
+              m.vx += nx2*1.5; m.vy += ny2*1.5;
+            }
+          }
+          break;
+        }
+        case 'snowMachine': {
+          // Spawn snowballs every ~30 frames, up to 20 active
+          const now2 = mrRaceTime;
+          if (!o.balls) o.balls = [];
+          if (o.balls.length < 20 && (now2 - (o.lastSpawn||0)) > 30) {
+            o.lastSpawn = now2;
+            o.balls.push({
+              x: o.x + (Math.random()-0.5)*20,
+              y: o.y,
+              vx: (Math.random()-0.5)*1.5,
+              vy: -1-Math.random(),
+              r: 5+Math.random()*3,
+              born: now2
+            });
+          }
+          // Move & melt balls (600 frames = 10s)
+          o.balls = o.balls.filter(b => {
+            b.x += b.vx; b.y += b.vy; b.vy += 0.06;
+            b.vx *= 0.99; b.r *= 0.9995;
+            // Marble collision
+            const dx=m.x-b.x, dy=m.y-b.y, d=Math.hypot(dx,dy);
+            if (d < m.r + b.r) {
+              const nx=dx/d, ny=dy/d;
+              m.vx -= nx*0.3; m.vy -= ny*0.3;
+            }
+            return (now2 - b.born) < 600 && b.r > 1;
+          });
+          break;
+        }
+
+        // ── SAKURA THEME OBSTACLES ───────────────────────────────
+        case 'sakuraPetal': {
+          if (!o.flopped) {
+            mrRampCollide(m, o.cx, o.y, o.w/2, 4, o.angle, 0.6);
+            const localX = m.x - o.cx;
+            if (Math.abs(m.y - o.y) < 18 && Math.abs(localX) < o.w/2) {
+              const impact = Math.hypot(m.vx, m.vy);
+              if (impact > 2) {
+                o.angV += localX * 0.001;
+                if (Math.abs(o.angle) > 0.6) o.flopped = true;
+              }
+            }
+            o.angV += -o.angle * 0.003; o.angV *= 0.94; o.angle += o.angV;
+            o.angle = Math.max(-Math.PI/2, Math.min(Math.PI/2, o.angle));
+          }
+          break;
+        }
+        case 'leafPile': {
+          // Slows marble if it lands on the pile
+          const lx = o.x, ly = o.y, lw2 = (o.w||50)/2;
+          if (m.x > lx-lw2 && m.x < lx+lw2 && m.y > ly-16 && m.y < ly+10) {
+            m.vx *= 0.88; m.vy *= 0.82;
+            // Spawn leaf particles
+            if (!o.particles) o.particles = [];
+            if (o.particles.length < 12 && Math.random() < 0.15) {
+              o.particles.push({
+                x: m.x, y: m.y,
+                vx: (Math.random()-0.5)*1.5, vy: -Math.random()*1.5,
+                life: 1.0, color: ['#80c040','#a0e060','#60a030','#ffd080'][Math.floor(Math.random()*4)]
+              });
+            }
+            mrPlayHazardSound('leafPile', o, 800);
+          }
+          // Update particles
+          if (o.particles) {
+            o.particles = o.particles.filter(p => {
+              p.x += p.vx; p.y += p.vy; p.vy += 0.04; p.life -= 0.025; return p.life > 0;
+            });
+          }
+          break;
+        }
 
     // Marble-marble collision
     mrMarbles.forEach(m2 => {
@@ -9558,6 +9831,15 @@ function mrPlayHazardSound(soundKey, obstacle, cooldownMs) {
     seesaw: 'click',
     boing: 'success',
     rollerchain: 'pop',
+    buzzsaw: 'error',
+    fallenTree: 'whoosh',
+    string: 'pop',
+    icePatch: 'tick',
+    icicle: 'whoosh',
+    icyBoulder: 'error',
+    snowMachine: 'tick',
+    sakuraPetal: 'pop',
+    leafPile: 'tick',
   };
   const s = soundMap[soundKey];
   if (s) playSound(s);
@@ -9859,6 +10141,203 @@ function mrDrawFrame() {
           ctx.strokeStyle='rgba(200,200,220,0.5)';ctx.lineWidth=0.8;
           ctx.beginPath();ctx.roundRect(lx-3,bounce-4,6,8,2);ctx.fill();ctx.stroke();
         }
+        break;
+      }
+
+      // ── FOREST THEME OBSTACLES ────────────────────────────────────
+      case 'buzzsaw': {
+        o.angle = (o.angle||0) + (o.speed||0.06);
+        ctx.translate(o.x, o.y); ctx.rotate(o.angle);
+        ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(200,50,50,0.8)';
+        // Disc
+        const bzG = ctx.createRadialGradient(0,0,2,0,0,o.r||16);
+        bzG.addColorStop(0,'rgba(240,80,60,0.95)'); bzG.addColorStop(1,'rgba(160,20,20,0.7)');
+        ctx.fillStyle = bzG; ctx.beginPath(); ctx.arc(0,0,o.r||16,0,Math.PI*2); ctx.fill();
+        // Teeth
+        ctx.strokeStyle = 'rgba(255,120,80,0.95)'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+        const teeth = 10, r = o.r||16;
+        for (let t=0;t<teeth;t++) {
+          const a = t*Math.PI*2/teeth;
+          ctx.beginPath(); ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r); ctx.lineTo(Math.cos(a)*(r+8),Math.sin(a)*(r+8)); ctx.stroke();
+        }
+        // Center hub
+        ctx.fillStyle = 'rgba(255,200,160,0.9)'; ctx.beginPath(); ctx.arc(0,0,4,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0; break;
+      }
+      case 'fallenTree': {
+        ctx.translate(o.cx, o.y);
+        if (!o.split) {
+          ctx.rotate(o.angle||0);
+          // Wood texture
+          const tg = ctx.createLinearGradient(-o.w/2,-8,o.w/2,8);
+          tg.addColorStop(0,'rgba(120,70,30,0.9)'); tg.addColorStop(0.5,'rgba(160,100,50,0.9)'); tg.addColorStop(1,'rgba(100,60,20,0.8)');
+          ctx.fillStyle = tg; ctx.fillRect(-o.w/2,-7,o.w,14);
+          // Bark lines
+          ctx.strokeStyle='rgba(80,40,10,0.5)'; ctx.lineWidth=1;
+          for(let i=0;i<6;i++){const lx=-o.w/2+(i+1)*o.w/7;ctx.beginPath();ctx.moveTo(lx,-7);ctx.lineTo(lx+4,7);ctx.stroke();}
+          ctx.strokeStyle='rgba(150,100,50,0.8)';ctx.lineWidth=1.5;ctx.strokeRect(-o.w/2,-7,o.w,14);
+          // Leaves at ends
+          for(const end of [-o.w/2-5, o.w/2+5]){
+            ctx.fillStyle='rgba(60,160,60,0.7)';ctx.beginPath();ctx.arc(end,0,9,0,Math.PI*2);ctx.fill();
+          }
+        } else {
+          // Split: draw two halves
+          const split = o.splitT > 0 ? (30-o.splitT)/30 : 1;
+          const offset = split*12;
+          for(const side of [-1,1]){
+            ctx.save(); ctx.translate(side*offset, side*offset*0.5); ctx.rotate((o.angle||0)+side*split*0.3);
+            ctx.fillStyle='rgba(120,70,30,0.75)'; ctx.fillRect(-o.w/4,-7,o.w/2,14);
+            ctx.restore();
+          }
+        }
+        break;
+      }
+      case 'string': {
+        ctx.translate(o.x, o.y);
+        const swingX = Math.sin(o.swing||0)*12;
+        ctx.strokeStyle = 'rgba(200,180,120,0.85)'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+        ctx.shadowBlur = 3; ctx.shadowColor = 'rgba(200,180,120,0.4)';
+        // Draw curved/swinging string (simplified pendulum)
+        ctx.beginPath();
+        ctx.moveTo(0, -(o.len||50)/2);
+        ctx.quadraticCurveTo(swingX*0.5, 0, swingX, (o.len||50)/2);
+        ctx.stroke();
+        // Knot at bottom
+        ctx.fillStyle = 'rgba(180,150,80,0.9)'; ctx.beginPath(); ctx.arc(swingX,(o.len||50)/2,4,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0; break;
+      }
+
+      // ── ICE THEME OBSTACLES ─────────────────────────────────────
+      case 'icePatch': {
+        const ipx = (o.x||0)-(o.w||50)/2, ipy = (o.y||0)-3, ipw = o.w||50;
+        // Shiny ice surface
+        const ipG = ctx.createLinearGradient(ipx, ipy, ipx+ipw, ipy+6);
+        ipG.addColorStop(0,'rgba(200,240,255,0.7)'); ipG.addColorStop(0.5,'rgba(255,255,255,0.9)'); ipG.addColorStop(1,'rgba(180,220,255,0.6)');
+        ctx.fillStyle = ipG; ctx.fillRect(ipx, ipy, ipw, 6); ctx.strokeRect(ipx, ipy, ipw, 6);
+        ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(160,220,255,0.7)';
+        ctx.strokeStyle = 'rgba(160,220,255,0.9)'; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.shadowBlur = 0;
+        // Sparkle glints
+        for(let g=0;g<3;g++){const gx=ipx+g*(ipw/3)+8;
+          ctx.fillStyle='rgba(255,255,255,0.8)';ctx.beginPath();ctx.arc(gx,ipy+3,1.5,0,Math.PI*2);ctx.fill();}
+        break;
+      }
+      case 'icicle': {
+        if (!o.fallen) {
+          ctx.save();
+          const tip = o.y + (o.h||20);
+          // Icicle body (gradient crystal)
+          const icG = ctx.createLinearGradient(o.x-5, o.y, o.x+5, tip);
+          icG.addColorStop(0,'rgba(220,245,255,0.95)'); icG.addColorStop(1,'rgba(160,220,255,0.5)');
+          ctx.fillStyle = icG;
+          ctx.beginPath(); ctx.moveTo(o.x-5,o.y); ctx.lineTo(o.x+5,o.y); ctx.lineTo(o.x,tip); ctx.closePath(); ctx.fill();
+          ctx.strokeStyle = 'rgba(200,240,255,0.8)'; ctx.lineWidth = 1; ctx.stroke();
+          // Inner shine
+          ctx.fillStyle = 'rgba(255,255,255,0.5)';
+          ctx.beginPath(); ctx.moveTo(o.x-1,o.y+2); ctx.lineTo(o.x+2,o.y+2); ctx.lineTo(o.x,tip-4); ctx.closePath(); ctx.fill();
+          ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(160,220,255,0.6)'; ctx.shadowBlur = 0;
+          ctx.restore();
+        } else if (!o._patchCreated) {
+          // Falling — draw as moving shard
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, 1-((o.y-o.fallY)/200));
+          ctx.translate(o.x, o.y);
+          ctx.fillStyle = 'rgba(200,240,255,0.8)';
+          ctx.beginPath(); ctx.moveTo(-4,0); ctx.lineTo(4,0); ctx.lineTo(0,o.h||20); ctx.closePath(); ctx.fill();
+          ctx.globalAlpha=1; ctx.restore();
+        }
+        break;
+      }
+      case 'icyBoulder': {
+        if (o.broken) {
+          // Draw broken pieces scattered
+          const pieces = o.pieces || [];
+          if (!pieces.length) {
+            for(let p=0;p<5;p++) pieces.push({
+              ox:(Math.random()-0.5)*24, oy:(Math.random()-0.5)*24,
+              r:4+Math.random()*6, angle:Math.random()*Math.PI*2
+            });
+            if (!o.pieces) o.pieces = pieces;
+          }
+          pieces.forEach(p => {
+            ctx.save(); ctx.translate(o.x+p.ox, o.y+p.oy); ctx.rotate(p.angle);
+            ctx.fillStyle='rgba(200,240,255,0.6)'; ctx.strokeStyle='rgba(160,220,255,0.8)'; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.arc(0,0,p.r,0,Math.PI*2); ctx.fill(); ctx.stroke(); ctx.restore();
+          });
+        } else {
+          ctx.translate(o.x,o.y);
+          const ibG = ctx.createRadialGradient(-6,-6,2,0,0,o.r||18);
+          ibG.addColorStop(0,'rgba(240,255,255,0.98)'); ibG.addColorStop(0.4,'rgba(200,240,255,0.85)'); ibG.addColorStop(1,'rgba(140,200,240,0.6)');
+          ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(160,230,255,0.7)';
+          ctx.fillStyle = ibG; ctx.beginPath(); ctx.arc(0,0,o.r||18,0,Math.PI*2); ctx.fill();
+          ctx.strokeStyle = 'rgba(200,240,255,0.9)'; ctx.lineWidth = 2; ctx.stroke();
+          ctx.shadowBlur = 0;
+          // Crack if rolling
+          if (o.rolling && o.breakT > 120) {
+            const crackA = Math.min(1, (o.breakT-120)/240);
+            ctx.strokeStyle = `rgba(100,180,220,${crackA*0.8})`; ctx.lineWidth=1.5;
+            ctx.beginPath(); ctx.moveTo(-5,-3); ctx.lineTo(0,5); ctx.lineTo(8,-2); ctx.stroke();
+          }
+          if (o.rolling) {
+            ctx.fillStyle='rgba(200,240,255,0.5)'; ctx.font='bold 7px sans-serif'; ctx.textAlign='center';
+            const secs = Math.ceil(Math.max(0,(360-o.breakT)/60));
+            ctx.fillText(secs>0?secs+'s':'💥',0,3);
+          }
+        }
+        break;
+      }
+      case 'snowMachine': {
+        // Machine body (draw at world coords)
+        const smx = o.x, smy = o.y;
+        ctx.fillStyle='rgba(160,200,240,0.85)'; ctx.strokeStyle='rgba(200,230,255,0.9)'; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.roundRect(smx-16,smy-12,32,22,6); ctx.fill(); ctx.stroke();
+        ctx.fillStyle='rgba(100,160,220,0.9)'; ctx.fillRect(smx-4,smy+10,8,8);
+        ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='bold 10px sans-serif'; ctx.textAlign='center';
+        ctx.fillText('❄',smx,smy+4);
+        // Draw snowballs directly in world space (no extra save/restore needed)
+        (o.balls||[]).forEach(b => {
+          const alpha = Math.min(1, b.life * 2);
+          ctx.globalAlpha = alpha * 0.85;
+          const sbG = ctx.createRadialGradient(b.x-b.r*0.3,b.y-b.r*0.3,0.5,b.x,b.y,b.r);
+          sbG.addColorStop(0,'rgba(255,255,255,0.98)'); sbG.addColorStop(1,'rgba(200,230,255,0.6)');
+          ctx.fillStyle=sbG; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fill();
+        });
+        ctx.globalAlpha=1;
+        break;
+      }
+
+      // ── SAKURA THEME OBSTACLES ──────────────────────────────────
+      case 'sakuraPetal': {
+        ctx.translate(o.cx, o.y); ctx.rotate(o.angle||0);
+        ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(255,140,180,0.6)';
+        const spG = ctx.createLinearGradient(-(o.w||40)/2,-4,(o.w||40)/2,4);
+        spG.addColorStop(0,'rgba(255,180,210,0.9)'); spG.addColorStop(0.5,'rgba(255,140,180,0.95)'); spG.addColorStop(1,'rgba(240,100,160,0.8)');
+        ctx.fillStyle = spG;
+        ctx.beginPath(); ctx.ellipse(0,0,(o.w||40)/2,7,0,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle='rgba(255,200,220,0.7)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(-(o.w||40)/2+4,0); ctx.lineTo((o.w||40)/2-4,0); ctx.stroke();
+        for(let v=0;v<4;v++){const vx=-(o.w||40)/4+v*(o.w||40)/4;ctx.beginPath();ctx.moveTo(vx,0);ctx.lineTo(vx+6,-5);ctx.moveTo(vx,0);ctx.lineTo(vx+6,5);ctx.stroke();}
+        if (o.flopped) { ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.beginPath(); ctx.ellipse(0,0,4,2,0,0,Math.PI*2); ctx.fill(); }
+        ctx.shadowBlur=0;
+        break;
+      }
+      case 'leafPile': {
+        const lpx = o.x, lpy = o.y, lw = (o.w||50)/2;
+        ctx.fillStyle='rgba(40,100,30,0.3)'; ctx.beginPath(); ctx.ellipse(lpx,lpy+4,lw,8,0,0,Math.PI*2); ctx.fill();
+        const leafColors=['rgba(80,180,60,0.85)','rgba(100,200,70,0.8)','rgba(60,150,40,0.9)','rgba(180,220,60,0.75)','rgba(200,180,60,0.7)'];
+        for(let l=0;l<8;l++){
+          const lox=(Math.sin(l*2.1)*lw*0.6)+lpx, loy=(Math.cos(l*1.7)*6-4)+lpy;
+          const lr=lw*0.3+l%3*4;
+          ctx.fillStyle=leafColors[l%leafColors.length];
+          ctx.beginPath(); ctx.ellipse(lox,loy,lr,lr*0.45,l*0.8,0,Math.PI*2); ctx.fill();
+        }
+        // Particles drawn in world space
+        (o.particles||[]).forEach(p => {
+          ctx.save(); ctx.globalAlpha=p.life; ctx.translate(p.x,p.y);
+          ctx.rotate(p.life*5); ctx.fillStyle=p.color;
+          ctx.beginPath(); ctx.ellipse(0,0,5,3,0,0,Math.PI*2); ctx.fill();
+          ctx.globalAlpha=1; ctx.restore();
+        });
         break;
       }
     }
@@ -10201,59 +10680,233 @@ function renderMRVoteUI() {
   const today = new Date().toDateString();
   if (!S.mrRacesToday) S.mrRacesToday = { date:'', count:0 };
   const racesToday = S.mrRacesToday.date === today ? S.mrRacesToday.count : 0;
-  const MAX_DAILY = 10;
-  const turnsLeft = Math.max(0, MAX_DAILY - racesToday);
+  const MAX_DAILY = isAdmin() ? Infinity : 3;
+  const turnsLeft = isAdmin() ? Infinity : Math.max(0, MAX_DAILY - racesToday);
   const th = MR_THEMES[mrTheme] || MR_THEMES.space;
 
-  ui.innerHTML = `
-    <div style="padding:12px 14px 14px">
-      <!-- Daily turns dock -->
-      <div style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
-        <div>
-          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase">Daily Races</div>
-          <div style="font-size:16px;font-weight:900;color:#fff;margin-top:2px">${turnsLeft} <span style="font-size:11px;font-weight:500;color:rgba(255,255,255,0.4)">/ ${MAX_DAILY} left</span></div>
-        </div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">
-          ${Array.from({length:MAX_DAILY}).map((_,i)=>`<div style="width:10px;height:10px;border-radius:50%;background:${i<racesToday?'rgba(255,255,255,0.2)':'rgba(78,223,208,0.8)'};box-shadow:${i<racesToday?'none':'0 0 6px rgba(78,223,208,0.5)'}"></div>`).join('')}
-        </div>
-      </div>
+  // Build admin badge / dots HTML outside the template literal to avoid nesting issues
+  const adminDockHTML = isAdmin()
+    ? '<div style="font-size:11px;font-weight:700;color:#4edfd0;padding:4px 10px;border-radius:99px;background:rgba(78,223,208,0.15);border:1px solid rgba(78,223,208,0.3)">👑 Admin</div>'
+    : Array.from({length:3}).map((_,i) =>
+        '<div style="width:10px;height:10px;border-radius:50%;background:' +
+        (i<racesToday?'rgba(255,255,255,0.2)':'rgba(78,223,208,0.8)') +
+        ';box-shadow:' + (i<racesToday?'none':'0 0 6px rgba(78,223,208,0.5)') + '"></div>'
+      ).join('');
 
-      <!-- Level preview banner -->
-      <div style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:10px 14px;margin-bottom:12px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase">Next Level</div>
-          <div style="background:${th.bgA};border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:3px 9px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.7)">${th.name} Theme</div>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:5px">
-          ${(()=>{
-            const types = {};
-            mrObstacles.forEach(o => { types[o.type] = (types[o.type]||0)+1; });
-            const icons = {peg:'⚪',ramp:'↗️',slide:'🟡',bumper:'💥',funnel:'▽',springboard:'🌀',fan:'💨',gear:'⚙️',stickyzone:'🟣',bridge:'🟫',conveyor:'▶️',seesaw:'⚖️',bouncywall:'🪃',rollerchain:'🔗'};
-            return Object.entries(types).map(([t,n])=>`<div style="display:flex;align-items:center;gap:3px;background:rgba(255,255,255,0.07);border-radius:8px;padding:3px 7px;font-size:9px;color:rgba(255,255,255,0.65)"><span>${icons[t]||'•'}</span><span style="font-weight:600;text-transform:capitalize">${t}</span><span style="color:rgba(255,255,255,0.35)">×${n}</span></div>`).join('');
-          })()}
-        </div>
-      </div>
+  const racesCountHTML = isAdmin()
+    ? '∞ <span style="font-size:11px;font-weight:500;color:rgba(255,255,255,0.4)">unlimited</span>'
+    : turnsLeft + ' <span style="font-size:11px;font-weight:500;color:rgba(255,255,255,0.4)">/ 3 left</span>';
 
-      <!-- Theme badge + pick label -->
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.5px;text-transform:uppercase">Pick your marble</div>
-      </div>
-      <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px">🥇 10🎟 &nbsp;·&nbsp; 🥈 5🎟 &nbsp;·&nbsp; 🥉 3🎟</div>
+  const btnBg = (turnsLeft > 0 || isAdmin()) && mrVotedColor
+    ? 'linear-gradient(135deg,#4edfd0,#566ee3)'
+    : (turnsLeft <= 0 && !isAdmin() ? 'rgba(255,100,100,0.15)' : 'rgba(255,255,255,0.07)');
+  const btnColor = (turnsLeft > 0 || isAdmin()) && mrVotedColor
+    ? '#fff'
+    : (turnsLeft <= 0 && !isAdmin() ? 'rgba(255,100,100,0.6)' : 'rgba(255,255,255,0.3)');
+  const btnShadow = (turnsLeft > 0 || isAdmin()) && mrVotedColor
+    ? '0 4px 20px rgba(78,223,208,0.35)' : 'none';
+  const btnLabel = (turnsLeft <= 0 && !isAdmin()) ? '🚫 No Races Left Today'
+    : mrVotedColor ? '🏁 Start Race!' : '👆 Choose a marble';
 
-      <!-- Marble grid — 5 cols, full labels -->
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:12px">
-        ${MARBLE_COLORS.map(mc=>`
-          <div onclick="mrVotedColor='${mc.id}';renderMRVoteUI()" style="border-radius:12px;padding:8px 3px 7px;text-align:center;cursor:pointer;transition:all 0.15s;background:${mrVotedColor===mc.id?'rgba(255,255,255,0.12)':'rgba(255,255,255,0.04)'};border:1.5px solid ${mrVotedColor===mc.id?mc.hex:'rgba(255,255,255,0.07)'};box-shadow:${mrVotedColor===mc.id?`0 0 14px ${mc.hex}55`:'none'}">
-            <div style="width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,${mc.hex});margin:0 auto 5px;box-shadow:0 0 ${mrVotedColor===mc.id?'14px':'5px'} ${mc.glow}"></div>
-            <div style="font-size:9px;color:${mrVotedColor===mc.id?'#fff':'rgba(255,255,255,0.6)'};font-weight:${mrVotedColor===mc.id?'800':'500'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2">${mc.label}</div>
-          </div>`).join('')}
-      </div>
+  const marbleGridHTML = MARBLE_COLORS.map(mc => {
+    const sel = mrVotedColor === mc.id;
+    return '<div onclick="mrVotedColor=\'' + mc.id + '\';renderMRVoteUI()" style="border-radius:12px;padding:8px 3px 7px;text-align:center;cursor:pointer;transition:all 0.15s;background:' +
+      (sel?'rgba(255,255,255,0.12)':'rgba(255,255,255,0.04)') +
+      ';border:1.5px solid ' + (sel?mc.hex:'rgba(255,255,255,0.07)') +
+      ';box-shadow:' + (sel?'0 0 14px '+mc.hex+'55':'none') + '">' +
+      '<div style="width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,' + mc.hex + ');margin:0 auto 5px;box-shadow:0 0 ' + (sel?'14px':'5px') + ' ' + mc.glow + '"></div>' +
+      '<div style="font-size:9px;color:' + (sel?'#fff':'rgba(255,255,255,0.6)') + ';font-weight:' + (sel?'800':'500') + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2">' + mc.label + '</div>' +
+      '</div>';
+  }).join('');
 
-      <button onclick="${turnsLeft>0?'if(mrVotedColor){mrStartCountdown()}else{showNotif(\"❌\",\"Pick a marble first!\",\"\")}':'showNotif(\"❌\",\"No races left today!\",\"Come back tomorrow\")'}" style="width:100%;padding:13px;border-radius:16px;border:none;cursor:pointer;font-size:14px;font-weight:800;letter-spacing:-0.2px;transition:all 0.15s;background:${turnsLeft>0&&mrVotedColor?'linear-gradient(135deg,#4edfd0,#566ee3)':turnsLeft<=0?'rgba(255,100,100,0.15)':'rgba(255,255,255,0.07)'};color:${turnsLeft>0&&mrVotedColor?'#fff':turnsLeft<=0?'rgba(255,100,100,0.6)':'rgba(255,255,255,0.3)'};box-shadow:${turnsLeft>0&&mrVotedColor?'0 4px 20px rgba(78,223,208,0.35)':'none'}">
-        ${turnsLeft<=0?'🚫 No Races Left Today':mrVotedColor?'🏁 Start Race!':'👆 Choose a marble'}
-      </button>
-    </div>`;
+  ui.innerHTML =
+    '<div style="padding:12px 14px 14px">' +
+    // Daily races dock
+    '<div style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">' +
+      '<div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase">Daily Races</div>' +
+      '<div style="font-size:16px;font-weight:900;color:#fff;margin-top:2px">' + racesCountHTML + '</div></div>' +
+      '<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">' + adminDockHTML + '</div>' +
+    '</div>' +
+    // Level preview canvas
+    '<div style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;margin-bottom:12px">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px 6px">' +
+        '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase">Level Preview</div>' +
+        '<div style="background:' + th.bgA + ';border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:2px 8px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.7)">' + th.name + '</div>' +
+      '</div>' +
+      '<canvas id="mr-preview-canvas" style="display:block;width:100%;height:120px"></canvas>' +
+    '</div>' +
+    // Pick label + rewards
+    '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px">Pick your marble</div>' +
+    '<div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px">🥇 10🎟 &nbsp;·&nbsp; 🥈 5🎟 &nbsp;·&nbsp; 🥉 3🎟</div>' +
+    // Marble grid
+    '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:12px">' + marbleGridHTML + '</div>' +
+    // Start button
+    '<button onclick="mrHandleStartBtn()" style="width:100%;padding:13px;border-radius:16px;border:none;cursor:pointer;font-size:14px;font-weight:800;letter-spacing:-0.2px;transition:all 0.15s;-webkit-tap-highlight-color:transparent;background:' + btnBg + ';color:' + btnColor + ';box-shadow:' + btnShadow + '">' +
+      btnLabel +
+    '</button>' +
+    '</div>';
+
+  // Draw the miniature level preview onto the canvas
+  requestAnimationFrame(() => mrDrawLevelPreview());
 }
+
+function mrHandleStartBtn() {
+  const today = new Date().toDateString();
+  if (!S.mrRacesToday) S.mrRacesToday = { date:'', count:0 };
+  const racesToday = S.mrRacesToday.date === today ? S.mrRacesToday.count : 0;
+  const canRace = isAdmin() || racesToday < 3;
+  if (!canRace) { showNotif('🚫','No Races Left Today','Come back tomorrow'); return; }
+  if (!mrVotedColor) { showNotif('❌','Pick a marble first!',''); return; }
+  mrStartCountdown();
+}
+
+function mrDrawLevelPreview() {
+  const canvas = document.getElementById('mr-preview-canvas');
+  if (!canvas) return;
+  const dpr  = Math.min(window.devicePixelRatio || 1, 2);
+  const cssW = canvas.offsetWidth  || 300;
+  const cssH = canvas.offsetHeight || 120;
+  canvas.width  = cssW * dpr;
+  canvas.height = cssH * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  // Scale factor: map MR_W × MR_H world into cssW × cssH preview
+  const scaleX = cssW / MR_W;
+  const scaleY = cssH / MR_H;
+
+  const th = MR_THEMES[mrTheme] || MR_THEMES.space;
+
+  // Background gradient
+  const bg = ctx.createLinearGradient(0, 0, 0, cssH);
+  bg.addColorStop(0, th.bgA); bg.addColorStop(1, th.bgB);
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, cssW, cssH);
+
+  // Faint grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 0.4;
+  for (let x = 0; x < cssW; x += 16 * scaleX) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,cssH); ctx.stroke(); }
+  for (let y = 0; y < cssH; y += 16 * scaleY) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(cssW,y); ctx.stroke(); }
+
+  // Draw each obstacle scaled down
+  mrObstacles.forEach(o => {
+    ctx.save();
+    const ox = (o.x || o.cx || 0) * scaleX;
+    const oy = (o.y || o.cy || 0) * scaleY;
+    ctx.translate(ox, oy);
+
+    switch (o.type) {
+      case 'peg': {
+        const r = Math.max(2, o.r * scaleX);
+        const pegBase = th.pegCol.replace('X','0.85');
+        ctx.shadowBlur = 4; ctx.shadowColor = pegBase;
+        const g = ctx.createRadialGradient(-r*0.2,-r*0.2,0.3,0,0,r);
+        g.addColorStop(0,'rgba(240,235,255,0.97)'); g.addColorStop(1,pegBase.replace('0.85','0.5'));
+        ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+        ctx.shadowBlur=0; break;
+      }
+      case 'ramp': case 'slide': {
+        ctx.rotate(o.angle);
+        const hw = (o.w/2)*scaleX, hh = 2;
+        const rampBase = o.type==='slide' ? 'rgba(246,187,78,0.7)' : th.rampCol.replace('X','0.7');
+        ctx.fillStyle = rampBase; ctx.fillRect(-hw,-hh,hw*2,hh*2); break;
+      }
+      case 'bumper': {
+        const r2 = Math.max(3, o.r * scaleX);
+        ctx.shadowBlur=4; ctx.shadowColor='rgba(252,119,144,0.7)';
+        ctx.fillStyle='rgba(252,119,144,0.7)';
+        ctx.fillRect(-r2,-r2*0.4,r2*2,r2*0.8); ctx.fillRect(-r2*0.4,-r2,r2*0.8,r2*2);
+        ctx.shadowBlur=0; break;
+      }
+      case 'funnel': {
+        ctx.translate((o.cx-o.x||0)*scaleX, (o.cy-o.y||0)*scaleY);
+        ctx.strokeStyle='rgba(246,187,78,0.7)'; ctx.lineWidth=1.5; ctx.lineCap='round';
+        const fw = (o.w/2)*scaleX, fh = 6*scaleY;
+        ctx.beginPath(); ctx.moveTo(-fw,-fh); ctx.lineTo(-fw/2,fh); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo( fw,-fh); ctx.lineTo( fw/2,fh); ctx.stroke(); break;
+      }
+      case 'springboard': {
+        const sw = (o.w/2)*scaleX;
+        ctx.fillStyle='rgba(68,255,136,0.7)'; ctx.fillRect(-sw,-2,sw*2,4); break;
+      }
+      case 'fan': {
+        const fr = Math.max(3, o.r * scaleX * 0.55);
+        ctx.fillStyle='rgba(78,223,208,0.6)'; ctx.beginPath(); ctx.arc(0,0,fr,0,Math.PI*2); ctx.fill(); break;
+      }
+      case 'gear': {
+        const gr = Math.max(3, o.r * scaleX);
+        ctx.shadowBlur=3; ctx.shadowColor='rgba(200,180,80,0.6)';
+        ctx.fillStyle='rgba(220,200,80,0.7)'; ctx.beginPath(); ctx.arc(0,0,gr,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0; break;
+      }
+      case 'stickyzone': {
+        const sr = Math.max(4, o.r * scaleX);
+        const sg = ctx.createRadialGradient(0,0,0,0,0,sr);
+        sg.addColorStop(0,'rgba(160,80,255,0.5)'); sg.addColorStop(1,'rgba(80,20,160,0)');
+        ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(0,0,sr,0,Math.PI*2); ctx.fill(); break;
+      }
+      case 'bridge': {
+        const bw = (o.w/2)*scaleX;
+        ctx.fillStyle=o.broken?'rgba(140,90,40,0.3)':'rgba(180,120,60,0.8)';
+        ctx.fillRect(-bw,-2,bw*2,4); break;
+      }
+      case 'conveyor': {
+        const cw = (o.w/2)*scaleX;
+        ctx.fillStyle='rgba(80,80,200,0.6)'; ctx.fillRect(-cw,-2,cw*2,4);
+        ctx.fillStyle='rgba(160,160,255,0.8)'; ctx.font='bold 6px sans-serif'; ctx.textAlign='center';
+        ctx.fillText(o.dir>0?'→':'←',0,2); break;
+      }
+      case 'seesaw': {
+        const sw2 = ((o.w||80)/2)*scaleX;
+        ctx.rotate(o.angle||0);
+        ctx.fillStyle='rgba(100,200,255,0.6)'; ctx.fillRect(-sw2,-2,sw2*2,4); break;
+      }
+      case 'bouncywall': {
+        const bwX2 = (o.side==='left' ? 8 : MR_W-8) * scaleX - ox;
+        const bh = (o.h||60)*scaleY;
+        ctx.fillStyle = o.side==='left' ? 'rgba(78,223,208,0.5)' : 'rgba(252,119,144,0.5)';
+        ctx.fillRect(bwX2-2, -bh/2, 4, bh); break;
+      }
+      case 'rollerchain': {
+        const rcw = (o.w/2)*scaleX;
+        ctx.strokeStyle='rgba(180,180,200,0.6)'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.moveTo(-rcw,0); ctx.lineTo(rcw,0); ctx.stroke(); break;
+      }
+    }
+    ctx.restore();
+  });
+
+  // Finish line strip at bottom
+  const flY = (MR_H - 22) * scaleY;
+  const sqS = 5;
+  const cols3 = Math.ceil(cssW / sqS);
+  for (let col = 0; col < cols3; col++) {
+    ctx.fillStyle = col % 2 === 0 ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.7)';
+    ctx.fillRect(col * sqS, flY, sqS, cssH - flY);
+  }
+  // Glow line above finish
+  ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(246,187,78,0.9)';
+  ctx.strokeStyle = 'rgba(246,187,78,0.9)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0, flY); ctx.lineTo(cssW, flY); ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // "FINISH" label
+  ctx.fillStyle = '#f6bb4e'; ctx.font = 'bold 7px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('FINISH', cssW/2, flY - 3);
+
+  // Marble spawn dots at top
+  MARBLE_COLORS.forEach((mc, i) => {
+    const mx = (30 + (i % 10) * (MR_W-60)/9) * scaleX;
+    const my = (18 + Math.floor(i/10)*20) * scaleY;
+    ctx.beginPath(); ctx.arc(mx, my, 3, 0, Math.PI*2);
+    ctx.fillStyle = mc.hex; ctx.fill();
+  });
+
+  // "START" label at top
+  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = 'bold 7px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('▼ START', cssW/2, 10);
+}
+
+
 
 function renderMRResultsUI() {
   mrDrawFrame();
@@ -14770,6 +15423,7 @@ fbAuth.onAuthStateChanged(async user => {
   window._fbListenGlobalSettings();
       fbCheckVersion();
       _startClawLiveListener();
+      _mrStartLiveLevelListener();
       // Dismiss update splash if this was an update boot
       if (typeof window._suDismiss === 'function') {
         setTimeout(function() { window._suDismiss(); }, 400);
@@ -15448,6 +16102,21 @@ window._fbApplyBroadcast = function(d, docId) {
       }
       saveState();
       showBroadcastNotif('🏆', 'New Season Pass Season!', d.seasonName || 'Check Season Pass');
+      break;
+    case 'marble_rotation_update':
+      if (d.schedule) {
+        window._mrAdmRotation = d.schedule;
+        if (!isAdmin()) showBroadcastNotif('🔮','Marble Race Updated!','New race schedule is live — check your calendar!');
+      }
+      break;
+    case 'marble_live_level':
+      if (d.levelData) {
+        window._mrLiveOverride = d.levelData;
+        if (!isAdmin()) showBroadcastNotif('🔮','Special Marble Race!','A custom level is running now — race today!');
+      }
+      break;
+    case 'marble_live_clear':
+      window._mrLiveOverride = null;
       break;
   }
 }
@@ -16437,6 +17106,9 @@ window._admClearUndoneHistory = async function() {
   } else if (tab === 'plinko') {
     await window._admRenderPlinkoTab(content);
 
+  } else if (tab === 'marbleadmin') {
+    await window._admRenderMarbleTab(content);
+
   } else if (tab === 'support') {
     try {
       const snap = await fbDb.collection('supportTickets').orderBy('createdAt','desc').limit(40).get();
@@ -16472,6 +17144,701 @@ window._admClearUndoneHistory = async function() {
       content.innerHTML = `<div class="adm-card"><div style="color:#ff6b6b;font-size:12px">Error: ${e.message}</div></div>`;
     }
   }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🔮 MARBLE RACE — ADMIN PANEL TAB (Level Editor + Rotation Gallery)
+// ═══════════════════════════════════════════════════════════════
+
+// Admin-editable level gallery stored in Firestore config/marbleLevels
+// Each level: { id, name, theme, obstacles:[], createdAt }
+// Rotation schedule stored in config/marbleRotation
+// Each entry: { date:'YYYY-MM-DD', levelId }
+
+window._mrAdmLevels = [];           // loaded from Firestore
+window._mrAdmRotation = [];         // [{date, levelId}] for upcoming dates
+window._mrEditorObstacles = [];     // obstacles being edited
+window._mrEditorTheme = 'space';
+window._mrEditorTool = 'ramp';      // selected tool
+window._mrEditorCanvas = null;
+window._mrEditorCtx = null;
+window._mrEditorDragging = null;
+window._mrEditorTestMode = false;
+window._mrEditorTestMarbles = [];
+window._mrEditorTestAnim = null;
+
+// ── Main tab renderer ────────────────────────────────────────
+window._admRenderMarbleTab = async function(content) {
+  content.innerHTML = `<div style="text-align:center;padding:24px;color:rgba(255,255,255,0.4);font-size:12px">Loading levels…</div>`;
+  try {
+    const levDoc = await fbDb.collection('config').doc('marbleLevels').get();
+    window._mrAdmLevels = levDoc.exists ? (levDoc.data().levels || []) : [];
+    const rotDoc = await fbDb.collection('config').doc('marbleRotation').get();
+    window._mrAdmRotation = rotDoc.exists ? (rotDoc.data().schedule || []) : [];
+  } catch(e) { console.warn('Marble admin load:', e); }
+
+  content.innerHTML = `
+  <!-- SECTION: Level Library -->
+  <div class="adm-card" style="background:linear-gradient(135deg,rgba(78,223,208,0.1),rgba(86,110,227,0.07));border:1px solid rgba(78,223,208,0.3)">
+    <div class="adm-card-title" style="color:#4edfd0">🔮 Level Library
+      <button onclick="window._mrAdmNewLevel()" class="adm-btn adm-btn-primary" style="margin-left:auto;font-size:10px;padding:4px 10px">✚ New Level</button>
+    </div>
+    <div id="mr-adm-levels-list" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+
+  <!-- SECTION: Rotation Gallery (Calendar) -->
+  <div class="adm-card" style="background:linear-gradient(135deg,rgba(246,187,78,0.08),rgba(231,129,97,0.05));border:1px solid rgba(246,187,78,0.3)">
+    <div class="adm-card-title" style="color:#f6bb4e">📅 Rotation Gallery
+      <button onclick="window._mrAdmSaveRotation()" class="adm-btn adm-btn-gold" style="margin-left:auto;font-size:10px;padding:4px 10px">💾 Save & Push Live</button>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:12px;line-height:1.6">
+      Assign up to 5 custom levels to upcoming race days (Tue/Wed/Sat). Players' calendars update instantly — no refresh needed.
+    </div>
+    <div id="mr-adm-rotation-list" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+
+  <!-- SECTION: Live Push Controls -->
+  <div class="adm-card" style="background:linear-gradient(135deg,rgba(160,136,250,0.1),rgba(252,119,144,0.07));border:1px solid rgba(160,136,250,0.3)">
+    <div class="adm-card-title" style="color:#c0b9f5">📡 Live Push</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:12px;line-height:1.6">
+      Push a specific level to run NOW for all players. Race days are overridden — everyone sees the level immediately.
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <select id="mr-adm-push-sel" class="adm-input" style="flex:1">
+        <option value="">— Pick a level to push —</option>
+      </select>
+      <button onclick="window._mrAdmPushLevelLive()" class="adm-btn" style="background:linear-gradient(135deg,#4edfd0,#566ee3);border:none;color:#fff;font-weight:900;padding:0 14px;flex-shrink:0">📡 Push</button>
+    </div>
+    <button onclick="window._mrAdmClearLivePush()" class="adm-btn adm-btn-ghost adm-btn-full" style="font-size:11px">✕ Clear Live Override (restore normal rotation)</button>
+  </div>
+
+  <!-- INLINE EDITOR (hidden by default) -->
+  <div id="mr-adm-editor-wrap" style="display:none"></div>
+  `;
+
+  window._mrAdmRefreshLevelsList();
+  window._mrAdmRefreshRotation();
+};
+
+window._mrAdmRefreshLevelsList = function() {
+  const el = document.getElementById('mr-adm-levels-list');
+  const pushSel = document.getElementById('mr-adm-push-sel');
+  if (!el) return;
+  const levels = window._mrAdmLevels;
+  if (!levels.length) {
+    el.innerHTML = `<div style="font-size:11px;color:rgba(255,255,255,0.25);text-align:center;padding:16px">No saved levels yet — create your first!</div>`;
+    if (pushSel) pushSel.innerHTML = '<option value="">— No levels yet —</option>';
+    return;
+  }
+  el.innerHTML = levels.map((lv, i) => `
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(78,223,208,0.18);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px">
+      <div style="font-size:20px">${_mrThemeEmoji(lv.theme)}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${lv.name||'Untitled'}</div>
+        <div style="font-size:10px;color:rgba(78,223,208,0.7)">${(lv.theme||'space').charAt(0).toUpperCase()+(lv.theme||'space').slice(1)} · ${lv.obstacles?.length||0} obstacles</div>
+      </div>
+      <button onclick="window._mrAdmEditLevel(${i})" class="adm-btn adm-btn-ghost" style="font-size:10px;padding:4px 9px">✏️ Edit</button>
+      <button onclick="window._mrAdmTestLevel(${i})" class="adm-btn" style="font-size:10px;padding:4px 9px;background:rgba(78,223,208,0.15);border:1px solid rgba(78,223,208,0.3);color:#4edfd0">▶ Test</button>
+      <button onclick="window._mrAdmDeleteLevel(${i})" class="adm-btn" style="font-size:10px;padding:4px 9px;background:rgba(255,59,48,0.1);border:1px solid rgba(255,59,48,0.2);color:#ff6b6b">🗑</button>
+    </div>
+  `).join('');
+  if (pushSel) {
+    pushSel.innerHTML = '<option value="">— Pick a level to push —</option>' +
+      levels.map((lv,i) => `<option value="${i}">${lv.name||'Untitled'} (${lv.theme||'space'})</option>`).join('');
+  }
+};
+
+function _mrThemeEmoji(theme) {
+  return {space:'🌌',sakura:'🌸',neon:'🌈',sunset:'🌅',ice:'❄️',forest:'🌲'}[theme]||'🔮';
+}
+
+window._mrAdmRefreshRotation = function() {
+  const el = document.getElementById('mr-adm-rotation-list');
+  if (!el) return;
+  // Build next 5 race days (Tue=2 Wed=3 Sat=6)
+  const raceDays = [2,3,6];
+  const upcoming = [];
+  const now = new Date();
+  let d = new Date(now); d.setHours(0,0,0,0);
+  while (upcoming.length < 5) {
+    d.setDate(d.getDate()+1);
+    if (raceDays.includes(d.getDay())) {
+      upcoming.push(d.toISOString().slice(0,10));
+    }
+  }
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  el.innerHTML = upcoming.map(dateStr => {
+    const dayObj = new Date(dateStr+'T12:00:00');
+    const dayLabel = dayNames[dayObj.getDay()];
+    const existing = window._mrAdmRotation.find(r=>r.date===dateStr);
+    const levels = window._mrAdmLevels;
+    return `
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(246,187,78,0.18);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px">
+        <div style="flex-shrink:0;text-align:center;min-width:44px">
+          <div style="font-size:9px;font-weight:800;color:rgba(246,187,78,0.6);text-transform:uppercase;letter-spacing:0.5px">${dayLabel}</div>
+          <div style="font-size:16px;font-weight:900;color:#f6bb4e">${dateStr.slice(8)}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.3)">${dateStr.slice(0,7)}</div>
+        </div>
+        <select data-rotdate="${dateStr}" class="adm-input" style="flex:1;font-size:11px">
+          <option value="">🎲 Random (default)</option>
+          ${levels.map((lv,i)=>`<option value="${i}" ${existing&&existing.levelIdx===i?'selected':''}>${_mrThemeEmoji(lv.theme)} ${lv.name||'Untitled'}</option>`).join('')}
+        </select>
+      </div>`;
+  }).join('');
+};
+
+window._mrAdmSaveRotation = async function() {
+  const selects = document.querySelectorAll('[data-rotdate]');
+  const schedule = [];
+  selects.forEach(sel => {
+    const date = sel.dataset.rotdate;
+    const val = sel.value;
+    if (val !== '') schedule.push({ date, levelIdx: parseInt(val) });
+  });
+  window._mrAdmRotation = schedule;
+  try {
+    await fbDb.collection('config').doc('marbleRotation').set({ schedule, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    // Broadcast live update
+    await fbDb.collection('broadcasts').add({
+      type: 'marble_rotation_update',
+      active: true,
+      schedule,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    playSound('success'); launchConfetti();
+    showNotif('📅','Rotation Saved & Pushed!', schedule.length + ' day(s) assigned');
+  } catch(e) { showNotif('⚠️','Save failed', e.message); }
+};
+
+window._mrAdmPushLevelLive = async function() {
+  const sel = document.getElementById('mr-adm-push-sel');
+  if (!sel || sel.value === '') { showNotif('⚠️','Pick a level first',''); return; }
+  const idx = parseInt(sel.value);
+  const lv = window._mrAdmLevels[idx];
+  if (!lv) return;
+  try {
+    await fbDb.collection('config').doc('marbleLive').set({
+      active: true,
+      levelIdx: idx,
+      levelData: lv,
+      pushedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await fbDb.collection('broadcasts').add({
+      type: 'marble_live_level',
+      active: true,
+      levelIdx: idx,
+      levelData: lv,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    playSound('success'); launchConfetti();
+    showNotif('📡','Level Pushed Live!', (lv.name||'Untitled') + ' is now running for everyone!');
+  } catch(e) { showNotif('⚠️','Push failed', e.message); }
+};
+
+window._mrAdmClearLivePush = async function() {
+  try {
+    await fbDb.collection('config').doc('marbleLive').set({ active: false });
+    await fbDb.collection('broadcasts').add({
+      type: 'marble_live_clear', active: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showNotif('✅','Live Override Cleared','Normal rotation restored');
+  } catch(e) { showNotif('⚠️','Failed', e.message); }
+};
+
+window._mrAdmDeleteLevel = async function(idx) {
+  if (!confirm('Delete "' + (window._mrAdmLevels[idx]?.name||'this level') + '"?')) return;
+  window._mrAdmLevels.splice(idx, 1);
+  await _mrAdmSaveLevels();
+  window._mrAdmRefreshLevelsList();
+  window._mrAdmRefreshRotation();
+  showNotif('🗑️','Level deleted','');
+};
+
+async function _mrAdmSaveLevels() {
+  await fbDb.collection('config').doc('marbleLevels').set({
+    levels: window._mrAdmLevels,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+// ─── Test a saved level in-place ────────────────────────────────
+window._mrAdmTestLevel = function(idx) {
+  const lv = window._mrAdmLevels[idx];
+  if (!lv) return;
+  mrObstacles = JSON.parse(JSON.stringify(lv.obstacles || []));
+  mrTheme = lv.theme || 'space';
+  mrGoals = [{ y: MR_H - 14 }];
+  mrObstacles.push({ type:'ramp', x:30, y:MR_H-60, w:90, angle:0.55, _theme:mrTheme });
+  mrObstacles.push({ type:'ramp', x:MR_W-30, y:MR_H-60, w:90, angle:-0.55, _theme:mrTheme });
+  mrObstacles.push({ type:'funnel', cx:MR_W/2, cy:MR_H-28, w:MR_W*0.65 });
+  openScreen('marblerace');
+  showNotif('▶️','Testing Level', lv.name||'Untitled');
+};
+
+// ─── NEW / EDIT Level (inline Level Editor) ──────────────────────
+window._mrAdmNewLevel = function() {
+  window._mrEditorObstacles = [];
+  window._mrEditorTheme = 'space';
+  window._mrAdmOpenEditor(null);
+};
+
+window._mrAdmEditLevel = function(idx) {
+  const lv = window._mrAdmLevels[idx];
+  if (!lv) return;
+  window._mrEditorObstacles = JSON.parse(JSON.stringify(lv.obstacles || []));
+  window._mrEditorTheme = lv.theme || 'space';
+  window._mrEditorEditIdx = idx;
+  window._mrEditorEditName = lv.name || '';
+  window._mrAdmOpenEditor(idx);
+};
+
+window._mrAdmOpenEditor = function(editIdx) {
+  const wrap = document.getElementById('mr-adm-editor-wrap');
+  if (!wrap) return;
+  wrap.style.display = 'block';
+  const themes = Object.keys(MR_THEMES);
+  const tools = [
+    { id:'ramp', label:'🟦 Ramp', tip:'Click drag to place angled platform' },
+    { id:'peg', label:'⚪ Peg', tip:'Click to place peg' },
+    { id:'bumper', label:'✛ Bumper', tip:'Click to place spinning bumper' },
+    { id:'springboard', label:'🟩 Spring', tip:'Click to place springboard' },
+    { id:'fan', label:'🌀 Fan', tip:'Click to place fan that blows marbles' },
+    { id:'gear', label:'⚙️ Gear', tip:'Click to place rotating gear' },
+    { id:'stickyzone', label:'🔵 Sticky', tip:'Click to place slow zone' },
+    { id:'bridge', label:'🟫 Bridge', tip:'Click to place breakable bridge' },
+    { id:'conveyor', label:'➡️ Conveyor', tip:'Click to place moving belt' },
+    { id:'seesaw', label:'⚖️ Seesaw', tip:'Click to place seesaw' },
+    { id:'bouncywall', label:'🧱 B.Wall', tip:'Click to place bouncy wall segment' },
+    { id:'slide', label:'🛝 Slide', tip:'Click to place fast slide' },
+    { id:'rollerchain', label:'⛓ Chain', tip:'Click to place roller chain' },
+    // Theme hazards
+    { id:'buzzsaw', label:'🪚 Buzzsaw', tip:'Forest only — repels marbles aggressively', themes:['forest'] },
+    { id:'fallenTree', label:'🌲 F.Tree', tip:'Forest only — seesaw that splits on impact', themes:['forest'] },
+    { id:'string', label:'🧵 String', tip:'Forest only — lightweight pushable string', themes:['forest'] },
+    { id:'icePatch', label:'🧊 Ice Patch', tip:'Ice only — slippery surface', themes:['ice'] },
+    { id:'icicle', label:'🧊 Icicle', tip:'Ice only — falls from platform above', themes:['ice'] },
+    { id:'icyBoulder', label:'❄️ Boulder', tip:'Ice only — rolls then breaks', themes:['ice'] },
+    { id:'snowMachine', label:'❄️ Snow', tip:'Ice only — spawns snowballs', themes:['ice'] },
+    { id:'sakuraPetal', label:'🌸 Petal', tip:'Sakura only — flops when hit', themes:['sakura'] },
+    { id:'leafPile', label:'🍃 Leaves', tip:'Sakura only — slows marble, leaf effect', themes:['sakura'] },
+  ];
+
+  const isNew = editIdx === null || editIdx === undefined;
+  const curName = isNew ? '' : (window._mrEditorEditName || '');
+
+  wrap.innerHTML = `
+  <div class="adm-card" style="background:linear-gradient(135deg,rgba(78,223,208,0.12),rgba(86,110,227,0.08));border:1px solid rgba(78,223,208,0.4);padding:16px">
+    <div class="adm-card-title" style="color:#4edfd0">✏️ ${isNew ? 'New Level' : 'Edit Level'}
+      <button onclick="document.getElementById('mr-adm-editor-wrap').style.display='none'" class="adm-btn adm-btn-ghost" style="margin-left:auto;font-size:10px;padding:4px 9px">✕ Close</button>
+    </div>
+
+    <!-- Name & Theme row -->
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <input id="mr-ed-name" class="adm-input" placeholder="Level name…" value="${curName}" style="flex:1;min-width:120px">
+      <select id="mr-ed-theme" class="adm-input" style="flex:1;min-width:100px" onchange="window._mrEditorTheme=this.value;window._mrEditorRedraw()">
+        ${themes.map(t=>`<option value="${t}" ${window._mrEditorTheme===t?'selected':''}>${_mrThemeEmoji(t)} ${MR_THEMES[t].name}</option>`).join('')}
+      </select>
+    </div>
+
+    <!-- Toolbar -->
+    <div style="margin-bottom:8px;font-size:9px;font-weight:800;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.6px">Tools</div>
+    <div id="mr-ed-toolbar" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px">
+      ${tools.map(t => {
+        const themeOk = !t.themes || t.themes.includes(window._mrEditorTheme);
+        return `<button data-tool="${t.id}" onclick="window._mrEditorSetTool('${t.id}')" title="${t.tip}"
+          class="adm-btn adm-btn-ghost" style="font-size:10px;padding:4px 8px;opacity:${themeOk?1:0.3};cursor:${themeOk?'pointer':'not-allowed'}"
+          ${t.themes?`data-themes="${t.themes.join(',')}"`:''}>${t.label}</button>`;
+      }).join('')}
+    </div>
+
+    <!-- Canvas -->
+    <div style="position:relative;margin-bottom:12px">
+      <canvas id="mr-ed-canvas" width="320" height="480"
+        style="border-radius:14px;border:1.5px solid rgba(78,223,208,0.35);cursor:crosshair;display:block;width:100%;touch-action:none"
+      ></canvas>
+      <div id="mr-ed-tooltip" style="position:absolute;top:6px;left:6px;background:rgba(4,3,18,0.9);border:1px solid rgba(78,223,208,0.3);border-radius:8px;padding:3px 8px;font-size:9px;color:#4edfd0;font-weight:700;pointer-events:none"></div>
+    </div>
+
+    <!-- Obstacle list -->
+    <div style="margin-bottom:8px;font-size:9px;font-weight:800;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.6px">Placed Obstacles (${window._mrEditorObstacles.length})</div>
+    <div id="mr-ed-obs-list" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;max-height:80px;overflow-y:auto"></div>
+
+    <!-- Action row -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="window._mrEditorClear()" class="adm-btn adm-btn-danger" style="font-size:11px">🗑 Clear All</button>
+      <button onclick="window._mrEditorGenAuto()" class="adm-btn adm-btn-ghost" style="font-size:11px">🎲 Auto-Generate</button>
+      <button onclick="window._mrEditorTestInGame()" class="adm-btn" style="font-size:11px;background:rgba(78,223,208,0.2);border:1px solid rgba(78,223,208,0.4);color:#4edfd0">▶ Test In Game</button>
+      <button onclick="window._mrEditorSave()" class="adm-btn adm-btn-primary" style="font-size:12px;font-weight:800;flex:1;min-width:80px">💾 Save Level</button>
+    </div>
+  </div>`;
+
+  window._mrEditorCanvas = document.getElementById('mr-ed-canvas');
+  window._mrEditorCtx = window._mrEditorCanvas.getContext('2d');
+
+  // Scale canvas for editor (320x480 world coords, scaled to fill)
+  window._mrEditorScale = window._mrEditorCanvas.offsetWidth / 320;
+
+  window._mrEditorRedraw();
+  window._mrEditorBindEvents();
+  window._mrEditorRefreshObsList();
+  window._mrEditorHighlightTool();
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+window._mrEditorSetTool = function(id) {
+  window._mrEditorTool = id;
+  window._mrEditorHighlightTool();
+};
+
+window._mrEditorHighlightTool = function() {
+  document.querySelectorAll('#mr-ed-toolbar [data-tool]').forEach(btn => {
+    const active = btn.dataset.tool === window._mrEditorTool;
+    btn.style.background = active ? 'rgba(78,223,208,0.3)' : '';
+    btn.style.borderColor = active ? '#4edfd0' : '';
+    btn.style.color = active ? '#4edfd0' : '';
+    // Grey out theme-locked tools
+    const themes = btn.dataset.themes ? btn.dataset.themes.split(',') : null;
+    const themeOk = !themes || themes.includes(window._mrEditorTheme);
+    btn.style.opacity = themeOk ? 1 : 0.3;
+    btn.style.cursor = themeOk ? 'pointer' : 'not-allowed';
+  });
+  // Update tooltip
+  const tip = document.getElementById('mr-ed-tooltip');
+  if (tip) {
+    const toolDefs = {
+      ramp:'Click & drag to place ramp', peg:'Click to place peg', bumper:'Click to place bumper',
+      springboard:'Click to place spring', fan:'Click to place fan', gear:'Click to place gear',
+      stickyzone:'Click to place sticky zone', bridge:'Click to place bridge', conveyor:'Click to place conveyor',
+      seesaw:'Click to place seesaw', bouncywall:'Click to place bouncy wall', slide:'Click to place slide',
+      rollerchain:'Click to place roller chain', buzzsaw:'Forest: Click to place buzzsaw',
+      fallenTree:'Forest: Click to place fallen tree', string:'Forest: Click to place string',
+      icePatch:'Ice: Click to place ice patch', icicle:'Ice: Click to place icicle',
+      icyBoulder:'Ice: Click to place icy boulder', snowMachine:'Ice: Click to place snow machine',
+      sakuraPetal:'Sakura: Click to place petal', leafPile:'Sakura: Click to place leaf pile'
+    };
+    tip.textContent = toolDefs[window._mrEditorTool] || window._mrEditorTool;
+  }
+};
+
+window._mrEditorBindEvents = function() {
+  const canvas = window._mrEditorCanvas;
+  if (!canvas) return;
+  let startX, startY, placing = false;
+
+  function getCoords(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scX = 320 / rect.width, scY = 480 / rect.height;
+    const src = e.touches ? e.touches[0] : e;
+    return { x: (src.clientX - rect.left) * scX, y: (src.clientY - rect.top) * scY };
+  }
+
+  canvas.onpointerdown = function(e) {
+    e.preventDefault();
+    const {x,y} = getCoords(e);
+    startX = x; startY = y; placing = true;
+
+    const tool = window._mrEditorTool;
+    // For single-click tools, place immediately
+    const singleClick = ['peg','bumper','fan','gear','stickyzone','bouncywall',
+      'springboard','conveyor','seesaw','slide','rollerchain','buzzsaw','fallenTree','string',
+      'icePatch','icicle','icyBoulder','snowMachine','sakuraPetal','leafPile'];
+    if (singleClick.includes(tool)) {
+      window._mrEditorPlaceObstacle(tool, x, y, x, y);
+      placing = false;
+      window._mrEditorRedraw();
+      window._mrEditorRefreshObsList();
+    }
+  };
+
+  canvas.onpointermove = function(e) {
+    if (!placing) return;
+    e.preventDefault();
+    const {x,y} = getCoords(e);
+    window._mrEditorRedraw();
+    // Preview drag for ramp/bridge/conveyor
+    const ctx = window._mrEditorCtx;
+    ctx.save();
+    ctx.scale(1, 480/480); // identity at editor scale
+    ctx.strokeStyle = 'rgba(78,223,208,0.7)';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([6,4]);
+    ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(x, y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  };
+
+  canvas.onpointerup = function(e) {
+    if (!placing) return;
+    e.preventDefault();
+    const {x,y} = getCoords(e);
+    placing = false;
+    const tool = window._mrEditorTool;
+    if (tool === 'ramp' || tool === 'bridge') {
+      // Use drag line to set position & angle
+      window._mrEditorPlaceObstacle(tool, startX, startY, x, y);
+    }
+    window._mrEditorRedraw();
+    window._mrEditorRefreshObsList();
+  };
+};
+
+window._mrEditorPlaceObstacle = function(tool, x1, y1, x2, y2) {
+  const mx = (x1+x2)/2, my = (y1+y2)/2;
+  const W = MR_W, H = MR_H;
+  // Scale from editor canvas (320x480) to world (MR_W x MR_H)
+  const scX = MR_W / 320, scY = MR_H / 480;
+  const wx = mx * scX, wy = my * scY;
+  const wx1 = x1*scX, wy1 = y1*scY, wx2 = x2*scX, wy2 = y2*scY;
+  const angle = Math.atan2(wy2-wy1, wx2-wx1);
+  const len = Math.hypot(wx2-wx1, wy2-wy1);
+  const th = window._mrEditorTheme;
+
+  const obs = { _theme: th };
+  switch(tool) {
+    case 'ramp':    Object.assign(obs, { type:'ramp', x:wx, y:wy, w:Math.max(30,len)||60, angle }); break;
+    case 'peg':     Object.assign(obs, { type:'peg', x:wx, y:wy, r:6, _theme:th }); break;
+    case 'bumper':  Object.assign(obs, { type:'bumper', x:wx, y:wy, r:12, angle:0, speed:0.025 }); break;
+    case 'springboard': Object.assign(obs, { type:'springboard', x:wx, y:wy, w:38, hits:0, armed:false, springT:0 }); break;
+    case 'fan':     Object.assign(obs, { type:'fan', x:wx, y:wy, r:18, dir:1, active:false, activeT:0, spin:0 }); break;
+    case 'gear':    Object.assign(obs, { type:'gear', x:wx, y:wy, r:14, teeth:8, angle:0, speed:0.025 }); break;
+    case 'stickyzone': Object.assign(obs, { type:'stickyzone', x:wx, y:wy, r:22 }); break;
+    case 'bridge':  Object.assign(obs, { type:'bridge', x:wx, y:wy, w:Math.max(40,len)||55, broken:false, load:0, breakAt:2, breakT:0 }); break;
+    case 'conveyor': Object.assign(obs, { type:'conveyor', x:wx, y:wy, w:55, dir:1, beltPhase:0 }); break;
+    case 'seesaw':  Object.assign(obs, { type:'seesaw', cx:wx, y:wy, w:60, angle:0, angV:0 }); break;
+    case 'bouncywall': Object.assign(obs, { type:'bouncywall', side:wx < MR_W/2 ? 'left':'right', y:wy, h:40, flash:0 }); break;
+    case 'slide':   Object.assign(obs, { type:'slide', x:wx, y:wy, w:52, angle:0.4 }); break;
+    case 'rollerchain': Object.assign(obs, { type:'rollerchain', x:wx, y:wy, w:44, phase:0 }); break;
+    // Forest-only
+    case 'buzzsaw':    Object.assign(obs, { type:'buzzsaw', x:wx, y:wy, r:16, angle:0, speed:0.06 }); break;
+    case 'fallenTree': Object.assign(obs, { type:'fallenTree', cx:wx, y:wy, w:64, angle:0, angV:0, split:false, splitT:0 }); break;
+    case 'string':     Object.assign(obs, { type:'string', x:wx, y:wy, len:50, angle:0, swing:0, swingV:0 }); break;
+    // Ice-only
+    case 'icePatch':   Object.assign(obs, { type:'icePatch', x:wx, y:wy, w:50, h:6 }); break;
+    case 'icicle':     Object.assign(obs, { type:'icicle', x:wx, y:wy, h:20, fallen:false, fallY:wy, patchX:null, patchY:null }); break;
+    case 'icyBoulder': Object.assign(obs, { type:'icyBoulder', x:wx, y:wy, r:18, vx:0, vy:0, rolling:false, breakT:0, pieces:[] }); break;
+    case 'snowMachine':Object.assign(obs, { type:'snowMachine', x:wx, y:wy, balls:[], lastSpawn:0 }); break;
+    // Sakura-only
+    case 'sakuraPetal':Object.assign(obs, { type:'sakuraPetal', cx:wx, y:wy, w:40, angle:0, angV:0, flopped:false }); break;
+    case 'leafPile':   Object.assign(obs, { type:'leafPile', x:wx, y:wy, w:50, particles:[] }); break;
+    default: return;
+  }
+  window._mrEditorObstacles.push(obs);
+};
+
+window._mrEditorClear = function() {
+  window._mrEditorObstacles = [];
+  window._mrEditorRedraw();
+  window._mrEditorRefreshObsList();
+};
+
+window._mrEditorGenAuto = function() {
+  // Use the existing mrGenMap logic but capture into editor
+  const prevTheme = mrTheme;
+  const prevObs = mrObstacles;
+  mrTheme = window._mrEditorTheme;
+  mrGenMap();
+  window._mrEditorObstacles = JSON.parse(JSON.stringify(mrObstacles));
+  mrTheme = prevTheme;
+  mrObstacles = prevObs;
+  window._mrEditorRedraw();
+  window._mrEditorRefreshObsList();
+  showNotif('🎲','Auto-generated!', window._mrEditorObstacles.length + ' obstacles');
+};
+
+window._mrEditorTestInGame = function() {
+  const obs = JSON.parse(JSON.stringify(window._mrEditorObstacles));
+  mrObstacles = obs;
+  mrTheme = window._mrEditorTheme;
+  mrGoals = [{ y: MR_H - 14 }];
+  mrObstacles.push({ type:'ramp', x:30, y:MR_H-60, w:90, angle:0.55, _theme:mrTheme });
+  mrObstacles.push({ type:'ramp', x:MR_W-30, y:MR_H-60, w:90, angle:-0.55, _theme:mrTheme });
+  mrObstacles.push({ type:'funnel', cx:MR_W/2, cy:MR_H-28, w:MR_W*0.65 });
+  openScreen('marblerace');
+  showNotif('▶️','Testing in game!', 'Race has been set up with your level');
+};
+
+window._mrEditorSave = async function() {
+  const name = (document.getElementById('mr-ed-name')?.value||'').trim() || 'Untitled Level';
+  const theme = window._mrEditorTheme;
+  const obstacles = JSON.parse(JSON.stringify(window._mrEditorObstacles));
+  const lv = { name, theme, obstacles, createdAt: Date.now() };
+  const editIdx = window._mrEditorEditIdx;
+  if (editIdx !== null && editIdx !== undefined && editIdx >= 0 && editIdx < window._mrAdmLevels.length) {
+    window._mrAdmLevels[editIdx] = lv;
+  } else {
+    window._mrAdmLevels.push(lv);
+  }
+  window._mrEditorEditIdx = null;
+  try {
+    await _mrAdmSaveLevels();
+    playSound('success');
+    showNotif('💾','Level Saved!', name);
+    window._mrAdmRefreshLevelsList();
+    window._mrAdmRefreshRotation();
+    document.getElementById('mr-adm-editor-wrap').style.display = 'none';
+  } catch(e) { showNotif('⚠️','Save failed', e.message); }
+};
+
+window._mrEditorRefreshObsList = function() {
+  const el = document.getElementById('mr-ed-obs-list');
+  if (!el) return;
+  const labels = window._mrEditorObstacles.map((o,i) =>
+    `<div style="font-size:9px;background:rgba(78,223,208,0.1);border:1px solid rgba(78,223,208,0.2);border-radius:6px;padding:2px 7px;color:#4edfd0;cursor:pointer" onclick="window._mrEditorRemoveObs(${i})">${o.type} ✕</div>`
+  );
+  el.innerHTML = labels.join('') || `<div style="font-size:10px;color:rgba(255,255,255,0.2)">No obstacles — start placing!</div>`;
+  // Update count
+  const titleEl = el.previousElementSibling;
+  if (titleEl) titleEl.textContent = `Placed Obstacles (${window._mrEditorObstacles.length})`;
+};
+
+window._mrEditorRemoveObs = function(idx) {
+  window._mrEditorObstacles.splice(idx, 1);
+  window._mrEditorRedraw();
+  window._mrEditorRefreshObsList();
+};
+
+window._mrEditorRedraw = function() {
+  const canvas = window._mrEditorCanvas;
+  const ctx = window._mrEditorCtx;
+  if (!canvas || !ctx) return;
+  const W = 320, H = 480;
+  const scX = MR_W / W, scY = MR_H / H; // world → canvas scale inverse
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Background using current theme
+  const th = MR_THEMES[window._mrEditorTheme] || MR_THEMES.space;
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, th.bgA); bg.addColorStop(1, th.bgB);
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)'; ctx.lineWidth = 0.5;
+  for (let x = 0; x < W; x += 20) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+  // Finish line
+  ctx.fillStyle = 'rgba(78,223,208,0.15)'; ctx.fillRect(0, H-8, W, 8);
+  ctx.strokeStyle = 'rgba(78,223,208,0.7)'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0, H-8); ctx.lineTo(W, H-8); ctx.stroke();
+  ctx.fillStyle = 'rgba(78,223,208,0.9)'; ctx.font = 'bold 8px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('FINISH', W/2, H-2);
+
+  // Draw each obstacle in editor coords
+  ctx.save();
+  ctx.scale(1/scX, 1/scY); // convert from world to canvas
+  window._mrEditorObstacles.forEach(o => {
+    ctx.save();
+    // Minimal preview drawing
+    ctx.globalAlpha = 0.85;
+    switch(o.type) {
+      case 'ramp': case 'slide': case 'bridge': case 'conveyor': case 'rollerchain':
+        ctx.translate(o.x||o.cx||0, o.y||0);
+        ctx.rotate(o.angle||0);
+        ctx.fillStyle = th.rampCol.replace('X','0.8');
+        ctx.fillRect(-(o.w||50)/2, -5, o.w||50, 10);
+        ctx.strokeStyle = th.rampCol.replace('X','1'); ctx.lineWidth = 2; ctx.strokeRect(-(o.w||50)/2,-5,o.w||50,10);
+        break;
+      case 'peg':
+        ctx.beginPath(); ctx.arc(o.x,o.y,o.r||6,0,Math.PI*2);
+        ctx.fillStyle = th.pegCol.replace('X','0.9'); ctx.fill();
+        break;
+      case 'bumper':
+        ctx.beginPath(); ctx.arc(o.x,o.y,o.r||12,0,Math.PI*2);
+        ctx.fillStyle = 'rgba(252,119,144,0.8)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(o.x-3,o.y-3,4,0,Math.PI*2);
+        ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fill();
+        break;
+      case 'seesaw': case 'fallenTree':
+        ctx.translate(o.cx||o.x||0, o.y||0); ctx.rotate(o.angle||0);
+        ctx.fillStyle = o.type==='fallenTree' ? 'rgba(100,60,20,0.9)' : 'rgba(100,200,255,0.7)';
+        ctx.fillRect(-(o.w||60)/2,-5,o.w||60,10);
+        break;
+      case 'springboard':
+        ctx.translate(o.x,o.y); ctx.fillStyle='rgba(68,255,136,0.8)';
+        ctx.fillRect(-19,-5,38,10); break;
+      case 'fan':
+        ctx.beginPath(); ctx.arc(o.x,o.y,o.r||18,0,Math.PI*2);
+        ctx.fillStyle='rgba(78,223,208,0.4)'; ctx.fill();
+        ctx.strokeStyle='rgba(78,223,208,0.9)'; ctx.lineWidth=2; ctx.stroke(); break;
+      case 'gear':
+        ctx.beginPath(); ctx.arc(o.x,o.y,o.r||14,0,Math.PI*2);
+        ctx.fillStyle='rgba(220,200,80,0.8)'; ctx.fill(); break;
+      case 'stickyzone':
+        ctx.beginPath(); ctx.arc(o.x,o.y,o.r||22,0,Math.PI*2);
+        ctx.fillStyle='rgba(120,60,180,0.4)'; ctx.fill();
+        ctx.strokeStyle='rgba(160,100,255,0.6)'; ctx.lineWidth=1.5; ctx.setLineDash([3,3]); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle='rgba(200,160,255,0.8)'; ctx.font='bold 8px sans-serif'; ctx.textAlign='center';
+        ctx.fillText('STICKY',o.x,o.y+3); break;
+      case 'bouncywall':
+        ctx.fillStyle='rgba(255,160,60,0.6)';
+        ctx.fillRect(o.side==='left'?8:MR_W-16, (o.y||0)-(o.h||40)/2, 8, o.h||40); break;
+      case 'buzzsaw':
+        ctx.beginPath(); ctx.arc(o.x,o.y,o.r||16,0,Math.PI*2);
+        ctx.fillStyle='rgba(220,50,50,0.8)'; ctx.fill();
+        for(let i=0;i<8;i++){const a=i*Math.PI/4;ctx.beginPath();ctx.moveTo(o.x+Math.cos(a)*(o.r||16),o.y+Math.sin(a)*(o.r||16));ctx.lineTo(o.x+Math.cos(a)*(o.r+8||24),o.y+Math.sin(a)*(o.r+8||24));ctx.strokeStyle='rgba(255,80,80,0.9)';ctx.lineWidth=3;ctx.stroke();}
+        break;
+      case 'icePatch':
+        ctx.fillStyle='rgba(160,220,255,0.55)';
+        ctx.fillRect((o.x||0)-(o.w||50)/2,(o.y||0)-3,o.w||50,6); break;
+      case 'icyBoulder':
+        ctx.beginPath(); ctx.arc(o.x,o.y,o.r||18,0,Math.PI*2);
+        ctx.fillStyle='rgba(200,240,255,0.7)'; ctx.fill();
+        ctx.strokeStyle='rgba(160,220,255,0.9)'; ctx.lineWidth=2; ctx.stroke(); break;
+      case 'icicle':
+        ctx.fillStyle='rgba(200,240,255,0.8)';
+        ctx.beginPath(); ctx.moveTo(o.x,o.y); ctx.lineTo(o.x-5,o.y+o.h||20); ctx.lineTo(o.x+5,o.y+o.h||20); ctx.closePath(); ctx.fill(); break;
+      case 'snowMachine':
+        ctx.fillStyle='rgba(200,220,255,0.6)'; ctx.fillRect((o.x||0)-14,(o.y||0)-10,28,20);
+        ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font='bold 8px sans-serif'; ctx.textAlign='center';
+        ctx.fillText('❄️',(o.x||0),(o.y||0)+3); break;
+      case 'sakuraPetal':
+        ctx.translate(o.cx||o.x||0,o.y||0); ctx.rotate(o.angle||0);
+        ctx.fillStyle='rgba(255,140,180,0.8)';
+        ctx.beginPath(); ctx.ellipse(0,0,(o.w||40)/2,6,0,0,Math.PI*2); ctx.fill(); break;
+      case 'leafPile':
+        ctx.fillStyle='rgba(80,180,80,0.55)';
+        ctx.beginPath(); ctx.ellipse(o.x,o.y,(o.w||50)/2,10,0,0,Math.PI*2); ctx.fill(); break;
+      case 'string':
+        ctx.strokeStyle='rgba(200,180,120,0.9)'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.moveTo(o.x,o.y-(o.len||50)/2); ctx.lineTo(o.x,o.y+(o.len||50)/2); ctx.stroke(); break;
+    }
+    ctx.globalAlpha=1; ctx.restore();
+  });
+  ctx.restore();
+  ctx.textAlign='left';
+};
+
+// ─── Listen for live marble level from admin ─────────────────────
+function _mrStartLiveLevelListener() {
+  if (!fbDb || window._mrLiveLevelUnsub) return;
+  window._mrLiveLevelUnsub = fbDb.collection('config').doc('marbleLive').onSnapshot(snap => {
+    if (!snap.exists) return;
+    const d = snap.data();
+    if (!d || !d.active || !d.levelData) return;
+    // Store as override
+    window._mrLiveOverride = d.levelData;
+    if (!isAdmin()) showNotif('🔮','New Race Level!','A special level has been pushed — race now!');
+  }, () => {});
+}
+
+// ─── Get current level from rotation (called by mrGenMap override) ─
+function _mrGetRotationLevel() {
+  // Check live override first
+  if (window._mrLiveOverride && window._mrLiveOverride.obstacles) {
+    const lv = window._mrLiveOverride;
+    window._mrLiveOverride = null; // consume once
+    return lv;
+  }
+  // Check rotation schedule
+  const todayStr = new Date().toISOString().slice(0,10);
+  const entry = (window._mrAdmRotation||[]).find(r => r.date === todayStr);
+  if (entry && entry.levelIdx >= 0) {
+    const levels = window._mrAdmLevels || [];
+    return levels[entry.levelIdx] || null;
+  }
+  return null;
 }
 
 // ═══════════════════════════════════════════════════════════════
