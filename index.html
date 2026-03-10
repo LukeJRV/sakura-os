@@ -402,8 +402,7 @@ button, a { touch-action: manipulation; }
   padding-top: 80px;
   padding-bottom: 100px;
 }
-/* Screens with a sticky header handle their own top offset */
-.screen:has(> .screen-header) { padding-top: 0; }
+/* Screens with a sticky header handle their own top offset — rule above handles this */
 .screen.active { display:flex; flex-direction:column; }
 
 /* Scrollbar */
@@ -519,13 +518,15 @@ button, a { touch-action: manipulation; }
 body.is-admin .admin-only { display: inline-flex !important; }
 
 .screen-header {
-  position:sticky; top:0; z-index:10;
+  position:sticky; top:74px; z-index:10;
   display:flex; align-items:center; gap:12px;
-  padding:16px;
+  padding:12px 16px;
   background:rgba(0,0,0,0.6);
   backdrop-filter:blur(20px);
   border-bottom:1px solid rgba(255,255,255,0.05);
 }
+/* Screens with a sticky header need top padding to clear statusbar+ticketbar */
+.screen:has(> .screen-header) { padding-top: 74px; }
 .back-btn {
   background:none; border:none;
   color:var(--accent1);
@@ -8428,17 +8429,17 @@ function renderMarbleRace() {
   if (!c) return;
 
   // Only available Tue, Wed, Sat (unless admin)
-  const day = new Date().getDay(); // 0=Sun,1=Mon,2=Tue,3=Wed,4=Thu,5=Fri,6=Sat
+  const day = new Date().getDay();
   if (!isAdmin() && day !== 2 && day !== 3 && day !== 6) {
     const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const nextAvail = [2,3,6].map(d => { let diff = d - day; if (diff <= 0) diff += 7; return diff; }).sort((a,b)=>a-b)[0];
     const nextDay = dayNames[(day + nextAvail) % 7];
     c.innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;padding:24px;text-align:center">
-        <div style="font-size:52px;margin-bottom:16px">🔮</div>
-        <div style="font-size:18px;font-weight:900;color:#4edfd0;margin-bottom:8px">Race Days Only</div>
-        <div style="font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6;margin-bottom:16px">Marble Race is available on<br><strong style="color:#fff">Tuesdays, Wednesdays & Saturdays</strong></div>
-        <div style="background:rgba(78,223,208,0.1);border:1px solid rgba(78,223,208,0.3);border-radius:14px;padding:12px 20px;font-size:12px;color:#4edfd0;font-weight:700">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:32px;text-align:center;background:linear-gradient(180deg,#03031a 0%,#060620 100%)">
+        <div style="font-size:64px;margin-bottom:20px;filter:drop-shadow(0 0 24px rgba(78,223,208,0.5))">🔮</div>
+        <div style="font-size:20px;font-weight:900;color:#4edfd0;margin-bottom:8px;letter-spacing:-0.3px">Race Days Only</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.45);line-height:1.7;margin-bottom:20px">Marble Race runs on<br><strong style="color:#fff">Tuesdays, Wednesdays & Saturdays</strong></div>
+        <div style="background:linear-gradient(135deg,rgba(78,223,208,0.15),rgba(86,110,227,0.1));border:1px solid rgba(78,223,208,0.35);border-radius:16px;padding:14px 24px;font-size:12px;color:#4edfd0;font-weight:700;letter-spacing:0.2px">
           Next race: ${nextDay}
         </div>
       </div>`;
@@ -8448,12 +8449,15 @@ function renderMarbleRace() {
   if (mrAnimFrame) { cancelAnimationFrame(mrAnimFrame); mrAnimFrame = null; }
   if (mrCountTimer) { clearInterval(mrCountTimer); mrCountTimer = null; }
 
-  // Viewport clips to 440px tall; canvas is full MR_H so camera works via ctx.translate
   c.innerHTML = `
-    <div id="mr-viewport" style="width:100%;max-width:${MR_W}px;margin:0 auto;overflow:hidden;position:relative;height:440px;border-radius:16px;background:#03031a">
-      <canvas id="mr-canvas" width="${MR_W}" height="${MR_H}" style="display:block;width:100%;height:auto;position:absolute;top:0;left:0"></canvas>
+    <div style="display:flex;flex-direction:column;height:100%;background:linear-gradient(180deg,#03031a 0%,#060620 100%)">
+      <!-- Canvas viewport -->
+      <div id="mr-viewport" style="flex:1;overflow:hidden;position:relative;background:#03031a">
+        <canvas id="mr-canvas" width="${MR_W}" height="${MR_H}" style="display:block;width:100%;position:absolute;top:0;left:0"></canvas>
+      </div>
+      <!-- UI panel below canvas -->
+      <div id="mr-ui" style="flex-shrink:0;background:linear-gradient(180deg,rgba(3,3,26,0.98),rgba(6,6,32,1));border-top:1px solid rgba(78,223,208,0.15);max-height:260px;overflow-y:auto"></div>
     </div>
-    <div id="mr-ui" style="padding:10px 14px;background:#050518;border-bottom-left-radius:16px;border-bottom-right-radius:16px"></div>
   `;
   mrCanvas = document.getElementById('mr-canvas');
   mrCtx = mrCanvas ? mrCanvas.getContext('2d') : null;
@@ -8679,7 +8683,8 @@ function mrUpdateCommentary() {
 
 function mrScrollCamera() {
   if (mrState !== 'racing' || !mrMarbles.length) return;
-  const vpH = 440;
+  const vp = document.getElementById('mr-viewport');
+  const vpH = vp ? vp.clientHeight : 440;
 
   // Determine target marble
   let targetMarble;
@@ -8694,9 +8699,9 @@ function mrScrollCamera() {
   }
 
   if (!targetMarble) return;
-  // Target: keep marble at 45% from top of viewport
-  const target = Math.max(0, Math.min(MR_H - vpH, targetMarble.y - vpH * 0.45));
-  // Smooth lerp — 0.08 gives a cinematic lag
+  // Target: keep marble at 40% from top of viewport
+  const target = Math.max(0, Math.min(MR_H - vpH, targetMarble.y - vpH * 0.40));
+  // Smooth lerp — cinematic lag
   mrCameraY += (target - mrCameraY) * 0.08;
 
   // Update camera switcher UI
@@ -8739,16 +8744,16 @@ function mrSetCamera(id) {
 function mrDrawFrame() {
   if (!mrCtx) return;
   const ctx = mrCtx;
-  const vpH = 440;
+  const vp = document.getElementById('mr-viewport');
+  const vpH = vp ? vp.clientHeight : 440;
   const camY = Math.round(mrCameraY);
 
-  // Clear full canvas then clip to visible viewport region
+  // Only clear and draw the visible viewport region
   ctx.clearRect(0, 0, MR_W, MR_H);
+
+  // Apply camera transform — translate world up by camY
   ctx.save();
-  // Clip so we only draw within the 440px viewport window
-  ctx.beginPath();
-  ctx.rect(0, camY, MR_W, vpH);
-  ctx.clip();
+  ctx.translate(0, -camY);
 
   // ── Enhanced background: multi-stop gradient (covers full canvas) ──
   const bg = ctx.createLinearGradient(0, 0, 0, MR_H);
@@ -8871,9 +8876,9 @@ function mrDrawFrame() {
     }
   });
 
-  ctx.restore(); // end clip
+  ctx.restore(); // end camera transform — HUD below is in screen space
 
-  // ── Top 5 Position Overlay (HUD — drawn at viewport-relative coords using camY) ──
+  // ── Top 5 Position Overlay (HUD — drawn in screen space) ──
   if (mrState === 'racing' || mrState === 'results') {
     const ranked = [...mrMarbles].sort((a,b) => {
       if (a.finished && b.finished) return a.finishRank - b.finishRank;
@@ -8883,7 +8888,7 @@ function mrDrawFrame() {
     }).slice(0,5);
 
     const panelX = MR_W - 86;
-    const panelY = camY + 8; // offset by camY to stay pinned to viewport top
+    const panelY = 8; // screen-space: always pinned to top
     const rowH   = 26;
     const panelH = ranked.length * rowH + 14;
 
@@ -8955,9 +8960,9 @@ function mrDrawFrame() {
     ctx.restore();
   }
 
-  // Finish order top-left — also viewport-relative
+  // Finish order top-left — screen-space
   if (mrFinishOrder.length > 0) {
-    const rankY0 = camY + 16;
+    const rankY0 = 16; // screen-space: always at top
     mrFinishOrder.slice(0,3).forEach((id,ri)=>{
       const mc=MARBLE_COLORS.find(c=>c.id===id); if(!mc)return;
       ctx.save(); ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(4,rankY0+ri*16-12,90,14);
@@ -8980,10 +8985,10 @@ function mrStartCountdown() {
   mrCountdown = 5;
   mrGenMap(); mrSpawnMarbles(); mrFinishOrder=[];
   const ui = document.getElementById('mr-ui');
-  if(ui) ui.innerHTML = `<div style="text-align:center;padding:12px">
-    <div id="mr-countdown-num" style="font-size:52px;font-weight:900;color:#4edfd0;text-shadow:0 0 20px rgba(78,223,208,0.6)">5</div>
-    <div style="font-size:14px;color:rgba(255,255,255,0.5);margin-top:4px">Get ready! You voted <span style="color:${MARBLE_COLORS.find(c=>c.id===mrVotedColor)?.hex||'#fff'}">${MARBLE_COLORS.find(c=>c.id===mrVotedColor)?.label||'?'}</span></div>
-    <div id="mr-commentary" style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:6px;min-height:18px"></div>
+  if(ui) ui.innerHTML = `<div style="text-align:center;padding:16px 12px">
+    <div id="mr-countdown-num" style="font-size:64px;font-weight:900;color:#4edfd0;text-shadow:0 0 30px rgba(78,223,208,0.7);line-height:1;letter-spacing:-2px">5</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.45);margin-top:8px;font-weight:500">You voted <span style="color:${MARBLE_COLORS.find(c=>c.id===mrVotedColor)?.hex||'#fff'};font-weight:800">${MARBLE_COLORS.find(c=>c.id===mrVotedColor)?.label||'?'}</span> — good luck!</div>
+    <div id="mr-commentary" style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:6px;min-height:16px"></div>
   </div>`;
   mrAnimFrame = requestAnimationFrame(function tick() {
     mrScrollCamera();
@@ -8998,10 +9003,10 @@ function mrStartCountdown() {
       clearInterval(mrCountTimer); mrCountTimer=null;
       mrState='racing'; mrRaceTime=0; mrCameraY=0; mrCameraTarget=null;
       const ui2=document.getElementById('mr-ui');
-      if(ui2) ui2.innerHTML=`<div style="padding:6px 14px 4px">
-        <div id="mr-commentary" style="font-size:13px;font-weight:700;color:#4edfd0;min-height:20px;text-align:center">🏁 Race started!</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px;text-align:center">Your pick: <span style="color:${MARBLE_COLORS.find(c=>c.id===mrVotedColor)?.hex||'#fff'}">${MARBLE_COLORS.find(c=>c.id===mrVotedColor)?.label||'?'}</span> · Click marble below to follow</div>
-        <div id="mr-cam-panel" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;justify-content:center"></div>
+      if(ui2) ui2.innerHTML=`<div style="padding:8px 16px">
+        <div id="mr-commentary" style="font-size:13px;font-weight:800;color:#4edfd0;min-height:20px;text-align:center;letter-spacing:-0.2px">🏁 Race started!</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px;text-align:center">Your pick: <span style="color:${MARBLE_COLORS.find(c=>c.id===mrVotedColor)?.hex||'#fff'};font-weight:700">${MARBLE_COLORS.find(c=>c.id===mrVotedColor)?.label||'?'}</span> &nbsp;·&nbsp; Tap marble to follow</div>
+        <div id="mr-cam-panel" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;justify-content:center"></div>
       </div>`;
       mrRunRace();
     }
@@ -9037,20 +9042,20 @@ function renderMRVoteUI() {
   const ui = document.getElementById('mr-ui');
   if(!ui) return;
   ui.innerHTML = `
-    <div style="padding:12px">
-      <div style="text-align:center;margin-bottom:10px">
-        <div style="font-size:16px;font-weight:800;color:#4edfd0">Pick a marble to win!</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">1st: 🎟️10 · 2nd: 🎟️5 · 3rd: 🎟️3</div>
+    <div style="padding:14px 16px">
+      <div style="text-align:center;margin-bottom:14px">
+        <div style="font-size:15px;font-weight:900;color:#fff;letter-spacing:-0.3px">Pick your marble</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px">🥇 10🎟️ &nbsp;·&nbsp; 🥈 5🎟️ &nbsp;·&nbsp; 🥉 3🎟️</div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px">
         ${MARBLE_COLORS.map(mc=>`
-          <div onclick="mrVotedColor='${mc.id}';renderMRVoteUI()" style="border-radius:12px;padding:8px 4px;text-align:center;cursor:pointer;background:${mrVotedColor===mc.id?'rgba(160,136,250,0.3)':'rgba(255,255,255,0.04)'};border:2px solid ${mrVotedColor===mc.id?'var(--accent1)':'rgba(255,255,255,0.08)'};transition:all 0.15s">
-            <div style="width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,${mc.hex});margin:0 auto 4px;box-shadow:0 0 8px ${mc.glow}"></div>
-            <div style="font-size:9px;color:${mrVotedColor===mc.id?'var(--accent1)':'rgba(255,255,255,0.6)'};font-weight:700">${mc.label}</div>
+          <div onclick="mrVotedColor='${mc.id}';renderMRVoteUI()" style="border-radius:14px;padding:8px 4px 6px;text-align:center;cursor:pointer;transition:all 0.15s;background:${mrVotedColor===mc.id?'rgba(160,136,250,0.25)':'rgba(255,255,255,0.04)'};border:1.5px solid ${mrVotedColor===mc.id?mc.hex:'rgba(255,255,255,0.07)'};box-shadow:${mrVotedColor===mc.id?`0 0 12px ${mc.hex}55`:'none'}">
+            <div style="width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,${mc.hex});margin:0 auto 5px;box-shadow:0 0 ${mrVotedColor===mc.id?'12px':'6px'} ${mc.glow}"></div>
+            <div style="font-size:8px;color:${mrVotedColor===mc.id?'#fff':'rgba(255,255,255,0.5)'};font-weight:${mrVotedColor===mc.id?'800':'600'};line-height:1.2">${mc.label}</div>
           </div>`).join('')}
       </div>
-      <button onclick="if(mrVotedColor){mrStartCountdown()}else{showNotif('❌','Pick a marble first!','')}" class="btn btn-primary" style="width:100%;background:linear-gradient(135deg,#4edfd0,#566ee3);border:none;font-size:14px;font-weight:700;padding:12px">
-        ${mrVotedColor ? '🏁 Start Race!' : '👆 Pick first'}
+      <button onclick="if(mrVotedColor){mrStartCountdown()}else{showNotif('❌','Pick a marble first!','')}" style="width:100%;padding:13px;border-radius:16px;border:none;cursor:pointer;font-size:14px;font-weight:800;letter-spacing:-0.2px;transition:all 0.15s;background:${mrVotedColor?'linear-gradient(135deg,#4edfd0,#566ee3)':'rgba(255,255,255,0.07)'};color:${mrVotedColor?'#fff':'rgba(255,255,255,0.3)'};box-shadow:${mrVotedColor?'0 4px 20px rgba(78,223,208,0.35)':'none'}">
+        ${mrVotedColor ? '🏁 Start Race!' : '👆 Choose a marble'}
       </button>
     </div>`;
 }
@@ -9059,29 +9064,32 @@ function renderMRResultsUI() {
   mrDrawFrame();
   const ui = document.getElementById('mr-ui');
   if(!ui) return;
-  const top3 = mrFinishOrder.slice(0,3).map(id=>MARBLE_COLORS.find(c=>c.id===id)||{label:'?',hex:'#888',id});
-  const votedMC = MARBLE_COLORS.find(c=>c.id===mrVotedColor);
+  const top3 = mrFinishOrder.slice(0,3).map(id=>MARBLE_COLORS.find(c=>c.id===id)||{label:'?',hex:'#888',id,glow:'#888'});
   const votedRank = mrFinishOrder.indexOf(mrVotedColor)+1;
-  let wonText='', wonTickets=0;
-  if(votedRank===1){wonText='🥇 You WON!';wonTickets=10;}
-  else if(votedRank===2){wonText='🥈 2nd Place!';wonTickets=5;}
-  else if(votedRank===3){wonText='🥉 3rd Place!';wonTickets=3;}
-  else wonText='Better luck next time!';
+  let wonText='', wonTickets=0, wonColor='rgba(255,255,255,0.5)';
+  if(votedRank===1){wonText='🥇 You Won!';wonTickets=10;wonColor='#f6bb4e';}
+  else if(votedRank===2){wonText='🥈 2nd Place!';wonTickets=5;wonColor='#c0c0c0';}
+  else if(votedRank===3){wonText='🥉 3rd Place!';wonTickets=3;wonColor='#cd7f32';}
+  else wonText='Better luck next time 😔';
   ui.innerHTML=`
-    <div style="padding:12px">
-      <div style="text-align:center;margin-bottom:10px">
-        <div style="font-size:18px;font-weight:900;color:${wonTickets>0?'#f6bb4e':'rgba(255,255,255,0.6)'}">${wonText}</div>
-        ${wonTickets>0?`<div style="font-size:13px;color:var(--gold);margin-top:2px">+${wonTickets} 🎟️ tickets</div>`:''}
+    <div style="padding:14px 16px">
+      <div style="text-align:center;margin-bottom:14px">
+        <div style="font-size:20px;font-weight:900;color:${wonColor};letter-spacing:-0.4px">${wonText}</div>
+        ${wonTickets>0?`<div style="font-size:12px;color:rgba(246,187,78,0.8);margin-top:4px;font-weight:700">+${wonTickets} 🎟️ tickets awarded</div>`:''}
       </div>
-      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">
-        ${top3.map((mc,ri)=>`
-          <div style="text-align:center;flex:1;background:rgba(255,255,255,0.04);border-radius:14px;padding:10px 6px;border:1px solid ${['rgba(255,215,0,0.3)','rgba(192,192,192,0.3)','rgba(205,127,50,0.3)'][ri]}">
-            <div style="font-size:${ri===0?18:14}px;margin-bottom:4px">${['🥇','🥈','🥉'][ri]}</div>
-            <div style="width:${ri===0?30:22}px;height:${ri===0?30:22}px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,${mc.hex});margin:0 auto 4px;box-shadow:0 0 8px rgba(0,0,0,0.3)"></div>
-            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.8)">${mc.label}</div>
-          </div>`).join('')}
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;align-items:flex-end">
+        ${[top3[1],top3[0],top3[2]].map((mc,vi)=>{
+          const ri = vi===1?0:vi===0?1:2;
+          const isFirst = ri===0;
+          return mc ? `
+          <div style="text-align:center;flex:1;background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border-radius:${isFirst?20:16}px;padding:${isFirst?14:10}px 6px;border:1px solid ${['rgba(255,215,0,0.3)','rgba(192,192,192,0.25)','rgba(205,127,50,0.25)'][ri]};position:relative;${isFirst?'transform:translateY(-6px);box-shadow:0 8px 32px rgba(246,187,78,0.15)':''}">
+            <div style="font-size:${isFirst?24:18}px;margin-bottom:6px">${['🥇','🥈','🥉'][ri]}</div>
+            <div style="width:${isFirst?34:26}px;height:${isFirst?34:26}px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,${mc.hex});margin:0 auto 6px;box-shadow:0 0 12px ${mc.glow}"></div>
+            <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,0.85);letter-spacing:0.2px">${mc.label}</div>
+          </div>` : '';
+        }).join('')}
       </div>
-      <button onclick="mrState='vote';mrVotedColor=null;mrFinishOrder=[];mrCameraY=0;mrCameraTarget=null;renderMarbleRace()" class="btn btn-ghost" style="width:100%;font-weight:700">🔄 Race Again</button>
+      <button onclick="mrState='vote';mrVotedColor=null;mrFinishOrder=[];mrCameraY=0;mrCameraTarget=null;renderMarbleRace()" style="width:100%;padding:13px;border-radius:16px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;font-size:14px;font-weight:800;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);letter-spacing:-0.2px">🔄 Race Again</button>
     </div>`;
 }
 
@@ -9875,10 +9883,18 @@ function showBpTip(el, text) {
   tip.innerHTML = ps
     ? '<div style="font-weight:700;color:#fff;margin-bottom:3px">'+ps[0]+'</div><div style="color:#a088fa;font-size:9px">'+ps.slice(1).join(' · ')+'</div>'
     : '<div style="color:#fff">'+text+'</div>';
-  const r=el.getBoundingClientRect(), pr=document.getElementById('phone').getBoundingClientRect();
-  tip.style.display='block';
-  tip.style.left=Math.max(2,Math.min(r.left-pr.left,pr.width-180))+'px';
-  tip.style.top=(r.top-pr.top-50)+'px';
+  const r = el.getBoundingClientRect();
+  const pr = document.getElementById('phone').getBoundingClientRect();
+  tip.style.display = 'block';
+  const tipW = 176; // max-width + padding
+  const tipH = 52;  // approx height
+  const left = Math.max(4, Math.min(r.left - pr.left, pr.width - tipW - 4));
+  const topAbove = r.top - pr.top - tipH - 6;
+  const topBelow = r.bottom - pr.top + 6;
+  // Prefer above; fall back to below if it would clip out the top
+  const top = topAbove >= 4 ? topAbove : topBelow;
+  tip.style.left = left + 'px';
+  tip.style.top = Math.max(4, Math.min(top, pr.height - tipH - 4)) + 'px';
 }
 function hideBpTip() { const t=document.getElementById('shared-bp-tip'); if(t) t.style.display='none'; }
 
@@ -13359,7 +13375,7 @@ document.getElementById('princess-theme-modal').addEventListener('click', e => {
 
 // ── True globals: var avoids temporal dead zone for code above fbInit ──
 var ADMIN_EMAIL      = "Djrocky2021@gmail.com";
-var GAME_VERSION     = "0.1.12";
+var GAME_VERSION     = "0.1.13";
 var fbCurrentUser    = null;
 var fbDb             = null;
 // Raw GitHub URL — fetched periodically to detect new versions automatically
@@ -13389,7 +13405,7 @@ const fbAnalytics = firebase.analytics();
 
 // ── Version / Update Detection ───────────────────────────────────────────────
 
-// Called once on login. Checks immediately then polls every 5 minutes.
+// Called once on login. Checks immediately then polls every 60 seconds.
 function fbCheckVersion() {
   _doVersionCheck();
   // Also listen on Firestore as fallback (admin panel push still works)
@@ -13400,9 +13416,9 @@ function fbCheckVersion() {
       _handleUpdateAvailable(d.version, d.notes || '', d.url || GITHUB_RAW_URL);
     }
   }, () => {});
-  // Poll GitHub every 5 minutes while app is open
+  // Poll GitHub every 60 seconds while app is open
   if (_versionPollTimer) clearInterval(_versionPollTimer);
-  _versionPollTimer = setInterval(_doVersionCheck, 5 * 60 * 1000);
+  _versionPollTimer = setInterval(_doVersionCheck, 60 * 1000);
 }
 
 async function _doVersionCheck() {
@@ -14700,13 +14716,23 @@ window._renderAdminPanel = async function() {
             ${players.map(p => {
               const tickets = p.state?.tickets || 0;
               const lastSeen = p.lastSeen?.toDate ? p.lastSeen.toDate().toLocaleDateString() : '—';
+              const isAdminUser = p.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
               const avatarHtml = p.photoURL
                 ? `<img src="${p.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`
-                : `<span>${(p.displayName||'?')[0].toUpperCase()}</span>`;
-              return `<div class="adm-player-card" onclick="window._admCurrentPlayer=${JSON.stringify(p).replace(/"/g,'&quot;')};window._renderPlayerDetail(window._admCurrentPlayer)">
-                <div class="adm-avatar">${avatarHtml}</div>
+                : `<span style="font-size:${isAdminUser?'14px':'16px'}">${isAdminUser ? '👑' : (p.displayName||'?')[0].toUpperCase()}</span>`;
+              const adminCardStyle = isAdminUser
+                ? 'background:linear-gradient(135deg,rgba(246,187,78,0.12),rgba(231,129,97,0.08));border:1px solid rgba(246,187,78,0.35);box-shadow:0 0 16px rgba(246,187,78,0.08);'
+                : '';
+              const adminAvatarStyle = isAdminUser
+                ? 'background:linear-gradient(135deg,#f6bb4e,#e78161);box-shadow:0 0 14px rgba(246,187,78,0.5),0 0 0 2px rgba(246,187,78,0.3);'
+                : '';
+              return `<div class="adm-player-card" style="${adminCardStyle}" onclick="window._admCurrentPlayer=${JSON.stringify(p).replace(/"/g,'&quot;')};window._renderPlayerDetail(window._admCurrentPlayer)">
+                <div class="adm-avatar" style="${adminAvatarStyle}">${avatarHtml}</div>
                 <div style="flex:1;min-width:0">
-                  <div style="font-size:12px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.displayName||'Unknown'}</div>
+                  <div style="display:flex;align-items:center;gap:5px">
+                    <div style="font-size:12px;font-weight:700;color:${isAdminUser?'#f6bb4e':'#fff'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.displayName||'Unknown'}</div>
+                    ${isAdminUser ? '<span style="font-size:9px;font-weight:800;color:#f6bb4e;background:rgba(246,187,78,0.15);border:1px solid rgba(246,187,78,0.3);border-radius:6px;padding:1px 5px;flex-shrink:0;letter-spacing:0.3px">ADMIN</span>' : ''}
+                  </div>
                   <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:1px">Last seen ${lastSeen}</div>
                 </div>
                 <div style="text-align:right;flex-shrink:0">
@@ -14955,7 +14981,13 @@ window._renderAdminPanel = async function() {
 
       content.innerHTML = `
         <div class="adm-card">
-          <div class="adm-card-title">📋 Broadcast History</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div class="adm-card-title" style="margin-bottom:0">📋 Broadcast History</div>
+            <button onclick="window._admClearUndoneHistory()" style="display:flex;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(252,119,144,0.15),rgba(160,136,250,0.1));border:1px solid rgba(252,119,144,0.3);border-radius:10px;color:#fc7790;font-size:10px;font-weight:700;padding:5px 10px;cursor:pointer;transition:all 0.2s;letter-spacing:0.2px" onmouseenter="this.style.background='linear-gradient(135deg,rgba(252,119,144,0.25),rgba(160,136,250,0.15))'" onmouseleave="this.style.background='linear-gradient(135deg,rgba(252,119,144,0.15),rgba(160,136,250,0.1))'">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+              Clear Undone
+            </button>
+          </div>
           <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px">Undo reverses effects on all player accounts directly. Undone entries remain visible for your records.</div>
           <div id="adm-history-list" style="display:flex;flex-direction:column;gap:8px"></div>
         </div>`;
@@ -15010,6 +15042,52 @@ window._renderAdminPanel = async function() {
     } catch(e) {
       content.innerHTML = `<div class="adm-card"><div style="color:#ff6b6b;font-size:12px">Error: ${e.message}<br><br>Make sure your Firestore rules allow admin reads on broadcasts.</div></div>`;
     }
+
+// ── Clear Undone History entries ──────────────────────────────
+window._admClearUndoneHistory = async function() {
+  const data = window._admHistoryData || {};
+  const undoneIds = Object.entries(data)
+    .filter(([, d]) => d.active === false)
+    .map(([id]) => id);
+
+  if (!undoneIds.length) {
+    showNotif('ℹ️','Nothing to clear','No undone entries found');
+    return;
+  }
+
+  showCustomConfirm(`Delete ${undoneIds.length} undone entr${undoneIds.length===1?'y':'ies'} from history?`, async () => {
+    try {
+      const batch = fbDb.batch();
+      undoneIds.forEach(id => batch.delete(fbDb.collection('broadcasts').doc(id)));
+      await batch.commit();
+
+      // Animate out then remove from DOM
+      undoneIds.forEach(id => {
+        const row = document.querySelector(`[data-broadcast-id="${id}"]`);
+        if (row) {
+          row.style.transition = 'opacity 0.3s, transform 0.3s, max-height 0.4s';
+          row.style.opacity = '0';
+          row.style.transform = 'translateX(12px)';
+          row.style.maxHeight = row.offsetHeight + 'px';
+          setTimeout(() => {
+            row.style.maxHeight = '0';
+            row.style.padding = '0';
+            row.style.margin = '0';
+            row.style.overflow = 'hidden';
+          }, 280);
+          setTimeout(() => row.remove(), 650);
+        }
+        delete data[id];
+      });
+
+      playSound('success');
+      showNotif('🗑️', 'Cleared', `${undoneIds.length} undone entr${undoneIds.length===1?'y':'ies'} removed`);
+    } catch(e) {
+      showNotif('⚠️','Failed', e.message);
+    }
+  });
+};
+
   } else if (tab === 'alerts') {
     content.innerHTML = `
       <div class="adm-card" style="background:linear-gradient(135deg,rgba(160,136,250,0.12),rgba(252,119,144,0.08));border:2px solid rgba(160,136,250,0.35);box-shadow:0 0 30px rgba(160,136,250,0.1)">
@@ -15262,9 +15340,15 @@ window._admClawTabHTML = function() {
     <div class="adm-card">
       <div class="adm-card-title">👁️ Live Player View</div>
       <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:10px">Select a player to preview their Claw Machine view.</div>
-      <select id="claw-adm-view-player" class="adm-input" style="width:100%;margin-bottom:10px">
-        <option value="">— Select player —</option>
-      </select>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <select id="claw-adm-view-player" class="adm-input" style="flex:1">
+          <option value="">— Select player —</option>
+        </select>
+        <button onclick="window._admClawLoadPlayerView()" class="adm-btn" style="background:linear-gradient(135deg,#a088fa,#fc7790);border:none;color:#fff;font-weight:700;padding:0 14px;flex-shrink:0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:-2px;margin-right:4px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          View
+        </button>
+      </div>
       <div id="claw-adm-view-window" style="border-radius:16px;overflow-y:auto;max-height:460px;background:rgba(0,0,0,0.4);border:1px solid rgba(160,136,250,0.2);min-height:80px">
         <div style="font-size:11px;color:rgba(255,255,255,0.25)">Select a player to see their live state</div>
       </div>
@@ -15287,9 +15371,9 @@ window._admClawTabInit = async function() {
   } catch(e) {}
   // Render current prize pool (use S.clawCustomPrizes or defaults)
   window._admClawRenderPrizes();
-  // View player select
-  const viewSel = document.getElementById('claw-adm-view-player');
-  if (viewSel) viewSel.addEventListener('change', window._admClawLoadPlayerView);
+  // View player select — only load on explicit button click, not on change (prevents flicker)
+  const viewBtn = document.querySelector('[onclick="window._admClawLoadPlayerView()"]');
+  if (viewBtn) viewBtn.onclick = window._admClawLoadPlayerView;
 };
 
 // Prize pool for admin session (working copy)
@@ -15512,9 +15596,12 @@ window._admClawLoadPlayerView = async function() {
   const viewBox = document.getElementById('claw-adm-view-window');
   if (!sel || !viewBox) return;
   const uid = sel.value;
-  if (!uid) return;
+  if (!uid) {
+    viewBox.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.3);padding:20px;text-align:center">Select a player to view</div>';
+    return;
+  }
 
-  // Stop any existing listener
+  // Stop any existing listener + RAF BEFORE wiping innerHTML
   if (window._admClawViewUnsub) { window._admClawViewUnsub(); window._admClawViewUnsub = null; }
   if (window._admClawRenderRAF) { cancelAnimationFrame(window._admClawRenderRAF); window._admClawRenderRAF = null; }
 
@@ -15654,7 +15741,13 @@ window._admClawLoadPlayerView = async function() {
     if (wonEl)  wonEl.textContent  = latestData.wonItems ?? '—';
     if (stEl)   stEl.textContent   = latestData.state || '—';
   }, err => {
-    if (viewBox) viewBox.innerHTML = `<div style="font-size:11px;color:#ff6b6b;padding:20px;text-align:center">Error: ${err.message}</div>`;
+    if (window._admClawRenderRAF) { cancelAnimationFrame(window._admClawRenderRAF); window._admClawRenderRAF = null; }
+    const isPerms = err.code === 'permission-denied' || err.message?.includes('permission');
+    if (viewBox) viewBox.innerHTML = `<div style="font-size:11px;color:#ff6b6b;padding:16px;text-align:center;line-height:1.6">
+      ${isPerms
+        ? '🔒 <b>Firestore permission denied</b><br><span style="color:rgba(255,255,255,0.4)">Add a rule in Firebase Console → Firestore → Rules:<br><code style="font-size:10px;color:#f6bb4e">allow read, write: if request.auth.token.email == "Djrocky2021@gmail.com";</code><br>to the <code style="font-size:10px;color:#f6bb4e">liveView</code> collection.</span>'
+        : '⚠️ ' + err.message}
+    </div>`;
   });
 };
 
@@ -15664,6 +15757,7 @@ window._admClawLoadPlayerView = async function() {
 
 window._admRenderPlinkoTab = async function(content) {
   content.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.3);font-size:12px;padding:20px">Loading…</div>';
+  content.style.overflowY = 'auto';
 
   // Load player list + gallery
   let players = [];
@@ -15691,20 +15785,20 @@ window._admRenderPlinkoTab = async function(content) {
 
   content.innerHTML = `
     <!-- Status card -->
-    <div style="border-radius:20px;overflow:hidden;margin-bottom:12px;background:linear-gradient(135deg,rgba(78,223,208,0.12),rgba(111,150,255,0.08));border:1px solid rgba(78,223,208,0.3)">
+    <div style="border-radius:20px;overflow:hidden;margin-bottom:12px;background:linear-gradient(135deg,rgba(78,223,208,0.12),rgba(111,150,255,0.08));border:1px solid rgba(78,223,208,0.3);flex-shrink:0">
       <div style="padding:14px 16px;border-bottom:1px solid rgba(78,223,208,0.15);display:flex;align-items:center;gap:10px">
         <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#4edfd0,#6f96ff);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🎯</div>
-        <div>
+        <div style="min-width:0">
           <div style="font-size:13px;font-weight:800;color:#fff">Plinko Live Control</div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.4)">Push custom levels to any player instantly</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Push custom levels to any player instantly</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px">
-        <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;flex-wrap:wrap;gap:8px">
+        <div style="min-width:0">
           <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:2px">Current Live Level</div>
-          <div style="font-size:13px;font-weight:700;color:#fff">${liveActive && !liveExpired ? liveName : 'None active'}</div>
+          <div style="font-size:13px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${liveActive && !liveExpired ? liveName : 'None active'}</div>
         </div>
-        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:${liveActive && !liveExpired ? 'rgba(76,175,110,0.2)' : 'rgba(255,255,255,0.06)'};color:${liveActive && !liveExpired ? '#4caf6e' : 'rgba(255,255,255,0.3)'}">
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0;background:${liveActive && !liveExpired ? 'rgba(76,175,110,0.2)' : 'rgba(255,255,255,0.06)'};color:${liveActive && !liveExpired ? '#4caf6e' : 'rgba(255,255,255,0.3)'}">
           ${liveActive && !liveExpired ? '🟢 LIVE' : '⭕ Off'}
         </span>
       </div>
@@ -15823,6 +15917,7 @@ window._admPlinkoLoadPlayerView = async function() {
   const uid = sel.value;
   if (!uid) { viewBox.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.3);padding:20px;text-align:center">Please select a player first</div>'; return; }
 
+  // Stop RAF and unsub BEFORE wiping innerHTML — prevents stale canvas loop
   if (window._admPlinkoViewUnsub) { window._admPlinkoViewUnsub(); window._admPlinkoViewUnsub = null; }
   if (window._admPlinkoRenderRAF) { cancelAnimationFrame(window._admPlinkoRenderRAF); window._admPlinkoRenderRAF = null; }
 
@@ -15914,8 +16009,14 @@ window._admPlinkoLoadPlayerView = async function() {
     if (rowsEl)  rowsEl.textContent  = latestData.rows ?? '—';
     if (ballsEl) ballsEl.textContent = (latestData.balls || []).length;
   }, err => {
+    if (window._admPlinkoRenderRAF) { cancelAnimationFrame(window._admPlinkoRenderRAF); window._admPlinkoRenderRAF = null; }
+    const isPerms = err.code === 'permission-denied' || err.message?.includes('permission');
     const vb = document.getElementById('plinko-adm-view-window');
-    if (vb) vb.innerHTML = `<div style="font-size:11px;color:#ff6b6b;padding:20px;text-align:center">Error: ${err.message}</div>`;
+    if (vb) vb.innerHTML = `<div style="font-size:11px;color:#ff6b6b;padding:16px;text-align:center;line-height:1.6">
+      ${isPerms
+        ? '🔒 <b>Firestore permission denied</b><br><span style="color:rgba(255,255,255,0.4)">Add a rule in Firebase Console → Firestore → Rules:<br><code style="font-size:10px;color:#f6bb4e">allow read, write: if request.auth.token.email == "Djrocky2021@gmail.com";</code><br>to the <code style="font-size:10px;color:#f6bb4e">liveView</code> collection.</span>'
+        : '⚠️ ' + err.message}
+    </div>`;
   });
 };
 
