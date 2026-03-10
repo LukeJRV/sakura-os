@@ -322,6 +322,7 @@ button, a { touch-action: manipulation; }
   animation:spinSlow 4s linear infinite;
 }
 @keyframes spinSlow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
 /* ===== TICKET BAR ===== */
 #ticketbar {
@@ -403,7 +404,7 @@ button, a { touch-action: manipulation; }
   padding-bottom: 100px;
 }
 /* Screens with a sticky header — header sticks at top of scroll container (already offset 74px) */
-.screen:has(> .screen-header) { padding-top: 0; }
+.screen.has-header { padding-top: 0; }
 .screen.active { display:flex; flex-direction:column; }
 
 /* Scrollbar */
@@ -527,7 +528,7 @@ body.is-admin .admin-only { display: inline-flex !important; }
   border-bottom:1px solid rgba(255,255,255,0.05);
 }
 /* Screens with a sticky header need no top padding — #screens already clears the chrome */
-.screen:has(> .screen-header) { padding-top: 0; }
+.screen.has-header { padding-top: 0; }
 .back-btn {
   background:none; border:none;
   color:var(--accent1);
@@ -1994,6 +1995,7 @@ input[type=number] { -moz-appearance:textfield; }
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(246,187,78,0.2),rgba(231,129,97,0.15));border:1px solid rgba(246,187,78,0.4);color:#f6bb4e;font-weight:800" onclick="admSwitchTab('liveupdater',this)">🔄 Updater</button>
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(160,136,250,0.2),rgba(252,119,144,0.15));border:1px solid rgba(160,136,250,0.35);color:#c0b9f5;font-weight:800" onclick="admSwitchTab('claw',this)">🦾 Claw</button>
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(78,223,208,0.15),rgba(160,136,250,0.1));border:1px solid rgba(78,223,208,0.3);color:#4edfd0;font-weight:800" onclick="admSwitchTab('plinko',this)">🎯 Plinko</button>
+        <button class="adm-tab" style="background:linear-gradient(135deg,rgba(78,223,208,0.2),rgba(86,110,227,0.2));border:1px solid rgba(78,223,208,0.4);color:#4edfd0;font-weight:800" onclick="admSwitchTab('marbleadmin',this)">🔮 Marble</button>
       </div>
     </div>
     <div class="adm-body" id="admin-content"></div>
@@ -2086,7 +2088,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== MARBLE RACE SCREEN ===== -->
-    <div id="screen-marblerace" class="screen" style="padding:0;flex-direction:column;background:#050518">
+    <div id="screen-marblerace" class="screen has-header" style="padding:0;flex-direction:column;background:#050518">
       <div class="screen-header" style="background:rgba(5,5,24,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(78,223,208,0.2)">
         <button class="back-btn" onclick="openScreen('home')" style="color:#4edfd0;background:rgba(78,223,208,0.1);border-color:rgba(78,223,208,0.3)">←</button>
         <span class="screen-title" style="color:#e0f7ff">🔮 Marble Race</span>
@@ -2096,7 +2098,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== GIFTS SCREEN ===== -->
-    <div id="screen-gifts" class="screen" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#1a0a20 0%,#0a0518 100%)">
+    <div id="screen-gifts" class="screen has-header" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#1a0a20 0%,#0a0518 100%)">
       <div class="screen-header" style="background:rgba(26,10,32,0.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(251,171,216,0.2)">
         <button class="back-btn" onclick="openScreen('home')" style="color:#fbabd8;background:rgba(251,171,216,0.1);border-color:rgba(251,171,216,0.3)">←</button>
         <span class="screen-title" style="color:#ffdcf0">🌸 Gift Box</span>
@@ -2107,7 +2109,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== CALENDAR SCREEN ===== -->
-    <div id="screen-calendar" class="screen">
+    <div id="screen-calendar" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">📅 Calendar</span>
@@ -2117,7 +2119,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== SHOP SCREEN ===== -->
-    <div id="screen-shop" class="screen">
+    <div id="screen-shop" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🛒 Shop</span>
@@ -2136,7 +2138,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== BACKPACK SCREEN ===== -->
-    <div id="screen-backpack" class="screen">
+    <div id="screen-backpack" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🎒 Backpack</span>
@@ -2146,7 +2148,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== TASKS SCREEN ===== -->
-    <div id="screen-tasks" class="screen">
+    <div id="screen-tasks" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">✅ Tasks</span>
@@ -2156,7 +2158,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== BATTLEPASS SCREEN ===== -->
-    <div id="screen-battlepass" class="screen" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#1a0e00 0%,#0a0a0a 100%)">
+    <div id="screen-battlepass" class="screen has-header" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#1a0e00 0%,#0a0a0a 100%)">
       <div class="screen-header" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,215,0,0.15)">
         <button class="back-btn" onclick="openScreen('home')" style="color:#ffd700;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2)">←</button>
         <span class="screen-title" style="background:linear-gradient(90deg,#ffd700,#ff8c00,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🏆 Season Pass</span>
@@ -2166,7 +2168,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== APP STORE SCREEN ===== -->
-    <div id="screen-appstore" class="screen" style="padding:0;flex-direction:column">
+    <div id="screen-appstore" class="screen has-header" style="padding:0;flex-direction:column">
       <div class="screen-header" style="background:rgba(0,10,30,0.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(13,132,255,0.2)">
         <button class="back-btn" onclick="openScreen('home')" style="background:rgba(13,132,255,0.15);border-color:rgba(13,132,255,0.3);color:#4db8ff">←</button>
         <span class="screen-title" style="background:linear-gradient(90deg,#0d84ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900">App Store</span>
@@ -2176,7 +2178,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== PIGGY BANK SCREEN ===== -->
-    <div id="screen-piggybank" class="screen" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#1a0a12 0%,#0a0508 100%)">
+    <div id="screen-piggybank" class="screen has-header" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#1a0a12 0%,#0a0508 100%)">
       <div class="screen-header" style="background:rgba(26,5,15,0.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,107,157,0.2)">
         <button class="back-btn" onclick="openScreen('home')" style="background:rgba(255,107,157,0.15);border-color:rgba(255,107,157,0.3);color:#ff9ab0">←</button>
         <span class="screen-title" style="background:linear-gradient(90deg,#ff6b9d,#ff9a8b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900">🐷 Piggy Bank</span>
@@ -2186,7 +2188,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== STACKER SCREEN ===== -->
-    <div id="screen-stacker" class="screen" style="padding:0;flex-direction:column;background:#000">
+    <div id="screen-stacker" class="screen has-header" style="padding:0;flex-direction:column;background:#000">
       <div class="screen-header" style="background:rgba(0,0,20,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(13,132,255,0.25)">
         <button class="back-btn" onclick="openScreen('home')" style="background:rgba(13,132,255,0.12);border-color:rgba(13,132,255,0.3);color:#4db8ff">←</button>
         <span class="screen-title" style="background:linear-gradient(90deg,#0d84ff,#a088fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900">STACKER</span>
@@ -2196,7 +2198,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== CHAT SCREEN ===== -->
-    <div id="screen-chat" class="screen" style="padding:0;flex-direction:column">
+    <div id="screen-chat" class="screen has-header" style="padding:0;flex-direction:column">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">💬 Messages</span>
@@ -2206,7 +2208,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== CHAT CONVO SCREEN ===== -->
-    <div id="screen-chat-convo" class="screen" style="padding:0;flex-direction:column;display:none;min-height:0">
+    <div id="screen-chat-convo" class="screen has-header" style="padding:0;flex-direction:column;display:none;min-height:0">
       <div class="screen-header" style="flex-shrink:0">
         <button class="back-btn" onclick="openScreen('chat')">←</button>
         <div style="display:flex;align-items:center;gap:8px;flex:1">
@@ -2225,7 +2227,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== NOTES SCREEN ===== -->
-    <div id="screen-notes" class="screen" style="padding:0;flex-direction:column;overflow:hidden">
+    <div id="screen-notes" class="screen has-header" style="padding:0;flex-direction:column;overflow:hidden">
       <div class="screen-header" style="flex-shrink:0">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">📝 Notes</span>
@@ -2261,7 +2263,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== REMINDERS SCREEN ===== -->
-    <div id="screen-reminders" class="screen">
+    <div id="screen-reminders" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🔔 Reminders</span>
@@ -2271,7 +2273,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== PET SCREEN ===== -->
-    <div id="screen-pet" class="screen">
+    <div id="screen-pet" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🐾 Virtual Pet</span>
@@ -2281,7 +2283,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== COUPONS SCREEN ===== -->
-    <div id="screen-coupons" class="screen">
+    <div id="screen-coupons" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🎫 Coupons</span>
@@ -2291,7 +2293,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== ACHIEVEMENTS / GOALS SCREEN ===== -->
-    <div id="screen-achievements" class="screen">
+    <div id="screen-achievements" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span id="achieve-screen-title" class="screen-title">🏆 Goals</span>
@@ -2301,7 +2303,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== PLINKO SCREEN ===== -->
-    <div id="screen-plinko" class="screen">
+    <div id="screen-plinko" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🎯 Plinko</span>
@@ -2311,7 +2313,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== SPIN WHEEL SCREEN ===== -->
-    <div id="screen-spinwheel" class="screen">
+    <div id="screen-spinwheel" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🎡 Spin Wheel</span>
@@ -2321,7 +2323,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== CLAW MACHINE SCREEN ===== -->
-    <div id="screen-claw" class="screen">
+    <div id="screen-claw" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🦾 Claw Machine</span>
@@ -2331,7 +2333,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== COIN PUSHER SCREEN ===== -->
-    <div id="screen-coinpusher" class="screen">
+    <div id="screen-coinpusher" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🪙 Coin Pusher</span>
@@ -2340,7 +2342,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== GACHA MACHINE SCREEN ===== -->
-    <div id="screen-gacha" class="screen">
+    <div id="screen-gacha" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🎰 Gacha</span>
@@ -2350,7 +2352,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== WISHLIST SCREEN ===== -->
-    <div id="screen-wishlist" class="screen">
+    <div id="screen-wishlist" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">⭐ Wishlist</span>
@@ -2383,7 +2385,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== SUPPORT CHAT SCREEN ===== -->
-    <div id="screen-support" class="screen" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#000c18 0%,#000508 100%)">
+    <div id="screen-support" class="screen has-header" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#000c18 0%,#000508 100%)">
       <div class="screen-header" style="background:rgba(0,12,24,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(78,223,208,0.2)">
         <button class="back-btn" onclick="openScreen('settings')" style="background:rgba(78,223,208,0.1);border-color:rgba(78,223,208,0.3);color:#4edfd0">←</button>
         <span class="screen-title" style="background:linear-gradient(90deg,#4edfd0,#6f96ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900">💬 Support</span>
@@ -2393,7 +2395,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== SETTINGS SCREEN ===== -->
-    <div id="screen-settings" class="screen">
+    <div id="screen-settings" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">⚙️ Settings</span>
@@ -2413,7 +2415,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== THEME SHOP SCREEN ===== -->
-    <div id="screen-themeshop" class="screen">
+    <div id="screen-themeshop" class="screen has-header">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🎨 Theme Shop</span>
@@ -2421,7 +2423,7 @@ input[type=number] { -moz-appearance:textfield; }
       <div id="themeshop-content" style="padding:16px"></div>
     </div>
 
-    <div id="screen-updatelogs" class="screen">
+    <div id="screen-updatelogs" class="screen has-header">
       <div class="screen-header" style="background:linear-gradient(135deg,rgba(160,136,250,0.15),rgba(125,101,214,0.08));border-bottom:1px solid rgba(160,136,250,0.2)">
         <button class="back-btn" onclick="openScreen('home')" style="color:#a088fa">←</button>
         <span class="screen-title" style="background:linear-gradient(90deg,#c0b9f5,#a088fa,#fbabd8);-webkit-background-clip:text;-webkit-text-fill-color:transparent">📋 Update Logs</span>
@@ -2911,12 +2913,12 @@ const DEFAULT_STATE = {
   coupons: [],
   wishes: [],
   gachaBubbles: [
-    { id:1, emoji:'🌸', name:'Cherry Blossom', rarity:'common', color:'#fbabd8', tickets:0 },
-    { id:2, emoji:'💎', name:'Diamond', rarity:'rare', color:'#91c7ff', tickets:50 },
-    { id:3, emoji:'🌟', name:'Gold Star', rarity:'epic', color:'#f6bb4e', tickets:100 },
-    { id:4, emoji:'🦄', name:'Unicorn', rarity:'legendary', color:'#ca7ced', tickets:200 },
-    { id:5, emoji:'🎮', name:'Game Token', rarity:'common', color:'#566ee3', tickets:0 },
-    { id:6, emoji:'🍀', name:'Lucky Clover', rarity:'uncommon', color:'#4caf6e', tickets:20 },
+    { id:1, emoji:'🌸', name:'Cherry Blossom', rarity:'common',    color:'#fbabd8', tickets:10  },
+    { id:2, emoji:'💎', name:'Diamond',        rarity:'rare',      color:'#91c7ff', tickets:17  },
+    { id:3, emoji:'🌟', name:'Gold Star',      rarity:'epic',      color:'#f6bb4e', tickets:40  },
+    { id:4, emoji:'🦄', name:'Unicorn',        rarity:'legendary', color:'#ca7ced', tickets:65  },
+    { id:5, emoji:'🎮', name:'Game Token',     rarity:'common',    color:'#566ee3', tickets:10  },
+    { id:6, emoji:'🍀', name:'Lucky Clover',   rarity:'uncommon',  color:'#4caf6e', tickets:22  },
   ],
   gachaCost: 10,
   backpackSlots: 6,
@@ -5375,21 +5377,22 @@ function bpShowMobileSheet(html) {
     sheet.className = 'bp-mobile-sheet';
     document.getElementById('phone').appendChild(sheet);
     sheet.addEventListener('click', e => { if(e.target===sheet) bpCloseMobileSheet(); });
-    // Backdrop
-    let bd = document.getElementById('bp-sheet-backdrop');
-    if (!bd) {
-      bd = document.createElement('div');
-      bd.id = 'bp-sheet-backdrop';
-      bd.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,0.5);z-index:9998;opacity:0;transition:opacity 0.3s';
-      bd.addEventListener('click', bpCloseMobileSheet);
-      document.getElementById('phone').appendChild(bd);
-    }
+    sheet.addEventListener('touchstart', e => { if(e.target===sheet) { e.preventDefault(); bpCloseMobileSheet(); } }, {passive:false});
+  }
+  // Backdrop
+  let bd = document.getElementById('bp-sheet-backdrop');
+  if (!bd) {
+    bd = document.createElement('div');
+    bd.id = 'bp-sheet-backdrop';
+    bd.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,0.5);z-index:9998;opacity:0;transition:opacity 0.3s;pointer-events:none';
+    bd.addEventListener('click', bpCloseMobileSheet);
+    bd.addEventListener('touchend', e => { e.preventDefault(); bpCloseMobileSheet(); }, {passive:false});
+    document.getElementById('phone').appendChild(bd);
   }
   sheet.innerHTML = html;
   requestAnimationFrame(() => {
     sheet.classList.add('open');
-    const bd = document.getElementById('bp-sheet-backdrop');
-    if (bd) bd.style.opacity = '1';
+    if (bd) { bd.style.opacity = '1'; bd.style.pointerEvents = 'auto'; }
   });
 }
 
@@ -5397,7 +5400,7 @@ function bpCloseMobileSheet() {
   const sheet = document.getElementById('bp-mobile-sheet');
   if (sheet) sheet.classList.remove('open');
   const bd = document.getElementById('bp-sheet-backdrop');
-  if (bd) bd.style.opacity = '0';
+  if (bd) { bd.style.opacity = '0'; bd.style.pointerEvents = 'none'; }
 }
 
 function bpShowHoverTooltip(slot, i) {
@@ -10267,8 +10270,8 @@ function renderMRVoteUI() {
   const today = new Date().toDateString();
   if (!S.mrRacesToday) S.mrRacesToday = { date:'', count:0 };
   const racesToday = S.mrRacesToday.date === today ? S.mrRacesToday.count : 0;
-  const MAX_DAILY = 10;
-  const turnsLeft = Math.max(0, MAX_DAILY - racesToday);
+  const MAX_DAILY = isAdmin() ? Infinity : 3;
+  const turnsLeft = isAdmin() ? Infinity : Math.max(0, MAX_DAILY - racesToday);
   const th = MR_THEMES[mrTheme] || MR_THEMES.space;
 
   ui.innerHTML = `
@@ -10277,10 +10280,13 @@ function renderMRVoteUI() {
       <div style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
         <div>
           <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase">Daily Races</div>
-          <div style="font-size:16px;font-weight:900;color:#fff;margin-top:2px">${turnsLeft} <span style="font-size:11px;font-weight:500;color:rgba(255,255,255,0.4)">/ ${MAX_DAILY} left</span></div>
+          <div style="font-size:16px;font-weight:900;color:#fff;margin-top:2px">${isAdmin() ? '∞' : turnsLeft} <span style="font-size:11px;font-weight:500;color:rgba(255,255,255,0.4)">${isAdmin() ? 'unlimited' : '/ 3 left'}</span></div>
         </div>
         <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">
-          ${Array.from({length:MAX_DAILY}).map((_,i)=>`<div style="width:10px;height:10px;border-radius:50%;background:${i<racesToday?'rgba(255,255,255,0.2)':'rgba(78,223,208,0.8)'};box-shadow:${i<racesToday?'none':'0 0 6px rgba(78,223,208,0.5)'}"></div>`).join('')}
+          ${isAdmin()
+            ? '<div style="font-size:11px;font-weight:700;color:#4edfd0;padding:4px 10px;border-radius:99px;background:rgba(78,223,208,0.15);border:1px solid rgba(78,223,208,0.3)">👑 Admin</div>'
+            : Array.from({length:3}).map((_,i)=>`<div style="width:10px;height:10px;border-radius:50%;background:${i<racesToday?'rgba(255,255,255,0.2)':'rgba(78,223,208,0.8)'};box-shadow:${i<racesToday?'none':'0 0 6px rgba(78,223,208,0.5)'}"></div>`).join('')
+          }
         </div>
       </div>
 
@@ -10300,10 +10306,20 @@ function renderMRVoteUI() {
           </div>`).join('')}
       </div>
 
-      <button onclick="${turnsLeft>0?'if(mrVotedColor){mrStartCountdown()}else{showNotif(\"❌\",\"Pick a marble first!\",\"\")}':'showNotif(\"❌\",\"No races left today!\",\"Come back tomorrow\")'}" style="width:100%;padding:13px;border-radius:16px;border:none;cursor:pointer;font-size:14px;font-weight:800;letter-spacing:-0.2px;transition:all 0.15s;background:${turnsLeft>0&&mrVotedColor?'linear-gradient(135deg,#4edfd0,#566ee3)':turnsLeft<=0?'rgba(255,100,100,0.15)':'rgba(255,255,255,0.07)'};color:${turnsLeft>0&&mrVotedColor?'#fff':turnsLeft<=0?'rgba(255,100,100,0.6)':'rgba(255,255,255,0.3)'};box-shadow:${turnsLeft>0&&mrVotedColor?'0 4px 20px rgba(78,223,208,0.35)':'none'}">
-        ${turnsLeft<=0?'🚫 No Races Left Today':mrVotedColor?'🏁 Start Race!':'👆 Choose a marble'}
+      <button onclick="mrHandleStartBtn()" style="width:100%;padding:13px;border-radius:16px;border:none;cursor:pointer;font-size:14px;font-weight:800;letter-spacing:-0.2px;transition:all 0.15s;background:${(turnsLeft>0||isAdmin())&&mrVotedColor?'linear-gradient(135deg,#4edfd0,#566ee3)':turnsLeft<=0&&!isAdmin()?'rgba(255,100,100,0.15)':'rgba(255,255,255,0.07)'};color:${(turnsLeft>0||isAdmin())&&mrVotedColor?'#fff':turnsLeft<=0&&!isAdmin()?'rgba(255,100,100,0.6)':'rgba(255,255,255,0.3)'};box-shadow:${(turnsLeft>0||isAdmin())&&mrVotedColor?'0 4px 20px rgba(78,223,208,0.35)':'none'}">
+        ${turnsLeft<=0&&!isAdmin()?'🚫 No Races Left Today':mrVotedColor?'🏁 Start Race!':'👆 Choose a marble'}
       </button>
     </div>`;
+}
+
+function mrHandleStartBtn() {
+  const today = new Date().toDateString();
+  if (!S.mrRacesToday) S.mrRacesToday = { date:'', count:0 };
+  const racesToday = S.mrRacesToday.date === today ? S.mrRacesToday.count : 0;
+  const canRace = isAdmin() || racesToday < 3;
+  if (!canRace) { showNotif('🚫','No Races Left Today','Come back tomorrow'); return; }
+  if (!mrVotedColor) { showNotif('❌','Pick a marble first!',''); return; }
+  mrStartCountdown();
 }
 
 function renderMRResultsUI() {
@@ -10536,25 +10552,27 @@ function cpInitMatter() {
   });
   World.add(cpWorld, cpPusherBody);
 
-  // Pre-load coins - slightly fewer, spread more toward front
-  for (let row = 0; row < 3; row++) {
-    for (let col = 0; col < 10; col++) {
-      const x = CP_WALL_T + 22 + col * (CP_COIN_R*2 + 4) + (row%2)*(CP_COIN_R+2);
-      // Place toward front of shelf so pusher can push them off
-      const y = CP_SHELF_Y - CP_COIN_R*1.5 - row*(CP_COIN_R*2+3);
-      if (x > CP_WALL_T + CP_COIN_R && x < CP_W - CP_WALL_T - CP_COIN_R) {
-        World.add(cpWorld, cpMakeCoin(x, y, false));
+  // Pre-load coins only when there's NO saved state to restore
+  if (!S.cpMachineState || !S.cpMachineState.length) {
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 10; col++) {
+        const x = CP_WALL_T + 22 + col * (CP_COIN_R*2 + 4) + (row%2)*(CP_COIN_R+2);
+        // Place toward front of shelf so pusher can push them off
+        const y = CP_SHELF_Y - CP_COIN_R*1.5 - row*(CP_COIN_R*2+3);
+        if (x > CP_WALL_T + CP_COIN_R && x < CP_W - CP_WALL_T - CP_COIN_R) {
+          World.add(cpWorld, cpMakeCoin(x, y, false));
+        }
       }
     }
-  }
 
-  // Prizes
-  CP_PRIZE_DEFS.forEach((def, i) => {
-    const x = 55 + (i % 3) * 85 + Math.random() * 15;
-    const y = CP_SHELF_Y - (def.r || def.h/2) - 12 - Math.floor(i/3) * 34;
-    const b = cpMakePrize(def, x, y);
-    World.add(cpWorld, b);
-  });
+    // Prizes — only on fresh start
+    CP_PRIZE_DEFS.forEach((def, i) => {
+      const x = 55 + (i % 3) * 85 + Math.random() * 15;
+      const y = CP_SHELF_Y - (def.r || def.h/2) - 12 - Math.floor(i/3) * 34;
+      const b = cpMakePrize(def, x, y);
+      World.add(cpWorld, b);
+    });
+  }
 
   // Events
   Events.on(cpEngine, 'beforeUpdate', () => {
@@ -11073,7 +11091,16 @@ function fillGachaMachine() {
   for (let i=0;i<toAdd;i++) {
     const tier = pickRandomRarity();
     const emoji = GACHA_RANDOM_EMOJIS[Math.floor(Math.random()*GACHA_RANDOM_EMOJIS.length)];
-    const tickets = Math.floor(1 + Math.random()*5); // 1-5 tickets (balanced)
+    const tickets = (function(rarity) {
+      switch(rarity) {
+        case 'common':    return 10;
+        case 'uncommon':  return 20 + Math.floor(Math.random() * 6);  // 20-25
+        case 'rare':      return 15 + Math.floor(Math.random() * 6);  // 15-20
+        case 'epic':      return 30 + Math.floor(Math.random() * 21); // 30-50
+        case 'legendary': return 55 + Math.floor(Math.random() * 21); // 55-75
+        default:          return 10;
+      }
+    })(tier.rarity);
     S.gachaBubbles.push({ id:Date.now()+i, emoji, name:tier.rarity+' '+emoji, rarity:tier.rarity, color:tier.color, tickets });
   }
   saveState(); playSound('pop');
@@ -14010,11 +14037,12 @@ function renderBattlepass() {
         }).join('')}
       </div>
 
-      <!-- Actions -->
+      <!-- Actions — admin only -->
+      ${isAdmin() ? `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
         <button onclick="openBPRotationGallery()" style="padding:12px;border-radius:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;cursor:pointer">📚 Gallery</button>
         <button onclick="openBPSettings()" style="padding:12px;border-radius:14px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);color:#ffd700;font-size:12px;font-weight:700;cursor:pointer">⚙️ Settings</button>
-      </div>
+      </div>` : ''}
     </div>
   `;
 }
@@ -16488,6 +16516,9 @@ window._admClearUndoneHistory = async function() {
   } else if (tab === 'plinko') {
     await window._admRenderPlinkoTab(content);
 
+  } else if (tab === 'marbleadmin') {
+    window._admRenderMarbleTab(content);
+
   } else if (tab === 'support') {
     try {
       const snap = await fbDb.collection('supportTickets').orderBy('createdAt','desc').limit(40).get();
@@ -18163,6 +18194,271 @@ window._admStopViewing = function() {
 }
 
 window._adminLoadPlayers = window._renderAdminPanel;
+
+// ── Marble Race Admin Tab ─────────────────────────────────────────────────────
+// Stored in Firestore: config/marbleAdmin  { levels:[], schedule:{} }
+// A level: { id, name, theme, obstacles:[], createdAt }
+// schedule: { 'YYYY-MM-DD': [levelId, ...] }  (up to 5 per day)
+
+let _mAdmMode = 'list'; // 'list' | 'editor' | 'testing'
+let _mAdmEditLevel = null; // level being edited
+let _mAdmTestLevel = null;
+let _mAdmGallery = [];   // loaded from Firestore
+
+const MR_ADMIN_THEMES = ['space','sakura','neon','sunset','ice','forest'];
+const MR_ADMIN_THEME_LABELS = { space:'🌌 Space', sakura:'🌸 Sakura', neon:'⚡ Neon', sunset:'🌅 Sunset', ice:'❄️ Ice', forest:'🌲 Forest' };
+
+window._admRenderMarbleTab = function(content) {
+  if (_mAdmMode === 'editor') { _admMRRenderEditor(content); return; }
+  if (_mAdmMode === 'testing') { _admMRRenderTesting(content); return; }
+  _admMRRenderList(content);
+};
+
+async function _admMRLoadGallery() {
+  try {
+    const doc = await fbDb.collection('config').doc('marbleAdmin').get();
+    _mAdmGallery = doc.exists ? (doc.data().levels || []) : [];
+  } catch(e) { _mAdmGallery = []; }
+}
+
+async function _admMRSaveGallery() {
+  try {
+    const doc = await fbDb.collection('config').doc('marbleAdmin').get();
+    const existing = doc.exists ? doc.data() : {};
+    await fbDb.collection('config').doc('marbleAdmin').set({ ...existing, levels: _mAdmGallery });
+  } catch(e) { showNotif('⚠️','Save failed', e.message); }
+}
+
+async function _admMRSaveSchedule(schedule) {
+  try {
+    const doc = await fbDb.collection('config').doc('marbleAdmin').get();
+    const existing = doc.exists ? doc.data() : {};
+    await fbDb.collection('config').doc('marbleAdmin').set({ ...existing, schedule });
+    await fbDb.collection('broadcasts').add({
+      type: 'marble_schedule_update', active: true, schedule,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) { showNotif('⚠️','Save failed', e.message); }
+}
+
+async function _admMRRenderList(content) {
+  content.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.3);padding:20px">Loading…</div>`;
+  await _admMRLoadGallery();
+
+  const today = new Date().toISOString().slice(0,10);
+  let scheduleData = {};
+  try {
+    const doc = await fbDb.collection('config').doc('marbleAdmin').get();
+    scheduleData = doc.exists ? (doc.data().schedule || {}) : {};
+  } catch(e) {}
+
+  // Build next 7 days for calendar
+  const days = Array.from({length:7}, (_,i) => {
+    const d = new Date(); d.setDate(d.getDate()+i);
+    return d.toISOString().slice(0,10);
+  });
+
+  content.innerHTML = `
+    <!-- Mode indicator -->
+    <div style="padding:12px 14px 0">
+      <div style="background:linear-gradient(135deg,rgba(78,223,208,0.15),rgba(86,110,227,0.1));border:1px solid rgba(78,223,208,0.35);border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="font-size:22px">🔮</div>
+        <div>
+          <div style="font-size:13px;font-weight:800;color:#4edfd0">Marble Race Admin</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4)">Create levels · Assign to dates · Control player access</div>
+        </div>
+        <button onclick="playSound('click');_mAdmEditLevel={id:'level_'+Date.now(),name:'New Level',theme:'space',obstacles:[]};_mAdmMode='editor';window._admRenderMarbleTab(document.getElementById('admin-content'))" style="margin-left:auto;padding:8px 14px;border-radius:10px;background:linear-gradient(135deg,#4edfd0,#566ee3);border:none;color:#fff;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap">+ New Level</button>
+      </div>
+
+      <!-- Gallery -->
+      <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">📚 Level Gallery (${_mAdmGallery.length})</div>
+      ${_mAdmGallery.length === 0 ? `<div style="background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.1);border-radius:14px;padding:20px;text-align:center;color:rgba(255,255,255,0.3);font-size:12px;margin-bottom:12px">No levels yet. Create your first level!</div>` : `
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">
+        ${_mAdmGallery.map((lvl,i) => `
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px">
+            <div style="font-size:20px">${{space:'🌌',sakura:'🌸',neon:'⚡',sunset:'🌅',ice:'❄️',forest:'🌲'}[lvl.theme]||'🔮'}</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:700;color:#fff">${lvl.name}</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.35)">${MR_ADMIN_THEME_LABELS[lvl.theme]||lvl.theme} · ${lvl.obstacles?.length||0} obstacles</div>
+            </div>
+            <button onclick="playSound('click');_mAdmTestLevel=_mAdmGallery[${i}];_mAdmMode='testing';window._admRenderMarbleTab(document.getElementById('admin-content'))" style="padding:5px 10px;border-radius:8px;background:rgba(78,223,208,0.12);border:1px solid rgba(78,223,208,0.3);color:#4edfd0;font-size:10px;font-weight:700;cursor:pointer">▶ Test</button>
+            <button onclick="playSound('click');_mAdmEditLevel={..._mAdmGallery[${i}]};_mAdmMode='editor';window._admRenderMarbleTab(document.getElementById('admin-content'))" style="padding:5px 10px;border-radius:8px;background:rgba(160,136,250,0.12);border:1px solid rgba(160,136,250,0.3);color:#a088fa;font-size:10px;font-weight:700;cursor:pointer">✏️ Edit</button>
+            <button onclick="if(confirm('Delete this level?')){playSound('click');_mAdmGallery.splice(${i},1);_admMRSaveGallery();window._admRenderMarbleTab(document.getElementById('admin-content'))}" style="padding:5px 8px;border-radius:8px;background:rgba(252,119,144,0.1);border:1px solid rgba(252,119,144,0.25);color:#fc7790;font-size:10px;cursor:pointer">🗑</button>
+          </div>`).join('')}
+      </div>`}
+
+      <!-- Schedule Planner -->
+      <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">📅 Race Calendar (Next 7 Days)</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px" id="mr-schedule-container">
+        ${days.map(date => {
+          const assigned = (scheduleData[date]||[]).slice(0,5);
+          const isToday = date === today;
+          return `<div style="background:${isToday?'rgba(78,223,208,0.08)':'rgba(255,255,255,0.03)'};border:1px solid ${isToday?'rgba(78,223,208,0.3)':'rgba(255,255,255,0.07)'};border-radius:12px;padding:10px 12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+              <div style="font-size:11px;font-weight:700;color:${isToday?'#4edfd0':'rgba(255,255,255,0.6)'}">${isToday?'📍 Today':''} ${new Date(date+'T00:00:00').toLocaleDateString('en-GB',{weekday:'short',month:'short',day:'numeric'})}</div>
+              <div style="font-size:9px;color:rgba(255,255,255,0.25)">${assigned.length}/5 races</div>
+            </div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px">
+              ${assigned.map((id,ai) => {
+                const lvl = _mAdmGallery.find(l=>l.id===id);
+                return lvl ? `<span style="font-size:9px;background:rgba(160,136,250,0.15);border:1px solid rgba(160,136,250,0.3);border-radius:6px;padding:3px 7px;color:#a088fa;cursor:pointer" onclick="const sd=${JSON.stringify(scheduleData)};sd['${date}'].splice(${ai},1);_admMRSaveSchedule(sd).then(()=>window._admRenderMarbleTab(document.getElementById('admin-content')))">✕ ${lvl.name}</span>` : '';
+              }).join('')}
+              ${assigned.length === 0 ? `<span style="font-size:10px;color:rgba(255,255,255,0.2)">No races scheduled</span>` : ''}
+            </div>
+            ${_mAdmGallery.length > 0 && assigned.length < 5 ? `
+            <select onchange="if(this.value){const sd=${JSON.stringify(scheduleData).replace(/'/g,"&#39;")};if(!sd['${date}'])sd['${date}']=[]; if(!sd['${date}'].includes(this.value))sd['${date}'].push(this.value);_admMRSaveSchedule(sd).then(()=>window._admRenderMarbleTab(document.getElementById('admin-content'))); playSound('click'); this.value='';}" style="width:100%;background:#12101e;color:#e8e0ff;border:1px solid rgba(160,136,250,0.3);border-radius:8px;padding:5px 8px;font-size:11px;cursor:pointer">
+              <option value="">+ Add level to this date…</option>
+              ${_mAdmGallery.map(lvl=>`<option value="${lvl.id}">${{space:'🌌',sakura:'🌸',neon:'⚡',sunset:'🌅',ice:'❄️',forest:'🌲'}[lvl.theme]||'🔮'} ${lvl.name}</option>`).join('')}
+            </select>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+
+      <!-- Broadcast control -->
+      <div class="adm-card" style="border-color:rgba(78,223,208,0.2);background:rgba(78,223,208,0.04)">
+        <div class="adm-card-title" style="color:#4edfd0">📢 Push Race Day Notification</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:10px">Send all players a notification that race day is live.</div>
+        <button onclick="window._admMRBroadcastRaceDay()" class="adm-btn adm-btn-full" style="background:linear-gradient(135deg,#4edfd0,#566ee3);border:none;color:#fff;font-weight:800">🏁 Broadcast Race Day Is Live!</button>
+      </div>
+    </div>
+  `;
+}
+
+function _admMRRenderEditor(content) {
+  const lvl = _mAdmEditLevel || { id:'level_'+Date.now(), name:'New Level', theme:'space', obstacles:[] };
+  content.innerHTML = `
+    <div style="position:sticky;top:0;z-index:10;background:rgba(3,3,26,0.97);backdrop-filter:blur(12px);padding:8px 14px;border-bottom:1px solid rgba(78,223,208,0.2);display:flex;align-items:center;gap:10px">
+      <button onclick="playSound('click');_mAdmMode='list';window._admRenderMarbleTab(document.getElementById('admin-content'))" style="padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:12px;cursor:pointer">← Back</button>
+      <div style="flex:1;font-size:13px;font-weight:800;color:#4edfd0">✏️ Editing Mode</div>
+      <div style="font-size:10px;background:rgba(252,119,144,0.15);border:1px solid rgba(252,119,144,0.3);border-radius:6px;padding:3px 8px;color:#fc7790;font-weight:700;animation:pulse 2s infinite">● EDITING</div>
+    </div>
+    <div style="padding:14px">
+      <!-- Level name -->
+      <div style="margin-bottom:12px">
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px">Level Name</div>
+        <input id="mr-ed-name" class="adm-input" value="${lvl.name}" placeholder="e.g. Sakura Canyon" style="width:100%">
+      </div>
+
+      <!-- Theme picker -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Visual Theme</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px" id="mr-ed-themes">
+          ${MR_ADMIN_THEMES.map(t => `
+            <button onclick="document.getElementById('mr-ed-themes').querySelectorAll('button').forEach(b=>b.style.borderColor='rgba(255,255,255,0.1)');this.style.borderColor='#4edfd0';_mAdmEditLevel.theme='${t}';playSound('click')" 
+              style="padding:8px 6px;border-radius:10px;background:${lvl.theme===t?'rgba(78,223,208,0.15)':'rgba(255,255,255,0.04)'};border:1px solid ${lvl.theme===t?'#4edfd0':'rgba(255,255,255,0.1)'};color:${lvl.theme===t?'#4edfd0':'rgba(255,255,255,0.6)'};font-size:12px;font-weight:700;cursor:pointer;text-align:center">
+              ${MR_ADMIN_THEME_LABELS[t]}
+            </button>`).join('')}
+        </div>
+      </div>
+
+      <!-- Obstacle builder -->
+      <div style="margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px">Obstacles (${lvl.obstacles.length})</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.25)">Auto-layout — no manual placement needed</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:8px">
+          ${['ramp','peg','bumper','springboard','fan','gear','stickyzone','bridge','conveyor','seesaw','bouncywall','slide','rollerchain'].map(type => `
+            <button onclick="playSound('click');document.getElementById('mr-ed-obs-count-${type}').textContent=parseInt(document.getElementById('mr-ed-obs-count-${type}').textContent||0)+1;_admMROBSCount('${type}',1)" 
+              style="padding:7px 4px;border-radius:9px;background:rgba(160,136,250,0.08);border:1px solid rgba(160,136,250,0.2);color:#c0b9f5;font-size:10px;font-weight:600;cursor:pointer;position:relative">
+              ${{ramp:'⬟ Ramp',peg:'● Peg',bumper:'◉ Bumper',springboard:'🔴 Spring',fan:'💨 Fan',gear:'⚙️ Gear',stickyzone:'🟣 Sticky',bridge:'🌉 Bridge',conveyor:'🔁 Conv.',seesaw:'⚖️ Seesaw',bouncywall:'🧱 Bounce',slide:'📐 Slide',rollerchain:'⛓ Chain'}[type]}
+              <span style="position:absolute;top:-4px;right:-4px;background:#a088fa;color:#fff;border-radius:99px;font-size:8px;font-weight:800;min-width:14px;height:14px;display:flex;align-items:center;justify-content:center" id="mr-ed-obs-count-${type}">${lvl.obstacles.filter(o=>o.type===type).length}</span>
+            </button>`).join('')}
+        </div>
+        <button onclick="playSound('click');_mAdmEditLevel.obstacles=[];document.querySelectorAll('[id^=mr-ed-obs-count-]').forEach(el=>el.textContent='0')" style="width:100%;padding:7px;border-radius:9px;background:rgba(252,119,144,0.08);border:1px solid rgba(252,119,144,0.2);color:#fc7790;font-size:11px;cursor:pointer">🗑 Clear All Obstacles</button>
+      </div>
+
+      <!-- Level density slider -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Obstacle Density <span id="mr-ed-density-val">${lvl.density||5}</span>/10</div>
+        <input type="range" min="1" max="10" value="${lvl.density||5}" oninput="document.getElementById('mr-ed-density-val').textContent=this.value;_mAdmEditLevel.density=parseInt(this.value)" style="width:100%;accent-color:#4edfd0">
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,0.2);margin-top:2px"><span>Relaxed</span><span>Chaotic</span></div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button onclick="playSound('click');_admMRSaveLevelFromEditor()" style="width:100%;padding:12px;border-radius:14px;background:linear-gradient(135deg,#4edfd0,#566ee3);border:none;color:#fff;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(78,223,208,0.3)">💾 Save to Gallery</button>
+        <button onclick="playSound('click');_admMRSaveLevelFromEditor(true)" style="width:100%;padding:12px;border-radius:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:13px;font-weight:700;cursor:pointer">▶ Save & Test Level</button>
+      </div>
+    </div>
+  `;
+}
+
+window._admMROBSCount = function(type, delta) {
+  if (!_mAdmEditLevel) return;
+  if (!_mAdmEditLevel.obstacles) _mAdmEditLevel.obstacles = [];
+  if (delta > 0) {
+    // Add a placeholder obstacle of this type
+    _mAdmEditLevel.obstacles.push({ type });
+  } else if (delta < 0) {
+    const idx = _mAdmEditLevel.obstacles.findLastIndex ? _mAdmEditLevel.obstacles.findLastIndex(o=>o.type===type) : [..._mAdmEditLevel.obstacles].reverse().findIndex(o=>o.type===type);
+    if (idx >= 0) _mAdmEditLevel.obstacles.splice(idx, 1);
+  }
+};
+
+function _admMRSaveLevelFromEditor(andTest) {
+  if (!_mAdmEditLevel) return;
+  const nameEl = document.getElementById('mr-ed-name');
+  if (nameEl) _mAdmEditLevel.name = nameEl.value.trim() || 'Unnamed Level';
+  _mAdmEditLevel.updatedAt = Date.now();
+  // Upsert in gallery
+  const idx = _mAdmGallery.findIndex(l => l.id === _mAdmEditLevel.id);
+  if (idx >= 0) _mAdmGallery[idx] = { ..._mAdmEditLevel };
+  else _mAdmGallery.push({ ..._mAdmEditLevel });
+  _admMRSaveGallery().then(() => {
+    showNotif('✅','Level saved!', _mAdmEditLevel.name);
+    playSound('success');
+    if (andTest) {
+      _mAdmTestLevel = { ..._mAdmEditLevel };
+      _mAdmMode = 'testing';
+    } else {
+      _mAdmMode = 'list';
+    }
+    window._admRenderMarbleTab(document.getElementById('admin-content'));
+  });
+}
+
+function _admMRRenderTesting(content) {
+  const lvl = _mAdmTestLevel;
+  content.innerHTML = `
+    <div style="position:sticky;top:0;z-index:10;background:rgba(3,3,26,0.97);backdrop-filter:blur(12px);padding:8px 14px;border-bottom:1px solid rgba(246,187,78,0.3);display:flex;align-items:center;gap:10px">
+      <button onclick="playSound('click');if(mrAnimFrame){cancelAnimationFrame(mrAnimFrame);mrAnimFrame=null;}if(mrCountTimer){clearInterval(mrCountTimer);mrCountTimer=null;}_mAdmMode='list';window._admRenderMarbleTab(document.getElementById('admin-content'))" style="padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:12px;cursor:pointer">← Back</button>
+      <div style="flex:1;font-size:13px;font-weight:800;color:#f6bb4e">▶ Testing: ${lvl?.name||'Level'}</div>
+      <div style="font-size:10px;background:rgba(246,187,78,0.15);border:1px solid rgba(246,187,78,0.3);border-radius:6px;padding:3px 8px;color:#f6bb4e;font-weight:700;animation:pulse 2s infinite">● TEST MODE</div>
+    </div>
+    <div style="flex:1;position:relative;overflow:hidden;background:#03031a" id="mr-test-viewport">
+      <canvas id="mr-canvas" width="${MR_W}" height="${MR_H}" style="display:block;width:100%;position:absolute;top:0;left:0"></canvas>
+    </div>
+    <div id="mr-ui" style="flex-shrink:0;background:rgba(3,3,26,0.98);border-top:1px solid rgba(246,187,78,0.2);padding:10px 14px">
+      <button onclick="playSound('click');_admMRStartTestRace()" style="width:100%;padding:11px;border-radius:12px;background:linear-gradient(135deg,#f6bb4e,#e78161);border:none;color:#000;font-size:13px;font-weight:900;cursor:pointer">🏁 Start Test Race</button>
+    </div>
+  `;
+  // Set up canvas for this level
+  mrCanvas = document.getElementById('mr-canvas');
+  mrCtx = mrCanvas ? mrCanvas.getContext('2d') : null;
+  if (!mrCtx) return;
+  if (lvl?.theme) mrTheme = lvl.theme;
+  mrDrawIdle();
+}
+
+window._admMRStartTestRace = function() {
+  mrVotedColor = MARBLE_COLORS[Math.floor(Math.random()*MARBLE_COLORS.length)].id;
+  mrStartCountdown();
+};
+
+window._admMRBroadcastRaceDay = async function() {
+  try {
+    await fbDb.collection('broadcasts').add({
+      type:'announcement', active:true,
+      emoji:'🏁', title:'Race Day is Live!',
+      message:'Marble Race is open today — place your bets and compete for tickets!',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    playSound('success');
+    showNotif('✅','Broadcast sent!','Players notified of race day');
+    launchConfetti();
+  } catch(e) { showNotif('⚠️','Failed', e.message); }
+};
 
 window._adminBroadcast = async function(type) {
   if (!fbCurrentUser || fbCurrentUser.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
