@@ -6147,7 +6147,9 @@ function renderPlinko() {
   plinkoCamY = 0; plinkoCamSmooth = 0;
   startPlinkoLoop();
   _plinkoStartLiveBroadcast();
-} buildPlinkoBoard(); playSound('click'); }
+}
+
+function rebuildPlinkoBoard() { buildPlinkoBoard(); playSound('click'); }
 
 function plinkoOpenSettings() {
   playSound('click');
