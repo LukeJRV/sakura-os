@@ -7583,6 +7583,7 @@ function _clawStopLiveBroadcast() {
     try { fbDb.collection('liveView').doc(fbCurrentUser.uid + '_claw').delete(); } catch(e) {}
   }
 }
+function renderClaw() {
   const c = document.getElementById('claw-content');
   if (!c) return;
   c.innerHTML = `
@@ -7654,6 +7655,7 @@ function _clawStopLiveBroadcast() {
   startMClawLoop();
   _clawStartLiveBroadcast();
 }
+function mClawDrop() {
   if (mClawState !== 'moving') return;
   if (S.clawCredits <= 0) { showNotif('❌','No credits!','Buy in Shop'); playSound('error'); return; }
   S.clawCredits--; saveState(); playSound('whoosh');
