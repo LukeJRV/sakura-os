@@ -322,7 +322,6 @@ button, a { touch-action: manipulation; }
   animation:spinSlow 4s linear infinite;
 }
 @keyframes spinSlow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
 /* ===== TICKET BAR ===== */
 #ticketbar {
@@ -404,7 +403,7 @@ button, a { touch-action: manipulation; }
   padding-bottom: 100px;
 }
 /* Screens with a sticky header — header sticks at top of scroll container (already offset 74px) */
-.screen.has-header { padding-top: 0; }
+.screen:has(> .screen-header) { padding-top: 0; }
 .screen.active { display:flex; flex-direction:column; }
 
 /* Scrollbar */
@@ -528,7 +527,7 @@ body.is-admin .admin-only { display: inline-flex !important; }
   border-bottom:1px solid rgba(255,255,255,0.05);
 }
 /* Screens with a sticky header need no top padding — #screens already clears the chrome */
-.screen.has-header { padding-top: 0; }
+.screen:has(> .screen-header) { padding-top: 0; }
 .back-btn {
   background:none; border:none;
   color:var(--accent1);
@@ -1995,7 +1994,6 @@ input[type=number] { -moz-appearance:textfield; }
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(246,187,78,0.2),rgba(231,129,97,0.15));border:1px solid rgba(246,187,78,0.4);color:#f6bb4e;font-weight:800" onclick="admSwitchTab('liveupdater',this)">🔄 Updater</button>
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(160,136,250,0.2),rgba(252,119,144,0.15));border:1px solid rgba(160,136,250,0.35);color:#c0b9f5;font-weight:800" onclick="admSwitchTab('claw',this)">🦾 Claw</button>
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(78,223,208,0.15),rgba(160,136,250,0.1));border:1px solid rgba(78,223,208,0.3);color:#4edfd0;font-weight:800" onclick="admSwitchTab('plinko',this)">🎯 Plinko</button>
-        <button class="adm-tab" style="background:linear-gradient(135deg,rgba(78,223,208,0.2),rgba(86,110,227,0.2));border:1px solid rgba(78,223,208,0.4);color:#4edfd0;font-weight:800" onclick="admSwitchTab('marbleadmin',this)">🔮 Marble</button>
       </div>
     </div>
     <div class="adm-body" id="admin-content"></div>
@@ -2088,7 +2086,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== MARBLE RACE SCREEN ===== -->
-    <div id="screen-marblerace" class="screen has-header" style="padding:0;flex-direction:column;background:#050518">
+    <div id="screen-marblerace" class="screen" style="padding:0;flex-direction:column;background:#050518">
       <div class="screen-header" style="background:rgba(5,5,24,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(78,223,208,0.2)">
         <button class="back-btn" onclick="openScreen('home')" style="color:#4edfd0;background:rgba(78,223,208,0.1);border-color:rgba(78,223,208,0.3)">←</button>
         <span class="screen-title" style="color:#e0f7ff">🔮 Marble Race</span>
@@ -2098,7 +2096,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== GIFTS SCREEN ===== -->
-    <div id="screen-gifts" class="screen has-header" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#1a0a20 0%,#0a0518 100%)">
+    <div id="screen-gifts" class="screen" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#1a0a20 0%,#0a0518 100%)">
       <div class="screen-header" style="background:rgba(26,10,32,0.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(251,171,216,0.2)">
         <button class="back-btn" onclick="openScreen('home')" style="color:#fbabd8;background:rgba(251,171,216,0.1);border-color:rgba(251,171,216,0.3)">←</button>
         <span class="screen-title" style="color:#ffdcf0">🌸 Gift Box</span>
@@ -2109,7 +2107,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== CALENDAR SCREEN ===== -->
-    <div id="screen-calendar" class="screen has-header">
+    <div id="screen-calendar" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">📅 Calendar</span>
@@ -2119,7 +2117,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== SHOP SCREEN ===== -->
-    <div id="screen-shop" class="screen has-header">
+    <div id="screen-shop" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🛒 Shop</span>
@@ -2138,7 +2136,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== BACKPACK SCREEN ===== -->
-    <div id="screen-backpack" class="screen has-header">
+    <div id="screen-backpack" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🎒 Backpack</span>
@@ -2148,7 +2146,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== TASKS SCREEN ===== -->
-    <div id="screen-tasks" class="screen has-header">
+    <div id="screen-tasks" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">✅ Tasks</span>
@@ -2158,7 +2156,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== BATTLEPASS SCREEN ===== -->
-    <div id="screen-battlepass" class="screen has-header" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#1a0e00 0%,#0a0a0a 100%)">
+    <div id="screen-battlepass" class="screen" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#1a0e00 0%,#0a0a0a 100%)">
       <div class="screen-header" style="background:rgba(0,0,0,0.6);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,215,0,0.15)">
         <button class="back-btn" onclick="openScreen('home')" style="color:#ffd700;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2)">←</button>
         <span class="screen-title" style="background:linear-gradient(90deg,#ffd700,#ff8c00,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent">🏆 Season Pass</span>
@@ -2168,7 +2166,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== APP STORE SCREEN ===== -->
-    <div id="screen-appstore" class="screen has-header" style="padding:0;flex-direction:column">
+    <div id="screen-appstore" class="screen" style="padding:0;flex-direction:column">
       <div class="screen-header" style="background:rgba(0,10,30,0.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(13,132,255,0.2)">
         <button class="back-btn" onclick="openScreen('home')" style="background:rgba(13,132,255,0.15);border-color:rgba(13,132,255,0.3);color:#4db8ff">←</button>
         <span class="screen-title" style="background:linear-gradient(90deg,#0d84ff,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900">App Store</span>
@@ -2178,7 +2176,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== PIGGY BANK SCREEN ===== -->
-    <div id="screen-piggybank" class="screen has-header" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#1a0a12 0%,#0a0508 100%)">
+    <div id="screen-piggybank" class="screen" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#1a0a12 0%,#0a0508 100%)">
       <div class="screen-header" style="background:rgba(26,5,15,0.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,107,157,0.2)">
         <button class="back-btn" onclick="openScreen('home')" style="background:rgba(255,107,157,0.15);border-color:rgba(255,107,157,0.3);color:#ff9ab0">←</button>
         <span class="screen-title" style="background:linear-gradient(90deg,#ff6b9d,#ff9a8b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900">🐷 Piggy Bank</span>
@@ -2188,7 +2186,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== STACKER SCREEN ===== -->
-    <div id="screen-stacker" class="screen has-header" style="padding:0;flex-direction:column;background:#000">
+    <div id="screen-stacker" class="screen" style="padding:0;flex-direction:column;background:#000">
       <div class="screen-header" style="background:rgba(0,0,20,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(13,132,255,0.25)">
         <button class="back-btn" onclick="openScreen('home')" style="background:rgba(13,132,255,0.12);border-color:rgba(13,132,255,0.3);color:#4db8ff">←</button>
         <span class="screen-title" style="background:linear-gradient(90deg,#0d84ff,#a088fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900">STACKER</span>
@@ -2198,7 +2196,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== CHAT SCREEN ===== -->
-    <div id="screen-chat" class="screen has-header" style="padding:0;flex-direction:column">
+    <div id="screen-chat" class="screen" style="padding:0;flex-direction:column">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">💬 Messages</span>
@@ -2208,7 +2206,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== CHAT CONVO SCREEN ===== -->
-    <div id="screen-chat-convo" class="screen has-header" style="padding:0;flex-direction:column;display:none;min-height:0">
+    <div id="screen-chat-convo" class="screen" style="padding:0;flex-direction:column;display:none;min-height:0">
       <div class="screen-header" style="flex-shrink:0">
         <button class="back-btn" onclick="openScreen('chat')">←</button>
         <div style="display:flex;align-items:center;gap:8px;flex:1">
@@ -2227,7 +2225,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== NOTES SCREEN ===== -->
-    <div id="screen-notes" class="screen has-header" style="padding:0;flex-direction:column;overflow:hidden">
+    <div id="screen-notes" class="screen" style="padding:0;flex-direction:column;overflow:hidden">
       <div class="screen-header" style="flex-shrink:0">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">📝 Notes</span>
@@ -2263,7 +2261,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== REMINDERS SCREEN ===== -->
-    <div id="screen-reminders" class="screen has-header">
+    <div id="screen-reminders" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🔔 Reminders</span>
@@ -2273,7 +2271,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== PET SCREEN ===== -->
-    <div id="screen-pet" class="screen has-header">
+    <div id="screen-pet" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🐾 Virtual Pet</span>
@@ -2283,7 +2281,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== COUPONS SCREEN ===== -->
-    <div id="screen-coupons" class="screen has-header">
+    <div id="screen-coupons" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🎫 Coupons</span>
@@ -2293,7 +2291,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== ACHIEVEMENTS / GOALS SCREEN ===== -->
-    <div id="screen-achievements" class="screen has-header">
+    <div id="screen-achievements" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span id="achieve-screen-title" class="screen-title">🏆 Goals</span>
@@ -2303,7 +2301,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== PLINKO SCREEN ===== -->
-    <div id="screen-plinko" class="screen has-header">
+    <div id="screen-plinko" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🎯 Plinko</span>
@@ -2313,7 +2311,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== SPIN WHEEL SCREEN ===== -->
-    <div id="screen-spinwheel" class="screen has-header">
+    <div id="screen-spinwheel" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🎡 Spin Wheel</span>
@@ -2323,7 +2321,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== CLAW MACHINE SCREEN ===== -->
-    <div id="screen-claw" class="screen has-header">
+    <div id="screen-claw" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🦾 Claw Machine</span>
@@ -2333,7 +2331,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== COIN PUSHER SCREEN ===== -->
-    <div id="screen-coinpusher" class="screen has-header">
+    <div id="screen-coinpusher" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🪙 Coin Pusher</span>
@@ -2342,7 +2340,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== GACHA MACHINE SCREEN ===== -->
-    <div id="screen-gacha" class="screen has-header">
+    <div id="screen-gacha" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🎰 Gacha</span>
@@ -2352,7 +2350,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== WISHLIST SCREEN ===== -->
-    <div id="screen-wishlist" class="screen has-header">
+    <div id="screen-wishlist" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">⭐ Wishlist</span>
@@ -2385,7 +2383,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== SUPPORT CHAT SCREEN ===== -->
-    <div id="screen-support" class="screen has-header" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#000c18 0%,#000508 100%)">
+    <div id="screen-support" class="screen" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#000c18 0%,#000508 100%)">
       <div class="screen-header" style="background:rgba(0,12,24,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(78,223,208,0.2)">
         <button class="back-btn" onclick="openScreen('settings')" style="background:rgba(78,223,208,0.1);border-color:rgba(78,223,208,0.3);color:#4edfd0">←</button>
         <span class="screen-title" style="background:linear-gradient(90deg,#4edfd0,#6f96ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900">💬 Support</span>
@@ -2395,7 +2393,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== SETTINGS SCREEN ===== -->
-    <div id="screen-settings" class="screen has-header">
+    <div id="screen-settings" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">⚙️ Settings</span>
@@ -2415,7 +2413,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== THEME SHOP SCREEN ===== -->
-    <div id="screen-themeshop" class="screen has-header">
+    <div id="screen-themeshop" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🎨 Theme Shop</span>
@@ -2423,7 +2421,7 @@ input[type=number] { -moz-appearance:textfield; }
       <div id="themeshop-content" style="padding:16px"></div>
     </div>
 
-    <div id="screen-updatelogs" class="screen has-header">
+    <div id="screen-updatelogs" class="screen">
       <div class="screen-header" style="background:linear-gradient(135deg,rgba(160,136,250,0.15),rgba(125,101,214,0.08));border-bottom:1px solid rgba(160,136,250,0.2)">
         <button class="back-btn" onclick="openScreen('home')" style="color:#a088fa">←</button>
         <span class="screen-title" style="background:linear-gradient(90deg,#c0b9f5,#a088fa,#fbabd8);-webkit-background-clip:text;-webkit-text-fill-color:transparent">📋 Update Logs</span>
@@ -2913,12 +2911,12 @@ const DEFAULT_STATE = {
   coupons: [],
   wishes: [],
   gachaBubbles: [
-    { id:1, emoji:'🌸', name:'Cherry Blossom', rarity:'common',    color:'#fbabd8', tickets:10  },
-    { id:2, emoji:'💎', name:'Diamond',        rarity:'rare',      color:'#91c7ff', tickets:17  },
-    { id:3, emoji:'🌟', name:'Gold Star',      rarity:'epic',      color:'#f6bb4e', tickets:40  },
-    { id:4, emoji:'🦄', name:'Unicorn',        rarity:'legendary', color:'#ca7ced', tickets:65  },
-    { id:5, emoji:'🎮', name:'Game Token',     rarity:'common',    color:'#566ee3', tickets:10  },
-    { id:6, emoji:'🍀', name:'Lucky Clover',   rarity:'uncommon',  color:'#4caf6e', tickets:22  },
+    { id:1, emoji:'🌸', name:'Cherry Blossom', rarity:'common', color:'#fbabd8', tickets:0 },
+    { id:2, emoji:'💎', name:'Diamond', rarity:'rare', color:'#91c7ff', tickets:50 },
+    { id:3, emoji:'🌟', name:'Gold Star', rarity:'epic', color:'#f6bb4e', tickets:100 },
+    { id:4, emoji:'🦄', name:'Unicorn', rarity:'legendary', color:'#ca7ced', tickets:200 },
+    { id:5, emoji:'🎮', name:'Game Token', rarity:'common', color:'#566ee3', tickets:0 },
+    { id:6, emoji:'🍀', name:'Lucky Clover', rarity:'uncommon', color:'#4caf6e', tickets:20 },
   ],
   gachaCost: 10,
   backpackSlots: 6,
@@ -5377,22 +5375,21 @@ function bpShowMobileSheet(html) {
     sheet.className = 'bp-mobile-sheet';
     document.getElementById('phone').appendChild(sheet);
     sheet.addEventListener('click', e => { if(e.target===sheet) bpCloseMobileSheet(); });
-    sheet.addEventListener('touchstart', e => { if(e.target===sheet) { e.preventDefault(); bpCloseMobileSheet(); } }, {passive:false});
-  }
-  // Backdrop
-  let bd = document.getElementById('bp-sheet-backdrop');
-  if (!bd) {
-    bd = document.createElement('div');
-    bd.id = 'bp-sheet-backdrop';
-    bd.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,0.5);z-index:9998;opacity:0;transition:opacity 0.3s;pointer-events:none';
-    bd.addEventListener('click', bpCloseMobileSheet);
-    bd.addEventListener('touchend', e => { e.preventDefault(); bpCloseMobileSheet(); }, {passive:false});
-    document.getElementById('phone').appendChild(bd);
+    // Backdrop
+    let bd = document.getElementById('bp-sheet-backdrop');
+    if (!bd) {
+      bd = document.createElement('div');
+      bd.id = 'bp-sheet-backdrop';
+      bd.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,0.5);z-index:9998;opacity:0;transition:opacity 0.3s';
+      bd.addEventListener('click', bpCloseMobileSheet);
+      document.getElementById('phone').appendChild(bd);
+    }
   }
   sheet.innerHTML = html;
   requestAnimationFrame(() => {
     sheet.classList.add('open');
-    if (bd) { bd.style.opacity = '1'; bd.style.pointerEvents = 'auto'; }
+    const bd = document.getElementById('bp-sheet-backdrop');
+    if (bd) bd.style.opacity = '1';
   });
 }
 
@@ -5400,7 +5397,7 @@ function bpCloseMobileSheet() {
   const sheet = document.getElementById('bp-mobile-sheet');
   if (sheet) sheet.classList.remove('open');
   const bd = document.getElementById('bp-sheet-backdrop');
-  if (bd) { bd.style.opacity = '0'; bd.style.pointerEvents = 'none'; }
+  if (bd) bd.style.opacity = '0';
 }
 
 function bpShowHoverTooltip(slot, i) {
@@ -9066,14 +9063,28 @@ function renderMarbleRace() {
     return;
   }
 
-  if (mrAnimFrame) { cancelAnimationFrame(mrAnimFrame); mrAnimFrame = null; }
-  if (mrCountTimer) { clearInterval(mrCountTimer); mrCountTimer = null; }
+  // Clean up any running animation / timers
+  if (mrAnimFrame)      { cancelAnimationFrame(mrAnimFrame); mrAnimFrame = null; }
+  if (mrCountTimer)     { clearInterval(mrCountTimer);       mrCountTimer = null; }
+  if (mrStuckCountTimer){ clearInterval(mrStuckCountTimer);  mrStuckCountTimer = null; mrStuckCountdown = 0; }
+  if (mrTop3CheckTimer) { clearTimeout(mrTop3CheckTimer);    mrTop3CheckTimer = null; }
+
+  // If we left mid-race or mid-countdown, drop back to vote so the UI is never broken
+  if (mrState === 'racing' || mrState === 'countdown') {
+    mrState = 'vote';
+    mrVotedColor = null;
+    mrFinishOrder = [];
+    mrCameraY = 0;
+    mrCameraTarget = null;
+    mrTop3Done = false;
+    mrTicketsAwarded = false;
+  }
 
   c.innerHTML = `
     <div style="display:flex;flex-direction:column;height:100%;background:linear-gradient(180deg,#03031a 0%,#060620 100%)">
       <!-- Canvas viewport -->
-      <div id="mr-viewport" style="flex:1;overflow:hidden;position:relative;background:#03031a">
-        <canvas id="mr-canvas" width="${MR_W}" height="${MR_H}" style="display:block;width:100%;position:absolute;top:0;left:0"></canvas>
+      <div id="mr-viewport" style="flex:1;overflow:hidden;position:relative;min-height:0;background:#03031a">
+        <canvas id="mr-canvas" style="display:block;position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
       </div>
       <!-- UI panel below canvas -->
       <div id="mr-ui" style="flex-shrink:0;background:linear-gradient(180deg,rgba(3,3,26,0.98),rgba(6,6,32,1));border-top:1px solid rgba(78,223,208,0.15);max-height:260px;overflow-y:auto"></div>
@@ -9082,6 +9093,23 @@ function renderMarbleRace() {
   mrCanvas = document.getElementById('mr-canvas');
   mrCtx = mrCanvas ? mrCanvas.getContext('2d') : null;
   if (!mrCtx) return;
+
+  // HiDPI: size canvas to physical pixels so everything is crisp
+  (function setupMRCanvas() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 3);
+    const vp  = document.getElementById('mr-viewport');
+    // Use clientWidth for canvas width; world height stays MR_H
+    const cssW = vp ? vp.clientWidth  : MR_W;
+    const cssH = MR_H;
+    mrCanvas.width  = cssW * dpr;
+    mrCanvas.height = cssH * dpr;
+    mrCanvas.style.width  = cssW + 'px';
+    mrCanvas.style.height = cssH + 'px';
+    mrCtx.scale(dpr, dpr);
+    // Stash for hit-test and draw routines
+    mrCanvas._dpr  = dpr;
+    mrCanvas._cssW = cssW;
+  })();
   if (mrState === 'vote') renderMRVoteUI();
   else if (mrState === 'results') renderMRResultsUI();
   mrDrawIdle();
@@ -9461,12 +9489,14 @@ function mrStepPhysics() {
 
   mrRaceTime++;
 
-  // ── Top-3 detection → start stuck countdown once 3 have finished ──
+  // ── After ANY finisher: if remaining marbles all slow to a crawl, clear them ──
+  const activeMarbles = mrMarbles.filter(m => !m.finished);
+  const finishedCount = mrMarbles.length - activeMarbles.length;
+
+  // Top-3 done → give 4 s then force-clear
   if (!mrTop3Done && mrFinishOrder.length >= 3) {
     mrTop3Done = true;
-    const activeLeft = mrMarbles.filter(m => !m.finished);
-    if (activeLeft.length > 0) {
-      // Give remaining marbles 4 seconds to finish naturally before countdown
+    if (activeMarbles.length > 0) {
       mrTop3CheckTimer = setTimeout(() => {
         if (mrState === 'racing' && mrMarbles.some(m => !m.finished)) {
           mrStartStuckCountdown();
@@ -9475,21 +9505,19 @@ function mrStepPhysics() {
     }
   }
 
-  // ── Individual stuck detection (any marble genuinely stuck) ──
-  const activeMarbles = mrMarbles.filter(m => !m.finished);
-  const finishedCount = mrMarbles.length - activeMarbles.length;
+  // Even 1 finisher: if ALL remaining have been slow for > ~5 s (300 frames), force-clear
   if (activeMarbles.length > 0 && finishedCount > 0 && mrStuckCountdown === 0 && !mrStuckCountTimer && !mrTop3CheckTimer) {
-    const allStuck = activeMarbles.every(m => Math.hypot(m.vx, m.vy) < 0.4 && (m._stuckFrames||0) > 90);
-    if (allStuck) mrStartStuckCountdown();
+    const allSlow = activeMarbles.every(m => (m._stuckFrames || 0) > 300);
+    if (allSlow) mrStartStuckCountdown();
   }
 
-  // Hard timeout
+  // Hard wall-clock timeout (90 s at 60fps)
   if (mrRaceTime > 5400) {
-    mrMarbles.filter(m=>!m.finished).forEach(m => {
-      m.finished=true; m.finishRank=mrFinishOrder.length+1; mrFinishOrder.push(m.id);
+    mrMarbles.filter(m => !m.finished).forEach(m => {
+      m.finished = true; m.finishRank = mrFinishOrder.length + 1; mrFinishOrder.push(m.id);
     });
   }
-  if (mrMarbles.every(m=>m.finished)) setTimeout(() => mrEndRace(), 800);
+  if (mrMarbles.every(m => m.finished)) setTimeout(() => mrEndRace(), 800);
 }
 
 function mrStartStuckCountdown() {
@@ -9552,35 +9580,53 @@ function mrUpdateCommentary() {
 
 function mrScrollCamera() {
   if (mrState !== 'racing' || !mrMarbles.length) return;
-  const vp = document.getElementById('mr-viewport');
-  const vpH = vp ? vp.clientHeight : 440;
+  const vp  = document.getElementById('mr-viewport');
+  const vpH = vp ? vp.clientHeight : 500;
 
-  let targetMarble;
+  // --- Resolve which marble to follow ---
+  let targetMarble = null;
   if (mrCameraTarget) {
     targetMarble = mrMarbles.find(m => m.id === mrCameraTarget) || null;
-    // Keep following even if finished — camera stays on chosen marble
-    if (!targetMarble) mrCameraTarget = null;
+    if (!targetMarble) mrCameraTarget = null; // target gone
   }
-  if (!mrCameraTarget) {
-    // Auto-follow: furthest-down active marble; fall back to last finished
-    const active = mrMarbles.filter(m=>!m.finished);
+  if (!targetMarble) {
+    // Auto: follow the furthest-down unfinished marble
+    const active = mrMarbles.filter(m => !m.finished);
     if (active.length) {
-      targetMarble = active.sort((a,b)=>b.y-a.y)[0];
+      targetMarble = active.sort((a, b) => b.y - a.y)[0];
     } else {
-      targetMarble = mrMarbles[mrMarbles.length-1];
+      // All finished — settle camera on finish line
+      targetMarble = { y: MR_H - 22 };
     }
   }
-  if (!targetMarble) return;
 
-  const target = Math.max(0, Math.min(MR_H - vpH, targetMarble.y - vpH * 0.40));
-  mrCameraY += (target - mrCameraY) * 0.08;
+  // --- Bias toward finish line as marble approaches it ---
+  const finishY     = MR_H - 22;
+  const distToFin   = finishY - targetMarble.y;
+  // vertBias: how far above centre the marble sits (0.40 = 40% from top)
+  // When ≤200px from finish, smoothly shift the focal point downward so the
+  // finish line slides into the bottom third of the viewport
+  let vertBias;
+  if (distToFin <= 200) {
+    const t  = Math.max(0, 1 - distToFin / 200); // 0→1 as marble nears finish
+    vertBias = vpH * (0.40 - t * 0.28);           // shifts from 40% → 12%
+  } else {
+    vertBias = vpH * 0.40;
+  }
+
+  const rawTarget     = targetMarble.y - vertBias;
+  const maxCam        = MR_H - vpH;
+  const clampedTarget = Math.max(0, Math.min(maxCam, rawTarget));
+
+  // Faster lerp (0.12) so camera keeps up on mobile
+  mrCameraY += (clampedTarget - mrCameraY) * 0.12;
   mrUpdateCameraUI();
 }
 
 function mrUpdateCameraUI() {
   const panel = document.getElementById('mr-cam-panel');
   if (!panel) return;
-  const ranked = [...mrMarbles].sort((a,b) => {
+  const ranked = [...mrMarbles].sort((a, b) => {
     if (a.finished && b.finished) return a.finishRank - b.finishRank;
     if (a.finished) return -1;
     if (b.finished) return 1;
@@ -9588,13 +9634,26 @@ function mrUpdateCameraUI() {
   });
   panel.innerHTML = ranked.map((m, ri) => {
     const isActive = mrCameraTarget === m.id || (!mrCameraTarget && ri === 0);
-    const isVoted = m.id === mrVotedColor;
-    const medal = ri===0?'🥇':ri===1?'🥈':ri===2?'🥉':`#${ri+1}`;
-    return `<div onclick="mrSetCamera('${m.id}')" style="display:inline-flex;align-items:center;gap:4px;padding:5px 9px;border-radius:10px;cursor:pointer;background:${isActive?`${m.hex}33`:'rgba(255,255,255,0.04)'};border:1.5px solid ${isActive?m.hex:'rgba(255,255,255,0.08)'};transition:all 0.15s;flex-shrink:0;box-shadow:${isActive?`0 0 8px ${m.hex}55`:'none'}">
-      <div style="width:13px;height:13px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,${m.hex});box-shadow:0 0 5px ${m.glow};flex-shrink:0${isVoted?';outline:2px solid #fff':''}"></div>
-      <span style="font-size:8px;font-weight:800;color:${isActive?'#fff':'rgba(255,255,255,0.45)'}">${medal}</span>
+    const isVoted  = m.id === mrVotedColor;
+    const pos      = ri === 0 ? '🥇' : ri === 1 ? '🥈' : ri === 2 ? '🥉' : `#${ri+1}`;
+    return `<div data-marble-id="${m.id}" style="display:inline-flex;align-items:center;gap:5px;padding:7px 11px;border-radius:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;background:${isActive ? m.hex+'44' : 'rgba(255,255,255,0.05)'};border:1.5px solid ${isActive ? m.hex : 'rgba(255,255,255,0.1)'};box-shadow:${isActive ? `0 0 10px ${m.hex}66` : 'none'};flex-shrink:0;transition:all 0.12s">
+      <div style="width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,${m.hex});box-shadow:0 0 6px ${m.glow};flex-shrink:0${isVoted ? ';outline:2.5px solid #fff;outline-offset:1px' : ''}"></div>
+      <span style="font-size:9px;font-weight:800;color:${isActive ? '#fff' : 'rgba(255,255,255,0.5)'};pointer-events:none">${pos}</span>
     </div>`;
   }).join('');
+
+  // Single delegated listener — re-attach each update
+  panel.onclick = null;
+  panel.addEventListener('click', function camClick(e) {
+    const el = e.target.closest('[data-marble-id]');
+    if (el) mrSetCamera(el.dataset.marbleId);
+  }, { once: true });
+  // Re-add for subsequent updates since we use once:true
+  panel._clickHandler = function(e) {
+    const el = e.target.closest('[data-marble-id]');
+    if (el) mrSetCamera(el.dataset.marbleId);
+  };
+  panel.addEventListener('click', panel._clickHandler);
 }
 
 function mrSetCamera(id) {
@@ -9609,50 +9668,50 @@ function mrSetCamera(id) {
   }
 }
 function mrDrawFrame() {
-  if (!mrCtx) return;
-  const ctx = mrCtx;
-  const vp = document.getElementById('mr-viewport');
-  const vpH = vp ? vp.clientHeight : 440;
+  if (!mrCtx || !mrCanvas) return;
+  const ctx  = mrCtx;
+  const dpr  = mrCanvas._dpr  || 1;
+  const cssW = mrCanvas._cssW || MR_W;
+  const vp   = document.getElementById('mr-viewport');
+  const vpH  = vp ? vp.clientHeight : 500;
   const camY = Math.round(mrCameraY);
 
-  // Only clear and draw the visible viewport region
-  ctx.clearRect(0, 0, MR_W, MR_H);
+  // Clear logical (CSS-pixel) space
+  ctx.clearRect(0, 0, cssW, MR_H);
 
-  // Apply camera transform — translate world up by camY
+  // ── Camera-space: world scrolled by camY ──
   ctx.save();
   ctx.translate(0, -camY);
 
-  // ── Theme-aware background ──
+  // Background
   const th = MR_THEMES[mrTheme] || MR_THEMES.space;
   const bg = ctx.createLinearGradient(0, 0, 0, MR_H);
   bg.addColorStop(0, th.bgA); bg.addColorStop(0.5, th.bgA); bg.addColorStop(1, th.bgB);
-  ctx.fillStyle=bg; ctx.fillRect(0, 0, MR_W, MR_H);
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, cssW, MR_H);
 
-  // Subtle particles / starfield
-  ctx.fillStyle='rgba(255,255,255,0.05)';
-  for(let i=0;i<60;i++){
-    const sx=((i*137+23)%MR_W), sy=((i*97+17)%MR_H);
-    ctx.beginPath(); ctx.arc(sx,sy,0.7,0,Math.PI*2); ctx.fill();
+  // Stars / grid
+  ctx.fillStyle = 'rgba(255,255,255,0.05)';
+  for (let i = 0; i < 60; i++) {
+    const sx = ((i*137+23) % cssW), sy = ((i*97+17) % MR_H);
+    ctx.beginPath(); ctx.arc(sx, sy, 0.8, 0, Math.PI*2); ctx.fill();
   }
+  ctx.strokeStyle = 'rgba(255,255,255,0.03)'; ctx.lineWidth = 0.5;
+  for (let x = 0; x < cssW; x += 24) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,MR_H); ctx.stroke(); }
+  for (let y = 0; y < MR_H; y += 24) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(cssW,y); ctx.stroke(); }
 
-  // Grid lines
-  ctx.strokeStyle='rgba(255,255,255,0.03)'; ctx.lineWidth=0.5;
-  for(let x=0;x<MR_W;x+=24){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,MR_H);ctx.stroke();}
-  for(let y=0;y<MR_H;y+=24){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(MR_W,y);ctx.stroke();}
-
-  // Track walls — themed colour
+  // Track walls
   const wallRGB = th.wallCol;
-  const wallG=ctx.createLinearGradient(0,0,8,0);
-  wallG.addColorStop(0, wallRGB); wallG.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle=wallG; ctx.fillRect(0,0,6,MR_H);
-  const wallGR=ctx.createLinearGradient(MR_W-6,0,MR_W,0);
-  wallGR.addColorStop(0,'rgba(0,0,0,0)'); wallGR.addColorStop(1, wallRGB);
-  ctx.fillStyle=wallGR; ctx.fillRect(MR_W-6,0,6,MR_H);
+  const wL = ctx.createLinearGradient(0,0,8,0);
+  wL.addColorStop(0, wallRGB); wL.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle = wL; ctx.fillRect(0, 0, 6, MR_H);
+  const wR = ctx.createLinearGradient(cssW-6,0,cssW,0);
+  wR.addColorStop(0,'rgba(0,0,0,0)'); wR.addColorStop(1, wallRGB);
+  ctx.fillStyle = wR; ctx.fillRect(cssW-6, 0, 6, MR_H);
 
-  // Obstacles — full visual pass for all types
+  // ── Obstacles ──
   mrObstacles.forEach(o => {
     ctx.save();
-    switch(o.type) {
+    switch (o.type) {
       case 'peg': {
         const pegBase = (MR_THEMES[mrTheme]||MR_THEMES.space).pegCol.replace('X','0.85');
         ctx.shadowBlur=8; ctx.shadowColor=pegBase;
@@ -9661,32 +9720,19 @@ function mrDrawFrame() {
         ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
         ctx.shadowBlur=0;
         ctx.beginPath(); ctx.arc(o.x-1.2,o.y-1.2,o.r*0.38,0,Math.PI*2);
-        ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fill();
-        break;
+        ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fill(); break;
       }
-      case 'ramp': {
+      case 'ramp': case 'slide': {
         ctx.translate(o.x,o.y); ctx.rotate(o.angle);
-        const rampBase = (MR_THEMES[mrTheme]||MR_THEMES.space).rampCol.replace('X','0.55');
-        ctx.shadowBlur=6; ctx.shadowColor=rampBase;
+        const isSlide = o.type==='slide';
+        const col = isSlide ? 'rgba(246,187,78,' : (MR_THEMES[mrTheme]||MR_THEMES.space).rampCol.replace('X,','');
+        const baseCol = isSlide ? 'rgba(246,187,78,0.7)' : (MR_THEMES[mrTheme]||MR_THEMES.space).rampCol.replace('X','0.55');
+        ctx.shadowBlur=6; ctx.shadowColor=baseCol;
         const rg=ctx.createLinearGradient(-o.w/2,-5,o.w/2,5);
-        rg.addColorStop(0,rampBase); rg.addColorStop(1,rampBase.replace('0.55','0.35'));
+        rg.addColorStop(0,baseCol); rg.addColorStop(1,baseCol.replace(/[\d.]+\)$/,'0.3)'));
         ctx.fillStyle=rg; ctx.fillRect(-o.w/2,-5,o.w,10);
-        ctx.strokeStyle=rampBase.replace('0.55','0.85'); ctx.lineWidth=1.5; ctx.strokeRect(-o.w/2,-5,o.w,10);
-        ctx.shadowBlur=0;
-        break;
-      }
-      case 'slide': {
-        ctx.translate(o.x,o.y); ctx.rotate(o.angle);
-        ctx.shadowBlur=5; ctx.shadowColor='rgba(246,187,78,0.5)';
-        const sg=ctx.createLinearGradient(-o.w/2,0,o.w/2,0);
-        sg.addColorStop(0,'rgba(246,187,78,0.6)'); sg.addColorStop(0.5,'rgba(255,220,80,0.8)'); sg.addColorStop(1,'rgba(246,187,78,0.6)');
-        ctx.fillStyle=sg; ctx.fillRect(-o.w/2,-4,o.w,8);
-        // Slide rails
-        ctx.strokeStyle='rgba(255,230,100,0.9)'; ctx.lineWidth=1.5;
-        ctx.beginPath(); ctx.moveTo(-o.w/2,-4); ctx.lineTo(o.w/2,-4); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(-o.w/2,4); ctx.lineTo(o.w/2,4); ctx.stroke();
-        ctx.shadowBlur=0;
-        break;
+        ctx.strokeStyle=baseCol.replace(/[\d.]+\)$/,'0.85)'); ctx.lineWidth=1.5; ctx.strokeRect(-o.w/2,-5,o.w,10);
+        ctx.shadowBlur=0; break;
       }
       case 'bumper': {
         ctx.translate(o.x,o.y); ctx.rotate(o.angle||0);
@@ -9697,220 +9743,121 @@ function mrDrawFrame() {
         ctx.fillRect(-o.r,-o.r*0.35,o.r*2,o.r*0.7); ctx.fillRect(-o.r*0.35,-o.r,o.r*0.7,o.r*2);
         ctx.strokeStyle='rgba(252,119,144,0.9)'; ctx.lineWidth=1;
         ctx.strokeRect(-o.r,-o.r*0.35,o.r*2,o.r*0.7); ctx.strokeRect(-o.r*0.35,-o.r,o.r*0.7,o.r*2);
-        ctx.shadowBlur=0;
-        break;
+        ctx.shadowBlur=0; break;
       }
       case 'funnel': {
         ctx.shadowBlur=5; ctx.shadowColor='rgba(246,187,78,0.5)';
         ctx.strokeStyle='rgba(246,187,78,0.7)'; ctx.lineWidth=2.5; ctx.lineCap='round';
         ctx.beginPath(); ctx.moveTo(o.cx-o.w/2,o.cy-12); ctx.lineTo(o.cx-o.w/4,o.cy+12); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(o.cx+o.w/2,o.cy-12); ctx.lineTo(o.cx+o.w/4,o.cy+12); ctx.stroke();
-        ctx.shadowBlur=0;
-        break;
+        ctx.shadowBlur=0; break;
       }
       case 'springboard': {
-        ctx.translate(o.x, o.y);
-        const springed = o.armed && o.springT < 12;
-        const scaleY = springed ? 1 + Math.sin(o.springT/12*Math.PI)*0.4 : 1;
-        ctx.scale(1, scaleY);
-        const sColor = o.armed ? '#ff6644' : (o.hits===1?'#f6bb4e':'#44ff88');
-        ctx.shadowBlur=8; ctx.shadowColor=sColor+'99';
-        ctx.fillStyle=sColor+'cc';
-        ctx.fillRect(-o.w/2,-5,o.w,10);
-        ctx.strokeStyle=sColor; ctx.lineWidth=2;
-        ctx.strokeRect(-o.w/2,-5,o.w,10);
-        // Spring coils
+        ctx.translate(o.x,o.y);
+        const springed=o.armed&&o.springT<12; const scaleY=springed?1+Math.sin(o.springT/12*Math.PI)*0.4:1;
+        ctx.scale(1,scaleY);
+        const sColor=o.armed?'#ff6644':(o.hits===1?'#f6bb4e':'#44ff88');
+        ctx.shadowBlur=8; ctx.shadowColor=sColor+'99'; ctx.fillStyle=sColor+'cc';
+        ctx.fillRect(-o.w/2,-5,o.w,10); ctx.strokeStyle=sColor; ctx.lineWidth=2; ctx.strokeRect(-o.w/2,-5,o.w,10);
         ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=1;
-        for(let i=0;i<4;i++){
-          const cx2=-o.w/2+o.w*(i+0.5)/4;
-          ctx.beginPath(); ctx.arc(cx2,0,3,0,Math.PI); ctx.stroke();
-        }
-        // Hits counter badge
-        ctx.shadowBlur=0;
-        ctx.fillStyle='#fff'; ctx.font='bold 7px Inter'; ctx.textAlign='center';
-        ctx.fillText(o.hits+'/2', 0, -9);
-        break;
+        for(let i=0;i<4;i++){const cx2=-o.w/2+o.w*(i+0.5)/4;ctx.beginPath();ctx.arc(cx2,0,3,0,Math.PI);ctx.stroke();}
+        ctx.shadowBlur=0; ctx.fillStyle='#fff'; ctx.font='bold 7px sans-serif'; ctx.textAlign='center';
+        ctx.fillText(o.hits+'/2',0,-9); break;
       }
       case 'fan': {
-        ctx.translate(o.x, o.y);
-        const fanColor = o.active ? '#4edfd0' : '#6688aa';
-        // Body
+        ctx.translate(o.x,o.y);
+        const fanColor=o.active?'#4edfd0':'#6688aa';
         ctx.fillStyle='rgba(30,40,60,0.85)'; ctx.strokeStyle=fanColor+'88'; ctx.lineWidth=1.2;
         ctx.beginPath(); ctx.arc(0,0,o.r*0.55,0,Math.PI*2); ctx.fill(); ctx.stroke();
-        // Spinning blades
         ctx.rotate(o.spin);
         for(let b=0;b<3;b++){
           ctx.save(); ctx.rotate(b*Math.PI*2/3);
-          ctx.fillStyle=fanColor+(o.active?'cc':'66');
-          ctx.shadowBlur=o.active?8:0; ctx.shadowColor=fanColor;
-          ctx.beginPath(); ctx.ellipse(0,-o.r*0.45,o.r*0.18,o.r*0.38,0,0,Math.PI*2); ctx.fill();
-          ctx.restore();
+          ctx.fillStyle=fanColor+(o.active?'cc':'66'); ctx.shadowBlur=o.active?8:0; ctx.shadowColor=fanColor;
+          ctx.beginPath(); ctx.ellipse(0,-o.r*0.45,o.r*0.18,o.r*0.38,0,0,Math.PI*2); ctx.fill(); ctx.restore();
         }
         ctx.shadowBlur=0;
-        // Wind lines if active
-        if (o.active) {
-          ctx.rotate(-o.spin); // unrotate for wind lines
-          const windX = o.dir * (o.r + 4);
-          for(let w=0;w<3;w++){
-            const wy = (w-1)*6;
-            const alpha = 0.3 + Math.sin(o.spin*2+w)*0.3;
+        if(o.active){ctx.rotate(-o.spin);const windX=o.dir*(o.r+4);
+          for(let w=0;w<3;w++){const wy=(w-1)*6,alpha=0.3+Math.sin(o.spin*2+w)*0.3;
             ctx.strokeStyle=`rgba(78,223,208,${alpha})`; ctx.lineWidth=1.5;
-            ctx.beginPath();
-            ctx.moveTo(windX, wy);
-            ctx.lineTo(windX + o.dir*12, wy);
-            ctx.stroke();
-            // arrowhead
-            ctx.beginPath();
-            ctx.moveTo(windX + o.dir*12, wy);
-            ctx.lineTo(windX + o.dir*8, wy-3);
-            ctx.moveTo(windX + o.dir*12, wy);
-            ctx.lineTo(windX + o.dir*8, wy+3);
-            ctx.stroke();
-          }
-        }
+            ctx.beginPath();ctx.moveTo(windX,wy);ctx.lineTo(windX+o.dir*12,wy);ctx.stroke();
+            ctx.beginPath();ctx.moveTo(windX+o.dir*12,wy);ctx.lineTo(windX+o.dir*8,wy-3);
+            ctx.moveTo(windX+o.dir*12,wy);ctx.lineTo(windX+o.dir*8,wy+3);ctx.stroke();}}
         break;
       }
       case 'gear': {
-        ctx.translate(o.x, o.y); ctx.rotate(o.angle);
+        ctx.translate(o.x,o.y); ctx.rotate(o.angle);
         ctx.shadowBlur=6; ctx.shadowColor='rgba(200,180,100,0.5)';
-        // Gear body
         const gc=ctx.createRadialGradient(0,0,2,0,0,o.r);
         gc.addColorStop(0,'rgba(220,200,80,0.9)'); gc.addColorStop(1,'rgba(140,120,40,0.7)');
-        ctx.fillStyle=gc;
-        ctx.beginPath(); ctx.arc(0,0,o.r,0,Math.PI*2); ctx.fill();
-        // Teeth
+        ctx.fillStyle=gc; ctx.beginPath(); ctx.arc(0,0,o.r,0,Math.PI*2); ctx.fill();
         ctx.strokeStyle='rgba(255,230,100,0.9)'; ctx.lineWidth=1.5;
-        for(let t=0;t<o.teeth;t++){
-          const ta=t*Math.PI*2/o.teeth;
-          const tx=Math.cos(ta)*(o.r+4), ty=Math.sin(ta)*(o.r+4);
-          ctx.beginPath(); ctx.arc(tx,ty,2.5,0,Math.PI*2);
-          ctx.fillStyle='rgba(255,230,100,0.95)'; ctx.fill();
-        }
-        // Hub
-        ctx.fillStyle='rgba(40,35,15,0.9)';
-        ctx.beginPath(); ctx.arc(0,0,o.r*0.3,0,Math.PI*2); ctx.fill();
-        ctx.shadowBlur=0;
-        break;
+        for(let t=0;t<o.teeth;t++){const ta=t*Math.PI*2/o.teeth;ctx.beginPath();ctx.arc(Math.cos(ta)*(o.r+4),Math.sin(ta)*(o.r+4),2.5,0,Math.PI*2);ctx.fillStyle='rgba(255,230,100,0.95)';ctx.fill();}
+        ctx.fillStyle='rgba(40,35,15,0.9)'; ctx.beginPath(); ctx.arc(0,0,o.r*0.3,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0; break;
       }
       case 'stickyzone': {
-        // Pulsing sticky pool
-        const pulse = 0.5 + Math.sin(Date.now()*0.004)*0.2;
+        const pulse=0.5+Math.sin(Date.now()*0.004)*0.2;
         const sg2=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);
-        sg2.addColorStop(0,`rgba(120,60,180,${pulse*0.6})`);
-        sg2.addColorStop(0.6,`rgba(80,30,120,${pulse*0.3})`);
-        sg2.addColorStop(1,'rgba(60,20,100,0)');
-        ctx.fillStyle=sg2;
-        ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,Math.PI*2); ctx.fill();
-        ctx.strokeStyle=`rgba(160,100,255,${pulse*0.5})`; ctx.lineWidth=1;
-        ctx.setLineDash([3,3]);
-        ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,Math.PI*2); ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle=`rgba(200,160,255,${pulse*0.7})`; ctx.font='7px Inter'; ctx.textAlign='center';
-        ctx.fillText('STICKY', o.x, o.y+2);
-        break;
+        sg2.addColorStop(0,`rgba(120,60,180,${pulse*0.6})`);sg2.addColorStop(0.6,`rgba(80,30,120,${pulse*0.3})`);sg2.addColorStop(1,'rgba(60,20,100,0)');
+        ctx.fillStyle=sg2;ctx.beginPath();ctx.arc(o.x,o.y,o.r,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle=`rgba(160,100,255,${pulse*0.5})`;ctx.lineWidth=1;ctx.setLineDash([3,3]);
+        ctx.beginPath();ctx.arc(o.x,o.y,o.r,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle=`rgba(200,160,255,${pulse*0.7})`;ctx.font='bold 7px sans-serif';ctx.textAlign='center';
+        ctx.fillText('STICKY',o.x,o.y+2); break;
       }
       case 'bridge': {
-        ctx.translate(o.x, o.y);
-        const intact = !o.broken;
-        const crackAlpha = Math.min(1, o.breakT / 30);
-        if (intact) {
-          // Bridge plank
+        ctx.translate(o.x,o.y);const crackAlpha=Math.min(1,o.breakT/30);
+        if(!o.broken){
           const bg3=ctx.createLinearGradient(-o.w/2,-5,o.w/2,5);
-          bg3.addColorStop(0,`rgba(180,120,60,${0.9-crackAlpha*0.3})`);
-          bg3.addColorStop(1,`rgba(140,90,40,${0.7-crackAlpha*0.2})`);
-          ctx.fillStyle=bg3; ctx.fillRect(-o.w/2,-5,o.w,10);
-          // Wooden planks
-          ctx.strokeStyle=`rgba(100,60,20,0.6)`; ctx.lineWidth=1;
-          for(let p2=0;p2<5;p2++){
-            const px = -o.w/2 + (p2+0.5)*o.w/5;
-            ctx.beginPath(); ctx.moveTo(px,-5); ctx.lineTo(px,5); ctx.stroke();
-          }
-          // Crack effect when loading
-          if (crackAlpha > 0.3) {
-            ctx.strokeStyle=`rgba(255,100,50,${crackAlpha*0.8})`; ctx.lineWidth=1.5;
-            ctx.beginPath(); ctx.moveTo(-5,-3); ctx.lineTo(0,3); ctx.lineTo(8,-2); ctx.stroke();
-          }
-          ctx.strokeStyle=`rgba(200,140,80,0.8)`; ctx.lineWidth=1.5;
-          ctx.strokeRect(-o.w/2,-5,o.w,10);
-          // Load counter badge
-          if (o.load > 0) {
-            ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.beginPath(); ctx.roundRect(-10,-16,20,11,4); ctx.fill();
-            const loadColor = crackAlpha>0.5?'#ff6644':'#f6bb4e';
-            ctx.fillStyle=loadColor; ctx.font='bold 7px Inter'; ctx.textAlign='center';
-            ctx.fillText(`${o.load}/${o.breakAt}`, 0, -8);
-          }
+          bg3.addColorStop(0,`rgba(180,120,60,${0.9-crackAlpha*0.3})`);bg3.addColorStop(1,`rgba(140,90,40,${0.7-crackAlpha*0.2})`);
+          ctx.fillStyle=bg3;ctx.fillRect(-o.w/2,-5,o.w,10);
+          ctx.strokeStyle='rgba(100,60,20,0.6)';ctx.lineWidth=1;
+          for(let p2=0;p2<5;p2++){const px=-o.w/2+(p2+0.5)*o.w/5;ctx.beginPath();ctx.moveTo(px,-5);ctx.lineTo(px,5);ctx.stroke();}
+          if(crackAlpha>0.3){ctx.strokeStyle=`rgba(255,100,50,${crackAlpha*0.8})`;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-5,-3);ctx.lineTo(0,3);ctx.lineTo(8,-2);ctx.stroke();}
+          ctx.strokeStyle='rgba(200,140,80,0.8)';ctx.lineWidth=1.5;ctx.strokeRect(-o.w/2,-5,o.w,10);
+          if(o.load>0){ctx.fillStyle='rgba(0,0,0,0.6)';ctx.beginPath();ctx.roundRect(-10,-16,20,11,4);ctx.fill();
+            ctx.fillStyle=crackAlpha>0.5?'#ff6644':'#f6bb4e';ctx.font='bold 7px sans-serif';ctx.textAlign='center';ctx.fillText(`${o.load}/${o.breakAt}`,0,-8);}
         } else {
-          // Broken — draw falling fragments
-          ctx.globalAlpha=0.3;
-          ctx.fillStyle='rgba(140,90,40,0.4)';
-          ctx.fillRect(-o.w/2+5,-8,o.w/3,6);
-          ctx.fillRect(o.w/6,-6,o.w/3,5);
-          ctx.globalAlpha=1;
+          ctx.globalAlpha=0.3;ctx.fillStyle='rgba(140,90,40,0.4)';
+          ctx.fillRect(-o.w/2+5,-8,o.w/3,6);ctx.fillRect(o.w/6,-6,o.w/3,5);ctx.globalAlpha=1;
         }
         break;
       }
       case 'conveyor': {
-        ctx.translate(o.x, o.y);
-        // Belt body
-        ctx.fillStyle='rgba(40,40,60,0.85)'; ctx.fillRect(-o.w/2,-5,o.w,10);
-        ctx.strokeStyle='rgba(100,100,160,0.7)'; ctx.lineWidth=1; ctx.strokeRect(-o.w/2,-5,o.w,10);
-        // Animated belt stripes
-        ctx.save(); ctx.rect(-o.w/2,-5,o.w,10); ctx.clip();
-        for(let s=0;s<8;s++){
-          const sx = -o.w/2 + ((s*10 + o.beltPhase * o.dir) % (o.w+10)) - 5;
-          ctx.fillStyle='rgba(80,80,180,0.5)';
-          ctx.fillRect(sx,-5,6,10);
-        }
-        ctx.restore();
-        // Direction arrow
-        ctx.fillStyle='rgba(140,140,255,0.9)'; ctx.font='bold 9px Inter'; ctx.textAlign='center';
-        ctx.fillText(o.dir>0?'→':'←', 0, 3);
-        break;
+        ctx.translate(o.x,o.y);
+        ctx.fillStyle='rgba(40,40,60,0.85)';ctx.fillRect(-o.w/2,-5,o.w,10);
+        ctx.strokeStyle='rgba(100,100,160,0.7)';ctx.lineWidth=1;ctx.strokeRect(-o.w/2,-5,o.w,10);
+        ctx.save();ctx.rect(-o.w/2,-5,o.w,10);ctx.clip();
+        for(let s=0;s<8;s++){const sx=-o.w/2+((s*10+o.beltPhase*o.dir)%(o.w+10))-5;ctx.fillStyle='rgba(80,80,180,0.5)';ctx.fillRect(sx,-5,6,10);}
+        ctx.restore();ctx.fillStyle='rgba(140,140,255,0.9)';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText(o.dir>0?'→':'←',0,3); break;
       }
       case 'seesaw': {
-        ctx.translate(o.cx, o.y); ctx.rotate(o.angle);
-        // Plank
+        ctx.translate(o.cx,o.y);ctx.rotate(o.angle);
         const seeBg=ctx.createLinearGradient(-o.w/2,-4,o.w/2,4);
-        seeBg.addColorStop(0,'rgba(100,200,255,0.7)'); seeBg.addColorStop(1,'rgba(60,140,200,0.5)');
-        ctx.fillStyle=seeBg; ctx.fillRect(-o.w/2,-4,o.w,8);
-        ctx.strokeStyle='rgba(100,200,255,0.9)'; ctx.lineWidth=1.5; ctx.strokeRect(-o.w/2,-4,o.w,8);
-        ctx.restore();
-        // Pivot triangle (drawn without rotation)
-        ctx.save(); ctx.translate(o.cx, o.y);
+        seeBg.addColorStop(0,'rgba(100,200,255,0.7)');seeBg.addColorStop(1,'rgba(60,140,200,0.5)');
+        ctx.fillStyle=seeBg;ctx.fillRect(-o.w/2,-4,o.w,8);
+        ctx.strokeStyle='rgba(100,200,255,0.9)';ctx.lineWidth=1.5;ctx.strokeRect(-o.w/2,-4,o.w,8);
+        ctx.restore();ctx.save();ctx.translate(o.cx,o.y);
         ctx.fillStyle='rgba(80,160,200,0.7)';
-        ctx.beginPath(); ctx.moveTo(0,4); ctx.lineTo(-6,12); ctx.lineTo(6,12); ctx.closePath(); ctx.fill();
-        break;
+        ctx.beginPath();ctx.moveTo(0,4);ctx.lineTo(-6,12);ctx.lineTo(6,12);ctx.closePath();ctx.fill(); break;
       }
       case 'bouncywall': {
-        const bwX = o.side==='left' ? 8 : MR_W-8;
-        const flashAlpha = o.flash/8;
-        const bwColor = o.side==='left'
-          ? `rgba(78,223,208,${0.3+flashAlpha*0.5})`
-          : `rgba(252,119,144,${0.3+flashAlpha*0.5})`;
-        ctx.shadowBlur = o.flash>0?12:4;
-        ctx.shadowColor = o.side==='left'?'rgba(78,223,208,0.8)':'rgba(252,119,144,0.8)';
-        ctx.fillStyle=bwColor;
-        ctx.beginPath(); ctx.roundRect(bwX-4, o.y-o.h/2, 8, o.h, 4); ctx.fill();
-        // Zigzag texture
-        ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=1;
-        for(let z2=0;z2<3;z2++){
-          const zy=o.y-o.h/2+o.h*(z2+0.5)/3;
-          ctx.beginPath(); ctx.moveTo(bwX-3,zy-4); ctx.lineTo(bwX+1,zy); ctx.lineTo(bwX-3,zy+4); ctx.stroke();
-        }
-        ctx.shadowBlur=0;
-        break;
+        const bwX=o.side==='left'?8:MR_W-8;const flashAlpha=o.flash/8;
+        const bwColor=o.side==='left'?`rgba(78,223,208,${0.3+flashAlpha*0.5})`:`rgba(252,119,144,${0.3+flashAlpha*0.5})`;
+        ctx.shadowBlur=o.flash>0?12:4;ctx.shadowColor=o.side==='left'?'rgba(78,223,208,0.8)':'rgba(252,119,144,0.8)';
+        ctx.fillStyle=bwColor;ctx.beginPath();ctx.roundRect(bwX-4,o.y-o.h/2,8,o.h,4);ctx.fill();
+        ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1;
+        for(let z2=0;z2<3;z2++){const zy=o.y-o.h/2+o.h*(z2+0.5)/3;ctx.beginPath();ctx.moveTo(bwX-3,zy-4);ctx.lineTo(bwX+1,zy);ctx.lineTo(bwX-3,zy+4);ctx.stroke();}
+        ctx.shadowBlur=0; break;
       }
       case 'rollerchain': {
-        ctx.translate(o.x, o.y);
-        o.phase = (o.phase||0) + 0.04;
-        // Chain links
-        const linkCount = Math.floor(o.w/8);
+        ctx.translate(o.x,o.y);o.phase=(o.phase||0)+0.04;
+        const linkCount=Math.floor(o.w/8);
         for(let l=0;l<linkCount;l++){
-          const lx = -o.w/2 + l*8 + 4;
-          const bounce = Math.sin(o.phase + l*0.8)*1.5;
+          const lx=-o.w/2+l*8+4,bounce=Math.sin(o.phase+l*0.8)*1.5;
           ctx.fillStyle=l%2===0?'rgba(160,160,180,0.8)':'rgba(120,120,140,0.8)';
-          ctx.strokeStyle='rgba(200,200,220,0.5)'; ctx.lineWidth=0.8;
-          ctx.beginPath(); ctx.roundRect(lx-3,bounce-4,6,8,2); ctx.fill(); ctx.stroke();
+          ctx.strokeStyle='rgba(200,200,220,0.5)';ctx.lineWidth=0.8;
+          ctx.beginPath();ctx.roundRect(lx-3,bounce-4,6,8,2);ctx.fill();ctx.stroke();
         }
         break;
       }
@@ -9918,267 +9865,251 @@ function mrDrawFrame() {
     ctx.restore();
   });
 
-  // ══ FINISH LINE — dramatic checkered pattern with pulsing beam ══
-  const flY = MR_H - 22;
-  const flH = 22;
+  // ══ FINISH LINE — design preserved exactly ══
+  const flY = MR_H - 22, flH = 22;
   const now2 = Date.now();
   const pulse = 0.65 + 0.35 * Math.sin(now2 * 0.005);
-
-  // Pulsing background glow beam
-  const flBeam = ctx.createLinearGradient(0, flY - 30, 0, MR_H);
-  flBeam.addColorStop(0, 'rgba(246,187,78,0)');
-  flBeam.addColorStop(0.4, `rgba(246,187,78,${0.12 * pulse})`);
-  flBeam.addColorStop(1, `rgba(246,187,78,${0.25 * pulse})`);
-  ctx.fillStyle = flBeam; ctx.fillRect(0, flY - 30, MR_W, 52);
-
-  // Checkered pattern
-  const sqW = 14, sqH = 11;
-  const cols2 = Math.ceil(MR_W / sqW);
-  const rows2 = Math.ceil(flH / sqH);
-  for (let row = 0; row < rows2; row++) {
-    for (let col = 0; col < cols2; col++) {
-      const isLight = (row + col) % 2 === 0;
-      ctx.fillStyle = isLight ? `rgba(255,255,255,${0.88 * pulse})` : `rgba(0,0,0,${0.7 * pulse})`;
-      ctx.fillRect(col * sqW, flY + row * sqH, sqW, sqH);
-    }
+  const flBeam = ctx.createLinearGradient(0, flY-30, 0, MR_H);
+  flBeam.addColorStop(0,'rgba(246,187,78,0)');
+  flBeam.addColorStop(0.4,`rgba(246,187,78,${0.12*pulse})`);
+  flBeam.addColorStop(1,`rgba(246,187,78,${0.25*pulse})`);
+  ctx.fillStyle=flBeam; ctx.fillRect(0, flY-30, cssW, 52);
+  const sqW=14, sqH2=11, cols2=Math.ceil(cssW/sqW), rows2=Math.ceil(flH/sqH2);
+  for(let row=0;row<rows2;row++) for(let col=0;col<cols2;col++) {
+    ctx.fillStyle=(row+col)%2===0?`rgba(255,255,255,${0.88*pulse})`:`rgba(0,0,0,${0.7*pulse})`;
+    ctx.fillRect(col*sqW, flY+row*sqH2, sqW, sqH2);
   }
-
-  // Top border glow line
-  ctx.shadowBlur = 12; ctx.shadowColor = `rgba(246,187,78,${0.9 * pulse})`;
-  ctx.strokeStyle = `rgba(246,187,78,${pulse})`; ctx.lineWidth = 2.5;
-  ctx.beginPath(); ctx.moveTo(0, flY); ctx.lineTo(MR_W, flY); ctx.stroke();
-  ctx.shadowBlur = 0;
-
-  // FINISH banner pill
+  ctx.shadowBlur=12; ctx.shadowColor=`rgba(246,187,78,${0.9*pulse})`;
+  ctx.strokeStyle=`rgba(246,187,78,${pulse})`; ctx.lineWidth=2.5;
+  ctx.beginPath(); ctx.moveTo(0,flY); ctx.lineTo(cssW,flY); ctx.stroke(); ctx.shadowBlur=0;
   ctx.save();
-  const bannerW = 80, bannerH = 18, bannerX = MR_W / 2 - bannerW / 2, bannerY = flY - 24;
-  ctx.shadowBlur = 14; ctx.shadowColor = `rgba(246,187,78,${0.8 * pulse})`;
-  ctx.fillStyle = `rgba(246,187,78,${0.92 * pulse})`;
-  const br2 = 9;
-  ctx.beginPath();
-  ctx.roundRect(bannerX, bannerY, bannerW, bannerH, br2);
-  ctx.fill();
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = '#1a1000';
-  ctx.font = 'bold 10px Inter'; ctx.textAlign = 'center'; ctx.letterSpacing = '2px';
-  ctx.fillText('FINISH', MR_W / 2, bannerY + 12.5);
-  ctx.letterSpacing = '0px';
-  ctx.restore();
+  const bW=80, bH=18, bX=cssW/2-bW/2, bY=flY-24;
+  ctx.shadowBlur=14; ctx.shadowColor=`rgba(246,187,78,${0.8*pulse})`;
+  ctx.fillStyle=`rgba(246,187,78,${0.92*pulse})`;
+  ctx.beginPath(); ctx.roundRect(bX,bY,bW,bH,9); ctx.fill(); ctx.shadowBlur=0;
+  ctx.fillStyle='#1a1000'; ctx.font='bold 10px sans-serif'; ctx.textAlign='center';
+  ctx.fillText('FINISH', cssW/2, bY+12.5); ctx.restore();
 
-  // Marbles — enhanced rendering with larger glow
+  // ── Marbles ──
   mrMarbles.forEach(m => {
     // Trail
     m.trail.forEach((pt,ti) => {
-      const progress = ti/m.trail.length;
-      ctx.beginPath(); ctx.arc(pt.x,pt.y,m.r*(0.25+progress*0.35),0,Math.PI*2);
-      ctx.fillStyle=m.hex+(Math.floor(progress*55+8).toString(16).padStart(2,'0'));
-      ctx.fill();
+      const p=ti/m.trail.length;
+      ctx.beginPath(); ctx.arc(pt.x,pt.y,m.r*(0.25+p*0.35),0,Math.PI*2);
+      ctx.fillStyle=m.hex+(Math.floor(p*55+8).toString(16).padStart(2,'0')); ctx.fill();
     });
-    if(m.finished) return;
+    if (m.finished) return;
 
-    // Marble glow halo
-    ctx.shadowBlur=16; ctx.shadowColor=m.glow;
-    const mg=ctx.createRadialGradient(m.x-m.r*0.3,m.y-m.r*0.3,m.r*0.1,m.x,m.y,m.r);
-    mg.addColorStop(0,'rgba(255,255,255,0.95)'); mg.addColorStop(0.25,m.hex); mg.addColorStop(1,m.hex+'66');
+    // Glow + body
+    ctx.shadowBlur=18; ctx.shadowColor=m.glow;
+    const mg=ctx.createRadialGradient(m.x-m.r*0.3,m.y-m.r*0.3,m.r*0.05,m.x,m.y,m.r);
+    mg.addColorStop(0,'rgba(255,255,255,0.97)');
+    mg.addColorStop(0.25,m.hex);
+    mg.addColorStop(1,m.hex+'44');
     ctx.beginPath(); ctx.arc(m.x,m.y,m.r,0,Math.PI*2);
-    ctx.fillStyle=mg; ctx.fill();
-    ctx.shadowBlur=0;
+    ctx.fillStyle=mg; ctx.fill(); ctx.shadowBlur=0;
+    // Main specular
+    ctx.beginPath(); ctx.arc(m.x-m.r*0.28,m.y-m.r*0.28,m.r*0.36,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.82)'; ctx.fill();
+    // Tiny secondary specular
+    ctx.beginPath(); ctx.arc(m.x-m.r*0.45,m.y-m.r*0.4,m.r*0.13,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fill();
 
-    // Specular highlight
-    ctx.beginPath(); ctx.arc(m.x-m.r*0.28,m.y-m.r*0.28,m.r*0.35,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,0.75)'; ctx.fill();
-
-    // Label — full name with adaptive size
-    const labelStr = m.label;
-    const labelSize = labelStr.length > 5 ? 6 : labelStr.length > 4 ? 6.5 : 7;
-    ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font=`bold ${labelSize}px Inter`;
-    ctx.textAlign='center'; ctx.fillText(labelStr, m.x, m.y+m.r+9);
+    // Crisp label with pill background
+    const lbl  = m.label;
+    const fSz  = lbl.length > 6 ? 8 : lbl.length > 4 ? 9 : 10;
+    ctx.font = `800 ${fSz}px -apple-system,BlinkMacSystemFont,sans-serif`;
+    ctx.textAlign = 'center';
+    const tw  = ctx.measureText(lbl).width;
+    const lx  = m.x, ly = m.y + m.r + 12;
+    // Pill
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.beginPath(); ctx.roundRect(lx - tw/2 - 4, ly - fSz + 1, tw + 8, fSz + 4, 4); ctx.fill();
+    // Text
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(lbl, lx, ly);
 
     // Voted ring
-    if(m.id===mrVotedColor){
-      ctx.strokeStyle='rgba(255,255,255,0.9)'; ctx.lineWidth=2.5;
-      ctx.beginPath(); ctx.arc(m.x,m.y,m.r+3,0,Math.PI*2); ctx.stroke();
+    if (m.id === mrVotedColor) {
+      ctx.strokeStyle='rgba(255,255,255,0.95)'; ctx.lineWidth=2.5;
+      ctx.beginPath(); ctx.arc(m.x,m.y,m.r+3.5,0,Math.PI*2); ctx.stroke();
     }
-    // Camera follow ring
-    if(m.id===mrCameraTarget){
-      ctx.strokeStyle='#4edfd0'; ctx.lineWidth=1.5; ctx.setLineDash([3,3]);
-      ctx.beginPath(); ctx.arc(m.x,m.y,m.r+6,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+    // Camera-follow dashed ring
+    if (m.id === mrCameraTarget) {
+      ctx.strokeStyle='#4edfd0'; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.arc(m.x,m.y,m.r+6.5,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
     }
   });
 
-  ctx.restore(); // end camera transform — HUD below is in screen space
+  ctx.restore(); // end camera / world transform
 
-  // ── Top 5 Position Overlay (HUD — drawn in screen space) ──
+  // ════════════════════════════════════════════════════════
+  //  HUD — screen-space (no camera offset)
+  // ════════════════════════════════════════════════════════
+  const SYS_FONT = '-apple-system,BlinkMacSystemFont,sans-serif';
+
+  // ── TOP-RIGHT: Live Race Positions ──
   if (mrState === 'racing' || mrState === 'results') {
     const ranked = [...mrMarbles].sort((a,b) => {
       if (a.finished && b.finished) return a.finishRank - b.finishRank;
       if (a.finished) return -1;
       if (b.finished) return 1;
       return b.y - a.y;
-    }).slice(0,5);
+    }).slice(0, 5);
 
-    const panelX = MR_W - 86;
-    const panelY = 8; // screen-space: always pinned to top
-    const rowH   = 26;
-    const panelH = ranked.length * rowH + 14;
+    const rw = 104, rh = ranked.length * 22 + 20;
+    const rx0 = cssW - rw - 8, ry0 = 8;
 
-    // Panel background
     ctx.save();
-    ctx.globalAlpha = 0.88;
-    const panBg = ctx.createLinearGradient(panelX, panelY, panelX, panelY+panelH);
-    panBg.addColorStop(0,'rgba(10,8,28,0.95)');
-    panBg.addColorStop(1,'rgba(20,12,40,0.9)');
-    ctx.fillStyle = panBg;
-    ctx.beginPath(); ctx.roundRect(panelX-4, panelY, 90, panelH, 10); ctx.fill();
-    // Panel border
-    const panBorder = ctx.createLinearGradient(panelX,panelY,panelX,panelY+panelH);
-    panBorder.addColorStop(0,'rgba(160,136,250,0.5)'); panBorder.addColorStop(1,'rgba(252,119,144,0.3)');
-    ctx.strokeStyle = panBorder; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.roundRect(panelX-4, panelY, 90, panelH, 10); ctx.stroke();
-    ctx.globalAlpha = 1;
+    // Glass panel
+    ctx.fillStyle = 'rgba(4,3,18,0.86)';
+    ctx.beginPath(); ctx.roundRect(rx0, ry0, rw, rh, 12); ctx.fill();
+    // Gradient border
+    const rb = ctx.createLinearGradient(rx0, ry0, rx0, ry0+rh);
+    rb.addColorStop(0,'rgba(78,223,208,0.55)'); rb.addColorStop(1,'rgba(160,136,250,0.2)');
+    ctx.strokeStyle=rb; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.roundRect(rx0, ry0, rw, rh, 12); ctx.stroke();
+    // Header
+    ctx.fillStyle='rgba(255,255,255,0.25)';
+    ctx.font=`bold 7px ${SYS_FONT}`; ctx.textAlign='center';
+    ctx.fillText('POSITIONS', rx0+rw/2, ry0+10);
 
     ranked.forEach((m, ri) => {
-      const rx = panelX;
-      const ry = panelY + 7 + ri * rowH;
-      const isVoted = m.id === mrVotedColor;
-      const isLeader = ri === 0;
+      const ey = ry0 + 18 + ri * 22;
+      const isLead = ri === 0, isVoted = m.id === mrVotedColor;
+      const posColors = ['#f6bb4e','#c0c8d4','#cd7f32','rgba(255,255,255,0.45)','rgba(255,255,255,0.3)'];
 
-      // Row highlight for leader
-      if (isLeader && mrState === 'racing') {
-        ctx.globalAlpha = 0.2;
-        ctx.fillStyle = m.hex;
-        ctx.beginPath(); ctx.roundRect(panelX-4, ry-4, 90, rowH, 6); ctx.fill();
-        ctx.globalAlpha = 1;
+      // Subtle row bg for voted marble
+      if (isVoted) {
+        ctx.globalAlpha=0.15; ctx.fillStyle=m.hex;
+        ctx.beginPath(); ctx.roundRect(rx0+4, ey-1, rw-8, 20, 6); ctx.fill(); ctx.globalAlpha=1;
       }
 
+      // Position badge
+      ctx.fillStyle = posColors[ri];
+      ctx.font = `bold ${isLead?10:8}px ${SYS_FONT}`; ctx.textAlign='center';
+      ctx.fillText(ri+1, rx0+15, ey+13);
+
       // Marble dot
-      ctx.shadowBlur = isLeader ? 8 : 3;
-      ctx.shadowColor = m.glow;
-      const dotG = ctx.createRadialGradient(rx-1,ry+5,0.5,rx+1,ry+6,7);
-      dotG.addColorStop(0,'rgba(255,255,255,0.9)'); dotG.addColorStop(1,m.hex);
-      ctx.beginPath(); ctx.arc(rx+1, ry+6, 7, 0, Math.PI*2);
-      ctx.fillStyle = dotG; ctx.fill();
-      ctx.shadowBlur = 0;
+      ctx.shadowBlur = isLead ? 10 : 4; ctx.shadowColor = m.glow;
+      const dg = ctx.createRadialGradient(rx0+30,ey+8,0.5,rx0+30,ey+9,7);
+      dg.addColorStop(0,'#fff'); dg.addColorStop(1,m.hex);
+      ctx.beginPath(); ctx.arc(rx0+30, ey+9, 6.5, 0, Math.PI*2);
+      ctx.fillStyle=dg; ctx.fill(); ctx.shadowBlur=0;
 
       // Voted ring
       if (isVoted) {
-        ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.arc(rx+1, ry+6, 9, 0, Math.PI*2); ctx.stroke();
+        ctx.strokeStyle='rgba(255,255,255,0.85)'; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.arc(rx0+30, ey+9, 8.5, 0, Math.PI*2); ctx.stroke();
       }
 
-      // Position number
-      ctx.fillStyle = isLeader ? '#f6bb4e' : 'rgba(255,255,255,0.4)';
-      ctx.font = `bold ${isLeader?9:8}px Inter`;
-      ctx.textAlign = 'left';
-      ctx.fillText((ri+1)+'.', rx+12, ry+10);
+      // Name
+      ctx.fillStyle = isLead ? '#fff' : isVoted ? '#d0eeff' : 'rgba(255,255,255,0.65)';
+      ctx.font=`${isLead?'bold ':''}${isLead?9:8}px ${SYS_FONT}`; ctx.textAlign='left';
+      ctx.fillText(m.label.slice(0,7), rx0+42, ey+13);
 
-      // Marble label
-      ctx.fillStyle = isLeader ? '#fff' : 'rgba(255,255,255,0.7)';
-      ctx.font = `${isLeader?'bold ':''}${isLeader?9:8}px Inter`;
-      ctx.fillText(m.label.slice(0,6), rx+24, ry+10);
-
-      // Finished check
+      // Finished tick
       if (m.finished) {
-        ctx.fillStyle = 'rgba(78,223,208,0.7)';
-        ctx.font = '8px Inter';
-        ctx.textAlign = 'right';
-        ctx.fillText('✓', panelX+82, ry+10);
+        ctx.fillStyle='#4edfd0'; ctx.font=`bold 9px ${SYS_FONT}`; ctx.textAlign='right';
+        ctx.fillText('✓', rx0+rw-6, ey+13);
       }
     });
-
-    ctx.textAlign = 'center';
-    ctx.restore();
+    ctx.textAlign='center'; ctx.restore();
   }
 
-  // Finish order top-left — screen-space
-  if (mrFinishOrder.length > 0) {
-    const rankY0 = 16;
-    mrFinishOrder.slice(0,3).forEach((id,ri)=>{
-      const mc=MARBLE_COLORS.find(c=>c.id===id); if(!mc)return;
-      ctx.save(); ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(4,rankY0+ri*16-12,90,14);
-      ctx.fillStyle=['#ffd700','#c0c0c0','#cd7f32'][ri]||'#888';
-      ctx.font='bold 10px Inter'; ctx.textAlign='left';
-      ctx.fillText(ri+1+'. '+mc.label, 6, rankY0+ri*16); ctx.restore();
-    });
+  // ── TOP-LEFT: Podium (finishers so far) ──
+  if (mrFinishOrder.length > 0 && (mrState === 'racing' || mrState === 'results')) {
+    const fin = mrFinishOrder.slice(0,3).map(id=>MARBLE_COLORS.find(c=>c.id===id)).filter(Boolean);
+    if (fin.length > 0) {
+      const pw = 110, ph = fin.length * 23 + 20;
+      const px = 8, py = 8;
+      ctx.save();
+      // Panel
+      ctx.fillStyle='rgba(4,3,18,0.86)';
+      ctx.beginPath(); ctx.roundRect(px, py, pw, ph, 12); ctx.fill();
+      // Gold-tinted border
+      const pb2 = ctx.createLinearGradient(px, py, px, py+ph);
+      pb2.addColorStop(0,'rgba(246,187,78,0.6)'); pb2.addColorStop(1,'rgba(246,187,78,0.1)');
+      ctx.strokeStyle=pb2; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.roundRect(px, py, pw, ph, 12); ctx.stroke();
+      // Header label
+      ctx.fillStyle='rgba(246,187,78,0.55)';
+      ctx.font=`bold 7px ${SYS_FONT}`; ctx.textAlign='center';
+      ctx.fillText('PODIUM', px+pw/2, py+10);
+
+      const medalColors  = ['#f6bb4e','#c8d0da','#d4895a'];
+      const medalGlows   = ['rgba(246,187,78,0.8)','rgba(200,208,218,0.6)','rgba(212,137,90,0.6)'];
+      const rankLabels   = ['1ST','2ND','3RD'];
+
+      fin.forEach((mc, ri) => {
+        const fy = py + 18 + ri * 23;
+        const isTop = ri === 0;
+
+        // Marble dot with glow
+        ctx.shadowBlur=isTop?12:6; ctx.shadowColor=medalGlows[ri];
+        const mg2=ctx.createRadialGradient(px+18,fy+10,0,px+18,fy+10,9);
+        mg2.addColorStop(0,'rgba(255,255,255,0.95)'); mg2.addColorStop(0.35,mc.hex); mg2.addColorStop(1,medalColors[ri]+'55');
+        ctx.beginPath(); ctx.arc(px+18, fy+10, isTop?9:7.5, 0, Math.PI*2);
+        ctx.fillStyle=mg2; ctx.fill(); ctx.shadowBlur=0;
+        // Specular
+        ctx.beginPath(); ctx.arc(px+(isTop?14:15), fy+(isTop?7:8), isTop?3.5:2.5, 0, Math.PI*2);
+        ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.fill();
+
+        // Rank badge
+        ctx.fillStyle=medalColors[ri];
+        ctx.font=`800 ${isTop?8:7}px ${SYS_FONT}`; ctx.textAlign='center';
+        ctx.fillText(rankLabels[ri], px+18, fy+22);
+
+        // Name
+        ctx.fillStyle = isTop ? '#fff' : ri===1 ? '#d0dae6' : '#e0a878';
+        ctx.font=`${isTop?'800':'600'} ${isTop?10:9}px ${SYS_FONT}`; ctx.textAlign='left';
+        ctx.fillText(mc.label.slice(0,9), px+33, fy+13);
+      });
+      ctx.textAlign='center'; ctx.restore();
+    }
   }
 
-  // ── Stuck countdown overlay ─────────────────────────────────
+  // ── Stuck countdown overlay (screen-space) ──
   if (mrStuckCountdown > 0) {
-    const vp2 = document.getElementById('mr-viewport');
-    const vpH2 = vp2 ? vp2.clientHeight : 440;
-    const cx2 = MR_W / 2;
-    const cy2 = (camY + vpH2 / 2); // world-space centre of viewport
+    const cx2 = cssW / 2, cy2 = vpH / 2;
     const radius = 38;
     const progress = mrStuckCountdown / 5;
     const ringColor = mrStuckCountdown <= 2 ? '#ff6644' : '#4edfd0';
     const urgent = mrStuckCountdown <= 2;
-
     ctx.save();
-
-    // Full-width frosted banner
-    const bannerH2 = 90;
-    const bannerY2 = cy2 - bannerH2/2;
-    const bannerGrad = ctx.createLinearGradient(0, bannerY2, 0, bannerY2+bannerH2);
-    bannerGrad.addColorStop(0, 'rgba(8,4,20,0)');
-    bannerGrad.addColorStop(0.25, `rgba(8,4,20,${urgent?0.92:0.85})`);
-    bannerGrad.addColorStop(0.75, `rgba(8,4,20,${urgent?0.92:0.85})`);
-    bannerGrad.addColorStop(1, 'rgba(8,4,20,0)');
-    ctx.fillStyle = bannerGrad;
-    ctx.fillRect(0, bannerY2, MR_W, bannerH2);
-
-    // Glowing horizontal lines framing banner
-    ctx.strokeStyle = `${ringColor}55`; ctx.lineWidth = 1;
-    ctx.beginPath(); ctx.moveTo(0,bannerY2+10); ctx.lineTo(MR_W,bannerY2+10); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0,bannerY2+bannerH2-10); ctx.lineTo(MR_W,bannerY2+bannerH2-10); ctx.stroke();
-
-    // Blurred backdrop disc
-    ctx.globalAlpha = 0.85;
-    const discGrad = ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, radius + 20);
-    discGrad.addColorStop(0, 'rgba(10,5,25,0.98)');
-    discGrad.addColorStop(1, 'rgba(5,3,15,0)');
-    ctx.fillStyle = discGrad;
-    ctx.beginPath(); ctx.arc(cx2, cy2, radius+22, 0, Math.PI*2); ctx.fill();
-    ctx.globalAlpha = 1;
-
-    // Progress ring background
-    ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 5;
-    ctx.beginPath(); ctx.arc(cx2, cy2, radius, -Math.PI/2, Math.PI*1.5); ctx.stroke();
-
-    // Progress ring
-    ctx.strokeStyle = ringColor; ctx.lineWidth = 5;
-    ctx.shadowBlur = 16; ctx.shadowColor = ringColor;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.arc(cx2, cy2, radius, -Math.PI/2, -Math.PI/2 + Math.PI*2*progress);
-    ctx.stroke();
-    ctx.shadowBlur = 0; ctx.lineCap = 'butt';
-
-    // Number
-    ctx.fillStyle = urgent ? '#ff6644' : '#fff';
-    ctx.font = `bold 32px Inter`;
-    ctx.textAlign = 'center';
-    ctx.shadowBlur = 20; ctx.shadowColor = ringColor;
-    ctx.fillText(mrStuckCountdown, cx2, cy2 + 11);
-    ctx.shadowBlur = 0;
-
-    // Top label: "1st, 2nd & 3rd place done!"
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.font = 'bold 9px Inter';
-    ctx.letterSpacing = '0.5px';
-    const doneCount = Math.min(mrFinishOrder.length, 3);
-    const doneLabel = doneCount >= 3 ? '🏆 Top 3 Finished!' : `${doneCount} marble${doneCount!==1?'s':''} finished`;
-    ctx.fillText(doneLabel, cx2, cy2 - radius - 10);
-
-    // Bottom label
-    ctx.fillStyle = urgent ? 'rgba(255,100,68,0.9)' : 'rgba(78,223,208,0.8)';
-    ctx.font = 'bold 8px Inter';
-    ctx.letterSpacing = '1.5px';
-    ctx.fillText('CLEARING STUCK', cx2, cy2 + radius + 14);
-    ctx.letterSpacing = '0px';
-
+    const bH2=90, bY2=cy2-bH2/2;
+    const bGrad=ctx.createLinearGradient(0,bY2,0,bY2+bH2);
+    bGrad.addColorStop(0,'rgba(8,4,20,0)');
+    bGrad.addColorStop(0.25,`rgba(8,4,20,${urgent?0.92:0.85})`);
+    bGrad.addColorStop(0.75,`rgba(8,4,20,${urgent?0.92:0.85})`);
+    bGrad.addColorStop(1,'rgba(8,4,20,0)');
+    ctx.fillStyle=bGrad; ctx.fillRect(0, bY2, cssW, bH2);
+    ctx.strokeStyle=`${ringColor}55`; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(0,bY2+10); ctx.lineTo(cssW,bY2+10); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,bY2+bH2-10); ctx.lineTo(cssW,bY2+bH2-10); ctx.stroke();
+    ctx.globalAlpha=0.85;
+    const dGrad=ctx.createRadialGradient(cx2,cy2,0,cx2,cy2,radius+20);
+    dGrad.addColorStop(0,'rgba(10,5,25,0.98)'); dGrad.addColorStop(1,'rgba(5,3,15,0)');
+    ctx.fillStyle=dGrad; ctx.beginPath(); ctx.arc(cx2,cy2,radius+22,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1;
+    ctx.strokeStyle='rgba(255,255,255,0.1)'; ctx.lineWidth=5;
+    ctx.beginPath(); ctx.arc(cx2,cy2,radius,-Math.PI/2,Math.PI*1.5); ctx.stroke();
+    ctx.strokeStyle=ringColor; ctx.lineWidth=5; ctx.shadowBlur=16; ctx.shadowColor=ringColor; ctx.lineCap='round';
+    ctx.beginPath(); ctx.arc(cx2,cy2,radius,-Math.PI/2,-Math.PI/2+Math.PI*2*progress); ctx.stroke();
+    ctx.shadowBlur=0; ctx.lineCap='butt';
+    ctx.fillStyle=urgent?'#ff6644':'#fff';
+    ctx.font=`bold 32px ${SYS_FONT}`; ctx.textAlign='center';
+    ctx.shadowBlur=20; ctx.shadowColor=ringColor;
+    ctx.fillText(mrStuckCountdown, cx2, cy2+11); ctx.shadowBlur=0;
+    const doneCount=Math.min(mrFinishOrder.length,3);
+    ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.font=`bold 9px ${SYS_FONT}`;
+    ctx.fillText(doneCount>=3?'🏆 Top 3 Finished!':`${doneCount} marble${doneCount!==1?'s':''} finished`, cx2, cy2-radius-10);
+    ctx.fillStyle=urgent?'rgba(255,100,68,0.9)':'rgba(78,223,208,0.8)';
+    ctx.font=`bold 8px ${SYS_FONT}`;
+    ctx.fillText('CLEARING STUCK', cx2, cy2+radius+14);
     ctx.restore();
   }
 }
+
 function mrDrawIdle() {
   if (!mrCtx) return;
   mrCameraY = 0; mrCameraTarget = null;
@@ -10270,8 +10201,8 @@ function renderMRVoteUI() {
   const today = new Date().toDateString();
   if (!S.mrRacesToday) S.mrRacesToday = { date:'', count:0 };
   const racesToday = S.mrRacesToday.date === today ? S.mrRacesToday.count : 0;
-  const MAX_DAILY = isAdmin() ? Infinity : 3;
-  const turnsLeft = isAdmin() ? Infinity : Math.max(0, MAX_DAILY - racesToday);
+  const MAX_DAILY = 10;
+  const turnsLeft = Math.max(0, MAX_DAILY - racesToday);
   const th = MR_THEMES[mrTheme] || MR_THEMES.space;
 
   ui.innerHTML = `
@@ -10280,20 +10211,32 @@ function renderMRVoteUI() {
       <div style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
         <div>
           <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase">Daily Races</div>
-          <div style="font-size:16px;font-weight:900;color:#fff;margin-top:2px">${isAdmin() ? '∞' : turnsLeft} <span style="font-size:11px;font-weight:500;color:rgba(255,255,255,0.4)">${isAdmin() ? 'unlimited' : '/ 3 left'}</span></div>
+          <div style="font-size:16px;font-weight:900;color:#fff;margin-top:2px">${turnsLeft} <span style="font-size:11px;font-weight:500;color:rgba(255,255,255,0.4)">/ ${MAX_DAILY} left</span></div>
         </div>
         <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">
-          ${isAdmin()
-            ? '<div style="font-size:11px;font-weight:700;color:#4edfd0;padding:4px 10px;border-radius:99px;background:rgba(78,223,208,0.15);border:1px solid rgba(78,223,208,0.3)">👑 Admin</div>'
-            : Array.from({length:3}).map((_,i)=>`<div style="width:10px;height:10px;border-radius:50%;background:${i<racesToday?'rgba(255,255,255,0.2)':'rgba(78,223,208,0.8)'};box-shadow:${i<racesToday?'none':'0 0 6px rgba(78,223,208,0.5)'}"></div>`).join('')
-          }
+          ${Array.from({length:MAX_DAILY}).map((_,i)=>`<div style="width:10px;height:10px;border-radius:50%;background:${i<racesToday?'rgba(255,255,255,0.2)':'rgba(78,223,208,0.8)'};box-shadow:${i<racesToday?'none':'0 0 6px rgba(78,223,208,0.5)'}"></div>`).join('')}
         </div>
       </div>
 
-      <!-- Theme badge -->
+      <!-- Level preview banner -->
+      <div style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:10px 14px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase">Next Level</div>
+          <div style="background:${th.bgA};border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:3px 9px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.7)">${th.name} Theme</div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px">
+          ${(()=>{
+            const types = {};
+            mrObstacles.forEach(o => { types[o.type] = (types[o.type]||0)+1; });
+            const icons = {peg:'⚪',ramp:'↗️',slide:'🟡',bumper:'💥',funnel:'▽',springboard:'🌀',fan:'💨',gear:'⚙️',stickyzone:'🟣',bridge:'🟫',conveyor:'▶️',seesaw:'⚖️',bouncywall:'🪃',rollerchain:'🔗'};
+            return Object.entries(types).map(([t,n])=>`<div style="display:flex;align-items:center;gap:3px;background:rgba(255,255,255,0.07);border-radius:8px;padding:3px 7px;font-size:9px;color:rgba(255,255,255,0.65)"><span>${icons[t]||'•'}</span><span style="font-weight:600;text-transform:capitalize">${t}</span><span style="color:rgba(255,255,255,0.35)">×${n}</span></div>`).join('');
+          })()}
+        </div>
+      </div>
+
+      <!-- Theme badge + pick label -->
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
         <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.5px;text-transform:uppercase">Pick your marble</div>
-        <div style="margin-left:auto;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:3px 8px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.5)">${th.name} Theme</div>
       </div>
       <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px">🥇 10🎟 &nbsp;·&nbsp; 🥈 5🎟 &nbsp;·&nbsp; 🥉 3🎟</div>
 
@@ -10306,20 +10249,10 @@ function renderMRVoteUI() {
           </div>`).join('')}
       </div>
 
-      <button onclick="mrHandleStartBtn()" style="width:100%;padding:13px;border-radius:16px;border:none;cursor:pointer;font-size:14px;font-weight:800;letter-spacing:-0.2px;transition:all 0.15s;background:${(turnsLeft>0||isAdmin())&&mrVotedColor?'linear-gradient(135deg,#4edfd0,#566ee3)':turnsLeft<=0&&!isAdmin()?'rgba(255,100,100,0.15)':'rgba(255,255,255,0.07)'};color:${(turnsLeft>0||isAdmin())&&mrVotedColor?'#fff':turnsLeft<=0&&!isAdmin()?'rgba(255,100,100,0.6)':'rgba(255,255,255,0.3)'};box-shadow:${(turnsLeft>0||isAdmin())&&mrVotedColor?'0 4px 20px rgba(78,223,208,0.35)':'none'}">
-        ${turnsLeft<=0&&!isAdmin()?'🚫 No Races Left Today':mrVotedColor?'🏁 Start Race!':'👆 Choose a marble'}
+      <button onclick="${turnsLeft>0?'if(mrVotedColor){mrStartCountdown()}else{showNotif(\"❌\",\"Pick a marble first!\",\"\")}':'showNotif(\"❌\",\"No races left today!\",\"Come back tomorrow\")'}" style="width:100%;padding:13px;border-radius:16px;border:none;cursor:pointer;font-size:14px;font-weight:800;letter-spacing:-0.2px;transition:all 0.15s;background:${turnsLeft>0&&mrVotedColor?'linear-gradient(135deg,#4edfd0,#566ee3)':turnsLeft<=0?'rgba(255,100,100,0.15)':'rgba(255,255,255,0.07)'};color:${turnsLeft>0&&mrVotedColor?'#fff':turnsLeft<=0?'rgba(255,100,100,0.6)':'rgba(255,255,255,0.3)'};box-shadow:${turnsLeft>0&&mrVotedColor?'0 4px 20px rgba(78,223,208,0.35)':'none'}">
+        ${turnsLeft<=0?'🚫 No Races Left Today':mrVotedColor?'🏁 Start Race!':'👆 Choose a marble'}
       </button>
     </div>`;
-}
-
-function mrHandleStartBtn() {
-  const today = new Date().toDateString();
-  if (!S.mrRacesToday) S.mrRacesToday = { date:'', count:0 };
-  const racesToday = S.mrRacesToday.date === today ? S.mrRacesToday.count : 0;
-  const canRace = isAdmin() || racesToday < 3;
-  if (!canRace) { showNotif('🚫','No Races Left Today','Come back tomorrow'); return; }
-  if (!mrVotedColor) { showNotif('❌','Pick a marble first!',''); return; }
-  mrStartCountdown();
 }
 
 function renderMRResultsUI() {
@@ -10552,27 +10485,25 @@ function cpInitMatter() {
   });
   World.add(cpWorld, cpPusherBody);
 
-  // Pre-load coins only when there's NO saved state to restore
-  if (!S.cpMachineState || !S.cpMachineState.length) {
-    for (let row = 0; row < 3; row++) {
-      for (let col = 0; col < 10; col++) {
-        const x = CP_WALL_T + 22 + col * (CP_COIN_R*2 + 4) + (row%2)*(CP_COIN_R+2);
-        // Place toward front of shelf so pusher can push them off
-        const y = CP_SHELF_Y - CP_COIN_R*1.5 - row*(CP_COIN_R*2+3);
-        if (x > CP_WALL_T + CP_COIN_R && x < CP_W - CP_WALL_T - CP_COIN_R) {
-          World.add(cpWorld, cpMakeCoin(x, y, false));
-        }
+  // Pre-load coins - slightly fewer, spread more toward front
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 10; col++) {
+      const x = CP_WALL_T + 22 + col * (CP_COIN_R*2 + 4) + (row%2)*(CP_COIN_R+2);
+      // Place toward front of shelf so pusher can push them off
+      const y = CP_SHELF_Y - CP_COIN_R*1.5 - row*(CP_COIN_R*2+3);
+      if (x > CP_WALL_T + CP_COIN_R && x < CP_W - CP_WALL_T - CP_COIN_R) {
+        World.add(cpWorld, cpMakeCoin(x, y, false));
       }
     }
-
-    // Prizes — only on fresh start
-    CP_PRIZE_DEFS.forEach((def, i) => {
-      const x = 55 + (i % 3) * 85 + Math.random() * 15;
-      const y = CP_SHELF_Y - (def.r || def.h/2) - 12 - Math.floor(i/3) * 34;
-      const b = cpMakePrize(def, x, y);
-      World.add(cpWorld, b);
-    });
   }
+
+  // Prizes
+  CP_PRIZE_DEFS.forEach((def, i) => {
+    const x = 55 + (i % 3) * 85 + Math.random() * 15;
+    const y = CP_SHELF_Y - (def.r || def.h/2) - 12 - Math.floor(i/3) * 34;
+    const b = cpMakePrize(def, x, y);
+    World.add(cpWorld, b);
+  });
 
   // Events
   Events.on(cpEngine, 'beforeUpdate', () => {
@@ -11091,16 +11022,7 @@ function fillGachaMachine() {
   for (let i=0;i<toAdd;i++) {
     const tier = pickRandomRarity();
     const emoji = GACHA_RANDOM_EMOJIS[Math.floor(Math.random()*GACHA_RANDOM_EMOJIS.length)];
-    const tickets = (function(rarity) {
-      switch(rarity) {
-        case 'common':    return 10;
-        case 'uncommon':  return 20 + Math.floor(Math.random() * 6);  // 20-25
-        case 'rare':      return 15 + Math.floor(Math.random() * 6);  // 15-20
-        case 'epic':      return 30 + Math.floor(Math.random() * 21); // 30-50
-        case 'legendary': return 55 + Math.floor(Math.random() * 21); // 55-75
-        default:          return 10;
-      }
-    })(tier.rarity);
+    const tickets = Math.floor(1 + Math.random()*5); // 1-5 tickets (balanced)
     S.gachaBubbles.push({ id:Date.now()+i, emoji, name:tier.rarity+' '+emoji, rarity:tier.rarity, color:tier.color, tickets });
   }
   saveState(); playSound('pop');
@@ -14037,12 +13959,11 @@ function renderBattlepass() {
         }).join('')}
       </div>
 
-      <!-- Actions — admin only -->
-      ${isAdmin() ? `
+      <!-- Actions -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
         <button onclick="openBPRotationGallery()" style="padding:12px;border-radius:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;cursor:pointer">📚 Gallery</button>
         <button onclick="openBPSettings()" style="padding:12px;border-radius:14px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);color:#ffd700;font-size:12px;font-weight:700;cursor:pointer">⚙️ Settings</button>
-      </div>` : ''}
+      </div>
     </div>
   `;
 }
@@ -16516,9 +16437,6 @@ window._admClearUndoneHistory = async function() {
   } else if (tab === 'plinko') {
     await window._admRenderPlinkoTab(content);
 
-  } else if (tab === 'marbleadmin') {
-    window._admRenderMarbleTab(content);
-
   } else if (tab === 'support') {
     try {
       const snap = await fbDb.collection('supportTickets').orderBy('createdAt','desc').limit(40).get();
@@ -18194,271 +18112,6 @@ window._admStopViewing = function() {
 }
 
 window._adminLoadPlayers = window._renderAdminPanel;
-
-// ── Marble Race Admin Tab ─────────────────────────────────────────────────────
-// Stored in Firestore: config/marbleAdmin  { levels:[], schedule:{} }
-// A level: { id, name, theme, obstacles:[], createdAt }
-// schedule: { 'YYYY-MM-DD': [levelId, ...] }  (up to 5 per day)
-
-let _mAdmMode = 'list'; // 'list' | 'editor' | 'testing'
-let _mAdmEditLevel = null; // level being edited
-let _mAdmTestLevel = null;
-let _mAdmGallery = [];   // loaded from Firestore
-
-const MR_ADMIN_THEMES = ['space','sakura','neon','sunset','ice','forest'];
-const MR_ADMIN_THEME_LABELS = { space:'🌌 Space', sakura:'🌸 Sakura', neon:'⚡ Neon', sunset:'🌅 Sunset', ice:'❄️ Ice', forest:'🌲 Forest' };
-
-window._admRenderMarbleTab = function(content) {
-  if (_mAdmMode === 'editor') { _admMRRenderEditor(content); return; }
-  if (_mAdmMode === 'testing') { _admMRRenderTesting(content); return; }
-  _admMRRenderList(content);
-};
-
-async function _admMRLoadGallery() {
-  try {
-    const doc = await fbDb.collection('config').doc('marbleAdmin').get();
-    _mAdmGallery = doc.exists ? (doc.data().levels || []) : [];
-  } catch(e) { _mAdmGallery = []; }
-}
-
-async function _admMRSaveGallery() {
-  try {
-    const doc = await fbDb.collection('config').doc('marbleAdmin').get();
-    const existing = doc.exists ? doc.data() : {};
-    await fbDb.collection('config').doc('marbleAdmin').set({ ...existing, levels: _mAdmGallery });
-  } catch(e) { showNotif('⚠️','Save failed', e.message); }
-}
-
-async function _admMRSaveSchedule(schedule) {
-  try {
-    const doc = await fbDb.collection('config').doc('marbleAdmin').get();
-    const existing = doc.exists ? doc.data() : {};
-    await fbDb.collection('config').doc('marbleAdmin').set({ ...existing, schedule });
-    await fbDb.collection('broadcasts').add({
-      type: 'marble_schedule_update', active: true, schedule,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  } catch(e) { showNotif('⚠️','Save failed', e.message); }
-}
-
-async function _admMRRenderList(content) {
-  content.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.3);padding:20px">Loading…</div>`;
-  await _admMRLoadGallery();
-
-  const today = new Date().toISOString().slice(0,10);
-  let scheduleData = {};
-  try {
-    const doc = await fbDb.collection('config').doc('marbleAdmin').get();
-    scheduleData = doc.exists ? (doc.data().schedule || {}) : {};
-  } catch(e) {}
-
-  // Build next 7 days for calendar
-  const days = Array.from({length:7}, (_,i) => {
-    const d = new Date(); d.setDate(d.getDate()+i);
-    return d.toISOString().slice(0,10);
-  });
-
-  content.innerHTML = `
-    <!-- Mode indicator -->
-    <div style="padding:12px 14px 0">
-      <div style="background:linear-gradient(135deg,rgba(78,223,208,0.15),rgba(86,110,227,0.1));border:1px solid rgba(78,223,208,0.35);border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div style="font-size:22px">🔮</div>
-        <div>
-          <div style="font-size:13px;font-weight:800;color:#4edfd0">Marble Race Admin</div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.4)">Create levels · Assign to dates · Control player access</div>
-        </div>
-        <button onclick="playSound('click');_mAdmEditLevel={id:'level_'+Date.now(),name:'New Level',theme:'space',obstacles:[]};_mAdmMode='editor';window._admRenderMarbleTab(document.getElementById('admin-content'))" style="margin-left:auto;padding:8px 14px;border-radius:10px;background:linear-gradient(135deg,#4edfd0,#566ee3);border:none;color:#fff;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap">+ New Level</button>
-      </div>
-
-      <!-- Gallery -->
-      <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">📚 Level Gallery (${_mAdmGallery.length})</div>
-      ${_mAdmGallery.length === 0 ? `<div style="background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.1);border-radius:14px;padding:20px;text-align:center;color:rgba(255,255,255,0.3);font-size:12px;margin-bottom:12px">No levels yet. Create your first level!</div>` : `
-      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px">
-        ${_mAdmGallery.map((lvl,i) => `
-          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px">
-            <div style="font-size:20px">${{space:'🌌',sakura:'🌸',neon:'⚡',sunset:'🌅',ice:'❄️',forest:'🌲'}[lvl.theme]||'🔮'}</div>
-            <div style="flex:1">
-              <div style="font-size:13px;font-weight:700;color:#fff">${lvl.name}</div>
-              <div style="font-size:10px;color:rgba(255,255,255,0.35)">${MR_ADMIN_THEME_LABELS[lvl.theme]||lvl.theme} · ${lvl.obstacles?.length||0} obstacles</div>
-            </div>
-            <button onclick="playSound('click');_mAdmTestLevel=_mAdmGallery[${i}];_mAdmMode='testing';window._admRenderMarbleTab(document.getElementById('admin-content'))" style="padding:5px 10px;border-radius:8px;background:rgba(78,223,208,0.12);border:1px solid rgba(78,223,208,0.3);color:#4edfd0;font-size:10px;font-weight:700;cursor:pointer">▶ Test</button>
-            <button onclick="playSound('click');_mAdmEditLevel={..._mAdmGallery[${i}]};_mAdmMode='editor';window._admRenderMarbleTab(document.getElementById('admin-content'))" style="padding:5px 10px;border-radius:8px;background:rgba(160,136,250,0.12);border:1px solid rgba(160,136,250,0.3);color:#a088fa;font-size:10px;font-weight:700;cursor:pointer">✏️ Edit</button>
-            <button onclick="if(confirm('Delete this level?')){playSound('click');_mAdmGallery.splice(${i},1);_admMRSaveGallery();window._admRenderMarbleTab(document.getElementById('admin-content'))}" style="padding:5px 8px;border-radius:8px;background:rgba(252,119,144,0.1);border:1px solid rgba(252,119,144,0.25);color:#fc7790;font-size:10px;cursor:pointer">🗑</button>
-          </div>`).join('')}
-      </div>`}
-
-      <!-- Schedule Planner -->
-      <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">📅 Race Calendar (Next 7 Days)</div>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px" id="mr-schedule-container">
-        ${days.map(date => {
-          const assigned = (scheduleData[date]||[]).slice(0,5);
-          const isToday = date === today;
-          return `<div style="background:${isToday?'rgba(78,223,208,0.08)':'rgba(255,255,255,0.03)'};border:1px solid ${isToday?'rgba(78,223,208,0.3)':'rgba(255,255,255,0.07)'};border-radius:12px;padding:10px 12px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-              <div style="font-size:11px;font-weight:700;color:${isToday?'#4edfd0':'rgba(255,255,255,0.6)'}">${isToday?'📍 Today':''} ${new Date(date+'T00:00:00').toLocaleDateString('en-GB',{weekday:'short',month:'short',day:'numeric'})}</div>
-              <div style="font-size:9px;color:rgba(255,255,255,0.25)">${assigned.length}/5 races</div>
-            </div>
-            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px">
-              ${assigned.map((id,ai) => {
-                const lvl = _mAdmGallery.find(l=>l.id===id);
-                return lvl ? `<span style="font-size:9px;background:rgba(160,136,250,0.15);border:1px solid rgba(160,136,250,0.3);border-radius:6px;padding:3px 7px;color:#a088fa;cursor:pointer" onclick="const sd=${JSON.stringify(scheduleData)};sd['${date}'].splice(${ai},1);_admMRSaveSchedule(sd).then(()=>window._admRenderMarbleTab(document.getElementById('admin-content')))">✕ ${lvl.name}</span>` : '';
-              }).join('')}
-              ${assigned.length === 0 ? `<span style="font-size:10px;color:rgba(255,255,255,0.2)">No races scheduled</span>` : ''}
-            </div>
-            ${_mAdmGallery.length > 0 && assigned.length < 5 ? `
-            <select onchange="if(this.value){const sd=${JSON.stringify(scheduleData).replace(/'/g,"&#39;")};if(!sd['${date}'])sd['${date}']=[]; if(!sd['${date}'].includes(this.value))sd['${date}'].push(this.value);_admMRSaveSchedule(sd).then(()=>window._admRenderMarbleTab(document.getElementById('admin-content'))); playSound('click'); this.value='';}" style="width:100%;background:#12101e;color:#e8e0ff;border:1px solid rgba(160,136,250,0.3);border-radius:8px;padding:5px 8px;font-size:11px;cursor:pointer">
-              <option value="">+ Add level to this date…</option>
-              ${_mAdmGallery.map(lvl=>`<option value="${lvl.id}">${{space:'🌌',sakura:'🌸',neon:'⚡',sunset:'🌅',ice:'❄️',forest:'🌲'}[lvl.theme]||'🔮'} ${lvl.name}</option>`).join('')}
-            </select>` : ''}
-          </div>`;
-        }).join('')}
-      </div>
-
-      <!-- Broadcast control -->
-      <div class="adm-card" style="border-color:rgba(78,223,208,0.2);background:rgba(78,223,208,0.04)">
-        <div class="adm-card-title" style="color:#4edfd0">📢 Push Race Day Notification</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:10px">Send all players a notification that race day is live.</div>
-        <button onclick="window._admMRBroadcastRaceDay()" class="adm-btn adm-btn-full" style="background:linear-gradient(135deg,#4edfd0,#566ee3);border:none;color:#fff;font-weight:800">🏁 Broadcast Race Day Is Live!</button>
-      </div>
-    </div>
-  `;
-}
-
-function _admMRRenderEditor(content) {
-  const lvl = _mAdmEditLevel || { id:'level_'+Date.now(), name:'New Level', theme:'space', obstacles:[] };
-  content.innerHTML = `
-    <div style="position:sticky;top:0;z-index:10;background:rgba(3,3,26,0.97);backdrop-filter:blur(12px);padding:8px 14px;border-bottom:1px solid rgba(78,223,208,0.2);display:flex;align-items:center;gap:10px">
-      <button onclick="playSound('click');_mAdmMode='list';window._admRenderMarbleTab(document.getElementById('admin-content'))" style="padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:12px;cursor:pointer">← Back</button>
-      <div style="flex:1;font-size:13px;font-weight:800;color:#4edfd0">✏️ Editing Mode</div>
-      <div style="font-size:10px;background:rgba(252,119,144,0.15);border:1px solid rgba(252,119,144,0.3);border-radius:6px;padding:3px 8px;color:#fc7790;font-weight:700;animation:pulse 2s infinite">● EDITING</div>
-    </div>
-    <div style="padding:14px">
-      <!-- Level name -->
-      <div style="margin-bottom:12px">
-        <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px">Level Name</div>
-        <input id="mr-ed-name" class="adm-input" value="${lvl.name}" placeholder="e.g. Sakura Canyon" style="width:100%">
-      </div>
-
-      <!-- Theme picker -->
-      <div style="margin-bottom:14px">
-        <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Visual Theme</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px" id="mr-ed-themes">
-          ${MR_ADMIN_THEMES.map(t => `
-            <button onclick="document.getElementById('mr-ed-themes').querySelectorAll('button').forEach(b=>b.style.borderColor='rgba(255,255,255,0.1)');this.style.borderColor='#4edfd0';_mAdmEditLevel.theme='${t}';playSound('click')" 
-              style="padding:8px 6px;border-radius:10px;background:${lvl.theme===t?'rgba(78,223,208,0.15)':'rgba(255,255,255,0.04)'};border:1px solid ${lvl.theme===t?'#4edfd0':'rgba(255,255,255,0.1)'};color:${lvl.theme===t?'#4edfd0':'rgba(255,255,255,0.6)'};font-size:12px;font-weight:700;cursor:pointer;text-align:center">
-              ${MR_ADMIN_THEME_LABELS[t]}
-            </button>`).join('')}
-        </div>
-      </div>
-
-      <!-- Obstacle builder -->
-      <div style="margin-bottom:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px">Obstacles (${lvl.obstacles.length})</div>
-          <div style="font-size:9px;color:rgba(255,255,255,0.25)">Auto-layout — no manual placement needed</div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:8px">
-          ${['ramp','peg','bumper','springboard','fan','gear','stickyzone','bridge','conveyor','seesaw','bouncywall','slide','rollerchain'].map(type => `
-            <button onclick="playSound('click');document.getElementById('mr-ed-obs-count-${type}').textContent=parseInt(document.getElementById('mr-ed-obs-count-${type}').textContent||0)+1;_admMROBSCount('${type}',1)" 
-              style="padding:7px 4px;border-radius:9px;background:rgba(160,136,250,0.08);border:1px solid rgba(160,136,250,0.2);color:#c0b9f5;font-size:10px;font-weight:600;cursor:pointer;position:relative">
-              ${{ramp:'⬟ Ramp',peg:'● Peg',bumper:'◉ Bumper',springboard:'🔴 Spring',fan:'💨 Fan',gear:'⚙️ Gear',stickyzone:'🟣 Sticky',bridge:'🌉 Bridge',conveyor:'🔁 Conv.',seesaw:'⚖️ Seesaw',bouncywall:'🧱 Bounce',slide:'📐 Slide',rollerchain:'⛓ Chain'}[type]}
-              <span style="position:absolute;top:-4px;right:-4px;background:#a088fa;color:#fff;border-radius:99px;font-size:8px;font-weight:800;min-width:14px;height:14px;display:flex;align-items:center;justify-content:center" id="mr-ed-obs-count-${type}">${lvl.obstacles.filter(o=>o.type===type).length}</span>
-            </button>`).join('')}
-        </div>
-        <button onclick="playSound('click');_mAdmEditLevel.obstacles=[];document.querySelectorAll('[id^=mr-ed-obs-count-]').forEach(el=>el.textContent='0')" style="width:100%;padding:7px;border-radius:9px;background:rgba(252,119,144,0.08);border:1px solid rgba(252,119,144,0.2);color:#fc7790;font-size:11px;cursor:pointer">🗑 Clear All Obstacles</button>
-      </div>
-
-      <!-- Level density slider -->
-      <div style="margin-bottom:14px">
-        <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Obstacle Density <span id="mr-ed-density-val">${lvl.density||5}</span>/10</div>
-        <input type="range" min="1" max="10" value="${lvl.density||5}" oninput="document.getElementById('mr-ed-density-val').textContent=this.value;_mAdmEditLevel.density=parseInt(this.value)" style="width:100%;accent-color:#4edfd0">
-        <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,0.2);margin-top:2px"><span>Relaxed</span><span>Chaotic</span></div>
-      </div>
-
-      <!-- Actions -->
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <button onclick="playSound('click');_admMRSaveLevelFromEditor()" style="width:100%;padding:12px;border-radius:14px;background:linear-gradient(135deg,#4edfd0,#566ee3);border:none;color:#fff;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(78,223,208,0.3)">💾 Save to Gallery</button>
-        <button onclick="playSound('click');_admMRSaveLevelFromEditor(true)" style="width:100%;padding:12px;border-radius:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:13px;font-weight:700;cursor:pointer">▶ Save & Test Level</button>
-      </div>
-    </div>
-  `;
-}
-
-window._admMROBSCount = function(type, delta) {
-  if (!_mAdmEditLevel) return;
-  if (!_mAdmEditLevel.obstacles) _mAdmEditLevel.obstacles = [];
-  if (delta > 0) {
-    // Add a placeholder obstacle of this type
-    _mAdmEditLevel.obstacles.push({ type });
-  } else if (delta < 0) {
-    const idx = _mAdmEditLevel.obstacles.findLastIndex ? _mAdmEditLevel.obstacles.findLastIndex(o=>o.type===type) : [..._mAdmEditLevel.obstacles].reverse().findIndex(o=>o.type===type);
-    if (idx >= 0) _mAdmEditLevel.obstacles.splice(idx, 1);
-  }
-};
-
-function _admMRSaveLevelFromEditor(andTest) {
-  if (!_mAdmEditLevel) return;
-  const nameEl = document.getElementById('mr-ed-name');
-  if (nameEl) _mAdmEditLevel.name = nameEl.value.trim() || 'Unnamed Level';
-  _mAdmEditLevel.updatedAt = Date.now();
-  // Upsert in gallery
-  const idx = _mAdmGallery.findIndex(l => l.id === _mAdmEditLevel.id);
-  if (idx >= 0) _mAdmGallery[idx] = { ..._mAdmEditLevel };
-  else _mAdmGallery.push({ ..._mAdmEditLevel });
-  _admMRSaveGallery().then(() => {
-    showNotif('✅','Level saved!', _mAdmEditLevel.name);
-    playSound('success');
-    if (andTest) {
-      _mAdmTestLevel = { ..._mAdmEditLevel };
-      _mAdmMode = 'testing';
-    } else {
-      _mAdmMode = 'list';
-    }
-    window._admRenderMarbleTab(document.getElementById('admin-content'));
-  });
-}
-
-function _admMRRenderTesting(content) {
-  const lvl = _mAdmTestLevel;
-  content.innerHTML = `
-    <div style="position:sticky;top:0;z-index:10;background:rgba(3,3,26,0.97);backdrop-filter:blur(12px);padding:8px 14px;border-bottom:1px solid rgba(246,187,78,0.3);display:flex;align-items:center;gap:10px">
-      <button onclick="playSound('click');if(mrAnimFrame){cancelAnimationFrame(mrAnimFrame);mrAnimFrame=null;}if(mrCountTimer){clearInterval(mrCountTimer);mrCountTimer=null;}_mAdmMode='list';window._admRenderMarbleTab(document.getElementById('admin-content'))" style="padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:12px;cursor:pointer">← Back</button>
-      <div style="flex:1;font-size:13px;font-weight:800;color:#f6bb4e">▶ Testing: ${lvl?.name||'Level'}</div>
-      <div style="font-size:10px;background:rgba(246,187,78,0.15);border:1px solid rgba(246,187,78,0.3);border-radius:6px;padding:3px 8px;color:#f6bb4e;font-weight:700;animation:pulse 2s infinite">● TEST MODE</div>
-    </div>
-    <div style="flex:1;position:relative;overflow:hidden;background:#03031a" id="mr-test-viewport">
-      <canvas id="mr-canvas" width="${MR_W}" height="${MR_H}" style="display:block;width:100%;position:absolute;top:0;left:0"></canvas>
-    </div>
-    <div id="mr-ui" style="flex-shrink:0;background:rgba(3,3,26,0.98);border-top:1px solid rgba(246,187,78,0.2);padding:10px 14px">
-      <button onclick="playSound('click');_admMRStartTestRace()" style="width:100%;padding:11px;border-radius:12px;background:linear-gradient(135deg,#f6bb4e,#e78161);border:none;color:#000;font-size:13px;font-weight:900;cursor:pointer">🏁 Start Test Race</button>
-    </div>
-  `;
-  // Set up canvas for this level
-  mrCanvas = document.getElementById('mr-canvas');
-  mrCtx = mrCanvas ? mrCanvas.getContext('2d') : null;
-  if (!mrCtx) return;
-  if (lvl?.theme) mrTheme = lvl.theme;
-  mrDrawIdle();
-}
-
-window._admMRStartTestRace = function() {
-  mrVotedColor = MARBLE_COLORS[Math.floor(Math.random()*MARBLE_COLORS.length)].id;
-  mrStartCountdown();
-};
-
-window._admMRBroadcastRaceDay = async function() {
-  try {
-    await fbDb.collection('broadcasts').add({
-      type:'announcement', active:true,
-      emoji:'🏁', title:'Race Day is Live!',
-      message:'Marble Race is open today — place your bets and compete for tickets!',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    playSound('success');
-    showNotif('✅','Broadcast sent!','Players notified of race day');
-    launchConfetti();
-  } catch(e) { showNotif('⚠️','Failed', e.message); }
-};
 
 window._adminBroadcast = async function(type) {
   if (!fbCurrentUser || fbCurrentUser.email?.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return;
