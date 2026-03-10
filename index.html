@@ -1368,6 +1368,103 @@ input[type=number] { -moz-appearance:textfield; }
 .bp-slot.locked { background:rgba(255,255,255,0.02); border-color:rgba(255,255,255,0.04); cursor:default; }
 .bp-slot.locked::after { content:'🔒'; font-size:16px; opacity:0.4; }
 
+/* ===== BACKPACK NEW (iPhone 15-inspired) ===== */
+.bp-new-container {
+  padding:0 2px;
+}
+.bp-new-header {
+  display:flex; align-items:center; gap:10px;
+  padding:14px 16px 10px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.05) 0%,transparent 100%);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  margin-bottom:2px;
+}
+.bp-new-title {
+  font-size:18px; font-weight:800; color:#fff; letter-spacing:-0.5px; flex:1;
+}
+.bp-new-subtitle {
+  font-size:11px; color:rgba(255,255,255,0.35); font-weight:500;
+}
+.bp-new-btn {
+  border:none; border-radius:12px; cursor:pointer;
+  display:flex; align-items:center; gap:5px;
+  font-weight:700; transition:all 0.15s;
+}
+.bp-new-btn:active { transform:scale(0.93); }
+.bp-new-grid {
+  display:grid;
+  gap:8px;
+  padding:10px 14px;
+}
+.bp-new-slot {
+  aspect-ratio:1;
+  border-radius:18px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  cursor:pointer;
+  transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  position:relative;
+  overflow:hidden;
+  border:1.5px solid rgba(255,255,255,0.08);
+  background:linear-gradient(145deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));
+  -webkit-tap-highlight-color:transparent;
+}
+.bp-new-slot.filled {
+  background:linear-gradient(145deg,rgba(160,136,250,0.18),rgba(100,80,200,0.1));
+  border-color:rgba(160,136,250,0.25);
+  box-shadow:0 2px 16px rgba(160,136,250,0.12), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.bp-new-slot.filled:active {
+  transform:scale(0.90);
+  box-shadow:0 1px 6px rgba(160,136,250,0.2);
+}
+.bp-new-slot.empty {
+  background:rgba(255,255,255,0.025);
+  border-color:rgba(255,255,255,0.06);
+  border-style:dashed;
+}
+.bp-new-slot .bp-slot-emoji {
+  font-size:26px; line-height:1;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+}
+.bp-new-slot .bp-slot-badge {
+  position:absolute; top:5px; right:5px;
+  width:8px; height:8px; border-radius:50%;
+  background:rgba(160,136,250,0.8);
+  box-shadow:0 0 6px rgba(160,136,250,0.6);
+}
+.bp-new-slot .bp-slot-lock {
+  font-size:18px; opacity:0.2;
+}
+.bp-section-label {
+  font-size:10px; font-weight:700; color:rgba(255,255,255,0.25);
+  text-transform:uppercase; letter-spacing:0.8px;
+  padding:8px 14px 4px;
+}
+/* Bottom-sheet tooltip for mobile */
+.bp-mobile-sheet {
+  position:absolute; bottom:0; left:0; right:0;
+  background:linear-gradient(180deg,rgba(18,12,38,0.97),rgba(12,8,28,0.99));
+  border-top:1px solid rgba(160,136,250,0.25);
+  border-radius:24px 24px 0 0;
+  padding:20px 20px 28px;
+  z-index:9999;
+  transform:translateY(100%);
+  transition:transform 0.32s cubic-bezier(0.32,0.72,0,1);
+  box-shadow:0 -8px 40px rgba(0,0,0,0.6);
+}
+.bp-mobile-sheet.open {
+  transform:translateY(0);
+}
+.bp-sheet-handle {
+  width:36px; height:4px; border-radius:99px;
+  background:rgba(255,255,255,0.15);
+  margin:0 auto 16px;
+}
+@keyframes bpSlotPop {
+  0%{transform:scale(1)} 40%{transform:scale(0.87)} 70%{transform:scale(1.08)} 100%{transform:scale(1)}
+}
+.bp-new-slot.pop { animation:bpSlotPop 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+
 /* ===== UPDATE LOGS ===== */
 .update-log-card {
   background: linear-gradient(145deg,rgba(160,136,250,0.08),rgba(125,101,214,0.04));
@@ -2629,6 +2726,11 @@ input[type=number] { -moz-appearance:textfield; }
   <div class="modal-overlay" id="backpack-options-modal">
     <div class="modal">
       <div class="modal-title">🎒 Backpack Options</div>
+      <!-- View toggle -->
+      <div style="display:flex;gap:6px;margin-bottom:12px;background:rgba(255,255,255,0.05);border-radius:12px;padding:4px">
+        <button onclick="S.bpViewMode='new';saveState();closeModal('backpack-options-modal');renderBackpack()" id="bp-toggle-new" style="flex:1;padding:8px;border-radius:9px;border:none;cursor:pointer;font-size:12px;font-weight:700;transition:all 0.15s;background:rgba(160,136,250,0.2);color:#a088fa">✦ New View</button>
+        <button onclick="S.bpViewMode='classic';saveState();closeModal('backpack-options-modal');renderBackpack()" id="bp-toggle-classic" style="flex:1;padding:8px;border-radius:9px;border:none;cursor:pointer;font-size:12px;font-weight:700;transition:all 0.15s;background:transparent;color:rgba(255,255,255,0.4)">Classic View</button>
+      </div>
       <button class="btn btn-danger btn-sm" style="width:100%;margin-bottom:8px" onclick="clearBackpack()">🗑️ Clear All Items</button>
       <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:8px" onclick="resetBackpackSize()">♻️ Reset Space</button>
       <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:8px">Upgrade Backpack (20 tickets each)</div>
@@ -2839,7 +2941,7 @@ const DEFAULT_STATE = {
   piggyBankBroken: false,
   piggyGhostMode: false,
   stackerBest: 0,
-  stackerDailyPlays: { date: '', count: 0 },
+  mrRacesToday: { date: '', count: 0 },
   settings: {
     uiScale: 1,
     fontRainbow: false,
@@ -2865,6 +2967,7 @@ const DEFAULT_STATE = {
   saveSlots: {},
   plinkoEditorMode: false,
   backpackTooltips: {},
+  bpViewMode: 'new',
   plinkoBarriers: [],
   discordChannels: {},
   budgetPrincess: { name: 'Princess Budget', limit: 0, spent: 0 },
@@ -4946,13 +5049,173 @@ function moveOverflowToBackpack(storeId, itemIdx) {
 }
 
 function renderBackpack() {
+  if (!S.bpViewMode) S.bpViewMode = 'new';
+  if (S.bpViewMode === 'new') {
+    renderBackpackNew();
+  } else {
+    renderBackpackClassic();
+  }
+}
+
+function renderBackpackNew() {
+  const c = document.getElementById('backpack-content');
+  const cols = 4;
+  const today = new Date().toDateString();
+  const itemCount = Object.values(S.backpackItems).filter(Boolean).length;
+
+  c.innerHTML = `
+    <div class="bp-new-container" id="bp-new-root">
+      <!-- Header -->
+      <div class="bp-new-header">
+        <div>
+          <div class="bp-new-title">🎒 Backpack</div>
+          <div class="bp-new-subtitle">${itemCount} of ${S.backpackSlots} slots used</div>
+        </div>
+        <div style="display:flex;gap:7px">
+          <button class="bp-new-btn" onclick="openModal('backpack-options-modal')" style="background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);font-size:11px;padding:6px 10px">⚙️ Options</button>
+          <button class="bp-new-btn" onclick="clearBackpack()" style="background:rgba(252,119,144,0.12);color:#fc7790;font-size:11px;padding:6px 10px">🗑️ Clear</button>
+        </div>
+      </div>
+
+      <!-- Capacity bar -->
+      <div style="padding:6px 14px 10px">
+        <div style="height:3px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden">
+          <div style="height:100%;width:${Math.round(itemCount/S.backpackSlots*100)}%;background:linear-gradient(90deg,#a088fa,#fc7790);border-radius:99px;transition:width 0.4s"></div>
+        </div>
+      </div>
+
+      <!-- Slot grid -->
+      <div class="bp-new-grid" style="grid-template-columns:repeat(${cols},1fr)" id="bp-new-grid"></div>
+
+      <!-- Overflow section injected below by JS -->
+    </div>
+  `;
+
+  const grid = document.getElementById('bp-new-grid');
+  const isMobile = 'ontouchstart' in window;
+
+  for (let i = 0; i < S.backpackSlots; i++) {
+    const item = S.backpackItems[i];
+    const tip  = (S.backpackTooltips||{})[i];
+    const slot = document.createElement('div');
+    slot.className = 'bp-new-slot ' + (item ? 'filled' : 'empty');
+    slot.dataset.slot = i;
+
+    if (item) {
+      slot.innerHTML = `
+        <div class="bp-slot-emoji">${item}</div>
+        ${tip ? '<div class="bp-slot-badge"></div>' : ''}
+      `;
+
+      // Tap / click → item detail sheet
+      slot.addEventListener('click', () => {
+        slot.classList.add('pop');
+        slot.addEventListener('animationend', () => slot.classList.remove('pop'), {once:true});
+        bpShowItemSheet(i);
+      });
+
+      // Drag (desktop)
+      slot.draggable = true;
+      slot.addEventListener('dragstart', e => { e.dataTransfer.setData('slot', i); playSound('click'); });
+
+      // Mobile tooltip on long-press (show sheet instead)
+      if (isMobile && tip) {
+        let pressTimer;
+        slot.addEventListener('touchstart', () => { pressTimer = setTimeout(() => bpShowTooltipSheet(i), 450); }, {passive:true});
+        slot.addEventListener('touchend', () => clearTimeout(pressTimer), {passive:true});
+      }
+
+      // Desktop tooltip on hover
+      if (!isMobile && tip) {
+        slot.addEventListener('mouseenter', () => bpShowHoverTooltip(slot, i));
+        slot.addEventListener('mouseleave', () => { const t=document.getElementById('bp-tooltip-overlay'); if(t) t.style.display='none'; });
+      }
+    } else {
+      slot.innerHTML = `<div style="font-size:20px;opacity:0.12">＋</div>`;
+    }
+
+    // Drag-over for reordering
+    slot.addEventListener('dragover', e => { e.preventDefault(); slot.style.borderColor='rgba(246,187,78,0.5)'; });
+    slot.addEventListener('dragleave', () => { slot.style.borderColor=''; });
+    slot.addEventListener('drop', e => {
+      e.preventDefault(); slot.style.borderColor='';
+      const from = parseInt(e.dataTransfer.getData('slot'));
+      const tmp = S.backpackItems[i];
+      S.backpackItems[i] = S.backpackItems[from];
+      S.backpackItems[from] = tmp;
+      if (!S.backpackItems[i]) delete S.backpackItems[i];
+      if (!S.backpackItems[from]) delete S.backpackItems[from];
+      // swap tooltips too
+      const tFrom = (S.backpackTooltips||{})[from];
+      const tTo   = (S.backpackTooltips||{})[i];
+      if (!S.backpackTooltips) S.backpackTooltips = {};
+      if (tFrom) S.backpackTooltips[i] = tFrom; else delete S.backpackTooltips[i];
+      if (tTo) S.backpackTooltips[from] = tTo; else delete S.backpackTooltips[from];
+      saveState(); renderBackpack();
+    });
+
+    // Right-click context menu (desktop)
+    slot.addEventListener('contextmenu', e => {
+      e.preventDefault();
+      if (!item) return;
+      const menu = document.getElementById('context-menu');
+      const pr = document.getElementById('phone').getBoundingClientRect();
+      menu.style.display = 'block';
+      menu.style.left = Math.max(4, Math.min(e.clientX-pr.left, pr.width-160)) + 'px';
+      menu.style.top  = Math.max(4, Math.min(e.clientY-pr.top,  pr.height-180)) + 'px';
+      menu.innerHTML = `
+        <div style="padding:8px 12px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(255,255,255,0.06)">${item} · Slot ${i+1}</div>
+        <button onclick="document.getElementById('context-menu').style.display='none';bpEditTooltip(${i})">✏️ Edit Tooltip</button>
+        <button onclick="document.getElementById('context-menu').style.display='none';bpViewTooltip(${i})">💬 View Tooltip</button>
+        <button onclick="document.getElementById('context-menu').style.display='none';bpClearTooltip(${i})">🗑️ Clear Tooltip</button>
+        <button onclick="document.getElementById('context-menu').style.display='none';bpRemoveItem(${i})">❌ Remove Item</button>
+        <button onclick="document.getElementById('context-menu').style.display='none'">✕ Close</button>
+      `;
+    });
+
+    grid.appendChild(slot);
+  }
+
+  // Overflow temp storage
+  cleanExpiredOverflows();
+  const _ovStores = getBpActiveOverflows();
+  if (_ovStores.length > 0) {
+    const root = document.getElementById('bp-new-root');
+    const _ovSection = document.createElement('div');
+    _ovSection.style.cssText = 'padding:4px 14px 14px';
+    _ovSection.innerHTML = '<div class="bp-section-label">📦 Temp Storage <span style="font-size:8px;color:rgba(255,255,255,0.15);font-weight:400;text-transform:none;letter-spacing:0">· tap to move in</span></div>';
+    _ovStores.forEach(store => {
+      const minsLeft = Math.max(0, Math.round((store.expiresAt - Date.now())/60000));
+      const pct = Math.max(0, Math.min(100, (store.expiresAt - Date.now()) / 3600000 * 100));
+      const el = document.createElement('div');
+      el.style.cssText = 'background:linear-gradient(145deg,rgba(80,50,160,0.15),rgba(40,25,80,0.1));border:1px solid rgba(160,136,250,0.2);border-radius:18px;padding:12px;margin-bottom:8px';
+      let slotsHtml = store.items.map((it,ii) =>
+        `<div style="width:40px;height:40px;border-radius:13px;background:rgba(160,136,250,0.18);border:1px solid rgba(160,136,250,0.3);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;position:relative;transition:transform 0.15s;-webkit-tap-highlight-color:transparent" onclick="moveOverflowToBackpack(${store.id},${ii})" title="${it.tip||it.emoji}">${it.emoji}<div style="position:absolute;bottom:-3px;right:-3px;width:13px;height:13px;background:#a088fa;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff">+</div></div>`
+      ).join('');
+      for (let e = store.items.length; e < 6; e++)
+        slotsHtml += `<div style="width:40px;height:40px;border-radius:13px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.06)"></div>`;
+      el.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:11px;font-weight:700;color:var(--accent1)">${store.items.length}/6 items</span>
+        <div style="display:flex;align-items:center;gap:7px">
+          <span style="font-size:9px;color:rgba(255,255,255,0.3)">⏱ ${minsLeft}m</span>
+          <div style="width:44px;height:3px;background:rgba(255,255,255,0.08);border-radius:99px"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#a088fa,#fbabd8);border-radius:99px"></div></div>
+        </div>
+      </div><div style="display:flex;gap:5px;flex-wrap:wrap">${slotsHtml}</div>`;
+      _ovSection.appendChild(el);
+    });
+    root.appendChild(_ovSection);
+  }
+}
+
+function renderBackpackClassic() {
   const c = document.getElementById('backpack-content');
   const cols = 9;
-  const rows = Math.ceil(S.backpackSlots / cols);
-  
+
   c.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div style="font-size:16px;font-weight:700;color:var(--fg)">🎒 ${S.backpackSlots} Slots</div>
+      <div style="font-size:16px;font-weight:700;color:var(--fg)">🎒 ${S.backpackSlots} Slots
+        <span style="font-size:10px;font-weight:500;color:rgba(255,255,255,0.3);margin-left:6px">Classic View</span>
+      </div>
       <div style="display:flex;gap:8px">
         <button class="btn btn-danger btn-sm" onclick="clearBackpack()">🗑️ Clear</button>
         <button class="btn btn-ghost btn-sm" onclick="openModal('backpack-options-modal')">⚙️</button>
@@ -4962,43 +5225,33 @@ function renderBackpack() {
       <div style="display:grid;grid-template-columns:repeat(${cols},1fr);gap:4px" id="backpack-grid"></div>
     </div>
   `;
-  
+
   const grid = document.getElementById('backpack-grid');
+  const isMobile = 'ontouchstart' in window;
+
   for (let i = 0; i < S.backpackSlots; i++) {
+    const item = S.backpackItems[i];
+    const tip  = (S.backpackTooltips||{})[i];
     const slot = document.createElement('div');
     slot.className = 'bp-slot';
     slot.dataset.slot = i;
-    if (S.backpackItems[i]) slot.textContent = S.backpackItems[i];
-    
-    // Tooltip display
-    const tip = S.backpackTooltips && S.backpackTooltips[i];
-    if (tip) {
-      slot.title = tip;
-      slot.style.position = 'relative';
-    }
-    
+    if (item) slot.textContent = item;
+    if (tip) slot.title = tip;
+
     slot.addEventListener('click', () => {
-      if (S.backpackItems[i]) {
-        showCustomConfirm(`Remove ${S.backpackItems[i]}?`, () => {
-          delete S.backpackItems[i];
-          delete S.backpackTooltips[i];
-          saveState(); renderBackpack();
-        });
-      }
+      if (item) bpShowItemSheet(i);
     });
-    
+
     slot.addEventListener('contextmenu', e => {
       e.preventDefault();
-      if (!S.backpackItems[i]) return;
+      if (!item) return;
       const menu = document.getElementById('context-menu');
+      const pr = document.getElementById('phone').getBoundingClientRect();
       menu.style.display = 'block';
-      const phoneRect = document.getElementById('phone').getBoundingClientRect();
-      const mx = Math.min(e.clientX - phoneRect.left, phoneRect.width - 150);
-      const my = Math.min(e.clientY - phoneRect.top, phoneRect.height - 160);
-      menu.style.left = Math.max(4, mx) + 'px';
-      menu.style.top = Math.max(4, my) + 'px';
+      menu.style.left = Math.max(4, Math.min(e.clientX-pr.left, pr.width-150)) + 'px';
+      menu.style.top  = Math.max(4, Math.min(e.clientY-pr.top,  pr.height-160)) + 'px';
       menu.innerHTML = `
-        <div style="padding:8px 12px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(255,255,255,0.06);letter-spacing:0.3px">${S.backpackItems[i]} SLOT ${i+1}</div>
+        <div style="padding:8px 12px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(255,255,255,0.06)">${item} SLOT ${i+1}</div>
         <button onclick="document.getElementById('context-menu').style.display='none';bpEditTooltip(${i})">✏️ Edit Tooltip</button>
         <button onclick="document.getElementById('context-menu').style.display='none';bpViewTooltip(${i})">💬 View Tooltip</button>
         <button onclick="document.getElementById('context-menu').style.display='none';bpClearTooltip(${i})">🗑️ Clear Tooltip</button>
@@ -5006,82 +5259,165 @@ function renderBackpack() {
         <button onclick="document.getElementById('context-menu').style.display='none'">✕ Close</button>
       `;
     });
-    
+
     slot.addEventListener('dragover', e => { e.preventDefault(); slot.classList.add('drag-over'); });
     slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
     slot.addEventListener('drop', e => {
-      e.preventDefault();
-      slot.classList.remove('drag-over');
-      const fromSlot = parseInt(e.dataTransfer.getData('slot'));
-      const temp = S.backpackItems[i];
-      S.backpackItems[i] = S.backpackItems[fromSlot];
-      S.backpackItems[fromSlot] = temp;
-      if (!S.backpackItems[i]) delete S.backpackItems[i];
-      if (!S.backpackItems[fromSlot]) delete S.backpackItems[fromSlot];
+      e.preventDefault(); slot.classList.remove('drag-over');
+      const from = parseInt(e.dataTransfer.getData('slot'));
+      const tmp = S.backpackItems[i]; S.backpackItems[i] = S.backpackItems[from]; S.backpackItems[from] = tmp;
+      if (!S.backpackItems[i]) delete S.backpackItems[i]; if (!S.backpackItems[from]) delete S.backpackItems[from];
       saveState(); renderBackpack();
     });
-    
-    if (S.backpackItems[i]) {
-      slot.draggable = true;
-      slot.addEventListener('dragstart', e => { e.dataTransfer.setData('slot', i); playSound('click'); });
-    }
-    
-    // Hover tooltip show
-    if (S.backpackItems[i] && S.backpackTooltips && S.backpackTooltips[i]) {
-      slot.addEventListener('mouseenter', () => {
-        let tip = document.getElementById('bp-tooltip-overlay');
-        if (!tip) { tip = document.createElement('div'); tip.id='bp-tooltip-overlay'; tip.style.cssText='position:absolute;background:linear-gradient(135deg,rgba(12,8,28,0.99),rgba(20,15,40,0.99));border:1px solid rgba(160,136,250,0.5);border-radius:12px;padding:9px 13px;font-size:11px;color:#fff;z-index:9999;pointer-events:none;max-width:170px;word-break:break-word;box-shadow:0 8px 32px rgba(0,0,0,0.7),0 0 0 1px rgba(160,136,250,0.1)'; document.getElementById('phone').appendChild(tip); }
-        const _tr = S.backpackTooltips[i];
-        tip.className = 'bp-tooltip-text';
-        const _ps = _tr.includes(' · ') ? _tr.split(' · ') : null;
-        tip.innerHTML = _ps
-          ? '<div style="font-weight:700;color:#fff;margin-bottom:3px">'+_ps[0]+'</div><div style="color:#a088fa;font-size:9px">'+_ps.slice(1).join(' · ')+'</div>'
-          : '<div style="color:#fff">'+_tr+'</div>';
-        tip.style.display = 'block';
-        const r = slot.getBoundingClientRect(), pr = document.getElementById('phone').getBoundingClientRect();
-        const tx = r.left - pr.left;
-        const ty = r.top - pr.top - 42;
-        tip.style.left = Math.max(2, Math.min(tx, pr.width - 150)) + 'px';
-        tip.style.top = Math.max(2, ty) + 'px';
-      });
-      slot.addEventListener('mouseleave', () => { const t = document.getElementById('bp-tooltip-overlay'); if(t) t.style.display='none'; });
+    if (item) { slot.draggable = true; slot.addEventListener('dragstart', e => { e.dataTransfer.setData('slot', i); playSound('click'); }); }
+
+    if (item && tip) {
+      if (!isMobile) {
+        slot.addEventListener('mouseenter', () => bpShowHoverTooltip(slot, i));
+        slot.addEventListener('mouseleave', () => { const t=document.getElementById('bp-tooltip-overlay'); if(t) t.style.display='none'; });
+      }
     }
     grid.appendChild(slot);
   }
 
-  // === OVERFLOW TEMP STORAGE ===
+  // Overflow
   cleanExpiredOverflows();
   const _ovStores = getBpActiveOverflows();
   if (_ovStores.length > 0) {
     const _ovSection = document.createElement('div');
     _ovSection.style.cssText = 'margin-top:18px';
-    _ovSection.innerHTML = '<div style="font-size:11px;font-weight:800;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;display:flex;align-items:center;gap:6px"><span>📦</span><span>Temp Storage</span><span style="font-size:9px;color:rgba(255,255,255,0.2);font-weight:500">· items sent when backpack is full · tap to move in</span></div>';
+    _ovSection.innerHTML = '<div style="font-size:11px;font-weight:800;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;display:flex;align-items:center;gap:6px"><span>📦</span><span>Temp Storage</span></div>';
     _ovStores.forEach(store => {
       const minsLeft = Math.max(0, Math.round((store.expiresAt - Date.now())/60000));
       const pct = Math.max(0, Math.min(100, (store.expiresAt - Date.now()) / 3600000 * 100));
       const el = document.createElement('div');
       el.style.cssText = 'background:linear-gradient(135deg,rgba(80,50,160,0.15),rgba(40,25,80,0.1));border:1px solid rgba(160,136,250,0.25);border-radius:18px;padding:14px;margin-bottom:10px';
       let slotsHtml = '';
-      store.items.forEach((it, ii) => {
-        slotsHtml += `<div style="width:44px;height:44px;border-radius:12px;background:rgba(160,136,250,0.18);border:1px solid rgba(160,136,250,0.3);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;position:relative;transition:transform 0.15s" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform=''" onclick="moveOverflowToBackpack(${store.id},${ii})" title="${it.tip||it.emoji} · Click to move to backpack">${it.emoji}<div style="position:absolute;bottom:-3px;right:-3px;width:14px;height:14px;background:#a088fa;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;border:1px solid rgba(0,0,0,0.5)">+</div></div>`;
-      });
-      for (let e = store.items.length; e < 6; e++) {
-        slotsHtml += `<div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.07)"></div>`;
-      }
-      el.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div style="display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden">
-          <span style="font-size:13px;font-weight:700;color:var(--accent1)">📦 ${store.items.length}/6 items</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span style="font-size:9px;color:rgba(255,255,255,0.3)">⏱️ ${minsLeft}m left</span>
-          <div style="width:50px;height:4px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#a088fa,#fbabd8);border-radius:99px"></div></div>
-        </div>
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">${slotsHtml}</div>`;
+      store.items.forEach((it,ii) => { slotsHtml += `<div style="width:44px;height:44px;border-radius:12px;background:rgba(160,136,250,0.18);border:1px solid rgba(160,136,250,0.3);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;position:relative" onclick="moveOverflowToBackpack(${store.id},${ii})" title="${it.tip||it.emoji}">${it.emoji}<div style="position:absolute;bottom:-3px;right:-3px;width:14px;height:14px;background:#a088fa;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff">+</div></div>`; });
+      for (let e = store.items.length; e < 6; e++) slotsHtml += `<div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px dashed rgba(255,255,255,0.07)"></div>`;
+      el.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><span style="font-size:13px;font-weight:700;color:var(--accent1)">📦 ${store.items.length}/6 items</span><div style="display:flex;align-items:center;gap:8px"><span style="font-size:9px;color:rgba(255,255,255,0.3)">⏱️ ${minsLeft}m left</span><div style="width:50px;height:4px;background:rgba(255,255,255,0.08);border-radius:99px"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#a088fa,#fbabd8);border-radius:99px"></div></div></div></div><div style="display:flex;gap:6px;flex-wrap:wrap">${slotsHtml}</div>`;
       _ovSection.appendChild(el);
     });
     c.appendChild(_ovSection);
   }
+}
+
+// Show item detail sheet (new tap UI — both modes)
+function bpShowItemSheet(i) {
+  const item = S.backpackItems[i];
+  const tip  = (S.backpackTooltips||{})[i];
+  if (!item) return;
+  // Parse tooltip into name + metadata
+  const parts = tip ? (tip.includes(' · ') ? tip.split(' · ') : [tip]) : [];
+  const itemName = parts[0] || item;
+  const itemMeta = parts.slice(1).join(' · ');
+  const isMobile = 'ontouchstart' in window;
+
+  if (isMobile) {
+    // Bottom sheet
+    bpShowMobileSheet(`
+      <div class="bp-sheet-handle"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <div style="font-size:44px;line-height:1;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.4))">${item}</div>
+        <div>
+          <div style="font-size:16px;font-weight:800;color:#fff;line-height:1.2">${itemName}</div>
+          ${itemMeta ? `<div style="font-size:12px;color:rgba(160,136,250,0.9);margin-top:3px">${itemMeta}</div>` : ''}
+          <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:4px">Slot ${i+1}</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <button onclick="bpCloseMobileSheet();bpEditTooltip(${i})" style="padding:12px;border-radius:14px;border:1px solid rgba(160,136,250,0.2);background:rgba(160,136,250,0.08);color:#a088fa;font-size:13px;font-weight:700;cursor:pointer">✏️ Edit Note</button>
+        <button onclick="bpCloseMobileSheet();bpViewTooltip(${i})" style="padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;cursor:pointer">💬 View Note</button>
+      </div>
+      <button onclick="bpCloseMobileSheet();bpRemoveItem(${i})" style="width:100%;padding:13px;border-radius:14px;border:none;background:rgba(252,119,144,0.12);color:#fc7790;font-size:14px;font-weight:800;cursor:pointer">❌ Remove Item</button>
+    `);
+  } else {
+    // Desktop modal
+    bpGetModal('bp-item-sheet-modal', `
+      <div style="text-align:center">
+        <div style="font-size:48px;margin-bottom:8px;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.5))">${item}</div>
+        <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:4px">${itemName}</div>
+        ${itemMeta ? `<div style="font-size:11px;color:rgba(160,136,250,0.9);margin-bottom:8px">${itemMeta}</div>` : ''}
+        <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:16px">Slot ${i+1}</div>
+      </div>
+      <div class="modal-row" style="margin-bottom:8px">
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeModal('bp-item-sheet-modal');bpEditTooltip(${i})">✏️ Edit Note</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeModal('bp-item-sheet-modal');bpViewTooltip(${i})">💬 View Note</button>
+      </div>
+      <button class="btn btn-danger btn-sm" style="width:100%" onclick="closeModal('bp-item-sheet-modal');bpRemoveItem(${i})">❌ Remove Item</button>
+      <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:6px" onclick="closeModal('bp-item-sheet-modal')">Cancel</button>
+    `);
+    openModal('bp-item-sheet-modal');
+  }
+}
+
+function bpShowTooltipSheet(i) {
+  const item = S.backpackItems[i];
+  const tip  = (S.backpackTooltips||{})[i];
+  if (!tip) return;
+  const parts = tip.includes(' · ') ? tip.split(' · ') : [tip];
+  bpShowMobileSheet(`
+    <div class="bp-sheet-handle"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <div style="font-size:34px">${item}</div>
+      <div style="font-size:15px;font-weight:700;color:#fff">${parts[0]}</div>
+    </div>
+    ${parts.length>1 ? `<div style="font-size:12px;color:rgba(160,136,250,0.9);line-height:1.6;margin-bottom:12px">${parts.slice(1).join(' · ')}</div>` : ''}
+    <button onclick="bpCloseMobileSheet()" style="width:100%;padding:13px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);font-size:14px;font-weight:700;cursor:pointer">Close</button>
+  `);
+}
+
+function bpShowMobileSheet(html) {
+  let sheet = document.getElementById('bp-mobile-sheet');
+  if (!sheet) {
+    sheet = document.createElement('div');
+    sheet.id = 'bp-mobile-sheet';
+    sheet.className = 'bp-mobile-sheet';
+    document.getElementById('phone').appendChild(sheet);
+    sheet.addEventListener('click', e => { if(e.target===sheet) bpCloseMobileSheet(); });
+    // Backdrop
+    let bd = document.getElementById('bp-sheet-backdrop');
+    if (!bd) {
+      bd = document.createElement('div');
+      bd.id = 'bp-sheet-backdrop';
+      bd.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,0.5);z-index:9998;opacity:0;transition:opacity 0.3s';
+      bd.addEventListener('click', bpCloseMobileSheet);
+      document.getElementById('phone').appendChild(bd);
+    }
+  }
+  sheet.innerHTML = html;
+  requestAnimationFrame(() => {
+    sheet.classList.add('open');
+    const bd = document.getElementById('bp-sheet-backdrop');
+    if (bd) bd.style.opacity = '1';
+  });
+}
+
+function bpCloseMobileSheet() {
+  const sheet = document.getElementById('bp-mobile-sheet');
+  if (sheet) sheet.classList.remove('open');
+  const bd = document.getElementById('bp-sheet-backdrop');
+  if (bd) bd.style.opacity = '0';
+}
+
+function bpShowHoverTooltip(slot, i) {
+  const tip = (S.backpackTooltips||{})[i];
+  if (!tip) return;
+  let el = document.getElementById('bp-tooltip-overlay');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'bp-tooltip-overlay';
+    el.style.cssText = 'position:absolute;background:linear-gradient(135deg,rgba(12,8,28,0.99),rgba(20,15,40,0.99));border:1px solid rgba(160,136,250,0.5);border-radius:12px;padding:9px 13px;font-size:11px;color:#fff;z-index:9999;pointer-events:none;max-width:170px;word-break:break-word;box-shadow:0 8px 32px rgba(0,0,0,0.7)';
+    document.getElementById('phone').appendChild(el);
+  }
+  const parts = tip.includes(' · ') ? tip.split(' · ') : null;
+  el.innerHTML = parts
+    ? '<div style="font-weight:700;color:#fff;margin-bottom:3px">'+parts[0]+'</div><div style="color:#a088fa;font-size:9px">'+parts.slice(1).join(' · ')+'</div>'
+    : '<div style="color:#fff">'+tip+'</div>';
+  el.style.display = 'block';
+  const r = slot.getBoundingClientRect(), pr = document.getElementById('phone').getBoundingClientRect();
+  el.style.left = Math.max(2, Math.min(r.left-pr.left, pr.width-150)) + 'px';
+  el.style.top  = Math.max(2, r.top-pr.top-42) + 'px';
 }
 
 function clearBackpack() {
@@ -7752,12 +8088,12 @@ function mClawTick(canvas) {
     case 'dropping':
       mClawDropY += 4;
       mFingerTarget = 0;  // keep open while descending
-      // Drop deeper — stop ~65px above floor so claw can actually reach piled prizes
-      if (mClawDropY >= CLAW_FLOOR_Y - 65) {
+      // Drop to within reach of the prize pile (foam top ≈ CLAW_FLOOR_Y - 30)
+      if (mClawDropY >= CLAW_FLOOR_Y - 30) {
         mClawState = 'closing';
         mFingerTarget = 1;
         // Give fingers time to fully close before rising
-        setTimeout(() => { if (mClawState === 'closing') mClawState = 'rising'; }, 1100);
+        setTimeout(() => { if (mClawState === 'closing') mClawState = 'rising'; }, 1200);
       }
       break;
 
@@ -7769,19 +8105,37 @@ function mClawTick(canvas) {
       break;
 
     case 'rising':
-      mClawDropY -= 4;
+      mClawDropY -= 3.5;
       mFingerTarget = 1;  // keep closed during rise
+
+      // Actively drag any prize that's inside the grip radius upward with the claw
+      if (mClawWorld && window.Matter) {
+        const clawTipY = mClawDropY + 50; // approximate tip of closed fingers
+        Matter.Composite.allBodies(mClawWorld).forEach(b => {
+          if (b.label !== 'prize') return;
+          const dx = b.position.x - mClawBridgeX;
+          const dy = b.position.y - clawTipY;
+          if (Math.sqrt(dx*dx + dy*dy) < 36) {
+            // Pull prize toward claw tip — simulates being gripped
+            const targetX = mClawBridgeX + dx * 0.85;
+            const targetY = clawTipY + dy * 0.85;
+            Matter.Body.setPosition(b, { x: targetX, y: targetY });
+            Matter.Body.setVelocity(b, { x: (b.velocity.x * 0.3), y: -3.0 });
+          }
+        });
+      }
+
       if (mClawDropY <= 72) {
         mClawDropY = 72;
-        // Check if any prize has risen with the claw (physically carried up)
-        // A prize is considered "held" if it is within grip radius of the hub
-        const GRIP_R = 48;
+        // Check if any prize rode up with the claw
+        const clawTipY = mClawDropY + 50;
+        const GRIP_R = 52;
         let carried = null;
         if (mClawWorld && window.Matter) {
           Matter.Composite.allBodies(mClawWorld).forEach(b => {
             if (b.label !== 'prize') return;
             const dx = b.position.x - mClawBridgeX;
-            const dy = b.position.y - (mClawDropY + 38);
+            const dy = b.position.y - clawTipY;
             if (Math.sqrt(dx*dx + dy*dy) < GRIP_R) carried = b;
           });
         }
@@ -7796,19 +8150,34 @@ function mClawTick(canvas) {
     case 'delivering':
       mClawBridgeX -= 2;
       mFingerTarget = 1;  // stay closed
-      // Check for a prize near the hub during travel
+
+      // Keep dragging the carried prize across to the box
       if (mClawWorld && window.Matter) {
+        const clawTipY = mClawDropY + 50;
+        Matter.Composite.allBodies(mClawWorld).forEach(b => {
+          if (b.label !== 'prize') return;
+          const dx = b.position.x - mClawBridgeX;
+          const dy = b.position.y - clawTipY;
+          if (Math.sqrt(dx*dx + dy*dy) < 52) {
+            Matter.Body.setPosition(b, { x: mClawBridgeX + dx * 0.8, y: clawTipY + dy * 0.8 });
+            Matter.Body.setVelocity(b, { x: -2, y: 0 });
+          }
+        });
+      }
+
+      if (mClawWorld && window.Matter) {
+        const clawTipY = mClawDropY + 50;
         let carried = null;
         Matter.Composite.allBodies(mClawWorld).forEach(b => {
           if (b.label !== 'prize') return;
           const dx = b.position.x - mClawBridgeX;
-          const dy = b.position.y - (mClawDropY + 38);
+          const dy = b.position.y - clawTipY;
           if (Math.sqrt(dx*dx + dy*dy) < 52) carried = b;
         });
 
         // Award when over the prize box
         if (mClawBridgeX <= CLAW_BOX_X + CLAW_BOX_W/2 + 8) {
-          mFingerTarget = 0;  // open — drop whatever we have
+          mFingerTarget = 0;  // open — drop into box
           if (carried) {
             const def = carried._def;
             S.clawBoxItems.push({ emoji: def.emoji || null, color: def.color, isPlush: def.isPlush, plushId: def.plushDef?.id || null, name: def.plushDef?.name || def.name || null });
@@ -7818,7 +8187,6 @@ function mClawTick(canvas) {
               Matter.Composite.allBodies(mClawWorld).forEach(seg => {
                 if (seg._ragdollId === rid) Matter.World.remove(mClawWorld, seg);
               });
-              // Also remove ragdoll constraints
               Matter.Composite.allConstraints(mClawWorld).forEach(c => {
                 if ((c.bodyA && c.bodyA._ragdollId === rid) || (c.bodyB && c.bodyB._ragdollId === rid))
                   Matter.World.remove(mClawWorld, c);
@@ -7837,14 +8205,12 @@ function mClawTick(canvas) {
             showNotif('🎉','Prize won!',`+${pts} tickets`);
             playSound('success'); launchConfetti();
           } else {
-            // Prize slipped during delivery
             showNotif('😿','Dropped it!','So close…');
             playSound('error');
           }
           mClawState = 'resetting';
         }
       } else {
-        // No world (shouldn't happen) — just reset
         if (mClawBridgeX <= CLAW_BOX_X + CLAW_BOX_W/2 + 8) mClawState = 'resetting';
       }
       break;
@@ -8656,9 +9022,24 @@ let mrResultText = '';
 let mrFinishOrder = [];
 let mrRaceTime = 0;
 let mrCanvas, mrCtx;
-let mrCameraY = 0; // current camera scroll Y in canvas coords
-let mrCameraTarget = null; // null = auto-follow leader, else marble id
+let mrCameraY = 0;
+let mrCameraTarget = null;
 let mrCameraLocked = false;
+let mrTheme = 'space'; // current level theme
+let mrSoundCooldowns = {}; // hazard sound rate-limiting
+let mrTop3Done = false;    // true once 3rd place finishes — starts stuck check
+let mrTop3CheckTimer = null;
+let mrTicketsAwarded = false; // guards against double-awarding tickets
+
+// Level themes — palette applied when generating map
+const MR_THEMES = {
+  space:    { rampCol:'rgba(78,223,208,X)',  pegCol:'rgba(160,136,250,X)', bumperCol:'rgba(252,119,144,X)', bgA:'#03031a', bgB:'#0a0a2e', wallCol:'rgba(78,223,208,0.5)',  name:'Space'    },
+  sakura:   { rampCol:'rgba(255,160,200,X)', pegCol:'rgba(255,120,180,X)', bumperCol:'rgba(255,210,230,X)', bgA:'#1a0510', bgB:'#2a0820', wallCol:'rgba(255,140,180,0.5)', name:'Sakura'   },
+  neon:     { rampCol:'rgba(80,255,160,X)',  pegCol:'rgba(255,255,80,X)',  bumperCol:'rgba(255,80,200,X)',  bgA:'#000a05', bgB:'#001510', wallCol:'rgba(80,255,160,0.5)',  name:'Neon'     },
+  sunset:   { rampCol:'rgba(255,160,60,X)',  pegCol:'rgba(255,220,80,X)',  bumperCol:'rgba(255,100,60,X)',  bgA:'#1a0800', bgB:'#2a1200', wallCol:'rgba(255,160,60,0.5)',  name:'Sunset'   },
+  ice:      { rampCol:'rgba(160,220,255,X)', pegCol:'rgba(200,240,255,X)', bumperCol:'rgba(120,200,255,X)', bgA:'#030d1a', bgB:'#061828', wallCol:'rgba(160,220,255,0.5)', name:'Ice'      },
+  forest:   { rampCol:'rgba(80,200,100,X)',  pegCol:'rgba(140,220,80,X)',  bumperCol:'rgba(200,255,120,X)', bgA:'#020d03', bgB:'#051205', wallCol:'rgba(80,200,100,0.5)',  name:'Forest'   },
+};
 
 function renderMarbleRace() {
   const c = document.getElementById('marblerace-content');
@@ -8713,63 +9094,83 @@ function mrGenMap() {
   const W = MR_W, H = MR_H;
   const rng = () => Math.random();
 
-  // ─────────────────────────────────────────────────────────────
-  // GUARANTEED-PASSABLE ZONE SYSTEM
-  // Track = 8 zones. Each zone places obstacles only in its outer
-  // thirds, leaving a 100px clear corridor down the centre.
-  // Every zone ends with a guide ramp pointing inward so marbles
-  // can always fall toward the centre and downward.
-  // ─────────────────────────────────────────────────────────────
-  const ZONES = 8;
-  const zoneH = (H - 100) / ZONES;
-  const CENTRE = W / 2;
-  const CORRIDOR = 50; // half-width of guaranteed clear path
+  // Pick a random theme for this level
+  const themeKeys = Object.keys(MR_THEMES);
+  mrTheme = themeKeys[Math.floor(rng() * themeKeys.length)];
 
-  // Hazard pool — one random hazard per zone from this list
-  const hazardPool = ['springboard','fan','gear','stickyzone','bridge','conveyor','seesaw','bouncywall'];
+  // ─────────────────────────────────────────────────────────────
+  // PATHING PLAN — before placing any obstacle, lay out a guaranteed
+  // clear passage from top to bottom. The passage is a series of
+  // "gate points" the marble can always fall through. Obstacles are
+  // placed only outside these gate corridors.
+  // ─────────────────────────────────────────────────────────────
+  const ZONES = 9;
+  const GATE_W = 60;   // width of guaranteed clear corridor per gate
+  const zoneH = (H - 100) / ZONES;
+
+  // Alternate gate X positions zigzag across track
+  const gates = [];
+  for (let z = 0; z < ZONES; z++) {
+    const side = z % 2;
+    const gx = side === 0
+      ? 30  + rng() * (W * 0.35)
+      : W * 0.65 + rng() * (W * 0.3 - 30);
+    gates.push({ x: gx, y: 60 + z * zoneH + zoneH * 0.5 });
+  }
 
   for (let z = 0; z < ZONES; z++) {
     const yBase = 60 + z * zoneH;
     const yMid  = yBase + zoneH * 0.5;
+    const gate  = gates[z];
+    const gLeft  = gate.x - GATE_W / 2;
+    const gRight = gate.x + GATE_W / 2;
 
-    // ── Alternating guide ramps — always slope downward and INWARD ──
-    if (z % 2 === 0) {
-      // Left side ramp slopes right-down (inward)
-      mrObstacles.push({ type:'ramp', x: 40 + rng()*20, y: yBase + 20 + rng()*20, w: 55 + rng()*15, angle:  0.30 + rng()*0.10 });
-      // Right side ramp slopes left-down (inward)
-      mrObstacles.push({ type:'ramp', x: W - 40 - rng()*20, y: yBase + 20 + rng()*20, w: 55 + rng()*15, angle: -(0.30 + rng()*0.10) });
-    } else {
-      // Crossing ramps in upper portion of zone — slope inward
-      mrObstacles.push({ type:'ramp', x: W*0.22 + rng()*15, y: yMid - 20 + rng()*15, w: 50 + rng()*15, angle:  0.22 + rng()*0.08 });
-      mrObstacles.push({ type:'ramp', x: W*0.78 - rng()*15, y: yMid - 20 + rng()*15, w: 50 + rng()*15, angle: -(0.22 + rng()*0.08) });
+    // ── Guide ramp pointing TOWARD the gate below ──
+    const nextGate = gates[Math.min(z + 1, ZONES - 1)];
+    const slope = nextGate.x > gate.x ? 0.28 + rng() * 0.12 : -(0.28 + rng() * 0.12);
+
+    // Left-side ramp (only if it doesn't block the gate corridor)
+    if (gLeft > 40) {
+      mrObstacles.push({ type:'ramp', x: gLeft * 0.5, y: yBase + 18 + rng() * 20, w: 50 + rng() * 15, angle: 0.28 + rng() * 0.1, _theme: mrTheme });
+    }
+    // Right-side ramp
+    if (gRight < W - 40) {
+      mrObstacles.push({ type:'ramp', x: (gRight + W) * 0.5, y: yBase + 18 + rng() * 20, w: 50 + rng() * 15, angle: -(0.28 + rng() * 0.1), _theme: mrTheme });
     }
 
-    // ── Small pegs only on outer thirds ──
-    for (let p = 0; p < 2; p++) {
-      const onLeft = rng() > 0.5;
-      mrObstacles.push({ type:'peg',
-        x: onLeft ? 15 + rng()*55 : W - 15 - rng()*55,
-        y: yBase + 10 + rng()*(zoneH - 20),
-        r: 5 + rng()*3
-      });
+    // ── Pegs — only outside gate corridor ──
+    for (let p = 0; p < 3; p++) {
+      let px;
+      if (rng() > 0.5 && gLeft > 50) {
+        px = 15 + rng() * (gLeft - 20);
+      } else if (gRight < W - 50) {
+        px = gRight + rng() * (W - gRight - 20);
+      } else {
+        continue;
+      }
+      mrObstacles.push({ type:'peg', x: px, y: yBase + 10 + rng() * (zoneH - 20), r: 5 + rng() * 3, _theme: mrTheme });
     }
 
-    // ── Spinning bumper — keep to outer 25% of width ──
+    // ── Bumper — outside gate ──
     if (z % 3 === 0) {
-      const onLeft = rng() > 0.5;
-      mrObstacles.push({ type:'bumper',
-        x: onLeft ? 20 + rng()*50 : W - 20 - rng()*50,
-        y: yMid + rng()*15 - 8,
-        r: 9 + rng()*5, angle: 0, speed: 0.025 + rng()*0.02
-      });
+      const bx = rng() > 0.5
+        ? Math.min(gLeft - 20, 60 + rng() * 40)
+        : Math.max(gRight + 20, W - 60 - rng() * 40);
+      if (bx > 20 && bx < W - 20) {
+        mrObstacles.push({ type:'bumper', x: bx, y: yMid + rng() * 15, r: 9 + rng() * 4, angle: 0, speed: 0.025 + rng() * 0.02, _theme: mrTheme });
+      }
     }
 
-    // ── One random interactive hazard per zone, placed safely ──
-    const pick = hazardPool[z % hazardPool.length];
-    const hx = CENTRE + (rng()-0.5)*(W*0.5 - 20); // anywhere but near walls
-    const hy = yBase + 15 + rng()*(zoneH - 30);
+    // ── One interactive hazard per zone — placed near gate but not IN it ──
+    const hazardPool = ['springboard','fan','gear','stickyzone','bridge','conveyor','seesaw','bouncywall','slide','rollerchain'];
+    const pick = hazardPool[Math.floor(rng() * hazardPool.length)];
+    // Place hazard on the opposite side of the track from the gate
+    const hx = gate.x > W / 2
+      ? 30 + rng() * (W * 0.35)
+      : W * 0.65 + rng() * (W * 0.3);
+    const hy = yBase + 15 + rng() * (zoneH - 30);
 
-    switch(pick) {
+    switch (pick) {
       case 'springboard':
         mrObstacles.push({ type:'springboard', x: hx, y: hy, w: 38, hits:0, armed:false, springT:0 });
         break;
@@ -8780,47 +9181,32 @@ function mrGenMap() {
         mrObstacles.push({ type:'gear', x: hx, y: hy, r: 14, teeth:8, angle:0, speed: rng()>0.5?0.02:-0.02 });
         break;
       case 'stickyzone':
-        mrObstacles.push({ type:'stickyzone', x: hx, y: hy, r: 20 + rng()*12 });
+        mrObstacles.push({ type:'stickyzone', x: hx, y: hy, r: 18 + rng() * 10 });
         break;
-      case 'bridge': {
-        // Bridge anchored at safe x positions (not near walls)
-        const bx = 30 + rng()*(W - 60);
-        mrObstacles.push({ type:'bridge', x: bx, y: hy, w: 60 + rng()*20, broken:false, load:0, breakAt: 2 + (rng()>0.5?1:0), breakT:0 });
+      case 'bridge':
+        mrObstacles.push({ type:'bridge', x: hx, y: hy, w: 55 + rng() * 18, broken:false, load:0, breakAt: 2 + (rng()>0.5?1:0), breakT:0 });
         break;
-      }
-      case 'conveyor': {
-        const dir = rng()>0.5?1:-1;
-        mrObstacles.push({ type:'conveyor', x: hx, y: hy, w: 50 + rng()*20, dir, beltPhase:0 });
+      case 'conveyor':
+        mrObstacles.push({ type:'conveyor', x: hx, y: hy, w: 50 + rng() * 18, dir: rng()>0.5?1:-1, beltPhase:0 });
         break;
-      }
-      case 'seesaw': {
-        const sw = 60 + rng()*20;
-        mrObstacles.push({ type:'seesaw', cx: hx, y: hy, w: sw, angle:0, angV:0 });
+      case 'seesaw':
+        mrObstacles.push({ type:'seesaw', cx: hx, y: hy, w: 58 + rng() * 18, angle:0, angV:0 });
         break;
-      }
-      case 'bouncywall': {
-        const side = rng()>0.5?'left':'right';
-        mrObstacles.push({ type:'bouncywall', side, y: hy, h: 35 + rng()*20, flash:0 });
+      case 'bouncywall':
+        mrObstacles.push({ type:'bouncywall', side: gate.x > W/2 ? 'left' : 'right', y: hy, h: 35 + rng() * 20, flash:0 });
         break;
-      }
-    }
-
-    // ── Slide every 3rd zone on alternating sides ──
-    if (z % 3 === 1) {
-      const slideLeft = z % 6 < 3;
-      const sx = slideLeft ? 25 + rng()*20 : W - 25 - rng()*20;
-      mrObstacles.push({ type:'slide', x: sx, y: yMid - 10, w: 55, angle: slideLeft ? 0.45 : -0.45 });
-    }
-
-    // ── Roller chain every 4 zones ──
-    if (z % 4 === 0) {
-      mrObstacles.push({ type:'rollerchain', x: CENTRE + (rng()-0.5)*60, y: hy + 20, w: 45, phase:0 });
+      case 'slide':
+        mrObstacles.push({ type:'slide', x: hx, y: hy, w: 52, angle: gate.x > W/2 ? 0.4 : -0.4 });
+        break;
+      case 'rollerchain':
+        mrObstacles.push({ type:'rollerchain', x: hx, y: hy, w: 44, phase:0 });
+        break;
     }
   }
 
-  // ── Bottom funnel — guides everything to centre finish ──
-  mrObstacles.push({ type:'ramp', x: 30,   y: H - 60, w: 90,  angle:  0.55 });
-  mrObstacles.push({ type:'ramp', x: W-30, y: H - 60, w: 90,  angle: -0.55 });
+  // ── Bottom funnel ──
+  mrObstacles.push({ type:'ramp',   x: 30,   y: H - 60, w: 90,  angle:  0.55, _theme: mrTheme });
+  mrObstacles.push({ type:'ramp',   x: W-30, y: H - 60, w: 90,  angle: -0.55, _theme: mrTheme });
   mrObstacles.push({ type:'funnel', cx: W/2, cy: H - 28, w: W * 0.65 });
   mrGoals.push({ y: H - 14 });
 }
@@ -8965,9 +9351,11 @@ function mrStepPhysics() {
             o.hits++;
             if (o.hits >= 2 && !o.armed) { o.armed = true; o.springT = 0; }
             if (o.armed) {
-              // Explode outward
               m.vx += (m.x < o.x ? -1 : 1) * (4 + Math.random()*2);
               m.vy -= 5 + Math.random()*3;
+              mrPlayHazardSound('springboard', o, 1800);
+            } else {
+              mrPlayHazardSound('springboard', o, 600);
             }
           }
           break;
@@ -8975,25 +9363,24 @@ function mrStepPhysics() {
         case 'fan': {
           const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
           if (d < o.r + m.r) {
-            if (!o.active) { o.active=true; o.activeT=90; }
-            // Push in fan direction
+            if (!o.active) { o.active=true; o.activeT=90; mrPlayHazardSound('fan', o, 1200); }
             const pushX = o.dir * 0.6;
             m.vx += pushX;
-            m.vy -= 0.15; // slight lift
+            m.vy -= 0.15;
           }
           break;
         }
         case 'gear': {
           const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
-          const effectiveR = o.r + 4; // teeth extend 4px
+          const effectiveR = o.r + 4;
           if (d < effectiveR + m.r && d > 0) {
             const nx=dx/d, ny=dy/d, ov=effectiveR+m.r-d;
             m.x+=nx*ov; m.y+=ny*ov;
-            // Gear transfers rotation to marble
             const tangX = -ny * o.speed * 80;
             const tangY =  nx * o.speed * 80;
             m.vx = m.vx*0.6 + tangX;
             m.vy = m.vy*0.6 + tangY;
+            mrPlayHazardSound('gear', o, 500);
           }
           break;
         }
@@ -9002,44 +9389,47 @@ function mrStepPhysics() {
           if (d < o.r) {
             m.vx *= 0.88;
             m.vy *= 0.88;
+            mrPlayHazardSound('sticky', o, 900);
           }
           break;
         }
         case 'bridge': {
           if (!o.broken) {
-            mrRampCollide(m, o.x, o.y, o.w/2, 5, 0, 1);
+            const hit = mrRampCollide(m, o.x, o.y, o.w/2, 5, 0, 1);
+            if (hit) { o.load = (o.load||0)+1; mrPlayHazardSound('bridge', o, 1400); }
           } else {
-            // broken — let marble fall through, slight inward push
             m.vx += (o.x - m.x) * 0.002;
           }
           break;
         }
         case 'conveyor': {
           const hit = mrRampCollide(m, o.x, o.y, o.w/2, 5, 0, 0.8);
-          if (hit) m.vx += o.dir * 0.5;
+          if (hit) { m.vx += o.dir * 0.5; mrPlayHazardSound('conveyor', o, 700); }
           break;
         }
         case 'seesaw': {
           mrRampCollide(m, o.cx, o.y, o.w/2, 5, o.angle, 1);
-          // marble weight tips seesaw
           const localX = m.x - o.cx;
-          if (Math.abs(m.y - o.y) < 20 && Math.abs(localX) < o.w/2)
+          if (Math.abs(m.y - o.y) < 20 && Math.abs(localX) < o.w/2) {
             o.angV += localX * 0.00015;
+            mrPlayHazardSound('seesaw', o, 1000);
+          }
           break;
         }
         case 'bouncywall': {
           const wx = o.side === 'left' ? m.r + 12 : W - m.r - 12;
           if (o.side === 'left' && m.x < wx && m.y > o.y - o.h/2 && m.y < o.y + o.h/2) {
             m.x = wx; m.vx = Math.abs(m.vx) * 0.65 + 1.2; o.flash = 8;
+            mrPlayHazardSound('boing', o, 600);
           } else if (o.side === 'right' && m.x > wx && m.y > o.y - o.h/2 && m.y < o.y + o.h/2) {
             m.x = wx; m.vx = -Math.abs(m.vx) * 0.65 - 1.2; o.flash = 8;
+            mrPlayHazardSound('boing', o, 600);
           }
           break;
         }
         case 'rollerchain': {
-          // Horizontal chain of small rollers — acts like a bumpy ramp
           const chainHit = mrRampCollide(m, o.x, o.y, o.w/2, 6, 0, 1.1);
-          if (chainHit) { m.vx += (Math.random()-0.5)*0.8; }
+          if (chainHit) { m.vx += (Math.random()-0.5)*0.8; mrPlayHazardSound('rollerchain', o, 400); }
           break;
         }
       }
@@ -9068,17 +9458,30 @@ function mrStepPhysics() {
 
   mrRaceTime++;
 
-  // ── Check for stuck marbles — all others finished, some still running ──
+  // ── Top-3 detection → start stuck countdown once 3 have finished ──
+  if (!mrTop3Done && mrFinishOrder.length >= 3) {
+    mrTop3Done = true;
+    const activeLeft = mrMarbles.filter(m => !m.finished);
+    if (activeLeft.length > 0) {
+      // Give remaining marbles 4 seconds to finish naturally before countdown
+      mrTop3CheckTimer = setTimeout(() => {
+        if (mrState === 'racing' && mrMarbles.some(m => !m.finished)) {
+          mrStartStuckCountdown();
+        }
+      }, 4000);
+    }
+  }
+
+  // ── Individual stuck detection (any marble genuinely stuck) ──
   const activeMarbles = mrMarbles.filter(m => !m.finished);
   const finishedCount = mrMarbles.length - activeMarbles.length;
-  if (activeMarbles.length > 0 && finishedCount > 0 && mrStuckCountdown === 0 && !mrStuckCountTimer) {
-    // If active marbles are all moving very slowly — they're stuck
-    const allStuck = activeMarbles.every(m => Math.hypot(m.vx, m.vy) < 0.4 && (m._stuckFrames||0) > 60);
+  if (activeMarbles.length > 0 && finishedCount > 0 && mrStuckCountdown === 0 && !mrStuckCountTimer && !mrTop3CheckTimer) {
+    const allStuck = activeMarbles.every(m => Math.hypot(m.vx, m.vy) < 0.4 && (m._stuckFrames||0) > 90);
     if (allStuck) mrStartStuckCountdown();
   }
 
   // Hard timeout
-  if (mrRaceTime > 4200) {
+  if (mrRaceTime > 5400) {
     mrMarbles.filter(m=>!m.finished).forEach(m => {
       m.finished=true; m.finishRank=mrFinishOrder.length+1; mrFinishOrder.push(m.id);
     });
@@ -9090,12 +9493,13 @@ function mrStartStuckCountdown() {
   if (mrStuckCountTimer) return;
   mrStuckCountdown = 5;
   playSound('timer');
+  const ui = document.getElementById('mr-commentary');
+  if (ui) ui.textContent = '⏱️ Clearing stuck marbles…';
   mrStuckCountTimer = setInterval(() => {
     mrStuckCountdown--;
     if (mrStuckCountdown > 0) playSound('timer');
     if (mrStuckCountdown <= 0) {
       clearInterval(mrStuckCountTimer); mrStuckCountTimer = null; mrStuckCountdown = 0;
-      // Force-finish stuck marbles
       mrMarbles.filter(m=>!m.finished).forEach(m => {
         m.finished=true; m.finishRank=mrFinishOrder.length+1; mrFinishOrder.push(m.id);
       });
@@ -9103,6 +9507,29 @@ function mrStartStuckCountdown() {
       setTimeout(() => mrEndRace(), 400);
     }
   }, 1000);
+}
+
+// Rate-limited hazard sounds — soundKey: minimum ms between plays per obstacle instance
+function mrPlayHazardSound(soundKey, obstacle, cooldownMs) {
+  const key = obstacle._id || (obstacle._id = Math.random().toString(36).slice(2));
+  const ck = soundKey + '_' + key;
+  const now = Date.now();
+  if ((mrSoundCooldowns[ck] || 0) > now) return;
+  mrSoundCooldowns[ck] = now + cooldownMs;
+  // Map hazard keys to existing game sounds
+  const soundMap = {
+    springboard: 'whoosh',
+    fan: 'whoosh',
+    gear: 'click',
+    sticky: 'pop',
+    bridge: 'error',
+    conveyor: 'click',
+    seesaw: 'click',
+    boing: 'success',
+    rollerchain: 'pop',
+  };
+  const s = soundMap[soundKey];
+  if (s) playSound(s);
 }
 
 function mrUpdateCommentary() {
@@ -9192,52 +9619,56 @@ function mrDrawFrame() {
   ctx.save();
   ctx.translate(0, -camY);
 
-  // ── Enhanced background: multi-stop gradient (covers full canvas) ──
+  // ── Theme-aware background ──
+  const th = MR_THEMES[mrTheme] || MR_THEMES.space;
   const bg = ctx.createLinearGradient(0, 0, 0, MR_H);
-  bg.addColorStop(0,'#03031a'); bg.addColorStop(0.4,'#060620'); bg.addColorStop(1,'#0a0a2e');
+  bg.addColorStop(0, th.bgA); bg.addColorStop(0.5, th.bgA); bg.addColorStop(1, th.bgB);
   ctx.fillStyle=bg; ctx.fillRect(0, 0, MR_W, MR_H);
 
-  // Subtle starfield dots — fixed in world space (they scroll with camera naturally)
-  ctx.fillStyle='rgba(255,255,255,0.06)';
+  // Subtle particles / starfield
+  ctx.fillStyle='rgba(255,255,255,0.05)';
   for(let i=0;i<60;i++){
-    const sx=((i*137+23)%MR_W), sy=((i*97+17)%(MR_H));
+    const sx=((i*137+23)%MR_W), sy=((i*97+17)%MR_H);
     ctx.beginPath(); ctx.arc(sx,sy,0.7,0,Math.PI*2); ctx.fill();
   }
 
-  // Grid — world-space so it scrolls correctly
-  ctx.strokeStyle='rgba(160,136,250,0.04)'; ctx.lineWidth=0.5;
+  // Grid lines
+  ctx.strokeStyle='rgba(255,255,255,0.03)'; ctx.lineWidth=0.5;
   for(let x=0;x<MR_W;x+=24){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,MR_H);ctx.stroke();}
   for(let y=0;y<MR_H;y+=24){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(MR_W,y);ctx.stroke();}
 
-  // Track walls — full height glow
+  // Track walls — themed colour
+  const wallRGB = th.wallCol;
   const wallG=ctx.createLinearGradient(0,0,8,0);
-  wallG.addColorStop(0,'rgba(78,223,208,0.5)'); wallG.addColorStop(1,'rgba(78,223,208,0)');
-  ctx.fillStyle=wallG; ctx.fillRect(0,0,4,MR_H);
-  const wallGR=ctx.createLinearGradient(MR_W-4,0,MR_W,0);
-  wallGR.addColorStop(0,'rgba(78,223,208,0)'); wallGR.addColorStop(1,'rgba(78,223,208,0.5)');
-  ctx.fillStyle=wallGR; ctx.fillRect(MR_W-4,0,4,MR_H);
+  wallG.addColorStop(0, wallRGB); wallG.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=wallG; ctx.fillRect(0,0,6,MR_H);
+  const wallGR=ctx.createLinearGradient(MR_W-6,0,MR_W,0);
+  wallGR.addColorStop(0,'rgba(0,0,0,0)'); wallGR.addColorStop(1, wallRGB);
+  ctx.fillStyle=wallGR; ctx.fillRect(MR_W-6,0,6,MR_H);
 
   // Obstacles — full visual pass for all types
   mrObstacles.forEach(o => {
     ctx.save();
     switch(o.type) {
       case 'peg': {
-        ctx.shadowBlur=8; ctx.shadowColor='rgba(160,136,250,0.7)';
+        const pegBase = (MR_THEMES[mrTheme]||MR_THEMES.space).pegCol.replace('X','0.85');
+        ctx.shadowBlur=8; ctx.shadowColor=pegBase;
         const g=ctx.createRadialGradient(o.x-1.5,o.y-1.5,0.5,o.x,o.y,o.r);
-        g.addColorStop(0,'rgba(225,220,255,0.95)'); g.addColorStop(0.4,'rgba(160,136,250,0.85)'); g.addColorStop(1,'rgba(86,60,180,0.5)');
+        g.addColorStop(0,'rgba(240,235,255,0.97)'); g.addColorStop(0.4,pegBase); g.addColorStop(1,pegBase.replace('0.85','0.4'));
         ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
         ctx.shadowBlur=0;
         ctx.beginPath(); ctx.arc(o.x-1.2,o.y-1.2,o.r*0.38,0,Math.PI*2);
-        ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fill();
+        ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fill();
         break;
       }
       case 'ramp': {
         ctx.translate(o.x,o.y); ctx.rotate(o.angle);
-        ctx.shadowBlur=6; ctx.shadowColor='rgba(78,223,208,0.5)';
+        const rampBase = (MR_THEMES[mrTheme]||MR_THEMES.space).rampCol.replace('X','0.55');
+        ctx.shadowBlur=6; ctx.shadowColor=rampBase;
         const rg=ctx.createLinearGradient(-o.w/2,-5,o.w/2,5);
-        rg.addColorStop(0,'rgba(78,223,208,0.5)'); rg.addColorStop(1,'rgba(86,110,227,0.4)');
+        rg.addColorStop(0,rampBase); rg.addColorStop(1,rampBase.replace('0.55','0.35'));
         ctx.fillStyle=rg; ctx.fillRect(-o.w/2,-5,o.w,10);
-        ctx.strokeStyle='rgba(78,223,208,0.8)'; ctx.lineWidth=1.5; ctx.strokeRect(-o.w/2,-5,o.w,10);
+        ctx.strokeStyle=rampBase.replace('0.55','0.85'); ctx.lineWidth=1.5; ctx.strokeRect(-o.w/2,-5,o.w,10);
         ctx.shadowBlur=0;
         break;
       }
@@ -9484,17 +9915,52 @@ function mrDrawFrame() {
     ctx.restore();
   });
 
-  // Finish line — more vivid
-  const flg=ctx.createLinearGradient(0,MR_H-18,0,MR_H-10);
-  flg.addColorStop(0,'rgba(246,187,78,0)'); flg.addColorStop(1,'rgba(246,187,78,0.5)');
-  ctx.fillStyle=flg; ctx.fillRect(0,MR_H-18,MR_W,8);
-  ctx.strokeStyle='rgba(246,187,78,0.9)'; ctx.lineWidth=2; ctx.setLineDash([8,6]);
-  ctx.shadowBlur=6; ctx.shadowColor='rgba(246,187,78,0.8)';
-  ctx.beginPath(); ctx.moveTo(0,MR_H-12); ctx.lineTo(MR_W,MR_H-12); ctx.stroke();
-  ctx.shadowBlur=0; ctx.setLineDash([]);
-  ctx.fillStyle='rgba(246,187,78,0.95)'; ctx.font='bold 10px Inter';
-  ctx.textAlign='center'; ctx.letterSpacing='2px'; ctx.fillText('FINISH', MR_W/2, MR_H-2);
-  ctx.letterSpacing='0px';
+  // ══ FINISH LINE — dramatic checkered pattern with pulsing beam ══
+  const flY = MR_H - 22;
+  const flH = 22;
+  const now2 = Date.now();
+  const pulse = 0.65 + 0.35 * Math.sin(now2 * 0.005);
+
+  // Pulsing background glow beam
+  const flBeam = ctx.createLinearGradient(0, flY - 30, 0, MR_H);
+  flBeam.addColorStop(0, 'rgba(246,187,78,0)');
+  flBeam.addColorStop(0.4, `rgba(246,187,78,${0.12 * pulse})`);
+  flBeam.addColorStop(1, `rgba(246,187,78,${0.25 * pulse})`);
+  ctx.fillStyle = flBeam; ctx.fillRect(0, flY - 30, MR_W, 52);
+
+  // Checkered pattern
+  const sqW = 14, sqH = 11;
+  const cols2 = Math.ceil(MR_W / sqW);
+  const rows2 = Math.ceil(flH / sqH);
+  for (let row = 0; row < rows2; row++) {
+    for (let col = 0; col < cols2; col++) {
+      const isLight = (row + col) % 2 === 0;
+      ctx.fillStyle = isLight ? `rgba(255,255,255,${0.88 * pulse})` : `rgba(0,0,0,${0.7 * pulse})`;
+      ctx.fillRect(col * sqW, flY + row * sqH, sqW, sqH);
+    }
+  }
+
+  // Top border glow line
+  ctx.shadowBlur = 12; ctx.shadowColor = `rgba(246,187,78,${0.9 * pulse})`;
+  ctx.strokeStyle = `rgba(246,187,78,${pulse})`; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(0, flY); ctx.lineTo(MR_W, flY); ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // FINISH banner pill
+  ctx.save();
+  const bannerW = 80, bannerH = 18, bannerX = MR_W / 2 - bannerW / 2, bannerY = flY - 24;
+  ctx.shadowBlur = 14; ctx.shadowColor = `rgba(246,187,78,${0.8 * pulse})`;
+  ctx.fillStyle = `rgba(246,187,78,${0.92 * pulse})`;
+  const br2 = 9;
+  ctx.beginPath();
+  ctx.roundRect(bannerX, bannerY, bannerW, bannerH, br2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#1a1000';
+  ctx.font = 'bold 10px Inter'; ctx.textAlign = 'center'; ctx.letterSpacing = '2px';
+  ctx.fillText('FINISH', MR_W / 2, bannerY + 12.5);
+  ctx.letterSpacing = '0px';
+  ctx.restore();
 
   // Marbles — enhanced rendering with larger glow
   mrMarbles.forEach(m => {
@@ -9519,9 +9985,11 @@ function mrDrawFrame() {
     ctx.beginPath(); ctx.arc(m.x-m.r*0.28,m.y-m.r*0.28,m.r*0.35,0,Math.PI*2);
     ctx.fillStyle='rgba(255,255,255,0.75)'; ctx.fill();
 
-    // Label
-    ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.font='bold 7px Inter';
-    ctx.textAlign='center'; ctx.fillText(m.label.slice(0,3), m.x, m.y+m.r+9);
+    // Label — full name with adaptive size
+    const labelStr = m.label;
+    const labelSize = labelStr.length > 5 ? 6 : labelStr.length > 4 ? 6.5 : 7;
+    ctx.fillStyle='rgba(255,255,255,0.9)'; ctx.font=`bold ${labelSize}px Inter`;
+    ctx.textAlign='center'; ctx.fillText(labelStr, m.x, m.y+m.r+9);
 
     // Voted ring
     if(m.id===mrVotedColor){
@@ -9635,28 +10103,47 @@ function mrDrawFrame() {
   if (mrStuckCountdown > 0) {
     const vp2 = document.getElementById('mr-viewport');
     const vpH2 = vp2 ? vp2.clientHeight : 440;
-    const cx2 = MR_W / 2, cy2 = vpH2 / 2;
-    const radius = 36;
+    const cx2 = MR_W / 2;
+    const cy2 = (camY + vpH2 / 2); // world-space centre of viewport
+    const radius = 38;
     const progress = mrStuckCountdown / 5;
+    const ringColor = mrStuckCountdown <= 2 ? '#ff6644' : '#4edfd0';
+    const urgent = mrStuckCountdown <= 2;
+
+    ctx.save();
+
+    // Full-width frosted banner
+    const bannerH2 = 90;
+    const bannerY2 = cy2 - bannerH2/2;
+    const bannerGrad = ctx.createLinearGradient(0, bannerY2, 0, bannerY2+bannerH2);
+    bannerGrad.addColorStop(0, 'rgba(8,4,20,0)');
+    bannerGrad.addColorStop(0.25, `rgba(8,4,20,${urgent?0.92:0.85})`);
+    bannerGrad.addColorStop(0.75, `rgba(8,4,20,${urgent?0.92:0.85})`);
+    bannerGrad.addColorStop(1, 'rgba(8,4,20,0)');
+    ctx.fillStyle = bannerGrad;
+    ctx.fillRect(0, bannerY2, MR_W, bannerH2);
+
+    // Glowing horizontal lines framing banner
+    ctx.strokeStyle = `${ringColor}55`; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0,bannerY2+10); ctx.lineTo(MR_W,bannerY2+10); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,bannerY2+bannerH2-10); ctx.lineTo(MR_W,bannerY2+bannerH2-10); ctx.stroke();
 
     // Blurred backdrop disc
-    ctx.save();
-    ctx.globalAlpha = 0.72;
-    const discGrad = ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, radius + 16);
+    ctx.globalAlpha = 0.85;
+    const discGrad = ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, radius + 20);
     discGrad.addColorStop(0, 'rgba(10,5,25,0.98)');
     discGrad.addColorStop(1, 'rgba(5,3,15,0)');
     ctx.fillStyle = discGrad;
-    ctx.beginPath(); ctx.arc(cx2, cy2, radius+20, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx2, cy2, radius+22, 0, Math.PI*2); ctx.fill();
     ctx.globalAlpha = 1;
 
     // Progress ring background
-    ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 4;
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 5;
     ctx.beginPath(); ctx.arc(cx2, cy2, radius, -Math.PI/2, Math.PI*1.5); ctx.stroke();
 
-    // Progress ring foreground
-    const ringColor = mrStuckCountdown <= 2 ? '#ff6644' : '#4edfd0';
-    ctx.strokeStyle = ringColor; ctx.lineWidth = 4;
-    ctx.shadowBlur = 12; ctx.shadowColor = ringColor;
+    // Progress ring
+    ctx.strokeStyle = ringColor; ctx.lineWidth = 5;
+    ctx.shadowBlur = 16; ctx.shadowColor = ringColor;
     ctx.lineCap = 'round';
     ctx.beginPath();
     ctx.arc(cx2, cy2, radius, -Math.PI/2, -Math.PI/2 + Math.PI*2*progress);
@@ -9664,27 +10151,37 @@ function mrDrawFrame() {
     ctx.shadowBlur = 0; ctx.lineCap = 'butt';
 
     // Number
-    ctx.fillStyle = mrStuckCountdown <= 2 ? '#ff6644' : '#fff';
-    ctx.font = `bold 28px Inter`;
+    ctx.fillStyle = urgent ? '#ff6644' : '#fff';
+    ctx.font = `bold 32px Inter`;
     ctx.textAlign = 'center';
-    ctx.shadowBlur = 16; ctx.shadowColor = ringColor;
-    ctx.fillText(mrStuckCountdown, cx2, cy2 + 10);
+    ctx.shadowBlur = 20; ctx.shadowColor = ringColor;
+    ctx.fillText(mrStuckCountdown, cx2, cy2 + 11);
     ctx.shadowBlur = 0;
 
-    // "stuck!" label
-    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    // Top label: "1st, 2nd & 3rd place done!"
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.font = 'bold 9px Inter';
+    ctx.letterSpacing = '0.5px';
+    const doneCount = Math.min(mrFinishOrder.length, 3);
+    const doneLabel = doneCount >= 3 ? '🏆 Top 3 Finished!' : `${doneCount} marble${doneCount!==1?'s':''} finished`;
+    ctx.fillText(doneLabel, cx2, cy2 - radius - 10);
+
+    // Bottom label
+    ctx.fillStyle = urgent ? 'rgba(255,100,68,0.9)' : 'rgba(78,223,208,0.8)';
     ctx.font = 'bold 8px Inter';
-    ctx.letterSpacing = '1px';
-    ctx.fillText('CLEARING', cx2, cy2 + 24);
+    ctx.letterSpacing = '1.5px';
+    ctx.fillText('CLEARING STUCK', cx2, cy2 + radius + 14);
     ctx.letterSpacing = '0px';
+
     ctx.restore();
   }
 }
 function mrDrawIdle() {
   if (!mrCtx) return;
   mrCameraY = 0; mrCameraTarget = null;
-  mrStuckCountdown = 0;
+  mrStuckCountdown = 0; mrTop3Done = false;
   if (mrStuckCountTimer) { clearInterval(mrStuckCountTimer); mrStuckCountTimer = null; }
+  if (mrTop3CheckTimer) { clearTimeout(mrTop3CheckTimer); mrTop3CheckTimer = null; }
   mrGenMap(); mrSpawnMarbles(); mrFinishOrder=[];
   mrMarbles.forEach(m=>{ m.finished=false; });
   mrDrawFrame();
@@ -9693,8 +10190,9 @@ function mrDrawIdle() {
 function mrStartCountdown() {
   mrState = 'countdown';
   mrCountdown = 5;
-  mrStuckCountdown = 0;
+  mrStuckCountdown = 0; mrTop3Done = false; mrTicketsAwarded = false;
   if (mrStuckCountTimer) { clearInterval(mrStuckCountTimer); mrStuckCountTimer = null; }
+  if (mrTop3CheckTimer) { clearTimeout(mrTop3CheckTimer); mrTop3CheckTimer = null; }
   mrGenMap(); mrSpawnMarbles(); mrFinishOrder=[];
   const ui = document.getElementById('mr-ui');
   if(ui) ui.innerHTML = `<div style="text-align:center;padding:16px 12px">
@@ -9738,38 +10236,72 @@ function mrRunRace() {
 
 function mrEndRace() {
   cancelAnimationFrame(mrAnimFrame); mrAnimFrame=null;
-  mrStuckCountdown = 0;
+  mrStuckCountdown = 0; mrTop3Done = false;
   if (mrStuckCountTimer) { clearInterval(mrStuckCountTimer); mrStuckCountTimer = null; }
+  if (mrTop3CheckTimer) { clearTimeout(mrTop3CheckTimer); mrTop3CheckTimer = null; }
   mrState='results';
   const top3 = mrFinishOrder.slice(0,3).map(id=>MARBLE_COLORS.find(c=>c.id===id));
-  // Award tickets
-  let won = 0;
-  if(mrVotedColor===top3[0]?.id) won=10;
-  else if(mrVotedColor===top3[1]?.id) won=5;
-  else if(mrVotedColor===top3[2]?.id) won=3;
-  if(won>0){ addTickets(won); showNotif('🎉','You won!',`+${won}🎟️`); }
-  else showNotif('😔','Better luck next time!','');
+  // Award tickets — only once, only if we haven't already awarded this race
+  if (!mrTicketsAwarded) {
+    mrTicketsAwarded = true;
+    let won = 0;
+    const rank = mrFinishOrder.indexOf(mrVotedColor) + 1;
+    if (rank === 1) won = 10;
+    else if (rank === 2) won = 5;
+    else if (rank === 3) won = 3;
+    if (won > 0) { addTickets(won); showNotif('🎉', 'You won!', `+${won}🎟️`); }
+    else showNotif('😔', 'Better luck next time!', '');
+    // Track daily races
+    const today = new Date().toDateString();
+    if (!S.mrRacesToday) S.mrRacesToday = { date:'', count:0 };
+    if (S.mrRacesToday.date !== today) { S.mrRacesToday.date = today; S.mrRacesToday.count = 0; }
+    S.mrRacesToday.count++;
+    saveState();
+  }
   renderMRResultsUI();
 }
 
 function renderMRVoteUI() {
   const ui = document.getElementById('mr-ui');
   if(!ui) return;
+  const today = new Date().toDateString();
+  if (!S.mrRacesToday) S.mrRacesToday = { date:'', count:0 };
+  const racesToday = S.mrRacesToday.date === today ? S.mrRacesToday.count : 0;
+  const MAX_DAILY = 10;
+  const turnsLeft = Math.max(0, MAX_DAILY - racesToday);
+  const th = MR_THEMES[mrTheme] || MR_THEMES.space;
+
   ui.innerHTML = `
-    <div style="padding:14px 16px">
-      <div style="text-align:center;margin-bottom:14px">
-        <div style="font-size:15px;font-weight:900;color:#fff;letter-spacing:-0.3px">Pick your marble</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px">🥇 10🎟️ &nbsp;·&nbsp; 🥈 5🎟️ &nbsp;·&nbsp; 🥉 3🎟️</div>
+    <div style="padding:12px 14px 14px">
+      <!-- Daily turns dock -->
+      <div style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase">Daily Races</div>
+          <div style="font-size:16px;font-weight:900;color:#fff;margin-top:2px">${turnsLeft} <span style="font-size:11px;font-weight:500;color:rgba(255,255,255,0.4)">/ ${MAX_DAILY} left</span></div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">
+          ${Array.from({length:MAX_DAILY}).map((_,i)=>`<div style="width:10px;height:10px;border-radius:50%;background:${i<racesToday?'rgba(255,255,255,0.2)':'rgba(78,223,208,0.8)'};box-shadow:${i<racesToday?'none':'0 0 6px rgba(78,223,208,0.5)'}"></div>`).join('')}
+        </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px">
+
+      <!-- Theme badge -->
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.5px;text-transform:uppercase">Pick your marble</div>
+        <div style="margin-left:auto;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:3px 8px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.5)">${th.name} Theme</div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px">🥇 10🎟 &nbsp;·&nbsp; 🥈 5🎟 &nbsp;·&nbsp; 🥉 3🎟</div>
+
+      <!-- Marble grid — 5 cols, full labels -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:12px">
         ${MARBLE_COLORS.map(mc=>`
-          <div onclick="mrVotedColor='${mc.id}';renderMRVoteUI()" style="border-radius:14px;padding:8px 4px 6px;text-align:center;cursor:pointer;transition:all 0.15s;background:${mrVotedColor===mc.id?'rgba(160,136,250,0.25)':'rgba(255,255,255,0.04)'};border:1.5px solid ${mrVotedColor===mc.id?mc.hex:'rgba(255,255,255,0.07)'};box-shadow:${mrVotedColor===mc.id?`0 0 12px ${mc.hex}55`:'none'}">
-            <div style="width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,${mc.hex});margin:0 auto 5px;box-shadow:0 0 ${mrVotedColor===mc.id?'12px':'6px'} ${mc.glow}"></div>
-            <div style="font-size:8px;color:${mrVotedColor===mc.id?'#fff':'rgba(255,255,255,0.5)'};font-weight:${mrVotedColor===mc.id?'800':'600'};line-height:1.2">${mc.label}</div>
+          <div onclick="mrVotedColor='${mc.id}';renderMRVoteUI()" style="border-radius:12px;padding:8px 3px 7px;text-align:center;cursor:pointer;transition:all 0.15s;background:${mrVotedColor===mc.id?'rgba(255,255,255,0.12)':'rgba(255,255,255,0.04)'};border:1.5px solid ${mrVotedColor===mc.id?mc.hex:'rgba(255,255,255,0.07)'};box-shadow:${mrVotedColor===mc.id?`0 0 14px ${mc.hex}55`:'none'}">
+            <div style="width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,${mc.hex});margin:0 auto 5px;box-shadow:0 0 ${mrVotedColor===mc.id?'14px':'5px'} ${mc.glow}"></div>
+            <div style="font-size:9px;color:${mrVotedColor===mc.id?'#fff':'rgba(255,255,255,0.6)'};font-weight:${mrVotedColor===mc.id?'800':'500'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2">${mc.label}</div>
           </div>`).join('')}
       </div>
-      <button onclick="if(mrVotedColor){mrStartCountdown()}else{showNotif('❌','Pick a marble first!','')}" style="width:100%;padding:13px;border-radius:16px;border:none;cursor:pointer;font-size:14px;font-weight:800;letter-spacing:-0.2px;transition:all 0.15s;background:${mrVotedColor?'linear-gradient(135deg,#4edfd0,#566ee3)':'rgba(255,255,255,0.07)'};color:${mrVotedColor?'#fff':'rgba(255,255,255,0.3)'};box-shadow:${mrVotedColor?'0 4px 20px rgba(78,223,208,0.35)':'none'}">
-        ${mrVotedColor ? '🏁 Start Race!' : '👆 Choose a marble'}
+
+      <button onclick="${turnsLeft>0?'if(mrVotedColor){mrStartCountdown()}else{showNotif(\"❌\",\"Pick a marble first!\",\"\")}':'showNotif(\"❌\",\"No races left today!\",\"Come back tomorrow\")'}" style="width:100%;padding:13px;border-radius:16px;border:none;cursor:pointer;font-size:14px;font-weight:800;letter-spacing:-0.2px;transition:all 0.15s;background:${turnsLeft>0&&mrVotedColor?'linear-gradient(135deg,#4edfd0,#566ee3)':turnsLeft<=0?'rgba(255,100,100,0.15)':'rgba(255,255,255,0.07)'};color:${turnsLeft>0&&mrVotedColor?'#fff':turnsLeft<=0?'rgba(255,100,100,0.6)':'rgba(255,255,255,0.3)'};box-shadow:${turnsLeft>0&&mrVotedColor?'0 4px 20px rgba(78,223,208,0.35)':'none'}">
+        ${turnsLeft<=0?'🚫 No Races Left Today':mrVotedColor?'🏁 Start Race!':'👆 Choose a marble'}
       </button>
     </div>`;
 }
@@ -9780,30 +10312,41 @@ function renderMRResultsUI() {
   if(!ui) return;
   const top3 = mrFinishOrder.slice(0,3).map(id=>MARBLE_COLORS.find(c=>c.id===id)||{label:'?',hex:'#888',id,glow:'#888'});
   const votedRank = mrFinishOrder.indexOf(mrVotedColor)+1;
-  let wonText='', wonTickets=0, wonColor='rgba(255,255,255,0.5)';
-  if(votedRank===1){wonText='🥇 You Won!';wonTickets=10;wonColor='#f6bb4e';}
-  else if(votedRank===2){wonText='🥈 2nd Place!';wonTickets=5;wonColor='#c0c0c0';}
-  else if(votedRank===3){wonText='🥉 3rd Place!';wonTickets=3;wonColor='#cd7f32';}
+  let wonText='', wonTickets=0, wonColor='rgba(255,255,255,0.5)', wonBg='rgba(255,255,255,0.05)';
+  if(votedRank===1){wonText='🥇 First Place!';wonTickets=10;wonColor='#f6bb4e';wonBg='rgba(246,187,78,0.1)';}
+  else if(votedRank===2){wonText='🥈 Second Place!';wonTickets=5;wonColor='#c0c0c0';wonBg='rgba(192,192,192,0.08)';}
+  else if(votedRank===3){wonText='🥉 Third Place!';wonTickets=3;wonColor='#cd7f32';wonBg='rgba(205,127,50,0.08)';}
   else wonText='Better luck next time 😔';
+  const th = MR_THEMES[mrTheme]||MR_THEMES.space;
   ui.innerHTML=`
-    <div style="padding:14px 16px">
-      <div style="text-align:center;margin-bottom:14px">
-        <div style="font-size:20px;font-weight:900;color:${wonColor};letter-spacing:-0.4px">${wonText}</div>
-        ${wonTickets>0?`<div style="font-size:12px;color:rgba(246,187,78,0.8);margin-top:4px;font-weight:700">+${wonTickets} 🎟️ tickets awarded</div>`:''}
+    <div style="padding:12px 14px 14px">
+      <!-- Theme tag -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5)">Race Complete</div>
+        <div style="font-size:9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:3px 8px;color:rgba(255,255,255,0.4);font-weight:600">${th.name} Theme</div>
       </div>
-      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;align-items:flex-end">
+      <!-- Result card -->
+      <div style="background:${wonBg};border:1px solid ${wonColor}44;border-radius:18px;padding:14px;text-align:center;margin-bottom:12px">
+        <div style="font-size:22px;font-weight:900;color:${wonColor};letter-spacing:-0.5px;margin-bottom:${wonTickets>0?4:0}px">${wonText}</div>
+        ${wonTickets>0?`<div style="font-size:13px;color:rgba(246,187,78,0.85);font-weight:700">+${wonTickets} 🎟️ tickets awarded</div>`:'<div style="font-size:12px;color:rgba(255,255,255,0.3);margin-top:2px">No tickets this time</div>'}
+      </div>
+      <!-- Podium -->
+      <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">Final Podium</div>
+      <div style="display:flex;gap:6px;justify-content:center;margin-bottom:12px;align-items:flex-end">
         ${[top3[1],top3[0],top3[2]].map((mc,vi)=>{
           const ri = vi===1?0:vi===0?1:2;
           const isFirst = ri===0;
+          const medals=['🥇','🥈','🥉'];
+          const borderCols=['rgba(255,215,0,0.3)','rgba(192,192,192,0.2)','rgba(205,127,50,0.2)'];
           return mc ? `
-          <div style="text-align:center;flex:1;background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border-radius:${isFirst?20:16}px;padding:${isFirst?14:10}px 6px;border:1px solid ${['rgba(255,215,0,0.3)','rgba(192,192,192,0.25)','rgba(205,127,50,0.25)'][ri]};position:relative;${isFirst?'transform:translateY(-6px);box-shadow:0 8px 32px rgba(246,187,78,0.15)':''}">
-            <div style="font-size:${isFirst?24:18}px;margin-bottom:6px">${['🥇','🥈','🥉'][ri]}</div>
-            <div style="width:${isFirst?34:26}px;height:${isFirst?34:26}px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,${mc.hex});margin:0 auto 6px;box-shadow:0 0 12px ${mc.glow}"></div>
-            <div style="font-size:9px;font-weight:800;color:rgba(255,255,255,0.85);letter-spacing:0.2px">${mc.label}</div>
-          </div>` : '';
+          <div style="text-align:center;flex:1;background:linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02));border-radius:${isFirst?20:16}px;padding:${isFirst?14:10}px 4px;border:1px solid ${borderCols[ri]};${isFirst?'transform:translateY(-5px);box-shadow:0 6px 28px rgba(246,187,78,0.12)':''}">
+            <div style="font-size:${isFirst?22:17}px;margin-bottom:5px">${medals[ri]}</div>
+            <div style="width:${isFirst?32:24}px;height:${isFirst?32:24}px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,${mc.hex});margin:0 auto 6px;box-shadow:0 0 10px ${mc.glow}"></div>
+            <div style="font-size:${isFirst?9:8}px;font-weight:800;color:rgba(255,255,255,${isFirst?'0.9':'0.6'});line-height:1.3">${mc.label}</div>
+          </div>` : `<div style="flex:1"></div>`;
         }).join('')}
       </div>
-      <button onclick="mrState='vote';mrVotedColor=null;mrFinishOrder=[];mrCameraY=0;mrCameraTarget=null;renderMarbleRace()" style="width:100%;padding:13px;border-radius:16px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;font-size:14px;font-weight:800;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);letter-spacing:-0.2px">🔄 Race Again</button>
+      <button onclick="mrState='vote';mrVotedColor=null;mrFinishOrder=[];mrCameraY=0;mrCameraTarget=null;renderMarbleRace()" style="width:100%;padding:13px;border-radius:16px;border:1px solid rgba(255,255,255,0.1);cursor:pointer;font-size:14px;font-weight:800;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);letter-spacing:-0.2px;-webkit-tap-highlight-color:transparent">🔄 Race Again</button>
     </div>`;
 }
 
@@ -13625,6 +14168,27 @@ loadState = function() {
 // ============================================================
 const UPDATE_LOGS = [
   {
+    version: '0.1.14',
+    date: 'March 2026',
+    emoji: '🏁',
+    title: 'Marble Racer Overhaul, Backpack Redesign & Bug Fixes',
+    items: [
+      { tag:'new',     text:'Marble Racer — Smart top-3 detection: once 1st, 2nd, and 3rd place finish, a 4-second grace period starts. If remaining marbles haven\'t finished, a visible centre-screen countdown appears and clears them.' },
+      { tag:'fix',     text:'Marble Racer — Ticket double-award bug fixed. A guard flag ensures tickets are only awarded once per race regardless of how the race ends.' },
+      { tag:'new',     text:'Marble Racer — Six visual themes (Space, Sakura, Neon, Sunset, Ice, Forest) — each race randomly picks a theme that recolours platforms, pegs, bumpers, and the background gradient.' },
+      { tag:'new',     text:'Marble Racer — Finish line is now a prominent visual: animated glowing checkered pattern with pulsing beam and FINISH banner.' },
+      { tag:'new',     text:'Marble Racer — Daily Races dock: a beautiful pill widget shows how many of your 10 daily races you have used, with glowing dot indicators that fill as races are played.' },
+      { tag:'fix',     text:'Marble Racer — Marble colour labels now always fit their grid cells without truncation.' },
+      { tag:'upgrade', text:'Marble Racer — Hazard sound effects added (springboard, fan, gear, sticky, bridge, conveyor, seesaw, bouncy wall). Rate-limited to prevent ear fatigue.' },
+      { tag:'upgrade', text:'Marble Racer — Pathing system redesigned: zigzag gate corridors ensure every level is always completable from top to bottom.' },
+      { tag:'new',     text:'Marble Racer — Full UI overhaul: frosted-glass cards, readable typography, themed vote grid, improved results podium.' },
+      { tag:'upgrade', text:'Backpack — Clicking/tapping an item now shows the item name and tooltip in the popup.' },
+      { tag:'new',     text:'Backpack — iPhone 15-inspired redesign with glassmorphism, spring animations, and improved item modals. Toggle between New and Classic view from options.' },
+      { tag:'fix',     text:'Backpack — Mobile: tapping an item shows tooltip as a bottom sheet with large readable text instead of a hover overlay.' },
+      { tag:'fix',     text:'Claw Machine — Win flow fully fixed: drop depth, grip radius, and active prize carry-up all corrected so winning is genuinely possible.' },
+    ]
+  },
+  {
     version: '0.1.12',
     date: 'March 2026',
     emoji: '🎬',
@@ -14089,7 +14653,7 @@ document.getElementById('princess-theme-modal').addEventListener('click', e => {
 
 // ── True globals: var avoids temporal dead zone for code above fbInit ──
 var ADMIN_EMAIL      = "Djrocky2021@gmail.com";
-var GAME_VERSION     = "0.1.13";
+var GAME_VERSION     = "0.1.14";
 var fbCurrentUser    = null;
 var fbDb             = null;
 // Raw GitHub URL — fetched periodically to detect new versions automatically
