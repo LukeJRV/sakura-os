@@ -9328,8 +9328,19 @@ function mrGenMap_inner() {
     };
     const basePool = ['springboard','fan','gear','stickyzone','bridge','conveyor','seesaw','bouncywall','slide','rollerchain'];
     const themePool = themeHazards[mrTheme] || [];
-    const hazardPool = themePool.length && rng() < 0.55 ? themePool : basePool;
-    const pick = hazardPool[Math.floor(rng() * hazardPool.length)];
+    // For themed levels always use the theme pool; for generic themes mix in base pool occasionally
+    const alwaysThemed = ['arctic','sewers','sunken','skatepark','beach','garden'].includes(mrTheme);
+    const hazardPool = themePool.length && (alwaysThemed || rng() < 0.75) ? themePool : basePool;
+
+    // Pick 2 distinct hazards per zone to ensure full theme variety across a race
+    const picks = [];
+    const poolCopy = hazardPool.slice();
+    for (let pi = 0; pi < 2 && poolCopy.length; pi++) {
+      const idx = Math.floor(rng() * poolCopy.length);
+      picks.push(poolCopy.splice(idx, 1)[0]);
+    }
+
+    for (const pick of picks) {
     // Place hazard on the opposite side of the track from the gate
     const hx = gate.x > W / 2
       ? 30 + rng() * (W * 0.35)
@@ -9502,8 +9513,9 @@ function mrGenMap_inner() {
       case 'beeSting':
         mrObstacles.push({ type:'beeSting', x: hx+rng()*30-15, y: hy, vx: rng()>0.5?1.5:-1.5, vy:(rng()-0.5)*0.8, buzz:0, _theme:'garden' });
         break;
-    }
-  }
+    } // end switch(pick)
+    } // end for(pick of picks)
+  } // end zone loop
 
   // ── Bottom funnel ──
   mrObstacles.push({ type:'ramp',   x: 30,   y: H - 60, w: 90,  angle:  0.55, _theme: mrTheme });
