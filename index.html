@@ -9036,16 +9036,19 @@ let mrTicketsAwarded = false; // guards against double-awarding tickets
 
 // Level themes — palette applied when generating map
 const MR_THEMES = {
-  space:    { rampCol:'rgba(78,223,208,X)',  pegCol:'rgba(160,136,250,X)', bumperCol:'rgba(252,119,144,X)', bgA:'#03031a', bgB:'#0a0a2e', wallCol:'rgba(78,223,208,0.5)',  name:'Space'    },
-  sakura:   { rampCol:'rgba(255,160,200,X)', pegCol:'rgba(255,120,180,X)', bumperCol:'rgba(255,210,230,X)', bgA:'#1a0510', bgB:'#2a0820', wallCol:'rgba(255,140,180,0.5)', name:'Sakura'   },
-  neon:     { rampCol:'rgba(80,255,160,X)',  pegCol:'rgba(255,255,80,X)',  bumperCol:'rgba(255,80,200,X)',  bgA:'#000a05', bgB:'#001510', wallCol:'rgba(80,255,160,0.5)',  name:'Neon'     },
-  sunset:   { rampCol:'rgba(255,160,60,X)',  pegCol:'rgba(255,220,80,X)',  bumperCol:'rgba(255,100,60,X)',  bgA:'#1a0800', bgB:'#2a1200', wallCol:'rgba(255,160,60,0.5)',  name:'Sunset'   },
-  ice:      { rampCol:'rgba(160,220,255,X)', pegCol:'rgba(200,240,255,X)', bumperCol:'rgba(120,200,255,X)', bgA:'#030d1a', bgB:'#061828', wallCol:'rgba(160,220,255,0.5)', name:'Ice'      },
-  forest:   { rampCol:'rgba(80,200,100,X)',  pegCol:'rgba(140,220,80,X)',  bumperCol:'rgba(200,255,120,X)', bgA:'#020d03', bgB:'#051205', wallCol:'rgba(80,200,100,0.5)',  name:'Forest'         },
-  arctic:   { rampCol:'rgba(200,235,255,X)', pegCol:'rgba(240,250,255,X)', bumperCol:'rgba(120,200,255,X)', bgA:'#04090f', bgB:'#081828', wallCol:'rgba(180,225,255,0.5)', name:'Arctic Mountain' },
-  sewers:   { rampCol:'rgba(100,160,50,X)',  pegCol:'rgba(80,140,40,X)',   bumperCol:'rgba(160,200,70,X)',  bgA:'#030601', bgB:'#070e03', wallCol:'rgba(80,130,30,0.5)',  name:'Sewers'          },
-  sunken:   { rampCol:'rgba(30,150,190,X)',  pegCol:'rgba(60,190,210,X)',  bumperCol:'rgba(0,210,170,X)',   bgA:'#01070d', bgB:'#021018', wallCol:'rgba(30,150,190,0.5)', name:'Sunken Depths'   },
-  fiesta:   { rampCol:'rgba(255,70,110,X)',  pegCol:'rgba(255,195,0,X)',   bumperCol:'rgba(130,60,255,X)',  bgA:'#0d0003', bgB:'#180006', wallCol:'rgba(255,70,110,0.5)', name:'Midnight Fiesta' },
+  space:      { rampCol:'rgba(78,223,208,X)',  pegCol:'rgba(160,136,250,X)', bumperCol:'rgba(252,119,144,X)', bgA:'#03031a', bgB:'#0a0a2e', wallCol:'rgba(78,223,208,0.5)',  name:'Space'          },
+  sakura:     { rampCol:'rgba(255,160,200,X)', pegCol:'rgba(255,120,180,X)', bumperCol:'rgba(255,210,230,X)', bgA:'#1a0510', bgB:'#2a0820', wallCol:'rgba(255,140,180,0.5)', name:'Sakura'         },
+  neon:       { rampCol:'rgba(80,255,160,X)',  pegCol:'rgba(255,255,80,X)',  bumperCol:'rgba(255,80,200,X)',  bgA:'#000a05', bgB:'#001510', wallCol:'rgba(80,255,160,0.5)',  name:'Neon'           },
+  sunset:     { rampCol:'rgba(255,160,60,X)',  pegCol:'rgba(255,220,80,X)',  bumperCol:'rgba(255,100,60,X)',  bgA:'#1a0800', bgB:'#2a1200', wallCol:'rgba(255,160,60,0.5)',  name:'Sunset'         },
+  ice:        { rampCol:'rgba(160,220,255,X)', pegCol:'rgba(200,240,255,X)', bumperCol:'rgba(120,200,255,X)', bgA:'#030d1a', bgB:'#061828', wallCol:'rgba(160,220,255,0.5)', name:'Ice'            },
+  forest:     { rampCol:'rgba(80,200,100,X)',  pegCol:'rgba(140,220,80,X)',  bumperCol:'rgba(200,255,120,X)', bgA:'#020d03', bgB:'#051205', wallCol:'rgba(80,200,100,0.5)',  name:'Forest'         },
+  arctic:     { rampCol:'rgba(200,235,255,X)', pegCol:'rgba(240,250,255,X)', bumperCol:'rgba(120,200,255,X)', bgA:'#04090f', bgB:'#081828', wallCol:'rgba(180,225,255,0.5)', name:'Arctic Mountain'},
+  sewers:     { rampCol:'rgba(100,160,50,X)',  pegCol:'rgba(80,140,40,X)',   bumperCol:'rgba(160,200,70,X)',  bgA:'#030601', bgB:'#070e03', wallCol:'rgba(80,130,30,0.5)',  name:'Sewers'         },
+  sunken:     { rampCol:'rgba(30,150,190,X)',  pegCol:'rgba(60,190,210,X)',  bumperCol:'rgba(0,210,170,X)',   bgA:'#01070d', bgB:'#021018', wallCol:'rgba(30,150,190,0.5)', name:'Sunken Depths'  },
+  fiesta:     { rampCol:'rgba(255,70,110,X)',  pegCol:'rgba(255,195,0,X)',   bumperCol:'rgba(130,60,255,X)',  bgA:'#0d0003', bgB:'#180006', wallCol:'rgba(255,70,110,0.5)', name:'Midnight Fiesta'},
+  skatepark:  { rampCol:'rgba(255,180,40,X)',  pegCol:'rgba(255,120,40,X)',  bumperCol:'rgba(80,200,255,X)',  bgA:'#0d0800', bgB:'#1a1000', wallCol:'rgba(255,160,30,0.5)', name:'Skate Park'     },
+  beach:      { rampCol:'rgba(255,210,80,X)',  pegCol:'rgba(255,170,50,X)',  bumperCol:'rgba(80,190,255,X)',  bgA:'#020b14', bgB:'#041a28', wallCol:'rgba(80,180,255,0.5)', name:'Beach'          },
+  garden:     { rampCol:'rgba(80,180,60,X)',   pegCol:'rgba(120,200,60,X)',  bumperCol:'rgba(180,230,80,X)',  bgA:'#030801', bgB:'#071204', wallCol:'rgba(80,180,60,0.5)',  name:'Garden'         },
 };
 
 function renderMarbleRace() {
@@ -9313,12 +9316,15 @@ function mrGenMap_inner() {
     // ── One interactive hazard per zone — placed near gate but not IN it ──
     // Theme-specific hazard pools
     const themeHazards = {
-      forest: ['buzzsaw','fallenTree','string'],
-      ice:    ['icePatch','icicle','icyBoulder','snowMachine'],
-      sakura: ['sakuraPetal','leafPile'],
-      arctic: ['snowAvalanche','crackingIceBridge','iceSpike','iceSlide','penguinBumper','frozenGear'],
-      sewers: ['toxicSludge','pipeBlade','steamBurst','waterCurrentPipe','drippingWater','ratStampede','drainTunnel'],
-      sunken: ['waterCurrent','pressureZone','clamTrap','bubbleElevator'],
+      forest:    ['buzzsaw','fallenTree','string'],
+      ice:       ['icePatch','icicle','icyBoulder','snowMachine'],
+      sakura:    ['sakuraPetal','leafPile'],
+      arctic:    ['snowAvalanche','crackingIceBridge','iceSpike','iceSlide','penguinBumper','frozenGear'],
+      sewers:    ['toxicSludge','pipeBlade','steamBurst','waterCurrentPipe','drippingWater','ratStampede','drainTunnel'],
+      sunken:    ['waterCurrent','pressureZone','clamTrap','bubbleElevator'],
+      skatepark: ['rollingBoard','grindRail','spinRamp','halfPipe','boostRail','grafittiBumper','rotatingObstacle'],
+      beach:     ['beachBall','crabTrap','wavePush','sandRamp','umbrellaBumper'],
+      garden:    ['waterPuddle','thornBush','grassPatch','beeSting'],
     };
     const basePool = ['springboard','fan','gear','stickyzone','bridge','conveyor','seesaw','bouncywall','slide','rollerchain'];
     const themePool = themeHazards[mrTheme] || [];
@@ -9445,6 +9451,57 @@ function mrGenMap_inner() {
       case 'bubbleElevator':
         mrObstacles.push({ type:'bubbleElevator', x: hx, y: hy, h:55+rng()*30, bubbles:[], phase:0, _theme:'sunken' });
         break;
+      // ── Skate Park ──
+      case 'rollingBoard':
+        mrObstacles.push({ type:'rollingBoard', x: hx, y: hy, w:32+rng()*12, vx: rng()>0.5?1.2:-1.2, phase:0, _theme:'skatepark' });
+        break;
+      case 'grindRail':
+        mrObstacles.push({ type:'grindRail', x: hx, y: hy, w:60+rng()*20, dir: rng()>0.5?1:-1, offset:0, _theme:'skatepark' });
+        break;
+      case 'spinRamp':
+        mrObstacles.push({ type:'spinRamp', x: hx, y: hy, w:50+rng()*15, angle:0, speed: rng()>0.5?0.018:-0.018, _theme:'skatepark' });
+        break;
+      case 'halfPipe':
+        mrObstacles.push({ type:'halfPipe', x: hx, y: hy, w:55+rng()*20, side: gate.x > W/2 ? 'left' : 'right', _theme:'skatepark' });
+        break;
+      case 'boostRail':
+        mrObstacles.push({ type:'boostRail', x: hx, y: hy, w:55+rng()*20, dir: rng()>0.5?1:-1, glow:0, _theme:'skatepark' });
+        break;
+      case 'grafittiBumper':
+        mrObstacles.push({ type:'grafittiBumper', x: hx, y: hy, r:13+rng()*5, colorIdx:Math.floor(rng()*5), wobble:0, _theme:'skatepark' });
+        break;
+      case 'rotatingObstacle':
+        mrObstacles.push({ type:'rotatingObstacle', x: hx, y: hy, r:18+rng()*8, angle:0, speed:(rng()>0.5?1:-1)*(0.025+rng()*0.02), armLen:22+rng()*10, _theme:'skatepark' });
+        break;
+      // ── Beach ──
+      case 'beachBall':
+        mrObstacles.push({ type:'beachBall', x: hx, y: hy, r:14+rng()*6, vx: rng()>0.5?0.8:-0.8, vy:0, _theme:'beach' });
+        break;
+      case 'crabTrap':
+        mrObstacles.push({ type:'crabTrap', x: hx, y: hy, w:28+rng()*10, open:true, phase:Math.floor(rng()*90), _theme:'beach' });
+        break;
+      case 'wavePush':
+        mrObstacles.push({ type:'wavePush', x: W/2, y: hy, w: W*0.85, h:18+rng()*8, phase:0, cooldown:150+Math.floor(rng()*100), timer:Math.floor(rng()*150), _theme:'beach' });
+        break;
+      case 'sandRamp':
+        mrObstacles.push({ type:'sandRamp', x: hx, y: hy, w:55+rng()*18, angle: gate.x > W/2 ? 0.32 : -0.32, _theme:'beach' });
+        break;
+      case 'umbrellaBumper':
+        mrObstacles.push({ type:'umbrellaBumper', x: hx, y: hy, r:16+rng()*5, colorIdx:Math.floor(rng()*4), _theme:'beach' });
+        break;
+      // ── Garden ──
+      case 'waterPuddle':
+        mrObstacles.push({ type:'waterPuddle', x: hx, y: hy, r:20+rng()*12, phase:0, _theme:'garden' });
+        break;
+      case 'thornBush':
+        mrObstacles.push({ type:'thornBush', x: hx, y: hy, w:45+rng()*20, _theme:'garden' });
+        break;
+      case 'grassPatch':
+        mrObstacles.push({ type:'grassPatch', x: hx, y: hy, w:55+rng()*20, _theme:'garden' });
+        break;
+      case 'beeSting':
+        mrObstacles.push({ type:'beeSting', x: hx+rng()*30-15, y: hy, vx: rng()>0.5?1.5:-1.5, vy:(rng()-0.5)*0.8, buzz:0, _theme:'garden' });
+        break;
     }
   }
 
@@ -9546,10 +9603,14 @@ function mrStepPhysics() {
     if (o.type === 'frozenGear') o.angle = (o.angle||0) + o.speed;
     if (o.type === 'penguinBumper') o.wobble = ((o.wobble||0) + 0.07) % (Math.PI*2);
     if (o.type === 'snowAvalanche' && o.triggered) {
-      o.despawnT = (o.despawnT||0) + 1;
+      // Real-time 15-second despawn — not frame-rate dependent
+      if (!o._triggeredAt) o._triggeredAt = Date.now();
+      const _avaAge = Date.now() - o._triggeredAt;
       if (!o.balls) o.balls=[];
       o.balls.forEach(b => { b.x+=b.vx; b.y+=b.vy; b.vy+=0.07; b.vx*=0.99; });
-      o.balls = o.balls.filter(b => b.y < MR_H+40 && o.despawnT < 900);
+      o.balls = o.balls.filter(b => b.y < MR_H+40 && _avaAge < 15000);
+      // Map real time to 0-900 range for alpha fade in draw code
+      o.despawnT = Math.min(900, (_avaAge / 15000) * 900);
     }
     if (o.type === 'crackingIceBridge' && !o.broken) {
       o.breakT = (o.breakT||0);
@@ -9601,6 +9662,58 @@ function mrStepPhysics() {
       o.bubbles.forEach(b=>{b.x+=(Math.random()-0.5)*0.4;b.y+=b.vy;b.life-=0.018;});
       o.bubbles=o.bubbles.filter(b=>b.life>0&&b.y>o.y-(o.h||60)-10);
     }
+    // Skate Park
+    if (o.type === 'rollingBoard') {
+      o.x += o.vx;
+      if (o.x < 20 || o.x > mrWorldW-20) o.vx = -o.vx;
+      o.phase = (o.phase||0) + 0.06;
+    }
+    if (o.type === 'grindRail') {
+      o.offset = (o.offset||0) + o.dir*0.4;
+      if (Math.abs(o.offset) > o.w/2) o.dir = -o.dir;
+    }
+    if (o.type === 'spinRamp') {
+      o.angle = (o.angle||0) + o.speed;
+    }
+    if (o.type === 'grafittiBumper') {
+      o.wobble = ((o.wobble||0) + 0.06) % (Math.PI*2);
+    }
+    if (o.type === 'rotatingObstacle') {
+      o.angle = ((o.angle||0) + o.speed) % (Math.PI*2);
+    }
+    if (o.type === 'boostRail') {
+      o.glow = (o.glow||0) + 0.08;
+    }
+    // Beach
+    if (o.type === 'beachBall') {
+      o.x += o.vx; o.vy += 0.04; o.y += o.vy;
+      if (o.x < o.r+8) { o.x = o.r+8; o.vx = Math.abs(o.vx); }
+      if (o.x > mrWorldW-o.r-8) { o.x = mrWorldW-o.r-8; o.vx = -Math.abs(o.vx); }
+      if (o.vy > 3) o.vy = 3;
+    }
+    if (o.type === 'crabTrap') {
+      o.phase = (o.phase||0)+1;
+      if (o.open && o.phase>110){ o.open=false; o.phase=0; }
+      if (!o.open && o.phase>70){ o.open=true; o.phase=0; }
+    }
+    if (o.type === 'wavePush') {
+      o.timer = (o.timer||0)+1;
+      if (o.timer >= o.cooldown) { o.active=true; o.timer=0; }
+      if (o.active) {
+        o.phase = (o.phase||0)+1;
+        if (o.phase > 60) { o.active=false; o.phase=0; }
+      }
+    }
+    // Garden
+    if (o.type === 'waterPuddle') { o.phase=(o.phase||0)+0.04; }
+    if (o.type === 'beeSting') {
+      o.x += o.vx; o.y += o.vy;
+      o.buzz = (o.buzz||0)+0.12;
+      if (o.x < 16) { o.x=16; o.vx=Math.abs(o.vx); }
+      if (o.x > mrWorldW-16) { o.x=mrWorldW-16; o.vx=-Math.abs(o.vx); }
+      if (o.y < 20) { o.y=20; o.vy=Math.abs(o.vy); }
+      if (o.y > MR_H-20) { o.y=MR_H-20; o.vy=-Math.abs(o.vy); }
+    }
   });
 
   mrMarbles.forEach(m => {
@@ -9623,6 +9736,12 @@ function mrStepPhysics() {
     m.vy    += GRAVITY;
     m.vx    *= FRICTION;
     m.vy    *= FRICTION;
+    // Bee sting slowdown — lasts 180 frames (3s at 60fps), fades out gradually
+    if (m._beeSlow && m._beeSlow > 0) {
+      const slowFactor = 0.88 + 0.12 * (1 - m._beeSlow / 180); // 0.88 → 1.0 as it fades
+      m.vx *= slowFactor; m.vy *= slowFactor;
+      m._beeSlow--;
+    }
     const spd = Math.hypot(m.vx, m.vy);
     if (spd > 8) { m.vx = m.vx/spd*8; m.vy = m.vy/spd*8; }
     m.x += m.vx; m.y += m.vy;
@@ -9952,11 +10071,29 @@ function mrStepPhysics() {
         // ── Sewers ──
         case 'toxicSludge': {
           const dx=m.x-o.x,dy=m.y-o.y,d=Math.hypot(dx,dy);
-          if(d<o.r){
-            m.vx*=0.82; m.vy*=0.82;
-            // pull toward center
-            m.vx+=(-dx/d)*0.18; m.vy+=(-dy/d)*0.18;
+          if(d<o.r+m.r*0.5){
+            // Attach marble to sludge: store a blob anchor on the marble
+            if(!m._sludgeAnchors) m._sludgeAnchors=[];
+            // Register this sludge as an anchor if not already
+            let anchor = m._sludgeAnchors.find(a=>a.obs===o);
+            if(!anchor){
+              anchor={obs:o, strength:0, attachX:m.x, attachY:m.y};
+              m._sludgeAnchors.push(anchor);
+            }
+            // Build up attachment strength gradually
+            anchor.strength=Math.min(1,anchor.strength+0.04);
+            const s=anchor.strength;
+            // Slow the marble proportional to attachment strength
+            m.vx*=(1-0.22*s); m.vy*=(1-0.22*s);
+            // Pull toward sludge center (spring force)
+            m.vx+=(-dx/(d||1))*0.25*s;
+            m.vy+=(-dy/(d||1))*0.25*s;
+            // Keep track of tendril endpoint for drawing
+            anchor.attachX=m.x; anchor.attachY=m.y;
             mrPlayHazardSound('sticky', o, 800);
+          } else if(m._sludgeAnchors){
+            // Release this sludge's anchor when marble escapes range
+            m._sludgeAnchors=m._sludgeAnchors.filter(a=>a.obs!==o);
           }
           break;
         }
@@ -10027,6 +10164,151 @@ function mrStepPhysics() {
         case 'bubbleElevator': {
           if(m.x>o.x-16&&m.x<o.x+16&&m.y<o.y&&m.y>o.y-(o.h||60)){
             m.vy-=0.14; m.vx*=0.97;
+          }
+          break;
+        }
+        // ── Skate Park ──
+        case 'rollingBoard': {
+          const dx=m.x-o.x, dy=m.y-o.y;
+          if(Math.abs(dx)<(o.w||32)/2+m.r && dy>-5-m.r && dy<8+m.r){
+            // Board is a moveable platform — transfer its horizontal velocity to marble
+            const ov=dy+5+m.r; if(ov>0){ m.y-=ov*0.6; }
+            m.vy=-Math.abs(m.vy)*0.55-0.5;
+            m.vx+=o.vx*0.45;
+            mrPlayHazardSound('click', o, 400);
+          }
+          break;
+        }
+        case 'grindRail': {
+          // Rail slides marble along its direction
+          const hit=mrRampCollide(m, o.x+(o.offset||0), o.y, (o.w||60)/2, 4, 0, 0.75);
+          if(hit){ m.vx+=o.dir*0.5; mrPlayHazardSound('conveyor', o, 700); }
+          break;
+        }
+        case 'spinRamp': {
+          mrRampCollide(m, o.x, o.y, (o.w||50)/2, 5, o.angle, 0.7);
+          break;
+        }
+        case 'halfPipe': {
+          // Curved wall on one side that redirects marble upward
+          const hw=(o.w||55)/2;
+          const curveX = o.side==='left' ? o.x-hw : o.x+hw;
+          const dx2=m.x-curveX, dy2=m.y-o.y;
+          if(Math.abs(dx2)<14+m.r && Math.abs(dy2)<(o.side==='left'?30:30)){
+            m.vx = o.side==='left' ? Math.abs(m.vx)*0.9+1 : -Math.abs(m.vx)*0.9-1;
+            m.vy = -Math.abs(m.vy)*0.7-1.5;
+            mrPlayHazardSound('boing', o, 500);
+          }
+          break;
+        }
+        case 'boostRail': {
+          const hit2=mrRampCollide(m, o.x, o.y, (o.w||55)/2, 5, 0, 0.5);
+          if(hit2){ m.vx+=o.dir*1.2; m.vy-=0.4; mrPlayHazardSound('springboard', o, 500); }
+          break;
+        }
+        case 'grafittiBumper': {
+          const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
+          if(d<o.r+m.r+2&&d>0){
+            const nx=dx/d, ny=dy/d;
+            m.x+=nx*(o.r+m.r+2-d); m.y+=ny*(o.r+m.r+2-d);
+            const dot=m.vx*nx+m.vy*ny;
+            m.vx-=(1+0.65)*dot*nx; m.vy-=(1+0.65)*dot*ny;
+            mrPlayHazardSound('boing', o, 500);
+          }
+          break;
+        }
+        case 'rotatingObstacle': {
+          // Each arm tip is a collision circle
+          for(let ai=0;ai<2;ai++){
+            const armA=o.angle+ai*Math.PI;
+            const tipX=o.x+Math.cos(armA)*o.armLen;
+            const tipY=o.y+Math.sin(armA)*o.armLen;
+            const dx=m.x-tipX, dy=m.y-tipY, d=Math.hypot(dx,dy);
+            if(d<m.r+7&&d>0){
+              const nx=dx/d, ny=dy/d;
+              m.x+=nx*(m.r+7-d); m.y+=ny*(m.r+7-d);
+              const tang=-ny*o.speed*o.armLen*3, tangY=nx*o.speed*o.armLen*3;
+              m.vx=m.vx*0.5+tang; m.vy=m.vy*0.5+tangY;
+              mrPlayHazardSound('gear', o, 400);
+            }
+          }
+          break;
+        }
+        // ── Beach ──
+        case 'beachBall': {
+          const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
+          if(d<o.r+m.r&&d>0){
+            const nx=dx/d, ny=dy/d, ov=o.r+m.r-d;
+            m.x+=nx*ov*0.5; m.y+=ny*ov*0.5;
+            o.x-=nx*ov*0.5; o.y-=ny*ov*0.5;
+            const dv=(m.vx-o.vx)*nx+(m.vy-(o.vy||0))*ny;
+            if(dv<0){ m.vx-=dv*nx*0.6; m.vy-=dv*ny*0.6; o.vx+=dv*nx*0.4; o.vy=(o.vy||0)+dv*ny*0.4; }
+            mrPlayHazardSound('boing', o, 400);
+          }
+          break;
+        }
+        case 'crabTrap': {
+          if(!o.open){
+            mrRampCollide(m, o.x, o.y-6, o.w/2, 5, 0.2, 1.1);
+            mrRampCollide(m, o.x, o.y+6, o.w/2, 5, -0.2, 1.1);
+          }
+          break;
+        }
+        case 'wavePush': {
+          if(o.active && m.x>o.x-o.w/2 && m.x<o.x+o.w/2 && m.y>o.y-o.h/2 && m.y<o.y+o.h/2){
+            m.vx+=(Math.random()-0.5)*1.2; m.vy-=1.8; m.vx*=0.92;
+            mrPlayHazardSound('whoosh', o, 1000);
+          }
+          break;
+        }
+        case 'sandRamp': {
+          // Sandy surface: slow-down + ramp physics
+          const hit3=mrRampCollide(m, o.x, o.y, (o.w||55)/2, 5, o.angle, 0.55);
+          if(hit3){ m.vx*=0.88; m.vy*=0.88; }
+          break;
+        }
+        case 'umbrellaBumper': {
+          const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
+          if(d<o.r+m.r+2&&d>0){
+            const nx=dx/d, ny=dy/d;
+            m.x+=nx*(o.r+m.r+2-d); m.y+=ny*(o.r+m.r+2-d);
+            const dot=m.vx*nx+m.vy*ny;
+            m.vx-=(1+0.7)*dot*nx; m.vy-=(1+0.7)*dot*ny;
+            mrPlayHazardSound('boing', o, 500);
+          }
+          break;
+        }
+        // ── Garden ──
+        case 'waterPuddle': {
+          const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
+          if(d<o.r){ m.vx*=0.88; m.vy*=0.88; mrPlayHazardSound('sticky', o, 700); }
+          break;
+        }
+        case 'thornBush': {
+          const hw_tb=(o.w||45)/2;
+          if(m.x>o.x-hw_tb-m.r && m.x<o.x+hw_tb+m.r && m.y>o.y-12 && m.y<o.y+12){
+            const dx=m.x-o.x;
+            if(Math.abs(dx)<hw_tb+m.r){
+              m.vx+=dx>0?1.4:-1.4; m.vy-=1.2;
+              mrPlayHazardSound('hit', o, 600);
+            }
+          }
+          break;
+        }
+        case 'grassPatch': {
+          const hw_gp=(o.w||55)/2;
+          const hit4=mrRampCollide(m, o.x, o.y, hw_gp, 5, 0, 0.7);
+          if(hit4){ m.vx*=0.86; m.vy*=0.86; }
+          break;
+        }
+        case 'beeSting': {
+          const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
+          if(d<m.r+8&&d>0){
+            // Bee pushes marble in opposite direction + applies 3-second slowdown
+            const nx=dx/d, ny=dy/d;
+            m.vx+=(-nx)*2.2; m.vy+=(-ny)*2.2; // push opposite to approach
+            m._beeSlow = 180; // 3 seconds at 60fps
+            mrPlayHazardSound('buzz', o, 1200);
           }
           break;
         }
@@ -10309,6 +10591,82 @@ function mrDrawFrame() {
     uvG.addColorStop(0,'rgba(0,0,0,0)');
     uvG.addColorStop(1,'rgba(0,20,60,0.35)');
     ctx.fillStyle=uvG; ctx.fillRect(0,0,cssW,MR_H);
+  }
+
+  // ── Skate Park — sunset sky with warm horizon glow ──
+  if (mrTheme === 'skatepark') {
+    // Warm sunset gradient at the top
+    const spG = ctx.createLinearGradient(0, 0, 0, 90);
+    spG.addColorStop(0, 'rgba(255,80,20,0.18)');
+    spG.addColorStop(0.5, 'rgba(255,160,30,0.1)');
+    spG.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = spG; ctx.fillRect(0, 0, cssW, 90);
+    // Sun disc near top-right
+    const sunX = cssW * 0.78, sunY = 30;
+    const sunG = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 28);
+    sunG.addColorStop(0, 'rgba(255,220,100,0.55)');
+    sunG.addColorStop(0.5, 'rgba(255,140,40,0.2)');
+    sunG.addColorStop(1, 'rgba(255,80,0,0)');
+    ctx.fillStyle = sunG; ctx.beginPath(); ctx.arc(sunX, sunY, 28, 0, Math.PI*2); ctx.fill();
+    // Horizon line
+    ctx.strokeStyle = 'rgba(255,160,60,0.12)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, 55); ctx.lineTo(cssW, 55); ctx.stroke();
+    // Graffiti/spray paint splatters on walls (purely decorative)
+    const tagCols = ['rgba(255,60,60,0.09)','rgba(80,200,255,0.09)','rgba(200,80,255,0.09)'];
+    [[8,60,tagCols[0]],[9,140,tagCols[1]],[cssW-10,90,tagCols[2]]].forEach(([tx,ty,tc])=>{
+      ctx.fillStyle=tc; ctx.beginPath(); ctx.arc(tx,ty,14,0,Math.PI*2); ctx.fill();
+    });
+  }
+
+  // ── Beach — blue sky, sun, gentle wave at top ──
+  if (mrTheme === 'beach') {
+    const skyG = ctx.createLinearGradient(0, 0, 0, 80);
+    skyG.addColorStop(0, 'rgba(80,180,255,0.18)');
+    skyG.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = skyG; ctx.fillRect(0, 0, cssW, 80);
+    // Sun
+    const bsX = cssW * 0.6, bsY = 20;
+    ctx.fillStyle = 'rgba(255,240,120,0.35)';
+    ctx.beginPath(); ctx.arc(bsX, bsY, 14, 0, Math.PI*2); ctx.fill();
+    // Rays
+    ctx.strokeStyle = 'rgba(255,230,80,0.12)'; ctx.lineWidth = 1.5;
+    for(let ri=0;ri<8;ri++){
+      const ra=ri*Math.PI/4; const r1=16, r2=22;
+      ctx.beginPath(); ctx.moveTo(bsX+Math.cos(ra)*r1, bsY+Math.sin(ra)*r1);
+      ctx.lineTo(bsX+Math.cos(ra)*r2, bsY+Math.sin(ra)*r2); ctx.stroke();
+    }
+    // Wave shimmer at top-left
+    const wavT = Date.now() * 0.002;
+    ctx.strokeStyle = 'rgba(120,200,255,0.12)'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    for(let xi=0;xi<=cssW;xi+=8){
+      const wy = 12 + Math.sin(wavT+xi*0.04)*4;
+      if(xi===0) ctx.moveTo(xi,wy); else ctx.lineTo(xi,wy);
+    }
+    ctx.stroke();
+  }
+
+  // ── Garden — soft green ambient haze ──
+  if (mrTheme === 'garden') {
+    const garG = ctx.createLinearGradient(0, 0, 0, 80);
+    garG.addColorStop(0, 'rgba(60,160,30,0.14)');
+    garG.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = garG; ctx.fillRect(0, 0, cssW, 80);
+    // Floating pollen dots
+    const polT = Date.now() * 0.0008;
+    for(let pi=0;pi<12;pi++){
+      const px = (pi*73+30) % cssW;
+      const py = 20 + Math.sin(polT+pi*0.8)*12 + pi*4;
+      if(py > 80) continue;
+      ctx.globalAlpha = 0.25;
+      ctx.fillStyle = 'rgba(220,255,100,0.9)';
+      ctx.beginPath(); ctx.arc(px, py, 1.5, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    // Light rays through leaves
+    ctx.strokeStyle = 'rgba(160,255,80,0.06)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(cssW*0.25,-5); ctx.lineTo(cssW*0.2,70); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cssW*0.6,-5); ctx.lineTo(cssW*0.65,70); ctx.stroke();
   }
 
   // ── Midnight Fiesta confetti ──
@@ -10892,6 +11250,240 @@ function mrDrawFrame() {
         ctx.save();ctx.translate(o.x,o.y);
         break;
       }
+      // ── Skate Park ──
+      case 'rollingBoard': {
+        ctx.rotate(Math.sin(o.phase||0)*0.08);
+        ctx.shadowBlur=8; ctx.shadowColor='rgba(255,180,40,0.5)';
+        ctx.fillStyle='rgba(255,160,30,0.9)';
+        const bw=(o.w||32)/2;
+        ctx.beginPath(); ctx.roundRect(-bw,-4,bw*2,8,3); ctx.fill();
+        // Wheels
+        ctx.fillStyle='rgba(80,80,80,0.9)';
+        ctx.beginPath(); ctx.arc(-bw+4,6,4,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc( bw-4,6,4,0,Math.PI*2); ctx.fill();
+        // Grip tape pattern
+        ctx.strokeStyle='rgba(0,0,0,0.3)'; ctx.lineWidth=1;
+        for(let gi=-bw+6;gi<bw-4;gi+=5){ ctx.beginPath(); ctx.moveTo(gi,-4); ctx.lineTo(gi+2,4); ctx.stroke(); }
+        ctx.shadowBlur=0; break;
+      }
+      case 'grindRail': {
+        const rw=(o.w||60)/2;
+        ctx.shadowBlur=6; ctx.shadowColor='rgba(200,180,80,0.6)';
+        ctx.strokeStyle='rgba(220,200,80,0.85)'; ctx.lineWidth=5; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(-rw,0); ctx.lineTo(rw,0); ctx.stroke();
+        // Moving highlight indicating scroll direction
+        const off=o.offset||0;
+        ctx.strokeStyle='rgba(255,240,150,0.7)'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.moveTo(off-8,0); ctx.lineTo(off+8,0); ctx.stroke();
+        ctx.shadowBlur=0; break;
+      }
+      case 'spinRamp': {
+        ctx.rotate(o.angle||0);
+        const srw=(o.w||50)/2;
+        ctx.shadowBlur=6; ctx.shadowColor='rgba(255,140,30,0.5)';
+        ctx.fillStyle='rgba(255,140,30,0.8)';
+        ctx.beginPath(); ctx.roundRect(-srw,-4,srw*2,8,3); ctx.fill();
+        // Arrow indicators
+        ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='bold 8px sans-serif'; ctx.textAlign='center';
+        ctx.fillText('↺',0,3);
+        ctx.shadowBlur=0; break;
+      }
+      case 'halfPipe': {
+        const hpw=(o.w||55)/2;
+        ctx.shadowBlur=8; ctx.shadowColor='rgba(80,200,255,0.4)';
+        ctx.strokeStyle='rgba(80,200,255,0.75)'; ctx.lineWidth=4; ctx.lineCap='round';
+        // Draw the curved U shape
+        if(o.side==='left'){
+          ctx.beginPath(); ctx.arc(-hpw+18,0,18,Math.PI,Math.PI*2,false); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(-hpw,0); ctx.lineTo(hpw,0); ctx.stroke();
+        } else {
+          ctx.beginPath(); ctx.arc(hpw-18,0,18,0,Math.PI,false); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(-hpw,0); ctx.lineTo(hpw,0); ctx.stroke();
+        }
+        ctx.shadowBlur=0; break;
+      }
+      case 'boostRail': {
+        const brw=(o.w||55)/2;
+        const glowPulse=0.5+0.5*Math.sin((o.glow||0));
+        ctx.shadowBlur=10*glowPulse; ctx.shadowColor=`rgba(80,255,120,${0.7*glowPulse})`;
+        ctx.strokeStyle=`rgba(80,255,120,${0.7+0.3*glowPulse})`; ctx.lineWidth=5; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(-brw,0); ctx.lineTo(brw,0); ctx.stroke();
+        // Arrow showing boost direction
+        const arr=o.dir>0?'→':'←';
+        ctx.fillStyle=`rgba(255,255,255,${0.6+0.3*glowPulse})`; ctx.font='bold 9px sans-serif'; ctx.textAlign='center';
+        ctx.fillText(arr,0,-6);
+        ctx.shadowBlur=0; break;
+      }
+      case 'grafittiBumper': {
+        const grafCols=['rgba(255,60,60,0.85)','rgba(255,200,0,0.85)','rgba(80,200,255,0.85)','rgba(200,80,255,0.85)','rgba(60,255,120,0.85)'];
+        ctx.rotate(Math.sin(o.wobble||0)*0.12);
+        ctx.shadowBlur=10; ctx.shadowColor=grafCols[o.colorIdx||0].replace('0.85','0.5');
+        ctx.fillStyle=grafCols[o.colorIdx||0];
+        ctx.beginPath(); ctx.arc(0,0,o.r,0,Math.PI*2); ctx.fill();
+        // Tag text
+        ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.font=`bold ${Math.floor(o.r*0.7)}px sans-serif`; ctx.textAlign='center';
+        ctx.fillText('★',0,o.r*0.3);
+        ctx.shadowBlur=0; break;
+      }
+      case 'rotatingObstacle': {
+        ctx.shadowBlur=8; ctx.shadowColor='rgba(255,160,30,0.5)';
+        // Center hub
+        ctx.fillStyle='rgba(180,140,60,0.9)';
+        ctx.beginPath(); ctx.arc(0,0,6,0,Math.PI*2); ctx.fill();
+        // Two arms
+        ctx.strokeStyle='rgba(220,180,60,0.9)'; ctx.lineWidth=5; ctx.lineCap='round';
+        for(let ai=0;ai<2;ai++){
+          const armA=(o.angle||0)+ai*Math.PI;
+          ctx.beginPath(); ctx.moveTo(0,0);
+          ctx.lineTo(Math.cos(armA)*(o.armLen||28), Math.sin(armA)*(o.armLen||28));
+          ctx.stroke();
+          // Tip ball
+          ctx.fillStyle='rgba(255,200,60,0.9)';
+          ctx.beginPath(); ctx.arc(Math.cos(armA)*(o.armLen||28), Math.sin(armA)*(o.armLen||28), 6, 0, Math.PI*2); ctx.fill();
+        }
+        ctx.shadowBlur=0; break;
+      }
+      // ── Beach ──
+      case 'beachBall': {
+        ctx.shadowBlur=8; ctx.shadowColor='rgba(255,100,80,0.4)';
+        // Striped beach ball
+        const bbCols=['rgba(255,60,60,0.9)','rgba(255,255,255,0.9)','rgba(60,160,255,0.9)','rgba(255,220,0,0.9)'];
+        for(let si=0;si<4;si++){
+          ctx.fillStyle=bbCols[si];
+          ctx.beginPath(); ctx.moveTo(0,0);
+          ctx.arc(0,0,o.r,si*Math.PI/2,(si+1)*Math.PI/2); ctx.closePath(); ctx.fill();
+        }
+        ctx.strokeStyle='rgba(0,0,0,0.15)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.arc(0,0,o.r,0,Math.PI*2); ctx.stroke();
+        ctx.shadowBlur=0; break;
+      }
+      case 'crabTrap': {
+        const ctw=(o.w||28)/2;
+        ctx.shadowBlur=6; ctx.shadowColor='rgba(255,120,60,0.4)';
+        if(o.open){
+          // Open claws
+          ctx.strokeStyle='rgba(255,140,60,0.85)'; ctx.lineWidth=4; ctx.lineCap='round';
+          ctx.beginPath(); ctx.moveTo(-ctw,-8); ctx.lineTo(-ctw/2,4); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo( ctw,-8); ctx.lineTo( ctw/2,4); ctx.stroke();
+          // Crab body
+          ctx.fillStyle='rgba(230,100,40,0.75)';
+          ctx.beginPath(); ctx.ellipse(0,0,ctw*0.55,6,0,0,Math.PI*2); ctx.fill();
+        } else {
+          // Snapped shut
+          ctx.strokeStyle='rgba(255,80,30,0.9)'; ctx.lineWidth=5; ctx.lineCap='round';
+          ctx.beginPath(); ctx.moveTo(-ctw,0); ctx.lineTo(ctw,0); ctx.stroke();
+          ctx.fillStyle='rgba(200,60,20,0.9)';
+          ctx.beginPath(); ctx.arc(0,0,5,0,Math.PI*2); ctx.fill();
+        }
+        ctx.shadowBlur=0; break;
+      }
+      case 'wavePush': {
+        if(o.active){
+          const wAlpha=0.3*(1-((o.phase||0)/60));
+          ctx.fillStyle=`rgba(80,160,255,${wAlpha})`;
+          ctx.beginPath(); ctx.roundRect(-o.w/2,-o.h/2,o.w,o.h,4); ctx.fill();
+          // Wave line
+          ctx.strokeStyle=`rgba(160,220,255,${wAlpha*2})`; ctx.lineWidth=2;
+          ctx.beginPath();
+          for(let wxi=0;wxi<=o.w;wxi+=10){
+            const wy=Math.sin(Date.now()*0.01+wxi*0.1)*3;
+            if(wxi===0) ctx.moveTo(-o.w/2+wxi,wy); else ctx.lineTo(-o.w/2+wxi,wy);
+          }
+          ctx.stroke();
+        } else {
+          // Inactive: subtle shimmer
+          ctx.strokeStyle='rgba(80,160,255,0.12)'; ctx.lineWidth=1; ctx.setLineDash([6,8]);
+          ctx.beginPath(); ctx.rect(-o.w/2,-o.h/2,o.w,o.h); ctx.stroke(); ctx.setLineDash([]);
+        }
+        break;
+      }
+      case 'sandRamp': {
+        ctx.rotate(o.angle||0);
+        const srw2=(o.w||55)/2;
+        ctx.shadowBlur=4; ctx.shadowColor='rgba(200,160,60,0.4)';
+        ctx.fillStyle='rgba(210,170,80,0.85)';
+        ctx.beginPath(); ctx.roundRect(-srw2,-5,srw2*2,10,3); ctx.fill();
+        // Sandy dots
+        ctx.fillStyle='rgba(255,220,120,0.5)';
+        for(let sdi=-srw2+4;sdi<srw2;sdi+=7){
+          ctx.beginPath(); ctx.arc(sdi,(Math.sin(sdi)*2),1.5,0,Math.PI*2); ctx.fill();
+        }
+        ctx.shadowBlur=0; break;
+      }
+      case 'umbrellaBumper': {
+        ctx.shadowBlur=10; ctx.shadowColor='rgba(255,100,200,0.4)';
+        const umbCols=['rgba(255,60,120,0.9)','rgba(60,180,255,0.9)','rgba(255,200,0,0.9)','rgba(100,255,120,0.9)'];
+        const uc=umbCols[o.colorIdx||0];
+        // Canopy arc
+        ctx.fillStyle=uc;
+        ctx.beginPath(); ctx.arc(0,0,o.r,Math.PI,0,false); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
+        // Pole
+        ctx.strokeStyle='rgba(180,180,180,0.85)'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,o.r); ctx.stroke();
+        // Rim
+        ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.arc(0,0,o.r,Math.PI,0,false); ctx.stroke();
+        ctx.shadowBlur=0; break;
+      }
+      // ── Garden ──
+      case 'waterPuddle': {
+        const wpPhase=o.phase||0;
+        const wpG=ctx.createRadialGradient(0,-2,0,0,0,o.r);
+        wpG.addColorStop(0,`rgba(100,180,255,${0.45+Math.sin(wpPhase)*0.08})`);
+        wpG.addColorStop(0.7,'rgba(60,140,255,0.25)');
+        wpG.addColorStop(1,'rgba(40,100,220,0.05)');
+        ctx.fillStyle=wpG;
+        ctx.beginPath(); ctx.ellipse(0,2,o.r,o.r*0.45,0,0,Math.PI*2); ctx.fill();
+        // Ripple rings
+        const rp=(wpPhase%60)/60;
+        ctx.strokeStyle=`rgba(160,210,255,${0.4*(1-rp)})`; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.ellipse(0,2,o.r*rp,o.r*0.4*rp,0,0,Math.PI*2); ctx.stroke();
+        break;
+      }
+      case 'thornBush': {
+        const tbw=(o.w||45)/2;
+        ctx.shadowBlur=6; ctx.shadowColor='rgba(100,180,40,0.4)';
+        // Bush base
+        ctx.fillStyle='rgba(50,120,20,0.85)';
+        ctx.beginPath(); ctx.ellipse(0,0,tbw,10,0,0,Math.PI*2); ctx.fill();
+        // Thorn spikes
+        ctx.fillStyle='rgba(180,80,30,0.9)';
+        for(let ti=-tbw+4;ti<tbw;ti+=9){
+          ctx.beginPath(); ctx.moveTo(ti-3,0); ctx.lineTo(ti,-(8+Math.abs(Math.sin(ti))*5)); ctx.lineTo(ti+3,0); ctx.closePath(); ctx.fill();
+        }
+        ctx.shadowBlur=0; break;
+      }
+      case 'grassPatch': {
+        const gpw=(o.w||55)/2;
+        // Ground strip
+        ctx.fillStyle='rgba(60,150,30,0.65)';
+        ctx.beginPath(); ctx.roundRect(-gpw,-4,gpw*2,8,3); ctx.fill();
+        // Grass blades
+        ctx.strokeStyle='rgba(80,200,40,0.75)'; ctx.lineWidth=1.5; ctx.lineCap='round';
+        for(let gi=-gpw+3;gi<gpw;gi+=5){
+          const h=4+Math.abs(Math.sin(gi*0.7))*4;
+          ctx.beginPath(); ctx.moveTo(gi,-3); ctx.lineTo(gi+1,-(3+h)); ctx.stroke();
+        }
+        break;
+      }
+      case 'beeSting': {
+        ctx.rotate(Math.atan2(o.vy||0,o.vx||0));
+        const buzzOff=Math.sin((o.buzz||0)*3)*1.5;
+        ctx.shadowBlur=6; ctx.shadowColor='rgba(255,220,0,0.5)';
+        // Body
+        ctx.fillStyle='rgba(255,200,0,0.9)';
+        ctx.beginPath(); ctx.ellipse(0,buzzOff,7,5,0,0,Math.PI*2); ctx.fill();
+        // Stripes
+        ctx.fillStyle='rgba(0,0,0,0.45)';
+        ctx.fillRect(-3,buzzOff-2,2,4); ctx.fillRect(1,buzzOff-2,2,4);
+        // Wings
+        ctx.globalAlpha=0.55;
+        ctx.fillStyle='rgba(200,240,255,0.9)';
+        ctx.beginPath(); ctx.ellipse(-2,buzzOff-6,5,3,0.4,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse( 2,buzzOff-6,5,3,-0.4,0,Math.PI*2); ctx.fill();
+        ctx.globalAlpha=1;
+        ctx.shadowBlur=0; break;
+      }
     }
     ctx.restore();
   });
@@ -10931,6 +11523,35 @@ function mrDrawFrame() {
     });
     if (m.finished) return;
 
+    // ── Toxic sludge blob tendrils: draw stretchy glue strands from marble to each sludge pool ──
+    if (m._sludgeAnchors && m._sludgeAnchors.length > 0) {
+      m._sludgeAnchors.forEach(anchor => {
+        const o2 = anchor.obs;
+        const s = anchor.strength;
+        // Tendril from sludge center to marble
+        const grad2 = ctx.createLinearGradient(o2.x, o2.y, m.x, m.y);
+        grad2.addColorStop(0, `rgba(80,200,20,${0.7*s})`);
+        grad2.addColorStop(0.5, `rgba(120,240,40,${0.45*s})`);
+        grad2.addColorStop(1, `rgba(160,255,60,${0.15*s})`);
+        ctx.strokeStyle = grad2;
+        ctx.lineWidth = Math.max(1, 3.5 * s);
+        ctx.lineCap = 'round';
+        ctx.shadowBlur = 6 * s; ctx.shadowColor = 'rgba(100,220,30,0.5)';
+        ctx.beginPath();
+        // Quadratic curve that sags slightly
+        const midX = (o2.x + m.x) / 2 + (Math.random() - 0.5) * 4;
+        const midY = (o2.y + m.y) / 2 + 6;
+        ctx.moveTo(o2.x, o2.y);
+        ctx.quadraticCurveTo(midX, midY, m.x, m.y);
+        ctx.stroke();
+        ctx.shadowBlur = 0; ctx.lineCap = 'butt';
+      });
+    }
+
+    // ── Drain tunnel ghost mode: make marble translucent so user can see inside ──
+    const _isDrainGhost = !!m._inDrain;
+    if (_isDrainGhost) ctx.globalAlpha = 0.4;
+
     // Glow + body
     ctx.shadowBlur=18; ctx.shadowColor=m.glow;
     const mg=ctx.createRadialGradient(m.x-m.r*0.3,m.y-m.r*0.3,m.r*0.05,m.x,m.y,m.r);
@@ -10960,6 +11581,9 @@ function mrDrawFrame() {
     ctx.fillStyle = '#ffffff';
     ctx.fillText(lbl, lx, ly);
 
+    // Restore alpha after drain ghost (body + label drawn at reduced opacity)
+    if (_isDrainGhost) ctx.globalAlpha = 1;
+
     // Ice effect overlay (arctic theme — doesn't cover marble colour, just a rim frost)
     if (m._iceEffect && m._iceEffect > 0) {
       m._iceEffect--;
@@ -10968,6 +11592,17 @@ function mrDrawFrame() {
       ctx.strokeStyle = 'rgba(180,235,255,0.95)';
       ctx.lineWidth = 2.5;
       ctx.beginPath(); ctx.arc(m.x, m.y, m.r + 2.5, 0, Math.PI*2); ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    // Bee sting slow indicator — buzzing yellow ring that fades over 3 seconds
+    if (m._beeSlow && m._beeSlow > 0) {
+      const beeAlpha = Math.min(1, m._beeSlow / 60) * 0.65;
+      ctx.globalAlpha = beeAlpha;
+      ctx.strokeStyle = 'rgba(255,220,0,0.9)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.arc(m.x, m.y, m.r + 4, 0, Math.PI*2); ctx.stroke();
+      ctx.setLineDash([]);
       ctx.globalAlpha = 1;
     }
     // Voted ring
@@ -11175,7 +11810,7 @@ function mrStartCountdown() {
   mrSpawnMarbles(); // reset positions only
 
   const th = MR_THEMES[mrTheme] || MR_THEMES.space;
-  const themeEmoji = {space:'🌌',sakura:'🌸',neon:'🌈',sunset:'🌅',ice:'❄️',forest:'🌲',arctic:'🏔️',sewers:'🕳️',sunken:'🌊',fiesta:'🎉'}[mrTheme]||'🔮';
+  const themeEmoji = {space:'🌌',sakura:'🌸',neon:'🌈',sunset:'🌅',ice:'❄️',forest:'🌲',arctic:'🏔️',sewers:'🕳️',sunken:'🌊',fiesta:'🎉',skatepark:'🛹',beach:'🏖️',garden:'🌻'}[mrTheme]||'🔮';
   const votedMC = MARBLE_COLORS.find(c=>c.id===mrVotedColor);
 
   const ui = document.getElementById('mr-ui');
@@ -11302,7 +11937,8 @@ function renderMRVoteUI() {
       '<div style="font-size:16px;font-weight:900;color:#fff;margin-top:2px">' + racesCountHTML + '</div></div>' +
       '<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">' + adminDockHTML + '</div>' +
     '</div>' +
-    // Level preview canvas
+    // Level preview canvas — HIDDEN (kept for future use, set display:none to re-enable)
+    /* LEVEL_PREVIEW_START
     '<div style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;margin-bottom:12px">' +
       '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px 6px">' +
         '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase">Level Preview</div>' +
@@ -11310,6 +11946,7 @@ function renderMRVoteUI() {
       '</div>' +
       '<canvas id="mr-preview-canvas" style="display:block;width:100%;height:120px"></canvas>' +
     '</div>' +
+    LEVEL_PREVIEW_END */
     // Pick label + rewards
     '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px">Pick your marble</div>' +
     '<div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px">🥇 10🎟 &nbsp;·&nbsp; 🥈 5🎟 &nbsp;·&nbsp; 🥉 3🎟</div>' +
@@ -11321,8 +11958,8 @@ function renderMRVoteUI() {
     '</button>' +
     '</div>';
 
-  // Draw the miniature level preview onto the canvas
-  requestAnimationFrame(() => mrDrawLevelPreview());
+  // Level preview drawing — disabled (uncomment to re-enable along with the preview block above)
+  // requestAnimationFrame(() => mrDrawLevelPreview());
 }
 
 function mrHandleStartBtn() {
