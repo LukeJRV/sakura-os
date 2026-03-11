@@ -9049,6 +9049,9 @@ const MR_THEMES = {
   skatepark:  { rampCol:'rgba(255,180,40,X)',  pegCol:'rgba(255,120,40,X)',  bumperCol:'rgba(80,200,255,X)',  bgA:'#0d0800', bgB:'#1a1000', wallCol:'rgba(255,160,30,0.5)', name:'Skate Park'     },
   beach:      { rampCol:'rgba(255,210,80,X)',  pegCol:'rgba(255,170,50,X)',  bumperCol:'rgba(80,190,255,X)',  bgA:'#020b14', bgB:'#041a28', wallCol:'rgba(80,180,255,0.5)', name:'Beach'          },
   garden:     { rampCol:'rgba(80,180,60,X)',   pegCol:'rgba(120,200,60,X)',  bumperCol:'rgba(180,230,80,X)',  bgA:'#030801', bgB:'#071204', wallCol:'rgba(80,180,60,0.5)',  name:'Garden'         },
+  jpnight:    { rampCol:'rgba(180,120,255,X)', pegCol:'rgba(255,160,220,X)', bumperCol:'rgba(120,180,255,X)', bgA:'#03010d', bgB:'#080118', wallCol:'rgba(180,120,255,0.5)', name:'Japanese Night'  },
+  kitchen:    { rampCol:'rgba(255,200,100,X)', pegCol:'rgba(255,160,60,X)',  bumperCol:'rgba(255,100,80,X)',  bgA:'#120800', bgB:'#1e0f00', wallCol:'rgba(255,180,80,0.5)',  name:'Kitchen'        },
+  midnightup: { rampCol:'rgba(80,120,255,X)',  pegCol:'rgba(180,80,255,X)',  bumperCol:'rgba(255,80,120,X)',  bgA:'#02020e', bgB:'#040418', wallCol:'rgba(80,120,255,0.5)',  name:'Midnight Uprise'},
 };
 
 function renderMarbleRace() {
@@ -9320,16 +9323,19 @@ function mrGenMap_inner() {
       ice:       ['icePatch','icicle','icyBoulder','snowMachine'],
       sakura:    ['sakuraPetal','leafPile'],
       arctic:    ['snowAvalanche','crackingIceBridge','iceSpike','iceSlide','penguinBumper','frozenGear'],
-      sewers:    ['toxicSludge','pipeBlade','steamBurst','waterCurrentPipe','drippingWater','ratStampede','drainTunnel'],
+      sewers:    ['toxicSludge','pipeBlade','steamBurst','directionalPipe','drippingWater','ratStampede','drainTunnel'],
       sunken:    ['waterCurrent','pressureZone','clamTrap','bubbleElevator'],
       skatepark: ['rollingBoard','grindRail','spinRamp','halfPipe','boostRail','grafittiBumper','rotatingObstacle'],
       beach:     ['beachBall','crabTrap','wavePush','sandRamp','umbrellaBumper'],
       garden:    ['waterPuddle','thornBush','grassPatch','beeSting'],
+      jpnight:   ['swingingBamboo','paperLantern','shurikenWheel','sakuraWindTunnel','waterGardenCurrent','moonlitSection'],
+      kitchen:   ['grillPlatform','kitchenKnife','mixingBowl','toiletPaper'],
+      midnightup:['trafficCar','trafficLight','trafficCone','oilSpillage'],
     };
     const basePool = ['springboard','fan','gear','stickyzone','bridge','conveyor','seesaw','bouncywall','slide','rollerchain'];
     const themePool = themeHazards[mrTheme] || [];
     // For themed levels always use the theme pool; for generic themes mix in base pool occasionally
-    const alwaysThemed = ['arctic','sewers','sunken','skatepark','beach','garden'].includes(mrTheme);
+    const alwaysThemed = ['arctic','sewers','sunken','skatepark','beach','garden','jpnight','kitchen','midnightup'].includes(mrTheme);
     const hazardPool = themePool.length && (alwaysThemed || rng() < 0.75) ? themePool : basePool;
 
     // Pick 2 distinct hazards per zone to ensure full theme variety across a race
@@ -9513,7 +9519,75 @@ function mrGenMap_inner() {
       case 'beeSting':
         mrObstacles.push({ type:'beeSting', x: hx+rng()*30-15, y: hy, vx: rng()>0.5?1.5:-1.5, vy:(rng()-0.5)*0.8, buzz:0, _theme:'garden' });
         break;
-    } // end switch(pick)
+      // ── Japanese Night ──
+      case 'swingingBamboo':
+        mrObstacles.push({ type:'swingingBamboo', x: hx, y: hy, len:55+rng()*25, angle:(rng()-0.5)*0.4, angV:0, restitution:0.82+rng()*0.12, _theme:'jpnight' });
+        break;
+      case 'paperLantern':
+        mrObstacles.push({ type:'paperLantern', x: hx, y: hy, r:13+rng()*5, phase:rng()*Math.PI*2, colorIdx:Math.floor(rng()*4), lit:true, flickerT:0, _theme:'jpnight' });
+        break;
+      case 'shurikenWheel':
+        mrObstacles.push({ type:'shurikenWheel', x: hx, y: hy, r:15+rng()*6, angle:0, speed:(rng()>0.5?1:-1)*(0.04+rng()*0.03), _theme:'jpnight' });
+        break;
+      case 'sakuraWindTunnel': {
+        // Tunnel direction: mostly downward but angled; pick a direction that goes across the track
+        const tDir = rng() > 0.5 ? 1 : -1;
+        const tLen = 90 + rng()*50;
+        const tAngle = tDir * (0.3 + rng()*0.35); // angle from vertical
+        const tunnel = { type:'sakuraWindTunnel', x: hx, y: hy, len: tLen, angle: tAngle, w: 28+rng()*10, phase:0, petals:[], _theme:'jpnight' };
+        mrObstacles.push(tunnel);
+        // Spawn a moonlit section at the tunnel exit — they are always connected
+        const exitX = hx + Math.sin(tAngle)*tLen;
+        const exitY = hy + Math.cos(tAngle)*tLen;
+        if (exitX > 20 && exitX < W-20 && exitY < MR_H - 40) {
+          mrObstacles.push({ type:'moonlitSection', x: exitX, y: exitY, r:24+rng()*10, phase:rng()*Math.PI*2, _theme:'jpnight' });
+        }
+        break;
+      }
+      case 'waterGardenCurrent':
+        mrObstacles.push({ type:'waterGardenCurrent', x: hx, y: hy, w:65+rng()*20, h:22+rng()*10, dir:rng()>0.5?1:-1, phase:0, ripples:[], _theme:'jpnight' });
+        break;
+      case 'moonlitSection':
+        mrObstacles.push({ type:'moonlitSection', x: hx, y: hy, r:28+rng()*12, phase:rng()*Math.PI*2, _theme:'jpnight' });
+        break;
+      // ── Directional Pipe (Sewers upgrade) ──
+      case 'directionalPipe': {
+        const dpAngle = rng()>0.5 ? 0 : (rng()-0.5)*0.5; // mostly horizontal, slight angle
+        const dpDir   = rng()>0.5 ? 1 : -1;
+        const dpLen   = 110 + rng()*60; // long enough to feel substantial
+        mrObstacles.push({ type:'directionalPipe', x: hx, y: hy, len: dpLen, angle: dpAngle, dir: dpDir, w: 24, phase:0, _theme:'sewers' });
+        break;
+      }
+      // ── Kitchen ──
+      case 'grillPlatform':
+        mrObstacles.push({ type:'grillPlatform', x: hx, y: hy, w: 60+rng()*20, heat:0, heatT:0, flipT:0, flipped:false, marbleCount:0, _theme:'kitchen' });
+        break;
+      case 'kitchenKnife':
+        mrObstacles.push({ type:'kitchenKnife', x: hx, y: hy, len:35+rng()*15, angle:rng()*Math.PI*2, speed:(rng()>0.5?1:-1)*(0.04+rng()*0.03), pivotR:18+rng()*10, _theme:'kitchen' });
+        break;
+      case 'mixingBowl':
+        mrObstacles.push({ type:'mixingBowl', x: hx, y: hy, r:22+rng()*8, marbles:[], rockAngle:0, rockV:0, pourT:0, pouring:false, _theme:'kitchen' });
+        break;
+      case 'toiletPaper':
+        mrObstacles.push({ type:'toiletPaper', x: hx, y: hy, r:14, rolling:false, rollV:0, trail:[], trailAge:0, _theme:'kitchen' });
+        break;
+      // ── Midnight Uprise ──
+      case 'trafficCar': {
+        const carDir = rng()>0.5 ? 1 : -1;
+        mrObstacles.push({ type:'trafficCar', x: hx, y: hy, w:46, h:18, dir:carDir, speed:1.2+rng()*0.8,
+          stopped:false, trunkOpen:false, trunkT:0, roofBroken:false, roofShards:[],
+          marbleInside:null, passedEdge:false, _theme:'midnightup' });
+        break;
+      }
+      case 'trafficLight':
+        mrObstacles.push({ type:'trafficLight', x: hx, y: hy, state:'green', timer:0, greenT:180+Math.floor(rng()*120), yellowT:60, redT:150+Math.floor(rng()*90), _theme:'midnightup' });
+        break;
+      case 'trafficCone':
+        mrObstacles.push({ type:'trafficCone', x: hx, y: hy, angle:0, angV:0, _theme:'midnightup' });
+        break;
+      case 'oilSpillage':
+        mrObstacles.push({ type:'oilSpillage', x: hx, y: hy, w:55+rng()*30, phase:0, _theme:'midnightup' });
+        break;
     } // end for(pick of picks)
   } // end zone loop
 
@@ -9726,6 +9800,148 @@ function mrStepPhysics() {
       if (o.y < 20) { o.y=20; o.vy=Math.abs(o.vy); }
       if (o.y > MR_H-20) { o.y=MR_H-20; o.vy=-Math.abs(o.vy); }
     }
+    // Japanese Night
+    if (o.type === 'swingingBamboo') {
+      // Pendulum physics: gravity pulls toward rest, dampen slowly so it swings long
+      o.angV = (o.angV||0) + -(o.angle||0) * 0.007;
+      o.angV *= 0.985; // very low damping — stays swinging
+      o.angle = (o.angle||0) + o.angV;
+      o.angle = Math.max(-Math.PI*0.55, Math.min(Math.PI*0.55, o.angle));
+    }
+    if (o.type === 'paperLantern') {
+      o.phase = (o.phase||0) + 0.025;
+      // Occasional flicker
+      o.flickerT = (o.flickerT||0)+1;
+      if (o.flickerT > 180+Math.random()*200) { o.lit=!o.lit; o.flickerT=0; }
+      if (!o.lit && o.flickerT > 6) o.lit=true;
+    }
+    if (o.type === 'shurikenWheel') { o.angle = (o.angle||0) + o.speed; }
+    if (o.type === 'sakuraWindTunnel') {
+      o.phase = (o.phase||0) + 0.04;
+      if (!o.petals) o.petals = [];
+      // Spawn petals inside tunnel periodically
+      if (o.petals.length < 18 && Math.random() < 0.18) {
+        const t = Math.random();
+        const cx = o.x + Math.sin(o.angle)*o.len*t;
+        const cy = o.y + Math.cos(o.angle)*o.len*t;
+        o.petals.push({ x:cx, y:cy, vx:Math.sin(o.angle)*1.4+(Math.random()-0.5)*0.6, vy:Math.cos(o.angle)*1.4+(Math.random()-0.5)*0.6, life:1, r:2+Math.random()*2, rot:Math.random()*Math.PI*2, rotV:(Math.random()-0.5)*0.15 });
+      }
+      o.petals.forEach(p => { p.x+=p.vx; p.y+=p.vy; p.rot+=p.rotV; p.life-=0.016; });
+      o.petals = o.petals.filter(p => p.life>0);
+    }
+    if (o.type === 'waterGardenCurrent') {
+      o.phase = (o.phase||0) + 0.05;
+      if (!o.ripples) o.ripples = [];
+      if (Math.random() < 0.06 && o.ripples.length < 8) {
+        o.ripples.push({ x: o.x+(Math.random()-0.5)*o.w*0.7, y: o.y+(Math.random()-0.5)*o.h*0.5, r:0, life:1 });
+      }
+      o.ripples.forEach(r => { r.r += 1.2; r.life -= 0.035; });
+      o.ripples = o.ripples.filter(r => r.life>0);
+    }
+    if (o.type === 'moonlitSection') { o.phase = (o.phase||0) + 0.018; }
+    // ── Directional Pipe (Sewers) ──
+    if (o.type === 'directionalPipe') { o.phase = (o.phase||0) + 0.06; }
+    // ── Kitchen ──
+    if (o.type === 'grillPlatform') {
+      if (o.marbleCount > 0) {
+        o.heatT = (o.heatT||0) + 1;
+        o.heat = Math.min(1, o.heatT / 180); // heats over 3s
+        if (o.heatT >= 180 && !o.flipped) {
+          o.flipT = (o.flipT||0) + 1;
+          if (o.flipT >= 180) { o.flipped = true; o.flipT = 0; } // flip after 3s hover
+        }
+        if (o.flipped) {
+          o.flipT++;
+          if (o.flipT > 60) { o.flipped=false; o.flipT=0; o.heatT=0; o.heat=0; o.marbleCount=0; }
+        }
+      } else {
+        o.heatT = Math.max(0, (o.heatT||0) - 2); // cools when empty
+        o.heat = o.heatT / 180;
+      }
+    }
+    if (o.type === 'kitchenKnife') {
+      o.angle = (o.angle||0) + o.speed;
+      // Knife tip orbits pivot
+      o.tipX = o.x + Math.cos(o.angle) * o.pivotR;
+      o.tipY = o.y + Math.sin(o.angle) * o.pivotR;
+    }
+    if (o.type === 'mixingBowl') {
+      if (o.pouring) {
+        o.pourT++;
+        o.rockAngle += o.rockV;
+        o.rockV += -o.rockAngle*0.04 + (o.pourT<60?0.06:-0.05);
+        o.rockV *= 0.92;
+        if (o.pourT > 90) { o.pouring=false; o.marbles=[]; o.pourT=0; o.rockAngle=0; o.rockV=0; }
+      } else {
+        // Gently right bowl back to level
+        o.rockV += -o.rockAngle * 0.05; o.rockV *= 0.85;
+        o.rockAngle += o.rockV;
+      }
+    }
+    if (o.type === 'toiletPaper') {
+      if (o.rolling) {
+        o.rollV *= 0.97;
+        o.x += o.rollV;
+        if (o.x < 20 || o.x > mrWorldW-20) o.rollV *= -0.7;
+        // Lay trail — cap at 80 segments
+        if (Math.abs(o.rollV) > 0.2 && (o.trail.length === 0 || Math.hypot(o.x - o.trail[o.trail.length-1].x, o.y - o.trail[o.trail.length-1].y) > 8)) {
+          o.trail.push({ x:o.x, y:o.y, age:0 });
+          if (o.trail.length > 80) o.trail.shift();
+        }
+        if (Math.abs(o.rollV) < 0.1) o.rolling = false;
+      }
+      // Age trail — after 900 frames (15s) per segment, mark as bg (single pass)
+      for(let ti=o.trail.length-1; ti>=0; ti--) {
+        o.trail[ti].age++;
+        if(o.trail[ti].age > 900) o.trail[ti].bg = true;
+      }
+    }
+    // ── Midnight Uprise ──
+    if (o.type === 'trafficCar') {
+      // Traffic light check — find nearest light
+      const nearLight = mrObstacles.find(l => l.type==='trafficLight' &&
+        Math.abs(l.x - o.x) < 80 && l.x * o.dir > o.x * o.dir);
+      if (nearLight && nearLight.state === 'red' && Math.abs(nearLight.x - o.x) < 55) {
+        o.stopped = true;
+      } else if (nearLight && nearLight.state === 'yellow' && Math.abs(nearLight.x - o.x) < 80) {
+        o.stopped = false; // slow — handled in speed calc
+      } else {
+        o.stopped = false;
+      }
+      const targetSpeed = (nearLight && nearLight.state==='yellow' && Math.abs(nearLight.x-o.x)<100) ? o.speed*0.4 : o.speed;
+      if (!o.stopped) o.x += o.dir * (nearLight && nearLight.state==='yellow' ? targetSpeed*0.5 : o.speed);
+      // Loop car across track
+      if (o.x > mrWorldW + 30) o.x = -30;
+      if (o.x < -30) o.x = mrWorldW + 30;
+      // Trunk auto-close
+      if (o.trunkOpen) { o.trunkT++; if (o.trunkT > 90) { o.trunkOpen=false; o.trunkT=0; } }
+      // Marble inside car — release when car loops
+      if (o.marbleInside) {
+        const m2 = mrMarbles.find(m => m.id === o.marbleInside);
+        if (m2 && !m2.finished) {
+          m2.x = o.x; m2.y = o.y - o.h/2 - m2.r;
+          m2.vx = o.dir * o.speed * 0.5; m2.vy = -0.5;
+        }
+        // Release if car reaches edge
+        if (o.x > mrWorldW - 10 || o.x < 10) { o.marbleInside = null; }
+      }
+      // Roof shards physics
+      if (o.roofShards) o.roofShards.forEach(s => {
+        s.x += s.vx; s.y += s.vy; s.vy += 0.18; s.vx *= 0.99; s.rot += s.rotV; s.life -= 0.008;
+      });
+      if (o.roofShards) o.roofShards = o.roofShards.filter(s => s.life > 0);
+    }
+    if (o.type === 'trafficLight') {
+      o.timer++;
+      if (o.state==='green'  && o.timer >= o.greenT)  { o.state='yellow'; o.timer=0; }
+      if (o.state==='yellow' && o.timer >= o.yellowT)  { o.state='red';    o.timer=0; }
+      if (o.state==='red'    && o.timer >= o.redT)     { o.state='green';  o.timer=0; }
+    }
+    if (o.type === 'trafficCone') {
+      o.angV += -o.angle * 0.06; o.angV *= 0.82;
+      o.angle += o.angV;
+    }
+    if (o.type === 'oilSpillage') { o.phase = (o.phase||0) + 0.02; }
   });
 
   mrMarbles.forEach(m => {
@@ -9754,6 +9970,18 @@ function mrStepPhysics() {
       m.vx *= slowFactor; m.vy *= slowFactor;
       m._beeSlow--;
     }
+    // Shuriken slowdown — stacks up, fades similarly
+    if (m._jpSlow && m._jpSlow > 0) {
+      const sf = 0.90 + 0.10 * (1 - Math.min(m._jpSlow, 150) / 150);
+      m.vx *= sf; m.vy *= sf;
+      m._jpSlow--;
+    }
+    // Ghost mode decay (sakura wind tunnel)
+    if (m._jpGhost && m._jpGhost > 0) m._jpGhost--;
+    // Pipe ghost mode decay (sewers directional pipe)
+    if (m._pipeGhost && m._pipeGhost > 0) m._pipeGhost--;
+    // Oil slick decay
+    if (m._oilSlick && m._oilSlick > 0) m._oilSlick--;
     const spd = Math.hypot(m.vx, m.vy);
     if (spd > 8) { m.vx = m.vx/spd*8; m.vy = m.vy/spd*8; }
     m.x += m.vx; m.y += m.vy;
@@ -10324,6 +10552,285 @@ function mrStepPhysics() {
           }
           break;
         }
+        // ── Japanese Night ──
+        case 'swingingBamboo': {
+          // Bamboo tip is where collision happens — compute tip world pos
+          const tipX = o.x + Math.sin(o.angle) * (o.len||55);
+          const tipY = o.y + Math.cos(o.angle) * (o.len||55);
+          // Also collide with shaft at midpoint
+          const midX = o.x + Math.sin(o.angle) * (o.len||55) * 0.55;
+          const midY = o.y + Math.cos(o.angle) * (o.len||55) * 0.55;
+          [[tipX,tipY,9],[midX,midY,6]].forEach(([bx,by,br]) => {
+            const dx=m.x-bx, dy=m.y-by, d=Math.hypot(dx,dy);
+            if(d<m.r+br&&d>0){
+              const nx=dx/d, ny=dy/d;
+              m.x+=nx*(m.r+br-d); m.y+=ny*(m.r+br-d);
+              const relV = m.vx*nx+m.vy*ny;
+              const impulse = -(1+(o.restitution||0.85))*relV;
+              m.vx+=impulse*nx; m.vy+=impulse*ny;
+              // Transfer impulse into bamboo swing — harder hit = bigger swing
+              o.angV = (o.angV||0) + (m.vx*Math.cos(o.angle) - m.vy*Math.sin(o.angle)) * 0.018;
+              mrPlayHazardSound('hit', o, 600);
+            }
+          });
+          break;
+        }
+        case 'paperLantern': {
+          const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
+          if(d<o.r+m.r+2&&d>0){
+            const nx=dx/d, ny=dy/d;
+            m.x+=nx*(o.r+m.r+2-d); m.y+=ny*(o.r+m.r+2-d);
+            const dot=m.vx*nx+m.vy*ny;
+            if(dot<0){ m.vx-=(1+0.55)*dot*nx; m.vy-=(1+0.55)*dot*ny; }
+            // Knock causes a flicker
+            o.lit=false; o.flickerT=0;
+            mrPlayHazardSound('boing', o, 500);
+          }
+          break;
+        }
+        case 'shurikenWheel': {
+          // 4 blade tips rotate around center
+          for(let si=0;si<4;si++){
+            const ba = (o.angle||0) + si*Math.PI/2;
+            const tx = o.x + Math.cos(ba)*(o.r+5);
+            const ty = o.y + Math.sin(ba)*(o.r+5);
+            const dx=m.x-tx, dy=m.y-ty, d=Math.hypot(dx,dy);
+            if(d<m.r+5&&d>0){
+              const nx=dx/d, ny=dy/d;
+              m.x+=nx*(m.r+5-d); m.y+=ny*(m.r+5-d);
+              const dot=m.vx*nx+m.vy*ny;
+              if(dot<0){ m.vx-=(1+0.6)*dot*nx; m.vy-=(1+0.6)*dot*ny; }
+              // Slow the marble — shuriken's spinning magic
+              m._jpSlow = (m._jpSlow||0) + 150;
+              mrPlayHazardSound('gear', o, 400);
+            }
+          }
+          // Also core collision
+          { const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
+            if(d<o.r+m.r&&d>0){ const nx=dx/d,ny=dy/d; m.x+=nx*(o.r+m.r-d); m.y+=ny*(o.r+m.r-d); const dot=m.vx*nx+m.vy*ny; if(dot<0){m.vx-=(1+0.5)*dot*nx;m.vy-=(1+0.5)*dot*ny;} } }
+          break;
+        }
+        case 'sakuraWindTunnel': {
+          // Compute tunnel axis: from (o.x,o.y) in direction (sin angle, cos angle) for o.len
+          const tx = Math.sin(o.angle), ty = Math.cos(o.angle);
+          // Project marble onto tunnel axis
+          const dx = m.x - o.x, dy = m.y - o.y;
+          const along = dx*tx + dy*ty;
+          const perp  = dx*ty - dy*tx; // perpendicular distance
+          const hw = (o.w||28)/2;
+          if(along > 0 && along < (o.len||100) && Math.abs(perp) < hw+m.r){
+            // Ghost mode inside tunnel — ignore wall collision, apply wind force along tunnel
+            m.vx += tx * 0.32;
+            m.vy += ty * 0.32;
+            // Damp cross-tunnel velocity so marble stays inside
+            const perpV = m.vx*ty - m.vy*tx;
+            m.vx -= perpV*ty*0.12;
+            m.vy += perpV*tx*0.12;
+            // Give the marble a ghost glow flag for the draw code
+            m._jpGhost = 8;
+          }
+          break;
+        }
+        case 'waterGardenCurrent': {
+          if(m.x>o.x-o.w/2&&m.x<o.x+o.w/2&&m.y>o.y-o.h/2&&m.y<o.y+o.h/2){
+            m.vx += o.dir * 0.28;
+            // Very gentle vertical nudge
+            m.vy += Math.sin(o.phase||0) * 0.06;
+            mrPlayHazardSound('sticky', o, 900);
+          }
+          break;
+        }
+        // ── Directional Pipe (Sewers) ──
+        case 'directionalPipe': {
+          const ptx=Math.sin(o.angle||0), pty=Math.cos(o.angle||0);
+          const dx=m.x-o.x, dy=m.y-o.y;
+          const along = dx*ptx + dy*pty;
+          const perp  = dx*pty - dy*ptx;
+          const hw    = (o.w||24)/2;
+          if(along > 0 && along < (o.len||110) && Math.abs(perp) < hw + m.r){
+            // Ghost inside pipe
+            m._pipeGhost = 8;
+            // Push along pipe direction
+            m.vx += ptx * 0.45 * o.dir;
+            m.vy += pty * 0.45 * o.dir;
+            // Clamp perpendicular drift
+            const perpV = m.vx*pty - m.vy*ptx;
+            m.vx -= perpV*pty*0.18;
+            m.vy += perpV*ptx*0.18;
+            mrPlayHazardSound('conveyor', o, 600);
+          }
+          break;
+        }
+        // ── Kitchen ──
+        case 'grillPlatform': {
+          if (!o.flipped) {
+            const hit = mrRampCollide(m, o.x, o.y, o.w/2, 5, 0, 0.85);
+            if(hit){
+              o.marbleCount = (o.marbleCount||0) + 1;
+              // Hover effect while hot
+              if (o.heat > 0.7) { m.vy -= 0.35 * o.heat; }
+              mrPlayHazardSound('gear', o, 400);
+            }
+          }
+          break;
+        }
+        case 'kitchenKnife': {
+          // Collision with orbiting tip
+          const tipX = o.x + Math.cos(o.angle||0) * (o.pivotR||18);
+          const tipY = o.y + Math.sin(o.angle||0) * (o.pivotR||18);
+          const dx=m.x-tipX, dy=m.y-tipY, d=Math.hypot(dx,dy);
+          if(d < m.r+8 && d>0){
+            const nx=dx/d, ny=dy/d;
+            m.x += nx*(m.r+8-d); m.y += ny*(m.r+8-d);
+            // Blade velocity transferred to marble
+            const bladeVx = -Math.sin(o.angle||0) * (o.pivotR||18) * Math.abs(o.speed||0.04);
+            const bladeVy =  Math.cos(o.angle||0) * (o.pivotR||18) * Math.abs(o.speed||0.04);
+            m.vx += bladeVx*0.6 + nx*2.5;
+            m.vy += bladeVy*0.6 + ny*2.5;
+            mrPlayHazardSound('boing', o, 300);
+          }
+          break;
+        }
+        case 'mixingBowl': {
+          // Bowl interior collision — marble enters bowl, rocks it
+          const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
+          const br = o.r||22;
+          if(d < br+m.r && !o.pouring){
+            if(d > br - m.r*2){
+              // Inside wall — bounce marble inward
+              const nx=dx/d, ny=dy/d;
+              m.vx -= nx*0.5; m.vy -= ny*0.5;
+              m.vx *= 0.92; m.vy *= 0.92;
+            }
+            // Count marbles in bowl
+            const inBowl = mrMarbles.filter(mb => Math.hypot(mb.x-o.x, mb.y-o.y) < br && !mb.finished).length;
+            if(inBowl >= 2 && !o.pouring){
+              o.pouring = true; o.pourT=0;
+              o.rockV = 0.12; // start rocking
+            }
+            mrPlayHazardSound('seesaw', o, 800);
+          }
+          // When pouring, eject marbles
+          if(o.pouring && o.pourT > 45){
+            mrMarbles.forEach(mb => {
+              if(Math.hypot(mb.x-o.x, mb.y-o.y) < (br+10) && !mb.finished){
+                const ejectAngle = o.rockAngle > 0 ? 0.6 : -0.6;
+                mb.vx += Math.sin(ejectAngle+Math.PI/4)*4;
+                mb.vy -= 2.5;
+              }
+            });
+          }
+          break;
+        }
+        case 'toiletPaper': {
+          const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
+          if(d < o.r+m.r && !o.rolling && d>0){
+            o.rolling = true;
+            o.rollV = m.vx * 0.8;
+            const nx=dx/d, ny=dy/d;
+            m.vx += nx*1.5; m.vy += ny*1.5;
+            mrPlayHazardSound('rollerchain', o, 400);
+          }
+          // Collide with active trail segments (not bg ones)
+          (o.trail||[]).filter(t=>!t.bg).forEach(t => {
+            const tdx=m.x-t.x, tdy=m.y-t.y, td=Math.hypot(tdx,tdy);
+            if(td < m.r+4 && td>0){
+              const nx=tdx/td, ny=tdy/td;
+              m.x+=nx*(m.r+4-td); m.y+=ny*(m.r+4-td);
+              m.vx+=nx*0.5; m.vy+=ny*0.5;
+            }
+          });
+          break;
+        }
+        // ── Midnight Uprise ──
+        case 'trafficCar': {
+          if(o.marbleInside) break; // marble is inside, no collision
+          const hw2=o.w/2, hh2=o.h/2;
+          const dx=m.x-o.x, dy=m.y-o.y;
+          // Check trunk area (rear of car based on dir)
+          const trunkX = o.x - o.dir * (hw2 - 5);
+          const onTrunk = Math.abs(m.x-trunkX)<12 && m.y > o.y-hh2-m.r-2 && m.y < o.y-hh2+4;
+          const onRoof  = Math.abs(m.x-o.x)<hw2-4 && m.y > o.y-hh2-m.r-2 && m.y < o.y-hh2+4;
+          const impact  = Math.hypot(m.vx, m.vy);
+          if(onTrunk && impact > 1.5){
+            o.trunkOpen = true; o.trunkT = 0;
+            // Springboard-style ejection
+            m.vy -= 5 + impact*0.8;
+            m.vx += o.dir * 2.5;
+            mrPlayHazardSound('springboard', o, 500);
+          } else if(onRoof && impact > 3 && !o.roofBroken){
+            o.roofBroken = true;
+            // Shatter roof into 2D shards
+            o.roofShards = Array.from({length:8}, (_,i) => ({
+              x: o.x+(Math.random()-0.5)*o.w*0.8, y: o.y-hh2,
+              vx:(Math.random()-0.5)*3, vy:-1-Math.random()*2,
+              rot:Math.random()*Math.PI*2, rotV:(Math.random()-0.5)*0.15,
+              w:8+Math.random()*8, h:3+Math.random()*3, life:1
+            }));
+            o.marbleInside = m.id;
+            m.vx *= 0.3; m.vy = 0.5;
+            mrPlayHazardSound('bridge', o, 400);
+          } else if(!onTrunk && !onRoof){
+            // Side collision
+            if(Math.abs(dx)<hw2+m.r && Math.abs(dy)<hh2+m.r){
+              const ox2 = hw2+m.r - Math.abs(dx);
+              const oy2 = hh2+m.r - Math.abs(dy);
+              if(ox2 < oy2){ m.x += Math.sign(dx)*ox2; m.vx += Math.sign(dx)*1.5; }
+              else { m.y += Math.sign(dy)*oy2; m.vy += Math.sign(dy)*1.5; }
+              m.vx += o.dir * o.speed * 0.4;
+            }
+          }
+          // Shard collisions
+          (o.roofShards||[]).forEach(s=>{
+            const sdx=m.x-s.x, sdy=m.y-s.y, sd=Math.hypot(sdx,sdy);
+            if(sd<m.r+6&&sd>0){ m.vx+=sdx/sd*1.2; m.vy+=sdy/sd*1.2; }
+          });
+          break;
+        }
+        case 'trafficLight': {
+          // Physical post collision
+          const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
+          if(d<m.r+6&&d>0){ const nx=dx/d,ny=dy/d; m.x+=nx*(m.r+6-d); m.y+=ny*(m.r+6-d);
+            const dot=m.vx*nx+m.vy*ny; if(dot<0){m.vx-=(1+0.6)*dot*nx;m.vy-=(1+0.6)*dot*ny;} }
+          break;
+        }
+        case 'trafficCone': {
+          const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
+          if(d<m.r+9&&d>0){
+            const nx=dx/d,ny=dy/d;
+            m.x+=nx*(m.r+9-d); m.y+=ny*(m.r+9-d);
+            const dot=m.vx*nx+m.vy*ny;
+            if(dot<0){m.vx-=(1+0.55)*dot*nx;m.vy-=(1+0.55)*dot*ny;}
+            // Cone tips over on impact
+            o.angV += (m.vx>0?0.12:-0.12) * Math.abs(dot);
+            mrPlayHazardSound('boing', o, 350);
+          }
+          break;
+        }
+        case 'oilSpillage': {
+          const hw3=o.w/2;
+          if(m.x>o.x-hw3&&m.x<o.x+hw3&&m.y>o.y-6&&m.y<o.y+8){
+            // Oil reduces friction — marble slides
+            m.vx *= 1.012; // slight speed boost from reduced friction
+            m.vy *= 0.995;
+            m._oilSlick = 30;
+          }
+          break;
+        }
+        case 'moonlitSection': {
+          // Soft radial gravity — pulls marble gently to centre of moonlit zone
+          const dx=m.x-o.x, dy=m.y-o.y, d=Math.hypot(dx,dy);
+          if(d<o.r*1.6&&d>o.r+m.r){
+            // Gentle inward pull
+            m.vx -= (dx/d)*0.08*(1-(d/(o.r*1.6)));
+            m.vy -= (dy/d)*0.08*(1-(d/(o.r*1.6)));
+          } else if(d<o.r+m.r&&d>0){
+            const nx=dx/d,ny=dy/d; m.x+=nx*(o.r+m.r-d); m.y+=ny*(o.r+m.r-d);
+            const dot=m.vx*nx+m.vy*ny; if(dot<0){m.vx-=(1+0.8)*dot*nx;m.vy-=(1+0.8)*dot*ny;}
+            mrPlayHazardSound('whoosh', o, 700);
+          }
+          break;
+        }
       }
     });
 
@@ -10419,6 +10926,9 @@ function mrPlayHazardSound(soundKey, obstacle, cooldownMs) {
     seesaw: 'click',
     boing: 'success',
     rollerchain: 'pop',
+    hit: 'error',
+    buzz: 'click',
+    whoosh: 'whoosh',
   };
   const s = soundMap[soundKey];
   if (s) playSound(s);
@@ -10679,6 +11189,177 @@ function mrDrawFrame() {
     ctx.strokeStyle = 'rgba(160,255,80,0.06)'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(cssW*0.25,-5); ctx.lineTo(cssW*0.2,70); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(cssW*0.6,-5); ctx.lineTo(cssW*0.65,70); ctx.stroke();
+  }
+
+  // ── Kitchen — warm overhead kitchen lighting skybox ──
+  if (mrTheme === 'kitchen') {
+    // Warm tile wall background at top
+    const kitT = Date.now() * 0.0003;
+    const kitG = ctx.createLinearGradient(0, 0, 0, 100);
+    kitG.addColorStop(0, 'rgba(255,220,160,0.18)');
+    kitG.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = kitG; ctx.fillRect(0, 0, cssW, 100);
+    // Tile grid
+    ctx.strokeStyle = 'rgba(200,180,140,0.08)'; ctx.lineWidth = 1;
+    for(let tx=0; tx<cssW; tx+=22){ ctx.beginPath(); ctx.moveTo(tx,0); ctx.lineTo(tx,88); ctx.stroke(); }
+    for(let ty=0; ty<88; ty+=22){ ctx.beginPath(); ctx.moveTo(0,ty); ctx.lineTo(cssW,ty); ctx.stroke(); }
+    // Overhead light fixtures
+    const lightPositions = [cssW*0.2, cssW*0.5, cssW*0.8];
+    lightPositions.forEach(lx => {
+      // Light housing
+      ctx.fillStyle = 'rgba(60,55,50,0.85)';
+      ctx.beginPath(); ctx.roundRect(lx-12, 0, 24, 8, 2); ctx.fill();
+      // Light cone
+      const lcG = ctx.createRadialGradient(lx, 8, 0, lx, 8, 55);
+      lcG.addColorStop(0, `rgba(255,240,180,${0.12+Math.sin(kitT+lx)*0.02})`);
+      lcG.addColorStop(0.5, 'rgba(255,220,140,0.05)');
+      lcG.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = lcG;
+      ctx.beginPath(); ctx.moveTo(lx-12,8); ctx.lineTo(lx-55,75); ctx.lineTo(lx+55,75); ctx.lineTo(lx+12,8); ctx.closePath(); ctx.fill();
+      // Bulb glow
+      ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(255,220,120,0.5)';
+      ctx.fillStyle = 'rgba(255,245,200,0.9)';
+      ctx.beginPath(); ctx.arc(lx, 5, 4, 0, Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+    // Steam wisps from bottom (cooking)
+    const steamT = Date.now() * 0.001;
+    for(let si=0; si<5; si++){
+      const sx = cssW*(0.15+si*0.18);
+      const sy = MR_H - 40 + Math.sin(steamT+si*0.7)*8;
+      ctx.globalAlpha = 0.06;
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.beginPath(); ctx.ellipse(sx, sy, 8, 14, 0, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ── Midnight Uprise — neon city nightscape ──
+  if (mrTheme === 'midnightup') {
+    const muT = Date.now() * 0.0005;
+    // City skyline silhouette at top
+    ctx.fillStyle = 'rgba(15,10,35,0.6)';
+    ctx.fillRect(0, 0, cssW, 70);
+    // Building silhouettes
+    const buildings = [[0,50,18,50],[20,35,14,35],[38,45,16,45],[58,28,12,28],[74,42,20,42],[98,22,16,22],[118,38,14,38],[140,30,18,30],[162,44,12,44],[178,26,14,26],[196,40,16,40],[216,18,12,18]];
+    ctx.fillStyle = 'rgba(8,6,20,0.85)';
+    buildings.forEach(([bx,bh,bw,by])=>{
+      ctx.fillRect(bx*cssW/240, 70-bh, bw*cssW/240, bh);
+    });
+    // Neon sign glows on buildings
+    const neonCols = ['rgba(255,40,120,', 'rgba(40,180,255,', 'rgba(180,40,255,', 'rgba(40,255,160,'];
+    for(let ni=0;ni<5;ni++){
+      const nx = cssW*(0.1+ni*0.2);
+      const ny = 20 + (ni%3)*14;
+      const nc = neonCols[ni%neonCols.length];
+      const nAlpha = 0.25+Math.sin(muT*2+ni*1.3)*0.12;
+      ctx.shadowBlur = 12; ctx.shadowColor = nc+'0.6)';
+      ctx.strokeStyle = nc+nAlpha+')'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.roundRect(nx-8, ny-4, 16, 8, 2); ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+    // Moon
+    const muMx = cssW*0.88, muMy=18;
+    ctx.shadowBlur=18; ctx.shadowColor='rgba(180,160,255,0.5)';
+    ctx.fillStyle='rgba(220,210,255,0.7)';
+    ctx.beginPath(); ctx.arc(muMx,muMy,10,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    // Road marking at bottom — dashed centre line
+    const dashOff = (Date.now()*0.06) % 40;
+    ctx.strokeStyle='rgba(255,220,80,0.18)'; ctx.lineWidth=2; ctx.setLineDash([20,20]);
+    ctx.lineDashOffset = -dashOff;
+    ctx.beginPath(); ctx.moveTo(0, MR_H-12); ctx.lineTo(cssW, MR_H-12); ctx.stroke();
+    ctx.setLineDash([]); ctx.lineDashOffset = 0;
+    // Rain streaks
+    if (!window._mrMURain) window._mrMURain = Array.from({length:35},()=>({x:Math.random()*cssW,y:Math.random()*MR_H,vy:6+Math.random()*4,len:8+Math.random()*10,alpha:0.08+Math.random()*0.1}));
+    window._mrMURain.forEach(r=>{
+      r.y+=r.vy; if(r.y>MR_H+20){r.y=-20;r.x=Math.random()*cssW;}
+      ctx.globalAlpha=r.alpha; ctx.strokeStyle='rgba(140,180,255,0.9)'; ctx.lineWidth=0.8;
+      ctx.beginPath(); ctx.moveTo(r.x,r.y); ctx.lineTo(r.x-1,r.y-r.len); ctx.stroke();
+    });
+    ctx.globalAlpha=1;
+  }
+
+  // ── Japanese Night — moonlit sky, stars, sakura petal storm ──
+  if (mrTheme === 'jpnight') {
+    // Deep indigo sky gradient at top
+    const jnSky = ctx.createLinearGradient(0, 0, 0, 120);
+    jnSky.addColorStop(0, 'rgba(40,20,100,0.35)');
+    jnSky.addColorStop(0.6, 'rgba(20,8,60,0.18)');
+    jnSky.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = jnSky; ctx.fillRect(0, 0, cssW, 120);
+
+    // Moon — top right
+    const moonX = cssW * 0.82, moonY = 28;
+    ctx.shadowBlur = 30; ctx.shadowColor = 'rgba(220,210,255,0.6)';
+    const moonG = ctx.createRadialGradient(moonX-4, moonY-4, 1, moonX, moonY, 18);
+    moonG.addColorStop(0, 'rgba(255,255,240,0.98)');
+    moonG.addColorStop(0.5, 'rgba(230,220,255,0.6)');
+    moonG.addColorStop(1, 'rgba(180,160,255,0)');
+    ctx.fillStyle = moonG; ctx.beginPath(); ctx.arc(moonX, moonY, 18, 0, Math.PI*2); ctx.fill();
+    ctx.shadowBlur = 0;
+    // Moon halo
+    ctx.strokeStyle = 'rgba(200,190,255,0.12)'; ctx.lineWidth = 8;
+    ctx.beginPath(); ctx.arc(moonX, moonY, 26, 0, Math.PI*2); ctx.stroke();
+
+    // Stars — stable seeded positions
+    const starT2 = Date.now() * 0.0005;
+    for(let si=0; si<22; si++){
+      const sx = (si*131+17) % cssW;
+      const sy = (si*79+11) % 90;
+      const salpha = 0.3 + Math.sin(starT2+si*1.3)*0.2;
+      ctx.globalAlpha = salpha;
+      ctx.fillStyle = 'rgba(220,210,255,0.9)';
+      ctx.beginPath(); ctx.arc(sx, sy, 0.9+Math.sin(si)*0.4, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Sakura petal storm — 10s on / 10s off cycle
+    if (!window._mrJPPetals) {
+      window._mrJPPetals = Array.from({length:55}, () => ({
+        x: Math.random()*cssW, y: Math.random()*MR_H,
+        vx: -0.4-Math.random()*0.7, vy: 0.5+Math.random()*0.9,
+        rot: Math.random()*Math.PI*2, rotV: (Math.random()-0.5)*0.08,
+        r: 2+Math.random()*2.5, alpha: 0.3+Math.random()*0.4,
+        phase: Math.random()*Math.PI*2
+      }));
+    }
+    // 20s cycle: 0-10s active, 10-20s dormant
+    const cyclePos = (Date.now() / 1000) % 20;
+    const stormActive = cyclePos < 10;
+    const stormFade = stormActive
+      ? Math.min(1, cyclePos / 1.5)                   // fade in over 1.5s
+      : Math.max(0, 1 - (cyclePos - 10) / 1.5);       // fade out over 1.5s
+
+    if (stormFade > 0.01) {
+      window._mrJPPetals.forEach(p => {
+        p.x += p.vx * stormFade;
+        p.y += p.vy;
+        p.rot += p.rotV;
+        p.phase += 0.03;
+        // Gentle horizontal sway
+        p.x += Math.sin(p.phase) * 0.3;
+        if (p.x < -10) p.x = cssW + 10;
+        if (p.y > MR_H + 10) { p.y = -10; p.x = Math.random()*cssW; }
+        ctx.save();
+        ctx.globalAlpha = p.alpha * stormFade;
+        ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+        ctx.fillStyle = 'rgba(255,160,200,0.9)';
+        ctx.beginPath(); ctx.ellipse(0, 0, p.r, p.r*0.55, 0, 0, Math.PI*2); ctx.fill();
+        // Petal vein
+        ctx.strokeStyle = 'rgba(255,200,220,0.5)'; ctx.lineWidth = 0.6;
+        ctx.beginPath(); ctx.moveTo(-p.r*0.8,0); ctx.lineTo(p.r*0.8,0); ctx.stroke();
+        ctx.globalAlpha = 1; ctx.restore();
+      });
+    }
+
+    // Soft purple vignette on sides for depth
+    const jnVL = ctx.createLinearGradient(0, 0, 20, 0);
+    jnVL.addColorStop(0, 'rgba(60,20,120,0.2)'); jnVL.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = jnVL; ctx.fillRect(0, 0, 20, MR_H);
+    const jnVR = ctx.createLinearGradient(cssW-20, 0, cssW, 0);
+    jnVR.addColorStop(0, 'rgba(0,0,0,0)'); jnVR.addColorStop(1, 'rgba(60,20,120,0.2)');
+    ctx.fillStyle = jnVR; ctx.fillRect(cssW-20, 0, 20, MR_H);
   }
 
   // ── Midnight Fiesta confetti ──
@@ -11527,17 +12208,573 @@ function mrDrawFrame() {
         ctx.rotate(Math.atan2(o.vy||0,o.vx||0));
         const buzzOff=Math.sin((o.buzz||0)*3)*1.5;
         ctx.shadowBlur=6; ctx.shadowColor='rgba(255,220,0,0.5)';
-        // Body
         ctx.fillStyle='rgba(255,200,0,0.9)';
         ctx.beginPath(); ctx.ellipse(0,buzzOff,7,5,0,0,Math.PI*2); ctx.fill();
-        // Stripes
         ctx.fillStyle='rgba(0,0,0,0.45)';
         ctx.fillRect(-3,buzzOff-2,2,4); ctx.fillRect(1,buzzOff-2,2,4);
-        // Wings
         ctx.globalAlpha=0.55;
         ctx.fillStyle='rgba(200,240,255,0.9)';
         ctx.beginPath(); ctx.ellipse(-2,buzzOff-6,5,3,0.4,0,Math.PI*2); ctx.fill();
         ctx.beginPath(); ctx.ellipse( 2,buzzOff-6,5,3,-0.4,0,Math.PI*2); ctx.fill();
+        ctx.globalAlpha=1;
+        ctx.shadowBlur=0; break;
+      }
+
+      // ════ JAPANESE NIGHT ══════════════════════════════════════════
+      case 'swingingBamboo': {
+        ctx.translate(o.x, o.y);
+        ctx.rotate(o.angle||0);
+        const bLen = o.len||55;
+        // Shadow/glow
+        ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(120,255,140,0.35)';
+        // Bamboo shaft — segmented
+        const segs = Math.floor(bLen/14);
+        for(let si=0; si<segs; si++){
+          const sy1 = si*(bLen/segs), sy2 = (si+1)*(bLen/segs);
+          const isNode = si < segs-1;
+          const bG = ctx.createLinearGradient(-5,sy1,5,sy2);
+          bG.addColorStop(0, si%2===0 ? 'rgba(80,180,60,0.95)' : 'rgba(60,150,40,0.95)');
+          bG.addColorStop(1, si%2===0 ? 'rgba(60,150,40,0.9)' : 'rgba(80,180,60,0.9)');
+          ctx.fillStyle = bG;
+          ctx.beginPath(); ctx.roundRect(-4,sy1,8,sy2-sy1,2); ctx.fill();
+          if(isNode){
+            // Node ring
+            ctx.fillStyle='rgba(40,100,30,0.9)';
+            ctx.fillRect(-5,sy2-2,10,4);
+          }
+        }
+        // Tip leaf cluster
+        ctx.shadowBlur=8; ctx.shadowColor='rgba(100,255,120,0.5)';
+        ctx.fillStyle='rgba(80,200,80,0.85)';
+        ctx.beginPath(); ctx.ellipse(0,bLen,8,5,0.2,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(6,bLen-4,6,4,-0.5,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(-5,bLen-6,6,4,0.5,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0; break;
+      }
+
+      case 'paperLantern': {
+        ctx.translate(o.x,o.y);
+        const lCols=[['rgba(255,80,80,','rgba(180,30,30,'],['rgba(255,180,40,','rgba(180,110,10,'],['rgba(200,80,255,','rgba(120,20,180,'],['rgba(80,160,255,','rgba(20,80,180,']];
+        const lc=lCols[o.colorIdx||0];
+        const ph=o.phase||0;
+        const bob = Math.sin(ph)*3; // gentle bobbing
+        const glowStr = (o.lit!==false) ? 0.7+Math.sin(ph*3)*0.15 : 0.1;
+        ctx.shadowBlur = o.lit!==false ? 18 : 4;
+        ctx.shadowColor = lc[0]+'0.6)';
+        // String from top
+        ctx.strokeStyle='rgba(180,160,120,0.7)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(0,-o.r-8+bob); ctx.lineTo(0,-o.r-16+bob); ctx.stroke();
+        // Body
+        const lg=ctx.createRadialGradient(-o.r*0.3,-o.r*0.3+bob,1,0,bob,o.r);
+        lg.addColorStop(0,lc[0]+'0.98)'); lg.addColorStop(0.6,lc[0]+glowStr+')'); lg.addColorStop(1,lc[1]+'0.7)');
+        ctx.fillStyle=lg;
+        ctx.beginPath(); ctx.ellipse(0,bob,o.r,o.r*1.3,0,0,Math.PI*2); ctx.fill();
+        // Ribs
+        ctx.strokeStyle=lc[1]+'0.4)'; ctx.lineWidth=0.8;
+        for(let ri=-2;ri<=2;ri++){
+          ctx.beginPath(); ctx.ellipse(0,bob,o.r*0.98,ri*o.r*0.22,0,0,Math.PI*2); ctx.stroke();
+        }
+        // Inner glow if lit
+        if(o.lit!==false){
+          const ig=ctx.createRadialGradient(0,bob,0,0,bob,o.r*0.6);
+          ig.addColorStop(0,'rgba(255,255,200,0.55)'); ig.addColorStop(1,'rgba(255,200,80,0)');
+          ctx.fillStyle=ig; ctx.beginPath(); ctx.ellipse(0,bob,o.r*0.6,o.r*0.8,0,0,Math.PI*2); ctx.fill();
+        }
+        // Top & bottom caps
+        ctx.fillStyle=lc[1]+'0.85)';
+        ctx.beginPath(); ctx.ellipse(0,bob-o.r*1.3,o.r*0.4,o.r*0.2,0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(0,bob+o.r*1.3,o.r*0.35,o.r*0.18,0,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0; break;
+      }
+
+      case 'shurikenWheel': {
+        ctx.translate(o.x,o.y); ctx.rotate(o.angle||0);
+        ctx.shadowBlur=14; ctx.shadowColor='rgba(180,220,255,0.6)';
+        // 4 blades
+        for(let bi=0;bi<4;bi++){
+          ctx.save(); ctx.rotate(bi*Math.PI/2);
+          const sg=ctx.createLinearGradient(0,0,o.r+6,0);
+          sg.addColorStop(0,'rgba(200,230,255,0.95)'); sg.addColorStop(0.5,'rgba(160,200,240,0.85)'); sg.addColorStop(1,'rgba(80,130,200,0.7)');
+          ctx.fillStyle=sg;
+          ctx.beginPath();
+          ctx.moveTo(0,-3); ctx.lineTo(o.r+6,-1); ctx.lineTo(o.r+10,0); ctx.lineTo(o.r+6,1); ctx.lineTo(0,3);
+          ctx.closePath(); ctx.fill();
+          // Edge glint
+          ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=0.8;
+          ctx.beginPath(); ctx.moveTo(2,-1.5); ctx.lineTo(o.r+8,0); ctx.stroke();
+          ctx.restore();
+        }
+        // Centre hub
+        const hg=ctx.createRadialGradient(0,0,0,0,0,o.r*0.45);
+        hg.addColorStop(0,'rgba(240,250,255,0.98)'); hg.addColorStop(1,'rgba(100,160,220,0.8)');
+        ctx.fillStyle=hg; ctx.beginPath(); ctx.arc(0,0,o.r*0.42,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle='rgba(180,220,255,0.7)'; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.arc(0,0,o.r*0.42,0,Math.PI*2); ctx.stroke();
+        ctx.shadowBlur=0; break;
+      }
+
+      case 'sakuraWindTunnel': {
+        ctx.translate(o.x,o.y);
+        const tx=Math.sin(o.angle||0), ty=Math.cos(o.angle||0);
+        const tLen=o.len||100, hw=(o.w||28)/2;
+        const ph=o.phase||0;
+        // Tunnel walls — glowing pink-purple
+        ctx.shadowBlur=10; ctx.shadowColor='rgba(255,140,200,0.4)';
+        for(let side=-1;side<=1;side+=2){
+          const wx1=side*hw*ty, wy1=-side*hw*tx; // perpendicular offsets
+          ctx.strokeStyle=`rgba(255,140,200,0.35)`; ctx.lineWidth=2; ctx.setLineDash([6,5]);
+          ctx.beginPath();
+          ctx.moveTo(wx1,wy1);
+          ctx.lineTo(wx1+tx*tLen, wy1+ty*tLen);
+          ctx.stroke(); ctx.setLineDash([]);
+        }
+        // Flowing petal stream along centre
+        const flowCols=['rgba(255,160,200,','rgba(255,100,180,','rgba(220,100,255,'];
+        for(let fi=0;fi<6;fi++){
+          const t2=(fi/6+ph*0.06)%1;
+          const fx=tx*tLen*t2, fy=ty*tLen*t2;
+          const wobX=Math.sin(ph*2+fi*1.1)*hw*0.3;
+          const wobY=Math.cos(ph*1.7+fi*0.9)*hw*0.3;
+          const fc=flowCols[fi%flowCols.length];
+          ctx.globalAlpha=0.55*(1-Math.abs(t2-0.5)*1.8+0.1);
+          ctx.fillStyle=fc+'0.8)';
+          ctx.save(); ctx.translate(fx+wobX*ty, fy-wobY*tx); ctx.rotate(ph*2+fi);
+          ctx.beginPath(); ctx.ellipse(0,0,3,2,0,0,Math.PI*2); ctx.fill();
+          ctx.restore();
+        }
+        ctx.globalAlpha=1;
+        // Draw loose petals in world space
+        ctx.restore();
+        (o.petals||[]).forEach(p=>{
+          ctx.save(); ctx.globalAlpha=p.life*0.8; ctx.translate(p.x,p.y); ctx.rotate(p.rot||0);
+          ctx.fillStyle='rgba(255,160,200,0.85)';
+          ctx.beginPath(); ctx.ellipse(0,0,p.r,p.r*0.6,0,0,Math.PI*2); ctx.fill();
+          ctx.globalAlpha=1; ctx.restore();
+        });
+        // Entry/exit glow rings
+        ctx.save(); ctx.translate(o.x,o.y);
+        ctx.shadowBlur=12; ctx.shadowColor='rgba(255,120,200,0.6)';
+        ctx.strokeStyle='rgba(255,160,220,0.6)'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.arc(0,0,hw+3,0,Math.PI*2); ctx.stroke();
+        ctx.translate(tx*tLen,ty*tLen);
+        ctx.beginPath(); ctx.arc(0,0,hw+3,0,Math.PI*2); ctx.stroke();
+        ctx.shadowBlur=0;
+        ctx.restore(); // restore after rings (this is the ctx.save() from the rings block)
+        break;
+      }
+
+      case 'waterGardenCurrent': {
+        ctx.translate(o.x,o.y);
+        const wph=o.phase||0;
+        // Background fill
+        const wgG=ctx.createLinearGradient(-o.w/2,-o.h/2,o.w/2,o.h/2);
+        wgG.addColorStop(0,'rgba(30,120,180,0.18)'); wgG.addColorStop(0.5,'rgba(60,180,220,0.22)'); wgG.addColorStop(1,'rgba(20,100,160,0.16)');
+        ctx.fillStyle=wgG; ctx.beginPath(); ctx.roundRect(-o.w/2,-o.h/2,o.w,o.h,8); ctx.fill();
+        // Flowing water lines
+        ctx.save(); ctx.beginPath(); ctx.roundRect(-o.w/2,-o.h/2,o.w,o.h,8); ctx.clip();
+        for(let wi=0;wi<5;wi++){
+          const woff=(wph*o.dir*18+wi*(o.w/5))%o.w - o.w/2;
+          ctx.strokeStyle=`rgba(120,210,255,${0.18+wi*0.04})`; ctx.lineWidth=1.5;
+          ctx.beginPath();
+          for(let xi=0;xi<=o.w;xi+=8){
+            const wy=Math.sin(wph+xi*0.12+wi*0.8)*o.h*0.3;
+            xi===0 ? ctx.moveTo(-o.w/2+xi,wy) : ctx.lineTo(-o.w/2+xi,wy);
+          }
+          ctx.stroke();
+        }
+        ctx.restore();
+        // Direction arrow
+        ctx.fillStyle='rgba(160,230,255,0.7)'; ctx.font='bold 11px sans-serif'; ctx.textAlign='center';
+        for(let ai=0;ai<3;ai++){
+          const ax=-o.w/4+ai*(o.w/4);
+          ctx.globalAlpha=0.5+0.3*Math.sin(wph*2+ai*1.2);
+          ctx.fillText(o.dir>0?'›':'‹',ax,4);
+        }
+        ctx.globalAlpha=1;
+        // Lily pads (static decorations)
+        ctx.shadowBlur=6; ctx.shadowColor='rgba(80,200,100,0.3)';
+        [[o.w*-0.28,o.h*0.1,7],[-2,-o.h*0.15,5],[o.w*0.3,0,6]].forEach(([lx,ly,lr])=>{
+          ctx.fillStyle='rgba(60,160,60,0.7)';
+          ctx.beginPath(); ctx.ellipse(lx,ly,lr,lr*0.55,0,0,Math.PI*2); ctx.fill();
+          // Notch
+          ctx.fillStyle='rgba(20,80,20,0.5)';
+          ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(lx+lr,ly); ctx.arc(lx,ly,lr,-0.1,0.1); ctx.closePath(); ctx.fill();
+        });
+        // Ripples (world-space)
+        ctx.restore();
+        (o.ripples||[]).forEach(r=>{
+          ctx.save(); ctx.globalAlpha=r.life*0.5;
+          ctx.strokeStyle='rgba(160,220,255,0.8)'; ctx.lineWidth=1;
+          ctx.beginPath(); ctx.ellipse(r.x,r.y,r.r,r.r*0.45,0,0,Math.PI*2); ctx.stroke();
+          ctx.globalAlpha=1; ctx.restore();
+        });
+        // Re-enter translated state so the forEach ctx.restore() is balanced
+        ctx.save(); ctx.translate(o.x,o.y);
+        ctx.shadowBlur=0; break;
+      }
+
+      case 'moonlitSection': {
+        ctx.translate(o.x,o.y);
+        const mph=o.phase||0;
+        // Outer ethereal ring
+        for(let ri=3;ri>=0;ri--){
+          const rr=o.r*(1.3+ri*0.3); const alpha=0.04+ri*0.02;
+          ctx.strokeStyle=`rgba(220,210,255,${alpha*(0.5+0.5*Math.sin(mph-ri*0.5))})`; ctx.lineWidth=1.2;
+          ctx.beginPath(); ctx.arc(0,0,rr,0,Math.PI*2); ctx.stroke();
+        }
+        // Moon surface
+        ctx.shadowBlur=20; ctx.shadowColor='rgba(220,210,255,0.5)';
+        const mg=ctx.createRadialGradient(-o.r*0.25,-o.r*0.25,1,0,0,o.r);
+        mg.addColorStop(0,'rgba(255,255,240,0.22)'); mg.addColorStop(0.5,'rgba(200,190,255,0.12)'); mg.addColorStop(1,'rgba(140,120,220,0.05)');
+        ctx.fillStyle=mg; ctx.beginPath(); ctx.arc(0,0,o.r,0,Math.PI*2); ctx.fill();
+        // Moon craters (static)
+        ctx.shadowBlur=0;
+        [[o.r*0.3,o.r*0.1,o.r*0.18],[o.r*-0.2,o.r*-0.25,o.r*0.12],[o.r*0.05,o.r*-0.1,o.r*0.08]].forEach(([cx2,cy2,cr])=>{
+          ctx.strokeStyle='rgba(180,170,240,0.18)'; ctx.lineWidth=1;
+          ctx.beginPath(); ctx.arc(cx2,cy2,cr,0,Math.PI*2); ctx.stroke();
+        });
+        // Floating sakura petals around moon
+        const starT=Date.now()*0.0008;
+        for(let si=0;si<5;si++){
+          const sa=starT+si*Math.PI*2/5, sd=o.r*(0.9+Math.sin(mph*0.7+si)*0.25);
+          const spx=Math.cos(sa)*sd, spy=Math.sin(sa)*sd;
+          ctx.globalAlpha=0.35+Math.sin(mph+si)*0.15;
+          ctx.fillStyle='rgba(255,160,210,0.8)';
+          ctx.save(); ctx.translate(spx,spy); ctx.rotate(sa+mph);
+          ctx.beginPath(); ctx.ellipse(0,0,3,2,0,0,Math.PI*2); ctx.fill();
+          ctx.restore();
+        }
+        ctx.globalAlpha=1;
+        ctx.shadowBlur=0; break;
+      }
+
+      // ════ DIRECTIONAL PIPE (Sewers upgrade) ══════════════════════
+      case 'directionalPipe': {
+        ctx.translate(o.x,o.y);
+        const dptx=Math.sin(o.angle||0), dpty=Math.cos(o.angle||0);
+        const dpLen=o.len||110, dpHw=(o.w||24)/2;
+        const dph=o.phase||0;
+        // Pipe body — two parallel walls
+        for(let side=-1;side<=1;side+=2){
+          const wx=side*dpHw*dpty, wy=-side*dpHw*dptx;
+          // Outer pipe wall
+          ctx.strokeStyle='rgba(60,90,40,0.85)'; ctx.lineWidth=4;
+          ctx.beginPath(); ctx.moveTo(wx,wy); ctx.lineTo(wx+dptx*dpLen,wy+dpty*dpLen); ctx.stroke();
+          // Inner highlight
+          ctx.strokeStyle='rgba(90,130,60,0.4)'; ctx.lineWidth=1.5;
+          ctx.beginPath(); ctx.moveTo(wx+dptx*6,wy+dpty*6); ctx.lineTo(wx+dptx*(dpLen-6),wy+dpty*(dpLen-6)); ctx.stroke();
+        }
+        // End caps
+        ctx.fillStyle='rgba(50,80,30,0.9)'; ctx.lineWidth=2.5; ctx.strokeStyle='rgba(80,120,50,0.8)';
+        [[0,0],[dptx*dpLen,dpty*dpLen]].forEach(([ex,ey])=>{
+          ctx.beginPath(); ctx.ellipse(ex,ey,dpHw+2,dpHw*0.4,Math.atan2(dptx,dpty),0,Math.PI*2);
+          ctx.fill(); ctx.stroke();
+        });
+        // Flowing gunk particles inside
+        for(let fi=0;fi<5;fi++){
+          const ft=((fi/5 + dph*0.04*o.dir)%1+1)%1;
+          const fx=dptx*dpLen*ft, fy=dpty*dpLen*ft;
+          const wobble=(Math.sin(dph*1.5+fi*1.3))*dpHw*0.35;
+          ctx.globalAlpha=0.45;
+          ctx.fillStyle='rgba(80,160,40,0.8)';
+          ctx.beginPath(); ctx.arc(fx+wobble*dpty, fy-wobble*dptx,3,0,Math.PI*2); ctx.fill();
+        }
+        ctx.globalAlpha=1;
+        // Arrow indicating direction
+        const midX=dptx*dpLen*0.5, midY=dpty*dpLen*0.5;
+        ctx.fillStyle='rgba(130,220,60,0.75)'; ctx.font='bold 9px sans-serif'; ctx.textAlign='center';
+        ctx.save(); ctx.translate(midX,midY); ctx.rotate(Math.atan2(dptx,dpty)*(o.dir>0?1:-1));
+        ctx.fillText(o.dir>0?'▶':'◀',0,3); ctx.restore();
+        ctx.shadowBlur=0; break;
+      }
+
+      // ════ KITCHEN ════════════════════════════════════════════════
+      case 'grillPlatform': {
+        ctx.translate(o.x,o.y);
+        const gHeat=o.heat||0;
+        const flipAng = o.flipped ? Math.PI : (o.flipT > 0 ? Math.PI*(o.flipT/180) : 0);
+        ctx.save(); ctx.rotate(flipAng);
+        // Base platform
+        const gpG=ctx.createLinearGradient(-o.w/2,-6,o.w/2,6);
+        gpG.addColorStop(0,`rgba(80,70,60,0.95)`); gpG.addColorStop(1,`rgba(50,45,40,0.9)`);
+        ctx.fillStyle=gpG; ctx.beginPath(); ctx.roundRect(-o.w/2,-6,o.w,12,3); ctx.fill();
+        // Grill bars
+        ctx.strokeStyle='rgba(120,110,100,0.9)'; ctx.lineWidth=2;
+        for(let gi=-o.w/2+8;gi<o.w/2;gi+=9){
+          ctx.beginPath(); ctx.moveTo(gi,-5); ctx.lineTo(gi,5); ctx.stroke();
+        }
+        // Heat glow overlay
+        if(gHeat>0){
+          const hg=ctx.createLinearGradient(-o.w/2,-8,o.w/2,8);
+          hg.addColorStop(0,`rgba(255,80,0,${gHeat*0.35})`);
+          hg.addColorStop(0.5,`rgba(255,160,0,${gHeat*0.45})`);
+          hg.addColorStop(1,`rgba(255,80,0,${gHeat*0.35})`);
+          ctx.fillStyle=hg; ctx.beginPath(); ctx.roundRect(-o.w/2,-6,o.w,12,3); ctx.fill();
+          // Heat shimmer particles
+          ctx.shadowBlur=12; ctx.shadowColor=`rgba(255,100,0,${gHeat*0.7})`;
+          for(let hi=0;hi<4;hi++){
+            const hx2=-o.w/2+o.w*(hi+0.5)/4;
+            const hoff=Math.sin(Date.now()*0.008+hi*0.9)*3;
+            ctx.globalAlpha=gHeat*0.5;
+            ctx.fillStyle='rgba(255,180,60,0.8)';
+            ctx.beginPath(); ctx.arc(hx2,-8+hoff,2,0,Math.PI*2); ctx.fill();
+          }
+          ctx.globalAlpha=1; ctx.shadowBlur=0;
+        }
+        ctx.restore();
+        // Heat gauge
+        if(gHeat>0.1){
+          ctx.fillStyle=`rgba(255,${Math.floor(160*(1-gHeat))},0,0.9)`;
+          ctx.fillRect(-o.w/2,-12,o.w*gHeat,3);
+          ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=0.5;
+          ctx.strokeRect(-o.w/2,-12,o.w,3);
+        }
+        ctx.shadowBlur=0; break;
+      }
+      case 'kitchenKnife': {
+        ctx.translate(o.x,o.y);
+        const kAngle=o.angle||0;
+        const kPivot=o.pivotR||18, kLen=o.len||35;
+        ctx.shadowBlur=8; ctx.shadowColor='rgba(200,200,220,0.5)';
+        // Arm/rod from pivot centre to knife
+        ctx.strokeStyle='rgba(100,100,120,0.6)'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(kAngle)*kPivot,Math.sin(kAngle)*kPivot); ctx.stroke();
+        // Knife at pivot end
+        ctx.save(); ctx.translate(Math.cos(kAngle)*kPivot, Math.sin(kAngle)*kPivot); ctx.rotate(kAngle+Math.PI/2);
+        // Blade
+        const kG=ctx.createLinearGradient(-3,0,3,-kLen);
+        kG.addColorStop(0,'rgba(200,210,220,0.95)'); kG.addColorStop(0.5,'rgba(240,245,255,0.98)'); kG.addColorStop(1,'rgba(180,190,200,0.85)');
+        ctx.fillStyle=kG;
+        ctx.beginPath(); ctx.moveTo(-3,0); ctx.lineTo(3,0); ctx.lineTo(1,-kLen); ctx.lineTo(-1,-kLen); ctx.closePath(); ctx.fill();
+        // Edge glint
+        ctx.strokeStyle='rgba(255,255,255,0.7)'; ctx.lineWidth=0.8;
+        ctx.beginPath(); ctx.moveTo(1.5,0); ctx.lineTo(0.5,-kLen+3); ctx.stroke();
+        // Handle
+        ctx.fillStyle='rgba(120,80,40,0.9)';
+        ctx.beginPath(); ctx.roundRect(-4,0,8,12,2); ctx.fill();
+        ctx.strokeStyle='rgba(160,110,60,0.6)'; ctx.lineWidth=0.8;
+        ctx.beginPath(); ctx.moveTo(-3,4); ctx.lineTo(3,4); ctx.moveTo(-3,8); ctx.lineTo(3,8); ctx.stroke();
+        ctx.restore();
+        // Centre pivot hub
+        ctx.fillStyle='rgba(80,80,100,0.8)';
+        ctx.beginPath(); ctx.arc(0,0,5,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0; break;
+      }
+      case 'mixingBowl': {
+        ctx.translate(o.x,o.y);
+        ctx.rotate(o.rockAngle||0);
+        const br2=o.r||22;
+        ctx.shadowBlur=8; ctx.shadowColor='rgba(200,180,140,0.4)';
+        // Bowl exterior
+        const bowlG=ctx.createLinearGradient(-br2,-br2,br2,br2);
+        bowlG.addColorStop(0,'rgba(220,200,160,0.95)'); bowlG.addColorStop(1,'rgba(180,160,120,0.9)');
+        ctx.fillStyle=bowlG;
+        ctx.beginPath(); ctx.arc(0,0,br2,0,Math.PI); ctx.lineTo(-br2,0); ctx.fill();
+        // Bowl rim
+        ctx.strokeStyle='rgba(240,220,180,0.9)'; ctx.lineWidth=3;
+        ctx.beginPath(); ctx.moveTo(-br2,0); ctx.lineTo(br2,0); ctx.stroke();
+        // Interior
+        const iG=ctx.createRadialGradient(0,br2*0.3,0,0,br2*0.3,br2*0.7);
+        iG.addColorStop(0,'rgba(240,225,190,0.8)'); iG.addColorStop(1,'rgba(200,180,140,0.4)');
+        ctx.fillStyle=iG;
+        ctx.beginPath(); ctx.arc(0,0,br2-3,0,Math.PI); ctx.fill();
+        // Stripe decoration
+        ctx.strokeStyle='rgba(180,100,60,0.4)'; ctx.lineWidth=2;
+        for(let si=-2;si<=2;si++){
+          ctx.beginPath(); ctx.arc(0,0,br2-2+si*4,0.1,Math.PI-0.1); ctx.stroke();
+        }
+        // Marble count indicator
+        if((o.marbles||[]).length>0||o.pouring){
+          ctx.fillStyle='rgba(255,200,80,0.8)'; ctx.font='bold 7px sans-serif'; ctx.textAlign='center';
+          ctx.fillText(o.pouring?'💫':'👀',0,br2*0.5);
+        }
+        ctx.shadowBlur=0; break;
+      }
+      case 'toiletPaper': {
+        ctx.translate(o.x,o.y);
+        // Draw trail first (in world space we need restore/save)
+        ctx.restore();
+        (o.trail||[]).forEach(t=>{
+          if(t.bg) return; // bg segments - skip in main draw
+          ctx.save(); ctx.globalAlpha=0.55;
+          ctx.strokeStyle='rgba(245,240,230,0.85)'; ctx.lineWidth=5; ctx.lineCap='round';
+          ctx.beginPath(); ctx.moveTo(t.x, t.y-2); ctx.lineTo(t.x, t.y+2); ctx.stroke();
+          ctx.globalAlpha=1; ctx.restore();
+        });
+        // Trail connections
+        const activeTrail=(o.trail||[]).filter(t=>!t.bg);
+        if(activeTrail.length>1){
+          ctx.save(); ctx.globalAlpha=0.4;
+          ctx.strokeStyle='rgba(245,240,230,0.7)'; ctx.lineWidth=4;
+          ctx.beginPath();
+          activeTrail.forEach((t,ti)=> ti===0 ? ctx.moveTo(t.x,t.y) : ctx.lineTo(t.x,t.y));
+          ctx.stroke(); ctx.globalAlpha=1; ctx.restore();
+        }
+        ctx.save(); ctx.translate(o.x,o.y);
+        // Paper roll itself
+        ctx.shadowBlur=6; ctx.shadowColor='rgba(220,215,200,0.4)';
+        const rollR=o.r||14;
+        // Outer paper
+        ctx.fillStyle='rgba(245,242,235,0.95)';
+        ctx.beginPath(); ctx.arc(0,0,rollR,0,Math.PI*2); ctx.fill();
+        // Cardboard core
+        ctx.fillStyle='rgba(200,180,140,0.9)';
+        ctx.beginPath(); ctx.arc(0,0,rollR*0.35,0,Math.PI*2); ctx.fill();
+        // Paper texture lines
+        ctx.strokeStyle='rgba(220,215,205,0.5)'; ctx.lineWidth=1;
+        for(let pi=0;pi<4;pi++){
+          const pr=rollR*(0.5+pi*0.12);
+          ctx.beginPath(); ctx.arc(0,0,pr,0,Math.PI*2); ctx.stroke();
+        }
+        ctx.shadowBlur=0; break;
+      }
+
+      // ════ MIDNIGHT UPRISE ════════════════════════════════════════
+      case 'trafficCar': {
+        ctx.translate(o.x,o.y);
+        if(o.dir<0) ctx.scale(-1,1);
+        const cw2=o.w/2, ch2=o.h/2;
+        ctx.shadowBlur=10; ctx.shadowColor='rgba(255,180,40,0.4)';
+        // Car body
+        const carG=ctx.createLinearGradient(-cw2,-ch2,cw2,ch2);
+        carG.addColorStop(0,'rgba(60,80,160,0.95)'); carG.addColorStop(1,'rgba(40,55,120,0.9)');
+        ctx.fillStyle=carG;
+        ctx.beginPath(); ctx.roundRect(-cw2,-ch2,o.w,o.h,4); ctx.fill();
+        // Roof/cabin
+        ctx.fillStyle='rgba(50,65,140,0.9)';
+        ctx.beginPath(); ctx.roundRect(-cw2*0.55,-ch2-7,o.w*0.55,9,3); ctx.fill();
+        // Windscreen + windows
+        if(!o.roofBroken){
+          ctx.fillStyle='rgba(160,210,240,0.55)';
+          ctx.beginPath(); ctx.roundRect(-cw2*0.5,-ch2-6,o.w*0.22,7,2); ctx.fill();
+          ctx.beginPath(); ctx.roundRect(-cw2*0.22,-ch2-6,o.w*0.28,7,2); ctx.fill();
+        } else {
+          // Broken roof outline
+          ctx.strokeStyle='rgba(160,200,230,0.3)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+          ctx.beginPath(); ctx.roundRect(-cw2*0.55,-ch2-7,o.w*0.55,9,3); ctx.stroke(); ctx.setLineDash([]);
+        }
+        // Headlights
+        ctx.fillStyle='rgba(255,240,180,0.9)';
+        ctx.beginPath(); ctx.ellipse(cw2-3,0,4,2.5,0,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=8; ctx.shadowColor='rgba(255,220,100,0.6)';
+        ctx.beginPath(); ctx.ellipse(cw2-3,0,6,3,0,0,Math.PI*2); ctx.fill();
+        // Tail lights
+        ctx.shadowBlur=0; ctx.fillStyle='rgba(255,40,40,0.8)';
+        ctx.beginPath(); ctx.ellipse(-cw2+3,0,3,2,0,0,Math.PI*2); ctx.fill();
+        // Wheels
+        ctx.fillStyle='rgba(30,30,30,0.95)';
+        [[-cw2+6,ch2],[-cw2+6,-ch2],[cw2-6,ch2],[cw2-6,-ch2]].forEach(([wx,wy])=>{
+          ctx.beginPath(); ctx.arc(wx,wy,4,0,Math.PI*2); ctx.fill();
+        });
+        // Trunk open flap
+        if(o.trunkOpen){
+          ctx.strokeStyle='rgba(80,100,180,0.9)'; ctx.lineWidth=3; ctx.lineCap='round';
+          const trunkProgress = Math.min(1, (o.trunkT||0)/30);
+          ctx.save(); ctx.translate(-cw2+4,-ch2); ctx.rotate(-trunkProgress*Math.PI*0.6);
+          ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-10); ctx.stroke();
+          ctx.restore();
+        }
+        // Roof shards (drawn in world space so restore/save)
+        ctx.restore();
+        (o.roofShards||[]).forEach(s=>{
+          if(s.life<=0) return;
+          ctx.save(); ctx.globalAlpha=s.life*0.85; ctx.translate(s.x,s.y); ctx.rotate(s.rot||0);
+          ctx.fillStyle='rgba(160,210,240,0.7)'; ctx.strokeStyle='rgba(200,230,255,0.5)'; ctx.lineWidth=0.8;
+          ctx.beginPath(); ctx.rect(-s.w/2,-s.h/2,s.w,s.h); ctx.fill(); ctx.stroke();
+          ctx.globalAlpha=1; ctx.restore();
+        });
+        ctx.save(); ctx.translate(o.x,o.y);
+        ctx.shadowBlur=0; break;
+      }
+      case 'trafficLight': {
+        ctx.translate(o.x,o.y);
+        ctx.shadowBlur=4; ctx.shadowColor='rgba(0,0,0,0.5)';
+        // Post
+        ctx.strokeStyle='rgba(100,100,110,0.9)'; ctx.lineWidth=3;
+        ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-40); ctx.stroke();
+        // Housing
+        ctx.fillStyle='rgba(40,40,45,0.95)';
+        ctx.beginPath(); ctx.roundRect(-8,-42,16,30,3); ctx.fill();
+        // Lights
+        const lightStates=[['red','green'],['green','red'],['yellow','yellow']];
+        const ls=o.state||'green';
+        [[0,ls==='red'?'rgba(255,60,60,0.95)':'rgba(80,20,20,0.5)',-38],
+         [0,ls==='yellow'?'rgba(255,220,0,0.95)':'rgba(80,70,0,0.5)',-30],
+         [0,ls==='green'?'rgba(60,255,80,0.95)':'rgba(10,60,15,0.5)',-22]].forEach(([,col,ly])=>{
+          ctx.fillStyle=col;
+          if(ls==='red'&&ly===-38||ls==='yellow'&&ly===-30||ls==='green'&&ly===-22){
+            ctx.shadowBlur=10; ctx.shadowColor=col;
+          }
+          ctx.beginPath(); ctx.arc(0,ly,4.5,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+        });
+        ctx.shadowBlur=0; break;
+      }
+      case 'trafficCone': {
+        ctx.translate(o.x,o.y);
+        ctx.rotate(o.angle||0);
+        ctx.shadowBlur=4; ctx.shadowColor='rgba(255,100,0,0.3)';
+        // Cone body — orange triangle
+        const coneG=ctx.createLinearGradient(0,-22,0,0);
+        coneG.addColorStop(0,'rgba(255,80,0,0.95)'); coneG.addColorStop(1,'rgba(220,60,0,0.9)');
+        ctx.fillStyle=coneG;
+        ctx.beginPath(); ctx.moveTo(0,-22); ctx.lineTo(-8,0); ctx.lineTo(8,0); ctx.closePath(); ctx.fill();
+        // White stripe
+        ctx.fillStyle='rgba(255,255,255,0.85)';
+        ctx.beginPath(); ctx.moveTo(-4,-9); ctx.lineTo(4,-9); ctx.lineTo(3.5,-15); ctx.lineTo(-3.5,-15); ctx.closePath(); ctx.fill();
+        // Base
+        ctx.fillStyle='rgba(40,40,40,0.9)';
+        ctx.beginPath(); ctx.roundRect(-9,-1,18,4,1); ctx.fill();
+        ctx.shadowBlur=0; break;
+      }
+      case 'oilSpillage': {
+        ctx.translate(o.x,o.y);
+        const oilPh=o.phase||0;
+        const oilW=o.w||55;
+        // Flat iridescent oil puddle — 2D, perfectly flat
+        const oilG=ctx.createLinearGradient(-oilW/2,0,oilW/2,0);
+        oilG.addColorStop(0,`rgba(20,20,40,${0.75+Math.sin(oilPh)*0.08})`);
+        oilG.addColorStop(0.2,`rgba(80,20,120,${0.65+Math.sin(oilPh+1)*0.08})`);
+        oilG.addColorStop(0.45,`rgba(20,80,120,${0.7+Math.sin(oilPh+2)*0.07})`);
+        oilG.addColorStop(0.7,`rgba(120,60,20,${0.65+Math.sin(oilPh+3)*0.08})`);
+        oilG.addColorStop(1,`rgba(20,20,40,${0.75+Math.sin(oilPh+4)*0.08})`);
+        ctx.fillStyle=oilG;
+        // Flat ellipse — no height
+        ctx.beginPath(); ctx.ellipse(0,0,oilW/2,5,0,0,Math.PI*2); ctx.fill();
+        // Iridescent shimmer lines
+        for(let oi=0;oi<3;oi++){
+          const ox3=-oilW/3+oi*(oilW/3)+Math.sin(oilPh*2+oi)*8;
+          ctx.strokeStyle=`rgba(180,180,255,${0.12+Math.sin(oilPh+oi*1.5)*0.07})`; ctx.lineWidth=1.5;
+          ctx.beginPath(); ctx.ellipse(ox3,0,oilW*0.15,3,0,0,Math.PI*2); ctx.stroke();
+        }
+        ctx.shadowBlur=0; break;
+      }
+        for(let ri=3;ri>=0;ri--){
+          const rr=o.r*(1.3+ri*0.3); const alpha=0.04+ri*0.02;
+          ctx.strokeStyle=`rgba(220,210,255,${alpha*(0.5+0.5*Math.sin(mph-ri*0.5))})`; ctx.lineWidth=1.2;
+          ctx.beginPath(); ctx.arc(0,0,rr,0,Math.PI*2); ctx.stroke();
+        }
+        // Moon surface
+        ctx.shadowBlur=20; ctx.shadowColor='rgba(220,210,255,0.5)';
+        const mg=ctx.createRadialGradient(-o.r*0.25,-o.r*0.25,1,0,0,o.r);
+        mg.addColorStop(0,'rgba(255,255,240,0.22)'); mg.addColorStop(0.5,'rgba(200,190,255,0.12)'); mg.addColorStop(1,'rgba(140,120,220,0.05)');
+        ctx.fillStyle=mg; ctx.beginPath(); ctx.arc(0,0,o.r,0,Math.PI*2); ctx.fill();
+        // Moon craters (static)
+        ctx.shadowBlur=0;
+        [[o.r*0.3,o.r*0.1,o.r*0.18],[o.r*-0.2,o.r*-0.25,o.r*0.12],[o.r*0.05,o.r*-0.1,o.r*0.08]].forEach(([cx2,cy2,cr])=>{
+          ctx.strokeStyle='rgba(180,170,240,0.18)'; ctx.lineWidth=1;
+          ctx.beginPath(); ctx.arc(cx2,cy2,cr,0,Math.PI*2); ctx.stroke();
+        });
+        // Floating sakura petals around moon
+        const starT=Date.now()*0.0008;
+        for(let si=0;si<5;si++){
+          const sa=starT+si*Math.PI*2/5, sd=o.r*(0.9+Math.sin(mph*0.7+si)*0.25);
+          const spx=Math.cos(sa)*sd, spy=Math.sin(sa)*sd;
+          ctx.globalAlpha=0.35+Math.sin(mph+si)*0.15;
+          ctx.fillStyle='rgba(255,160,210,0.8)';
+          ctx.save(); ctx.translate(spx,spy); ctx.rotate(sa+mph);
+          ctx.beginPath(); ctx.ellipse(0,0,3,2,0,0,Math.PI*2); ctx.fill();
+          ctx.restore();
+        }
         ctx.globalAlpha=1;
         ctx.shadowBlur=0; break;
       }
@@ -11661,6 +12898,49 @@ function mrDrawFrame() {
       ctx.beginPath(); ctx.arc(m.x, m.y, m.r + 4, 0, Math.PI*2); ctx.stroke();
       ctx.setLineDash([]);
       ctx.globalAlpha = 1;
+    }
+    // Shuriken slow indicator — icy blue ring
+    if (m._jpSlow && m._jpSlow > 0) {
+      const jpAlpha = Math.min(1, m._jpSlow / 60) * 0.6;
+      ctx.globalAlpha = jpAlpha;
+      ctx.strokeStyle = 'rgba(160,210,255,0.9)';
+      ctx.lineWidth = 1.8;
+      ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.arc(m.x, m.y, m.r + 5, 0, Math.PI*2); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+    }
+    // Sewer pipe ghost mode
+    if (m._pipeGhost && m._pipeGhost > 0) {
+      const pgAlpha = (m._pipeGhost / 8) * 0.55;
+      ctx.globalAlpha = pgAlpha;
+      ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(80,200,60,0.8)';
+      ctx.strokeStyle = 'rgba(100,220,60,0.9)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(m.x, m.y, m.r + 3, 0, Math.PI*2); ctx.stroke();
+      ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+    }
+    // Oil slick visual on marble
+    if (m._oilSlick && m._oilSlick > 0) {
+      const oAlpha = Math.min(1, m._oilSlick / 15) * 0.5;
+      ctx.globalAlpha = oAlpha;
+      const oilRG = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r+2);
+      oilRG.addColorStop(0, 'rgba(80,20,120,0.4)');
+      oilRG.addColorStop(0.5, 'rgba(20,80,120,0.3)');
+      oilRG.addColorStop(1, 'rgba(120,60,20,0)');
+      ctx.fillStyle = oilRG;
+      ctx.beginPath(); ctx.arc(m.x, m.y, m.r+2, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+    // Ghost mode inside sakura wind tunnel — translucent shimmer
+    if (m._jpGhost && m._jpGhost > 0) {
+      const gAlpha = (m._jpGhost / 8) * 0.5;
+      ctx.globalAlpha = gAlpha;
+      ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(255,140,200,0.8)';
+      ctx.strokeStyle = 'rgba(255,160,220,0.9)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.arc(m.x, m.y, m.r + 3, 0, Math.PI*2); ctx.stroke();
+      ctx.shadowBlur = 0; ctx.globalAlpha = 1;
     }
     // Voted ring
     if (m.id === mrVotedColor) {
