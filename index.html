@@ -9588,7 +9588,8 @@ function mrGenMap_inner() {
       case 'oilSpillage':
         mrObstacles.push({ type:'oilSpillage', x: hx, y: hy, w:55+rng()*30, phase:0, _theme:'midnightup' });
         break;
-    } // end for(pick of picks)
+    } // end switch(pick)
+  } // end for(pick of picks)
   } // end zone loop
 
   // ── Bottom funnel ──
