@@ -2394,19 +2394,18 @@ input[type=number] { -moz-appearance:textfield; }
   <div id="notif-drag-zone" style="position:absolute;top:0;left:0;width:60px;height:44px;z-index:9000;cursor:pointer" ontouchstart="notifPanelDragStart(event)" onmousedown="notifPanelDragStart(event)"></div>
 
   <!-- Notification Panel — full-screen iOS 15-style -->
-  <div id="notif-panel" style="position:absolute;inset:0;z-index:8900;transform:translateY(-100%);transition:transform 0.48s cubic-bezier(0.32,0,0.15,1);will-change:transform;overflow:hidden;border-radius:48px;">
+  <div id="notif-panel" style="position:absolute;inset:0;z-index:8900;transform:translateY(-100%);transition:transform 0.48s cubic-bezier(0.32,0,0.15,1);will-change:transform;overflow:hidden;border-radius:48px;isolation:isolate;">
     <!-- Wallpaper blur layer -->
-    <div id="notif-panel-wallpaper" style="position:absolute;inset:0;background:radial-gradient(ellipse at 20% 20%,#2a1a4e 0%,#000 50%,#1a0a2e 100%);filter:blur(0px);transform:scale(1.05)"></div>
+    <div id="notif-panel-wallpaper" style="position:absolute;inset:0;background:radial-gradient(ellipse at 20% 20%,#2a1a4e 0%,#000 50%,#1a0a2e 100%);filter:blur(0px);transform:scale(1.05);border-radius:48px;overflow:hidden;"></div>
     <!-- Dark overlay -->
-    <div style="position:absolute;inset:0;background:rgba(6,3,18,0.55);backdrop-filter:blur(32px) saturate(160%)"></div>
+    <div style="position:absolute;inset:0;background:rgba(6,3,18,0.55);backdrop-filter:blur(32px) saturate(160%);border-radius:48px;"></div>
     <!-- Ambient glow blobs -->
     <div style="position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(160,136,250,0.15) 0%,transparent 70%);top:-60px;left:50%;transform:translateX(-50%);pointer-events:none"></div>
     <div style="position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(252,119,144,0.08) 0%,transparent 70%);bottom:80px;right:-30px;pointer-events:none"></div>
     <!-- Content -->
     <div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;padding:0">
       <!-- Status bar area -->
-      <div style="height:44px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 20px 6px">
-        <span id="notif-panel-time" style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.9);letter-spacing:-0.2px"></span>
+      <div style="height:44px;display:flex;align-items:flex-end;justify-content:flex-end;padding:0 20px 6px">
         <div style="display:flex;align-items:center;gap:8px">
           <button onclick="notifPanelClearAll()" style="font-size:10px;font-weight:800;color:#a088fa;background:rgba(160,136,250,0.15);border:1px solid rgba(160,136,250,0.3);border-radius:20px;padding:4px 12px;cursor:pointer;letter-spacing:0.2px;backdrop-filter:blur(8px)">Clear All</button>
         </div>
@@ -2475,6 +2474,31 @@ input[type=number] { -moz-appearance:textfield; }
       content:'';position:absolute;inset:0;
       background:linear-gradient(135deg,rgba(160,136,250,0.06) 0%,transparent 60%);
       pointer-events:none;
+    }
+    @keyframes notifBubblePulse {
+      0%,100% { transform:scale(1); }
+      50% { transform:scale(1.08); }
+    }
+    @keyframes notifBubbleShimmer {
+      0% { transform:translateX(-100%) skewX(-15deg); }
+      100% { transform:translateX(350%) skewX(-15deg); }
+    }
+    @keyframes notifBubbleFloat {
+      0%,100% { transform:translateY(0); }
+      50% { transform:translateY(-3px); }
+    }
+    .notif-bubble-item { position:relative;overflow:hidden; }
+    .notif-bubble-orb {
+      width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+      animation:notifBubblePulse 2.4s ease-in-out infinite, notifBubbleFloat 3.2s ease-in-out infinite;
+    }
+    .notif-bubble-shimmer {
+      position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:hidden;border-radius:inherit;
+    }
+    .notif-bubble-shimmer::after {
+      content:'';position:absolute;top:0;left:0;width:40%;height:100%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);
+      animation:notifBubbleShimmer 2.8s ease-in-out infinite;
     }
   </style>
 
@@ -18845,8 +18869,10 @@ let _notifPanelDragStartYUp = 0;
 let _notifPanelDraggingUp = false;
 
 // Only truly important notifications go in the panel (broadcasts, logins, major events)
-function notifPanelAddImportant(icon, title, msg) {
-  window._notifPanelItems.unshift({ id: Date.now(), icon, title, msg, ts: new Date() });
+function notifPanelAddImportant(icon, title, msg, bubbleOpts) {
+  const item = { id: Date.now(), icon, title, msg, ts: new Date() };
+  if (bubbleOpts) item.bubble = bubbleOpts;
+  window._notifPanelItems.unshift(item);
   if (window._notifPanelItems.length > 30) window._notifPanelItems.pop();
   if (_notifPanelOpen) notifPanelRender();
 }
@@ -18855,6 +18881,101 @@ function notifPanelAddImportant(icon, title, msg) {
 function notifPanelAdd(icon, title, msg) {
   // intentionally empty — panel is for important notifications only
 }
+
+// ── Bubble presets for special notification types ──────────────
+const _NOTIF_BUBBLES = {
+  quint:      { c1:'rgba(91,24,154,0.85)',  c2:'rgba(199,125,255,0.6)', c3:'#e8c8ff', glowColor:'rgba(199,125,255,0.7)', borderColor:'rgba(199,125,255,0.6)' },
+  gift:       { c1:'rgba(252,119,144,0.8)', c2:'rgba(251,171,216,0.6)', c3:'#ffd4e8', glowColor:'rgba(252,119,144,0.7)', borderColor:'rgba(252,119,144,0.5)' },
+  calendar:   { c1:'rgba(78,223,208,0.75)', c2:'rgba(78,180,208,0.55)', c3:'#a0fff5', glowColor:'rgba(78,223,208,0.65)', borderColor:'rgba(78,223,208,0.5)' },
+  battlepass: { c1:'rgba(246,187,78,0.8)',  c2:'rgba(230,140,30,0.6)',  c3:'#ffe8a0', glowColor:'rgba(246,187,78,0.7)', borderColor:'rgba(246,187,78,0.5)' },
+  tickets:    { c1:'rgba(160,136,250,0.8)', c2:'rgba(120,90,220,0.6)',  c3:'#d8c8ff', glowColor:'rgba(160,136,250,0.7)', borderColor:'rgba(160,136,250,0.5)' },
+  announce:   { c1:'rgba(246,187,78,0.75)', c2:'rgba(252,119,144,0.5)', c3:'#fff0c0', glowColor:'rgba(246,187,78,0.6)', borderColor:'rgba(246,187,78,0.45)' },
+};
+
+// ── Quint stack time checker ───────────────────────────────────
+if (!window._quintNotifFired) window._quintNotifFired = {};
+setInterval(function _quintTimeCheck() {
+  if (!window.fbDb) return;
+  const { hour, minute } = _quintGetHourLondon();
+  const nowKey = hour + ':' + String(minute).padStart(2,'0');
+  fbDb.collection('config').doc('quintStack').get().then(function(snap) {
+    const items = snap.exists ? (snap.data().items || []) : [];
+    items.forEach(function(item) {
+      if (!item.time || !item.title) return;
+      const parts = item.time.split(':');
+      const ih = parseInt(parts[0]), im = parseInt(parts[1]);
+      const itemKey = ih + ':' + String(im).padStart(2,'0');
+      if (itemKey !== nowKey) return;
+      const fireKey = 'quint_' + itemKey + '_' + item.title;
+      if (window._quintNotifFired[fireKey]) return;
+      window._quintNotifFired[fireKey] = true;
+      const emoji = item.emoji || (item.type === 'date' ? '\u{1F495}' : item.type === 'activity' ? '\u{1F389}' : '\u{1F49C}');
+      notifPanelAddImportant(emoji, item.title, _quintFmtTime(item.time) + (item.desc ? ' \u00B7 ' + item.desc : ''), _NOTIF_BUBBLES.quint);
+    });
+    if (minute === 0) window._quintNotifFired = {};
+  }).catch(function(){});
+}, 60000);
+
+// ── Gift ready checker ────────────────────────────────────────
+if (!window._giftNotifFired) window._giftNotifFired = {};
+setInterval(function _giftReadyCheck() {
+  const now = Date.now();
+  (S.pendingGifts || []).forEach(function(gift) {
+    if (gift.opened) return;
+    if (now < gift.openAt) return;
+    const key = 'gift_' + gift.id;
+    if (window._giftNotifFired[key]) return;
+    window._giftNotifFired[key] = true;
+    notifPanelAddImportant('\u{1F381}', gift.emoji + ' ' + gift.name + ' is ready!', 'Open your Gifts app to unwrap it', _NOTIF_BUBBLES.gift);
+  });
+}, 30000);
+
+// ── Calendar upcoming checker (30 min before & exact time) ───
+if (!window._calNotifFired) window._calNotifFired = {};
+setInterval(function _calUpcomingCheck() {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  (S.events || []).forEach(function(ev) {
+    if (!ev.date || !ev.time || ev.date !== todayStr) return;
+    const evMs = new Date(ev.date + 'T' + ev.time).getTime();
+    const diffMin = Math.round((evMs - Date.now()) / 60000);
+    const key30 = 'cal30_' + ev.title + '_' + ev.date;
+    if (diffMin <= 30 && diffMin > 25 && !window._calNotifFired[key30]) {
+      window._calNotifFired[key30] = true;
+      notifPanelAddImportant(ev.emoji || '\u{1F4C5}', ev.title, 'Starting in 30 minutes', _NOTIF_BUBBLES.calendar);
+    }
+    const key0 = 'cal0_' + ev.title + '_' + ev.date;
+    if (diffMin <= 0 && diffMin > -5 && !window._calNotifFired[key0]) {
+      window._calNotifFired[key0] = true;
+      notifPanelAddImportant(ev.emoji || '\u{1F4C5}', ev.title + ' \u2014 Starting now!', ev.date, _NOTIF_BUBBLES.calendar);
+    }
+  });
+}, 60000);
+
+// ── Ticket goal reached ───────────────────────────────────────
+let _ticketGoalNotifLastPct = -1;
+const __ticketDisplayOrig = updateTicketDisplay;
+function updateTicketDisplay(delta) {
+  const prevPct = _ticketGoalNotifLastPct;
+  __ticketDisplayOrig(delta);
+  const pct = Math.min((S.tickets / (S.maxTickets || 100)) * 100, 100);
+  _ticketGoalNotifLastPct = pct;
+  if (pct >= 100 && prevPct >= 0 && prevPct < 100 && delta > 0) {
+    notifPanelAddImportant('\u{1F389}', 'Ticket Goal Reached!', S.tickets + ' / ' + (S.maxTickets || 100) + ' \u{1F3DF}\uFE0F', _NOTIF_BUBBLES.tickets);
+  }
+}
+
+// ── Admin broadcast → panel ──────────────────────────────────
+const __origShowBroadcastNotif = showBroadcastNotif;
+window.showBroadcastNotif = function(icon, title, msg) {
+  __origShowBroadcastNotif(icon, title, msg);
+  let bubble = null;
+  if (icon === '\u{1F3DF}\uFE0F' || (title && title.includes('Ticket'))) bubble = _NOTIF_BUBBLES.tickets;
+  else if (icon === '\u{1F381}' || (title && title.includes('gift'))) bubble = _NOTIF_BUBBLES.gift;
+  else if (icon === '\u{1F4C5}' || (title && title.includes('Event'))) bubble = _NOTIF_BUBBLES.calendar;
+  else if (icon === '\u{1F3C6}' || (title && (title.includes('Season') || title.includes('Battle')))) bubble = _NOTIF_BUBBLES.battlepass;
+  else bubble = _NOTIF_BUBBLES.announce;
+  notifPanelAddImportant(icon, title, msg, bubble);
+};
 
 function _notifDismissBtn(id) {
   return `<div class="notif-dismiss-btn-wrap" onclick="notifPanelDismiss(${id})" title="Dismiss">
@@ -18875,23 +18996,29 @@ function notifPanelRender() {
   _notifPanelUpdateTime();
   const items = window._notifPanelItems;
   if (!items.length) {
-    list.innerHTML = `<div style="text-align:center;padding:48px 0 20px;color:rgba(255,255,255,0.2);font-size:14px;font-weight:500;letter-spacing:0.2px">
-      <div style="font-size:36px;margin-bottom:12px;opacity:0.4">🔔</div>
-      No notifications
-    </div>`;
+    list.innerHTML = '<div style="text-align:center;padding:48px 0 20px;color:rgba(255,255,255,0.2);font-size:14px;font-weight:500;letter-spacing:0.2px"><div style="font-size:36px;margin-bottom:12px;opacity:0.4">🔔</div>No notifications</div>';
     return;
   }
-  list.innerHTML = items.map((n, i) => `
-    <div class="notif-item" data-notif-id="${n.id}" style="animation-delay:${i * 0.04}s">
-      <div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(145deg,rgba(160,136,250,0.2),rgba(252,119,144,0.15));border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${n.icon}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;letter-spacing:-0.1px">${n.title}</div>
-        ${n.msg ? `<div style="font-size:11px;color:rgba(255,255,255,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.msg}</div>` : ''}
-        <div style="font-size:10px;color:rgba(160,136,250,0.6);margin-top:4px;font-weight:600">${n.ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>
-      </div>
-      ${_notifDismissBtn(n.id)}
-    </div>
-  `).join('');
+  list.innerHTML = items.map((n, i) => {
+    if (n.bubble) {
+      const b = n.bubble;
+      return '<div class="notif-item notif-bubble-item" data-notif-id="'+n.id+'" style="animation-delay:'+(i*0.04)+'s;background:linear-gradient(135deg,'+b.c1+','+b.c2+');border-color:'+b.borderColor+';box-shadow:0 0 18px '+b.glowColor+',0 4px 24px rgba(0,0,0,0.4)">'
+        +'<div class="notif-bubble-shimmer"></div>'
+        +'<div class="notif-bubble-orb" style="background:radial-gradient(circle at 35% 35%,'+b.c3+','+b.c1+','+b.c2+');box-shadow:0 0 16px '+b.glowColor+',0 0 30px '+b.glowColor+'55"><span style="font-size:20px;filter:drop-shadow(0 0 6px '+b.glowColor+')">'+n.icon+'</span></div>'
+        +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:2px;letter-spacing:-0.1px;text-shadow:0 0 12px '+b.glowColor+'">'+n.title+'</div>'
+        +(n.msg ? '<div style="font-size:11px;color:rgba(255,255,255,0.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+n.msg+'</div>' : '')
+        +'<div style="font-size:10px;color:'+b.c3+';margin-top:4px;font-weight:700;text-shadow:0 0 8px '+b.glowColor+'">'+n.ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'</div>'
+        +'</div>'+_notifDismissBtn(n.id)+'</div>';
+    }
+    return '<div class="notif-item" data-notif-id="'+n.id+'" style="animation-delay:'+(i*0.04)+'s">'
+      +'<div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(145deg,rgba(160,136,250,0.2),rgba(252,119,144,0.15));border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">'+n.icon+'</div>'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;letter-spacing:-0.1px">'+n.title+'</div>'
+      +(n.msg ? '<div style="font-size:11px;color:rgba(255,255,255,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+n.msg+'</div>' : '')
+      +'<div style="font-size:10px;color:rgba(160,136,250,0.6);margin-top:4px;font-weight:600">'+n.ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'</div>'
+      +'</div>'+_notifDismissBtn(n.id)+'</div>';
+  }).join('');
 }
 
 function _notifPanelUpdateTime() {
