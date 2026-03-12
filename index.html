@@ -1301,39 +1301,187 @@ input[type=number] { -moz-appearance:textfield; }
   letter-spacing:0.4px; font-size:14px; font-weight:600; color:var(--fg); }
 .shop-item-price { font-size:12px; color:var(--gold); font-weight:600; }
 
-/* ===== CHAT ===== */
-.chat-bubble {
-  max-width:70%;
-  padding:10px 14px;
+/* ===== CHAT — iOS 26 / iPhone 15 iMessage Inspired ===== */
+.chat-contact-card {
+  display:flex; align-items:center; gap:14px;
+  padding:14px 16px;
+  background:rgba(255,255,255,0.04);
   border-radius:18px;
-  font-size:14px;
-  line-height:1.4;
-  margin-bottom:6px;
+  border:1px solid rgba(255,255,255,0.07);
+  cursor:pointer;
+  transition:all 0.2s cubic-bezier(.4,0,.2,1);
+  backdrop-filter:blur(12px);
+  position:relative;
+  overflow:hidden;
+}
+.chat-contact-card::before {
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0));
+  pointer-events:none;
+}
+.chat-contact-card:active { transform:scale(0.97); background:rgba(255,255,255,0.07); }
+.chat-avatar-ring {
+  width:52px; height:52px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px; flex-shrink:0;
+  position:relative;
+  box-shadow:0 4px 14px rgba(0,0,0,0.35);
+}
+.chat-avatar-ring::after {
+  content:'';
+  position:absolute; inset:-2px;
+  border-radius:50%;
+  background:conic-gradient(from 180deg, rgba(255,255,255,0.3), rgba(255,255,255,0.05), rgba(255,255,255,0.3));
+  z-index:-1;
+}
+.chat-online-dot {
+  width:12px; height:12px; border-radius:50%;
+  background:#30d158;
+  border:2.5px solid #000;
+  position:absolute; bottom:1px; right:1px;
+  box-shadow:0 0 6px rgba(48,209,88,0.6);
+}
+.chat-bubble {
+  max-width:72%;
+  padding:10px 14px;
+  border-radius:20px;
+  font-size:15px;
+  line-height:1.45;
   position:relative;
   word-break:break-word;
+  animation:bubblePop 0.25s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes bubblePop {
+  from { opacity:0; transform:scale(0.85) translateY(6px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
 }
 .chat-bubble.sent {
-  background:var(--accent1);
+  background:linear-gradient(135deg,#0a84ff,#0066cc);
   color:#fff;
   margin-left:auto;
-  border-bottom-right-radius:4px;
+  border-bottom-right-radius:5px;
+  box-shadow:0 3px 12px rgba(10,132,255,0.35);
 }
 .chat-bubble.recv {
-  background:var(--card);
-  color:var(--fg);
+  background:rgba(44,44,46,0.92);
+  color:#f5f5f7;
   margin-right:auto;
-  border-bottom-left-radius:4px;
+  border-bottom-left-radius:5px;
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.08);
+  box-shadow:0 3px 10px rgba(0,0,0,0.25);
 }
-.chat-input-area {
-  position:sticky; bottom:0;
-  background:rgba(0,0,0,0.8);
-  backdrop-filter:blur(20px);
-  padding:10px;
-  border-top:1px solid rgba(255,255,255,0.06);
-  display:flex; gap:8px; align-items:center;
+.chat-bubble-time {
+  font-size:10px; color:rgba(255,255,255,0.35);
+  margin-top:2px;
+  display:block;
+}
+.chat-typing-indicator {
+  display:flex; align-items:center; gap:4px;
+  padding:12px 16px;
+  background:rgba(44,44,46,0.92);
+  border-radius:20px; border-bottom-left-radius:5px;
+  width:fit-content;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.chat-typing-dot {
+  width:7px; height:7px; border-radius:50%;
+  background:rgba(255,255,255,0.4);
+  animation:typingBounce 1.2s ease-in-out infinite;
+}
+.chat-typing-dot:nth-child(2) { animation-delay:0.2s; }
+.chat-typing-dot:nth-child(3) { animation-delay:0.4s; }
+@keyframes typingBounce {
+  0%,60%,100% { transform:translateY(0); opacity:0.4; }
+  30% { transform:translateY(-6px); opacity:1; }
+}
+.imsg-header {
+  background:rgba(10,8,20,0.82);
+  backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  padding:12px 16px 14px;
+  display:flex; align-items:center; gap:12px;
+  position:sticky; top:0; z-index:10;
+}
+.imsg-input-wrap {
+  background:rgba(10,8,20,0.88);
+  backdrop-filter:blur(24px);
+  border-top:1px solid rgba(255,255,255,0.07);
+  padding:10px 12px 14px;
+  display:flex; gap:8px; align-items:flex-end;
+}
+.imsg-input {
+  flex:1; min-height:36px; max-height:120px;
+  background:rgba(44,44,46,0.85);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:20px;
+  padding:8px 14px;
+  color:#f5f5f7; font-size:15px;
+  outline:none; resize:none;
+  font-family:inherit;
+  line-height:1.4;
+  overflow-y:auto;
+}
+.imsg-input::placeholder { color:rgba(235,235,245,0.3); }
+.imsg-send-btn {
+  width:36px; height:36px; border-radius:50%;
+  background:linear-gradient(135deg,#0a84ff,#0066cc);
+  border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 3px 10px rgba(10,132,255,0.4);
+  transition:transform 0.15s, box-shadow 0.15s;
+}
+.imsg-send-btn:active { transform:scale(0.9); }
+.imsg-action-btn {
+  width:36px; height:36px; border-radius:50%;
+  background:rgba(44,44,46,0.8);
+  border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.6);
+  font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  transition:all 0.15s;
+}
+.imsg-action-btn:active { transform:scale(0.9); background:rgba(64,64,68,0.9); }
+
+@keyframes liquidShimmer {
+  0%,100% { transform:translateX(-100%); }
+  50% { transform:translateX(100%); }
+}
+@keyframes quintGlow {
+  0%,100% { box-shadow:0 0 12px rgba(199,125,255,0.5), 0 0 30px rgba(157,78,221,0.2); }
+  50% { box-shadow:0 0 20px rgba(199,125,255,0.9), 0 0 50px rgba(157,78,221,0.4); }
+}
+@keyframes stackHighlight {
+  0% { box-shadow:0 4px 20px rgba(199,125,255,0); transform:scale(1); }
+  40% { box-shadow:0 4px 30px rgba(199,125,255,0.6); transform:scale(1.015); }
+  100% { box-shadow:0 4px 20px rgba(199,125,255,0.15); transform:scale(1); }
+}
+.quint-stack-piece {
+  border-radius:18px;
+  padding:14px 16px;
+  background:rgba(255,255,255,0.07);
+  border:1px solid rgba(255,255,255,0.1);
+  backdrop-filter:blur(12px);
+  transition:all 0.4s cubic-bezier(.4,0,.2,1);
+  position:relative; overflow:hidden;
+  cursor:default;
+}
+.quint-stack-piece.active-now {
+  background:rgba(157,78,221,0.18);
+  border-color:rgba(199,125,255,0.45);
+  animation:stackHighlight 1.8s ease-in-out forwards;
+}
+.quint-stack-piece::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
 }
 
-/* ===== PET ===== */
+
 .pet-display {
   width:120px; height:120px;
   margin:0 auto;
@@ -1996,6 +2144,7 @@ input[type=number] { -moz-appearance:textfield; }
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(246,187,78,0.2),rgba(231,129,97,0.15));border:1px solid rgba(246,187,78,0.4);color:#f6bb4e;font-weight:800" onclick="admSwitchTab('liveupdater',this)">🔄 Updater</button>
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(160,136,250,0.2),rgba(252,119,144,0.15));border:1px solid rgba(160,136,250,0.35);color:#c0b9f5;font-weight:800" onclick="admSwitchTab('claw',this)">🦾 Claw</button>
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(78,223,208,0.15),rgba(160,136,250,0.1));border:1px solid rgba(78,223,208,0.3);color:#4edfd0;font-weight:800" onclick="admSwitchTab('plinko',this)">🎯 Plinko</button>
+        <button class="adm-tab" style="background:linear-gradient(135deg,rgba(199,125,255,0.2),rgba(123,47,247,0.15));border:1px solid rgba(199,125,255,0.4);color:#c77dff;font-weight:800" onclick="admSwitchTab('quint',this)">💜 Quint</button>
       </div>
     </div>
     <div class="adm-body" id="admin-content"></div>
@@ -2198,31 +2347,54 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== CHAT SCREEN ===== -->
-    <div id="screen-chat" class="screen" style="padding:0;flex-direction:column">
-      <div class="screen-header">
-        <button class="back-btn" onclick="openScreen('home')">←</button>
-        <span class="screen-title">💬 Messages</span>
-        <button class="btn btn-primary btn-sm" onclick="openModal('add-contact-modal')">+ Contact</button>
+    <div id="screen-chat" class="screen" style="padding:0;flex-direction:column;background:linear-gradient(180deg,#0a0a12 0%,#0d0d1a 100%)">
+      <!-- iOS 26 style header -->
+      <div style="background:rgba(10,8,20,0.82);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(255,255,255,0.07);padding:16px 16px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10">
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="back-btn" onclick="openScreen('home')" style="background:rgba(10,132,255,0.12);border:1px solid rgba(10,132,255,0.25);color:#0a84ff;border-radius:12px;width:34px;height:34px;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer">←</button>
+          <div>
+            <div style="font-size:17px;font-weight:700;color:#f5f5f7;letter-spacing:-0.3px">Messages</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.35)">${(S.contacts||[]).length} conversation${(S.contacts||[]).length!==1?'s':''}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="openModal('add-contact-modal')" style="background:linear-gradient(135deg,#0a84ff,#0066cc);border:none;border-radius:14px;padding:7px 14px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 3px 10px rgba(10,132,255,0.35)">+ New</button>
+        </div>
       </div>
-      <div id="chat-list" style="padding:12px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;flex:1"></div>
+      <!-- Search bar -->
+      <div style="padding:10px 16px 6px">
+        <div style="background:rgba(44,44,46,0.7);border-radius:14px;padding:8px 14px;display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,0.07)">
+          <span style="font-size:14px;color:rgba(255,255,255,0.3)">🔍</span>
+          <input placeholder="Search" style="background:none;border:none;outline:none;color:#f5f5f7;font-size:15px;flex:1" oninput="filterChats(this.value)">
+        </div>
+      </div>
+      <div id="chat-list" style="padding:8px 12px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;flex:1"></div>
     </div>
 
     <!-- ===== CHAT CONVO SCREEN ===== -->
-    <div id="screen-chat-convo" class="screen" style="padding:0;flex-direction:column;display:none;min-height:0">
-      <div class="screen-header" style="flex-shrink:0">
-        <button class="back-btn" onclick="openScreen('chat')">←</button>
-        <div style="display:flex;align-items:center;gap:8px;flex:1">
-          <span id="chat-convo-avatar" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent1),var(--pink));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0"></span>
-          <div>
-            <div id="chat-convo-name" style="font-size:14px;font-weight:700;color:var(--fg)">Chat</div>
-            <div style="font-size:10px;color:var(--green)">● Online</div>
-          </div>
+    <div id="screen-chat-convo" class="screen" style="padding:0;flex-direction:column;display:none;min-height:0;background:linear-gradient(180deg,#0a0a12 0%,#0d0d1a 100%)">
+      <!-- iMessage style header -->
+      <div class="imsg-header">
+        <button onclick="openScreen('chat')" style="background:rgba(10,132,255,0.12);border:1px solid rgba(10,132,255,0.2);color:#0a84ff;border-radius:12px;width:34px;height:34px;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">←</button>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;cursor:pointer" onclick="chatShowInfo()">
+          <div id="chat-convo-avatar" style="width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;background:linear-gradient(135deg,#0a84ff,#5e5ce6);box-shadow:0 3px 12px rgba(10,132,255,0.4);margin-bottom:2px;position:relative"></div>
+          <div id="chat-convo-name" style="font-size:13px;font-weight:600;color:#f5f5f7;letter-spacing:-0.2px"></div>
+          <div style="font-size:10px;color:#30d158;display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#30d158;display:inline-block"></span>Active now</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <button class="imsg-action-btn" onclick="playSound('click')">📞</button>
+          <button class="imsg-action-btn" onclick="playSound('click')">📹</button>
         </div>
       </div>
-      <div id="chat-messages" style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:6px"></div>
-      <div style="padding:10px;display:flex;gap:8px;align-items:center;background:rgba(10,8,20,0.95);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0">
-        <input class="input" id="chat-input-field" placeholder="Message..." style="flex:1;border-radius:20px" onkeydown="if(event.key==='Enter')sendChatMsg()">
-        <button class="btn btn-primary" style="border-radius:50%;width:36px;height:36px;padding:0;font-size:16px;flex-shrink:0" onclick="sendChatMsg()">↑</button>
+      <!-- Messages area -->
+      <div id="chat-messages" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch"></div>
+      <!-- Input bar -->
+      <div class="imsg-input-wrap">
+        <button class="imsg-action-btn" onclick="playSound('click')">📷</button>
+        <textarea class="imsg-input" id="chat-input-field" placeholder="iMessage" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMsg()}" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+        <button class="imsg-send-btn" onclick="sendChatMsg()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
       </div>
     </div>
 
@@ -2430,6 +2602,49 @@ input[type=number] { -moz-appearance:textfield; }
         <div style="font-size:10px;color:rgba(160,136,250,0.7);font-weight:700;letter-spacing:1px">v0.0.1</div>
       </div>
       <div id="updatelogs-content" style="padding:16px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch"></div>
+    </div>
+
+    <!-- ===== QUINT SCREEN ===== -->
+    <div id="screen-quint" class="screen" style="padding:0;flex-direction:column;overflow:hidden;position:relative">
+      <!-- Dynamic background (changes by time of day) -->
+      <div id="quint-bg" style="position:absolute;inset:0;z-index:0;transition:all 2s ease"></div>
+      <!-- Gentle confetti canvas -->
+      <canvas id="quint-confetti" style="position:absolute;inset:0;z-index:1;pointer-events:none;width:100%;height:100%"></canvas>
+      <!-- Header -->
+      <div style="position:relative;z-index:3;padding:20px 20px 14px;backdrop-filter:blur(20px);background:rgba(0,0,0,0.15);border-bottom:1px solid rgba(255,255,255,0.08)">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <button onclick="openScreen('home')" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:12px;width:34px;height:34px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">←</button>
+          <div style="text-align:center">
+            <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px">💜 Quint</div>
+            <div id="quint-time-label" style="font-size:11px;color:rgba(255,255,255,0.6)"></div>
+          </div>
+          <div style="width:34px"></div>
+        </div>
+      </div>
+      <!-- Main content -->
+      <div style="position:relative;z-index:2;flex:1;overflow:hidden;display:flex;min-height:0">
+        <!-- Left: Purple bar -->
+        <div style="width:72px;flex-shrink:0;padding:12px 0 12px 10px;display:flex;flex-direction:column">
+          <div style="flex:1;position:relative;display:flex;gap:5px">
+            <div id="quint-hour-labels" style="display:flex;flex-direction:column;justify-content:space-between;font-size:9px;color:rgba(255,255,255,0.4);min-width:28px;font-weight:600"></div>
+            <div style="position:relative;flex:1">
+              <div id="quint-bar-track" style="position:absolute;inset:0;background:rgba(255,255,255,0.06);border-radius:99px;border:1px solid rgba(255,255,255,0.1);overflow:hidden">
+                <div id="quint-bar-fill" style="position:absolute;bottom:0;left:0;right:0;border-radius:99px;transition:height 1.5s cubic-bezier(.4,0,.2,1);background:linear-gradient(0deg,#5a189a,#9d4edd,#c77dff);box-shadow:inset 0 2px 6px rgba(255,255,255,0.25),0 0 20px rgba(157,78,221,0.5)">
+                  <div style="position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent);animation:liquidShimmer 2s ease-in-out infinite"></div>
+                </div>
+              </div>
+              <div id="quint-bar-pointer" style="position:absolute;right:-9px;width:16px;height:16px;border-radius:50%;background:#c77dff;border:3px solid #fff;box-shadow:0 0 12px rgba(199,125,255,0.9);transition:bottom 1.5s cubic-bezier(.4,0,.2,1);transform:translateY(50%);z-index:2"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Stacks -->
+        <div id="quint-stacks" style="flex:1;overflow-y:auto;padding:12px 14px 12px 6px;display:flex;flex-direction:column;gap:8px">
+          <div id="quint-empty" style="display:flex;flex-direction:column;align-items:center;padding:40px 20px;text-align:center">
+            <div style="font-size:48px;margin-bottom:12px;opacity:0.6">💜</div>
+            <div style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.45)">Nothing planned yet</div>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div><!-- /screens -->
@@ -3363,6 +3578,7 @@ function renderScreen(id) {
     case 'piggybank': renderPiggyBank(); break;
     case 'stacker': renderStacker(); break;
     case 'battlepass': renderBattlepass(); break;
+    case 'quint': renderQuint(); break;
   }
 }
 
@@ -3413,6 +3629,7 @@ const APPS = [
   { id:'battlepass', label:'Pass', emoji:'🏆', color:'linear-gradient(135deg,#b8860b,#ffd700,#ff8c00)' },
   { id:'gifts', label:'Gifts', emoji:'🎁', color:'linear-gradient(135deg,#fbabd8,#fc7790)' },
   { id:'marblerace', label:'Marble Race', emoji:'🔮', color:'linear-gradient(135deg,#4edfd0,#566ee3)' },
+  { id:'quint', label:'Quint', emoji:'💜', color:'linear-gradient(135deg,#7b2ff7,#c77dff)' },
 ];
 
 let appEditMode = false;
@@ -5668,32 +5885,79 @@ function toggleTask(i) {
 function removeTask(i) { S.tasks.splice(i,1); saveState(); renderTasks(); }
 
 // ============================================================
-// CHAT
+// CHAT — iOS 26 / iPhone 15 iMessage Style
 // ============================================================
 let activeChatContact = null;
+window._chatTyping = false;
+
+function filterChats(query) {
+  document.querySelectorAll('#chat-list [data-contact-id]').forEach(card => {
+    const name = (card.dataset.name || '').toLowerCase();
+    card.style.display = (!query || name.includes(query.toLowerCase())) ? '' : 'none';
+  });
+}
+
+function chatShowInfo() {
+  if (!activeChatContact) return;
+  showNotif('👤', activeChatContact.name, activeChatContact.personality || 'Your contact');
+}
+
+function formatMsgTime(ts) {
+  if (!ts) return '';
+  const d = new Date(ts), now = new Date();
+  const diff = now - d;
+  if (diff < 60000) return 'now';
+  if (diff < 3600000) return Math.floor(diff / 60000) + 'm';
+  if (diff < 86400000) return d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+}
 
 function renderChatList() {
   const c = document.getElementById('chat-list');
   if (!c) return;
+
   if (!S.contacts || S.contacts.length === 0) {
-    c.innerHTML = `<div style="text-align:center;padding:52px 20px">
-      <div style="font-size:52px;margin-bottom:12px">💬</div>
-      <div style="font-size:16px;font-weight:700;color:rgba(255,255,255,0.45);margin-bottom:6px">No Messages</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.25)">Add a contact to start chatting</div>
-    </div>`; return;
+    c.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:60px 20px;text-align:center">
+        <div style="width:80px;height:80px;border-radius:28px;background:linear-gradient(135deg,rgba(10,132,255,0.2),rgba(94,92,230,0.15));border:1px solid rgba(10,132,255,0.2);display:flex;align-items:center;justify-content:center;font-size:38px;margin-bottom:18px;box-shadow:0 8px 30px rgba(10,132,255,0.15)">💬</div>
+        <div style="font-size:18px;font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:8px;letter-spacing:-0.3px">No messages yet</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:24px;line-height:1.5">Add a contact to start chatting</div>
+        <button onclick="openModal('add-contact-modal')" style="background:linear-gradient(135deg,#0a84ff,#0066cc);border:none;border-radius:16px;padding:12px 24px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(10,132,255,0.4)">+ New Message</button>
+      </div>`;
+    return;
   }
-  const cols = ['#a088fa','#fc7790','#f6bb4e','#4caf6e','#4edfd0','#6f96ff'];
+
+  const grads = [
+    'linear-gradient(135deg,#0a84ff,#5e5ce6)',
+    'linear-gradient(135deg,#ff6b9d,#c44dff)',
+    'linear-gradient(135deg,#30d158,#34c759)',
+    'linear-gradient(135deg,#ff9f0a,#ff6b00)',
+    'linear-gradient(135deg,#64d2ff,#0a84ff)',
+    'linear-gradient(135deg,#bf5af2,#ff375f)',
+  ];
+
   c.innerHTML = S.contacts.map((contact, i) => {
-    const msgs = (S.messages||{})[contact.id] || [];
-    const last = msgs[msgs.length-1];
-    const col = cols[i%cols.length];
-    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:18px;cursor:pointer;margin-bottom:6px;transition:background 0.2s" onmouseenter="this.style.background='rgba(255,255,255,0.06)'" onmouseleave="this.style.background='rgba(255,255,255,0.03)'" onclick="openChat(${i})">
-      <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,${col},${col}88);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 4px 14px ${col}44">${contact.emoji||'👤'}</div>
-      <div style="flex:1;overflow:hidden">
-        <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:2px">${contact.name}</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.38);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${last ? (last.sender==='user'?'You: ':'')+last.text.slice(0,30)+(last.text.length>30?'…':'') : '👋 Say hello!'}</div>
+    const msgs = (S.messages || {})[contact.id] || [];
+    const last = msgs[msgs.length - 1];
+    const unread = msgs.filter(m => m.sender !== 'user' && !m.read).length;
+    const grad = grads[i % grads.length];
+    const timeStr = last ? formatMsgTime(last.ts) : '';
+    return `<div class="chat-contact-card" data-contact-id="${contact.id}" data-name="${contact.name}" onclick="openChat(${i})">
+      <div class="chat-avatar-ring" style="background:${grad}">
+        <span style="position:relative;z-index:1;font-size:22px">${contact.emoji || '👤'}</span>
+        <div class="chat-online-dot"></div>
       </div>
-      <div style="width:8px;height:8px;border-radius:50%;background:${last?col:'rgba(255,255,255,0.1)'};flex-shrink:0"></div>
+      <div style="flex:1;overflow:hidden;min-width:0">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:3px">
+          <div style="font-size:15px;font-weight:600;color:#f5f5f7;letter-spacing:-0.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${contact.name}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.3);flex-shrink:0;margin-left:8px">${timeStr}</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+          <div style="font-size:13px;color:rgba(255,255,255,0.38);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${last ? (last.sender==='user' ? '↗ ' : '') + last.text : contact.personality || 'Tap to chat'}</div>
+          ${unread > 0 ? `<div style="min-width:20px;height:20px;border-radius:10px;background:#0a84ff;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px;flex-shrink:0">${unread}</div>` : ''}
+        </div>
+      </div>
+      <svg width="7" height="13" viewBox="0 0 7 13" fill="none" style="flex-shrink:0;margin-left:4px;opacity:0.22"><path d="M1 1l5 5.5L1 12" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>`;
   }).join('');
 }
@@ -5702,11 +5966,15 @@ function openChat(i) {
   playSound('click');
   activeChatContact = S.contacts[i];
   if (!S.messages[activeChatContact.id]) S.messages[activeChatContact.id] = [];
-  const ne = document.getElementById('chat-convo-name');
-  const ae = document.getElementById('chat-convo-avatar');
-  if (ne) ne.textContent = activeChatContact.name;
-  if (ae) ae.textContent = activeChatContact.emoji||'👤';
-  // Manually show chat-convo screen (it's a special nested screen)
+
+  const nameEl = document.getElementById('chat-convo-name');
+  const avatarEl = document.getElementById('chat-convo-avatar');
+  if (nameEl) nameEl.textContent = activeChatContact.name;
+  if (avatarEl) {
+    avatarEl.textContent = activeChatContact.emoji || '👤';
+    const grads = ['linear-gradient(135deg,#0a84ff,#5e5ce6)','linear-gradient(135deg,#ff6b9d,#c44dff)','linear-gradient(135deg,#30d158,#34c759)','linear-gradient(135deg,#ff9f0a,#ff6b00)','linear-gradient(135deg,#64d2ff,#0a84ff)','linear-gradient(135deg,#bf5af2,#ff375f)'];
+    avatarEl.style.background = grads[i % grads.length];
+  }
   document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
   const cv = document.getElementById('screen-chat-convo');
   if (cv) { cv.style.display = 'flex'; cv.classList.add('active'); currentScreen = 'chat-convo'; }
@@ -5717,33 +5985,66 @@ function renderChatMessages() {
   const c = document.getElementById('chat-messages');
   if (!c || !activeChatContact) return;
   const msgs = S.messages[activeChatContact.id] || [];
-  c.innerHTML = msgs.map(m => `
-    <div style="display:flex;${m.sender==='user'?'justify-content:flex-end':'justify-content:flex-start'}">
-      <div class="chat-bubble ${m.sender==='user'?'sent':'recv'}">${m.text}</div>
-    </div>`).join('');
+
+  if (msgs.length === 0) {
+    c.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:40px 20px;text-align:center">
+      <div style="font-size:44px;margin-bottom:12px">${activeChatContact.emoji || '👤'}</div>
+      <div style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.5);margin-bottom:6px">${activeChatContact.name}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.25)">Say hello 👋</div>
+    </div>`;
+    return;
+  }
+
+  let html = '';
+  let lastDate = null;
+  msgs.forEach((m, idx) => {
+    const d = m.ts ? new Date(m.ts) : null;
+    if (d) {
+      const ds = d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+      if (ds !== lastDate) {
+        html += `<div style="text-align:center;margin:8px 0"><span style="font-size:11px;color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.05);padding:3px 10px;border-radius:99px">${ds}</span></div>`;
+        lastDate = ds;
+      }
+    }
+    const isSent = m.sender === 'user';
+    const ts = d ? d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : '';
+    const showName = !isSent && (idx === 0 || msgs[idx-1]?.sender === 'user');
+    html += `<div style="display:flex;flex-direction:column;align-items:${isSent?'flex-end':'flex-start'};margin-bottom:2px">
+      ${showName ? `<div style="font-size:11px;color:rgba(255,255,255,0.3);margin:6px 0 3px 4px">${activeChatContact.name}</div>` : ''}
+      <div class="chat-bubble ${isSent?'sent':'recv'}">${m.text}</div>
+      ${ts ? `<span style="font-size:10px;color:rgba(255,255,255,0.28);margin:2px 4px 0">${ts}</span>` : ''}
+    </div>`;
+  });
+
+  if (window._chatTyping) {
+    html += `<div style="display:flex;align-items:flex-start;margin-bottom:4px">
+      <div class="chat-typing-indicator"><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div><div class="chat-typing-dot"></div></div>
+    </div>`;
+  }
+  c.innerHTML = html;
   c.scrollTop = c.scrollHeight;
 }
 
 async function sendChatMsg() {
   const input = document.getElementById('chat-input-field');
-  const text = input.value.trim();
+  const text = (input.value || input.innerText || '').trim();
   if (!text || !activeChatContact) return;
-  input.value = '';
+  input.value = ''; input.innerText = ''; input.style.height = '';
   playSound('click');
-  
+
   if (!S.messages[activeChatContact.id]) S.messages[activeChatContact.id] = [];
-  S.messages[activeChatContact.id].push({ sender:'user', text });
+  S.messages[activeChatContact.id].push({ sender:'user', text, ts: Date.now() });
+  renderChatMessages(); saveState();
+
+  window._chatTyping = true;
   renderChatMessages();
-  saveState();
-  
-  // AI response
   setTimeout(async () => {
     const response = await getAIChat(activeChatContact, text);
-    S.messages[activeChatContact.id].push({ sender:'ai', text: response });
-    renderChatMessages();
-    saveState();
+    window._chatTyping = false;
+    S.messages[activeChatContact.id].push({ sender:'ai', text: response, ts: Date.now() });
+    renderChatMessages(); saveState();
     playSound('tick');
-  }, 800 + Math.random()*1200);
+  }, 800 + Math.random() * 1200);
 }
 
 async function getAIChat(contact, userMsg) {
@@ -5752,7 +6053,6 @@ async function getAIChat(contact, userMsg) {
       role: m.sender === 'user' ? 'user' : 'assistant',
       content: m.text
     }));
-    
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -5766,8 +6066,8 @@ async function getAIChat(contact, userMsg) {
     const data = await response.json();
     return data.content?.[0]?.text || '👋';
   } catch(e) {
-    const replies = ['Hey! 😊','Cool!','lol fr','Sounds good!','Haha yeah','That\'s wild 😂','No way!','For real??','Love that for you!'];
-    return replies[Math.floor(Math.random()*replies.length)];
+    const replies = ["Hey! 😊","Cool!","lol fr","Sounds good!","Haha yeah","That's wild 😂","No way!","For real tho 💀","omg yes","ngl that's kinda cute"];
+    return replies[Math.floor(Math.random() * replies.length)];
   }
 }
 
@@ -5786,6 +6086,303 @@ function addContact() {
   document.getElementById('contact-personality').value = '';
   renderChatList();
 }
+// ============================================================
+// QUINT — Relationship Day Planner
+// ============================================================
+
+// Time-of-day background themes (London time via Intl)
+function _quintGetHourLondon() {
+  const now = new Date();
+  const londonTime = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/London', hour: 'numeric', minute: 'numeric', hour12: false
+  }).formatToParts(now);
+  const hPart = londonTime.find(p => p.type === 'hour');
+  const mPart = londonTime.find(p => p.type === 'minute');
+  return { hour: parseInt(hPart?.value || 0), minute: parseInt(mPart?.value || 0) };
+}
+
+function _quintDayTheme(hour) {
+  if (hour >= 5 && hour < 8)   return { bg: 'linear-gradient(180deg,#1a0a2e 0%,#3d1a4a 30%,#ff7043 60%,#ffcc80 100%)', label: '🌅 Morning glow' };
+  if (hour >= 8 && hour < 12)  return { bg: 'linear-gradient(180deg,#0d1b3e 0%,#1e3a6e 40%,#4a90d9 100%)', label: '☀️ Morning' };
+  if (hour >= 12 && hour < 15) return { bg: 'linear-gradient(180deg,#0a1628 0%,#1a3a5c 40%,#2e86c1 100%)', label: '🌤️ Afternoon' };
+  if (hour >= 15 && hour < 18) return { bg: 'linear-gradient(180deg,#1a0d2e 0%,#3d2060 40%,#7b5ea7 70%,#ffb347 100%)', label: '🌇 Late afternoon' };
+  if (hour >= 18 && hour < 21) return { bg: 'linear-gradient(180deg,#0d0520 0%,#1a0a3a 40%,#4a1c6b 70%,#e86b50 100%)', label: '🌆 Evening' };
+  if (hour >= 21 && hour < 23) return { bg: 'linear-gradient(180deg,#030212 0%,#0a0520 40%,#1a0a3a 100%)', label: '🌙 Night' };
+  return { bg: 'linear-gradient(180deg,#020110 0%,#080418 40%,#0d0620 100%)', label: '✨ Late night' };
+}
+
+// Confetti system
+let _quintConfettiParticles = [];
+function _quintInitConfetti(canvas) {
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 320;
+  const H = canvas.offsetHeight || 600;
+  canvas.width = W; canvas.height = H;
+  const colors = ['rgba(199,125,255,0.6)', 'rgba(157,78,221,0.5)', 'rgba(123,47,247,0.5)', 'rgba(255,200,255,0.4)', 'rgba(220,180,255,0.5)', 'rgba(255,255,255,0.25)'];
+  if (_quintConfettiParticles.length < 30) {
+    _quintConfettiParticles = Array.from({ length: 30 }, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.4, vy: 0.3 + Math.random() * 0.5,
+      r: 2 + Math.random() * 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      spin: Math.random() * Math.PI * 2,
+      spinV: (Math.random() - 0.5) * 0.04,
+      shape: Math.random() > 0.5 ? 'circle' : 'rect',
+      W, H
+    }));
+  }
+
+  function tick() {
+    if (!canvas.isConnected) return;
+    ctx.clearRect(0, 0, W, H);
+    _quintConfettiParticles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.spin += p.spinV;
+      if (p.y > p.H + 10) { p.y = -10; p.x = Math.random() * p.W; }
+      if (p.x < -10) p.x = p.W + 5; if (p.x > p.W + 10) p.x = -5;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.spin);
+      ctx.fillStyle = p.color;
+      if (p.shape === 'circle') { ctx.beginPath(); ctx.arc(0, 0, p.r, 0, Math.PI * 2); ctx.fill(); }
+      else { ctx.fillRect(-p.r, -p.r * 0.5, p.r * 2, p.r); }
+      ctx.restore();
+    });
+    requestAnimationFrame(tick);
+  }
+  tick();
+}
+
+// Quint Firestore listener
+let _quintUnsub = null;
+function _startQuintListener() {
+  if (_quintUnsub || !fbDb) return;
+  _quintUnsub = fbDb.collection('config').doc('quintStack').onSnapshot(snap => {
+    if (document.getElementById('screen-quint')?.classList.contains('active')) {
+      _quintRenderStack(snap.exists ? (snap.data()?.items || []) : []);
+    }
+  }, () => {});
+}
+
+function _stopQuintListener() {
+  if (_quintUnsub) { _quintUnsub(); _quintUnsub = null; }
+}
+
+function renderQuint() {
+  // Set dynamic background
+  const { hour, minute } = _quintGetHourLondon();
+  const theme = _quintDayTheme(hour);
+  const bg = document.getElementById('quint-bg');
+  if (bg) bg.style.background = theme.bg;
+  const label = document.getElementById('quint-time-label');
+  if (label) label.textContent = theme.label + ' · ' + String(hour).padStart(2,'0') + ':' + String(minute).padStart(2,'0');
+
+  // Start confetti
+  setTimeout(() => {
+    const canvas = document.getElementById('quint-confetti');
+    if (canvas) _quintInitConfetti(canvas);
+  }, 100);
+
+  // Build hour labels on bar
+  _quintRenderBar(hour, minute);
+
+  // Load from Firestore
+  _startQuintListener();
+  if (fbDb) {
+    fbDb.collection('config').doc('quintStack').get().then(snap => {
+      _quintRenderStack(snap.exists ? (snap.data()?.items || []) : []);
+    }).catch(() => _quintRenderStack([]));
+  } else {
+    _quintRenderStack([]);
+  }
+}
+
+function _quintRenderBar(curHour, curMinute) {
+  const labelsEl = document.getElementById('quint-hour-labels');
+  const fillEl = document.getElementById('quint-bar-fill');
+  const pointerEl = document.getElementById('quint-bar-pointer');
+  if (!labelsEl) return;
+
+  // Show hours 6am to 11pm (17 hour span)
+  const START_H = 6, END_H = 23, SPAN = END_H - START_H;
+  const hours = [];
+  for (let h = START_H; h <= END_H; h += 2) hours.push(h);
+
+  labelsEl.innerHTML = hours.map(h => {
+    const label = h === 0 ? '12a' : h < 12 ? h + 'a' : h === 12 ? '12p' : (h - 12) + 'p';
+    const isCur = Math.abs(h - curHour) <= 1;
+    return `<div style="font-size:9px;font-weight:${isCur?'700':'500'};color:${isCur?'#c77dff':'rgba(255,255,255,0.35)'};line-height:1;text-align:right">${label}</div>`;
+  }).join('');
+
+  // Calculate fill percentage
+  const clampedH = Math.max(START_H, Math.min(END_H, curHour));
+  const elapsed = (clampedH - START_H) + curMinute / 60;
+  const pct = Math.min(100, (elapsed / SPAN) * 100);
+  if (fillEl) fillEl.style.height = pct + '%';
+  if (pointerEl) pointerEl.style.bottom = pct + '%';
+}
+
+function _quintRenderStack(items) {
+  const container = document.getElementById('quint-stacks');
+  const emptyEl = document.getElementById('quint-empty');
+  if (!container) return;
+
+  if (!items || items.length === 0) {
+    if (emptyEl) emptyEl.style.display = 'flex';
+    // Clear old cards but keep empty
+    Array.from(container.children).forEach(ch => { if (ch !== emptyEl) ch.remove(); });
+    return;
+  }
+  if (emptyEl) emptyEl.style.display = 'none';
+
+  const { hour, minute } = _quintGetHourLondon();
+  const curMins = hour * 60 + minute;
+
+  // Sort by time
+  const sorted = [...items].sort((a, b) => {
+    const ta = _quintTimeToMins(a.time), tb = _quintTimeToMins(b.time);
+    return ta - tb;
+  });
+
+  // Find active item (closest to current time)
+  let activeIdx = -1;
+  let minDiff = Infinity;
+  sorted.forEach((item, i) => {
+    const t = _quintTimeToMins(item.time);
+    const diff = Math.abs(t - curMins);
+    if (diff < minDiff) { minDiff = diff; activeIdx = i; }
+  });
+
+  const typeColors = {
+    event:    { border: '#4edfd0', glow: 'rgba(78,223,208,0.25)', icon: '📅' },
+    activity: { border: '#f6bb4e', glow: 'rgba(246,187,78,0.25)', icon: '🎉' },
+    date:     { border: '#ff6b9d', glow: 'rgba(255,107,157,0.3)', icon: '💕' },
+    reminder: { border: '#a088fa', glow: 'rgba(160,136,250,0.25)', icon: '🔔' },
+    note:     { border: 'rgba(255,255,255,0.2)', glow: 'rgba(255,255,255,0.05)', icon: '📝' },
+  };
+
+  // Build new HTML
+  const html = sorted.map((item, i) => {
+    const isActive = i === activeIdx;
+    const tc = typeColors[item.type] || typeColors.note;
+    const emoji = item.emoji || tc.icon;
+    const timeLabel = item.time || '';
+    const isPast = _quintTimeToMins(item.time) < curMins - 30;
+    return `<div class="quint-stack-piece ${isActive ? 'active-now' : ''}" style="${isActive ? 'border-color:' + tc.border + ';box-shadow:0 4px 24px ' + tc.glow : ''}${isPast ? ';opacity:0.5' : ''}">
+      ${isActive ? `<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${tc.border},transparent);border-radius:99px"></div>` : ''}
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="font-size:22px;flex-shrink:0;margin-top:1px">${emoji}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+            <span style="font-size:14px;font-weight:700;color:${isActive?'#fff':'rgba(255,255,255,0.85)'};letter-spacing:-0.2px;flex:1;word-break:break-word">${item.title}</span>
+            ${timeLabel ? `<span style="font-size:11px;color:${isActive?tc.border:'rgba(255,255,255,0.3)'};font-weight:600;flex-shrink:0">${_quintFmtTime(timeLabel)}</span>` : ''}
+          </div>
+          ${item.desc ? `<div style="font-size:12px;color:rgba(255,255,255,0.45);line-height:1.4;word-break:break-word">${item.desc}</div>` : ''}
+          <div style="margin-top:4px;display:flex;align-items:center;gap:6px">
+            <span style="font-size:10px;color:${tc.border};background:${tc.glow};border:1px solid ${tc.border}44;padding:1px 6px;border-radius:99px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">${item.type}</span>
+            ${isActive ? `<span style="font-size:10px;color:${tc.border};font-weight:700;animation:quintGlow 2s ease-in-out infinite">● Now</span>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Replace content
+  Array.from(container.children).forEach(ch => { if (ch !== emptyEl) ch.remove(); });
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = html;
+  Array.from(wrapper.children).forEach(ch => container.appendChild(ch));
+}
+
+function _quintTimeToMins(timeStr) {
+  if (!timeStr) return 0;
+  const [h, m] = timeStr.split(':').map(Number);
+  return (h || 0) * 60 + (m || 0);
+}
+
+function _quintFmtTime(t) {
+  if (!t) return '';
+  const [h, m] = t.split(':').map(Number);
+  const ampm = h < 12 ? 'AM' : 'PM';
+  const h12 = h % 12 || 12;
+  return h12 + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+}
+
+// Admin functions
+window._quintAdmLoad = async function() {
+  const el = document.getElementById('quint-adm-items');
+  if (!el) return;
+  if (!fbDb) { el.innerHTML = '<span style="color:rgba(255,255,255,0.3)">Not connected to Firestore</span>'; return; }
+  try {
+    const snap = await fbDb.collection('config').doc('quintStack').get();
+    const items = snap.exists ? (snap.data()?.items || []) : [];
+    if (!items.length) { el.innerHTML = '<span style="color:rgba(255,255,255,0.3)">No items yet</span>'; return; }
+    const typeColors = { event:'#4edfd0', activity:'#f6bb4e', date:'#ff6b9d', reminder:'#a088fa', note:'rgba(255,255,255,0.5)' };
+    el.innerHTML = items.sort((a,b) => _quintTimeToMins(a.time) - _quintTimeToMins(b.time)).map((item, i) => `
+      <div style="display:flex;align-items:center;gap:8px;padding:8px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.07)">
+        <span style="font-size:16px">${item.emoji || '💜'}</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.title}</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.35)">${_quintFmtTime(item.time)} · <span style="color:${typeColors[item.type]||'#fff'}">${item.type}</span></div>
+        </div>
+        <button onclick="window._quintAdmDelete(${i})" style="background:rgba(255,100,100,0.15);border:1px solid rgba(255,100,100,0.3);color:#ff6b6b;border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer">✕</button>
+      </div>`).join('');
+  } catch(e) { el.innerHTML = `<span style="color:#ff6b6b;font-size:11px">Error: ${e.message}</span>`; }
+};
+
+window._quintAdmAdd = async function() {
+  const time = document.getElementById('qe-time')?.value || '';
+  const title = document.getElementById('qe-title')?.value.trim() || '';
+  const type = document.getElementById('qe-type')?.value || 'event';
+  const emoji = document.getElementById('qe-emoji')?.value.trim() || '';
+  const desc = document.getElementById('qe-desc')?.value.trim() || '';
+  if (!title) { showNotif('⚠️', 'Missing title', 'Please enter a title for the stack item'); return; }
+  if (!fbDb) { showNotif('⚠️', 'Not connected', 'Firestore not available'); return; }
+  try {
+    const snap = await fbDb.collection('config').doc('quintStack').get();
+    const items = snap.exists ? (snap.data()?.items || []) : [];
+    items.push({ time, title, type, emoji, desc, createdAt: Date.now() });
+    await fbDb.collection('config').doc('quintStack').set({ items });
+    showNotif('💜', 'Added!', `"${title}" pushed live`);
+    playSound('success');
+    // Clear fields
+    if (document.getElementById('qe-title')) document.getElementById('qe-title').value = '';
+    if (document.getElementById('qe-emoji')) document.getElementById('qe-emoji').value = '';
+    if (document.getElementById('qe-desc')) document.getElementById('qe-desc').value = '';
+    window._quintAdmLoad();
+  } catch(e) { showNotif('❌', 'Error', e.message); }
+};
+
+window._quintAdmDelete = async function(idx) {
+  if (!fbDb) return;
+  try {
+    const snap = await fbDb.collection('config').doc('quintStack').get();
+    const items = snap.exists ? (snap.data()?.items || []) : [];
+    items.splice(idx, 1);
+    await fbDb.collection('config').doc('quintStack').set({ items });
+    showNotif('🗑', 'Removed', 'Item deleted from stack');
+    window._quintAdmLoad();
+  } catch(e) { showNotif('❌', 'Error', e.message); }
+};
+
+window._quintAdmClear = async function() {
+  if (!fbDb) return;
+  if (!confirm('Clear all Quint stack items?')) return;
+  await fbDb.collection('config').doc('quintStack').set({ items: [] });
+  showNotif('🗑', 'Cleared', 'All stack items removed');
+  window._quintAdmLoad();
+};
+
+// Auto-refresh Quint bar every minute while open
+setInterval(() => {
+  if (document.getElementById('screen-quint')?.classList.contains('active')) {
+    const { hour, minute } = _quintGetHourLondon();
+    const theme = _quintDayTheme(hour);
+    const bg = document.getElementById('quint-bg');
+    if (bg) bg.style.background = theme.bg;
+    const label = document.getElementById('quint-time-label');
+    if (label) label.textContent = theme.label + ' · ' + String(hour).padStart(2,'0') + ':' + String(minute).padStart(2,'0');
+    _quintRenderBar(hour, minute);
+  }
+}, 60000);
 
 // ============================================================
 // NOTES
@@ -8999,6 +9596,14 @@ function clearOpenedGifts() {
 // MARBLE RACE
 // ============================================================
 const MR_W = 320, MR_H = 900;
+
+// ── Dynamic level depth system ──
+// Every 3 races the level can grow taller (6-10 "screens" instead of default 5).
+// One "screen" ≈ MR_H pixels.
+let mrRaceCount   = 0;          // increments each time a race finishes
+let mrLevelScreens = 5;         // current level height in MR_H units (default 5)
+let mrLevelH       = MR_H * 5;  // actual pixel height; updated before each gen
+
 let mrWorldW = 320; // live canvas CSS width — updated on render/resize
 const MARBLE_COLORS = [
   {id:'red',    label:'Red',     hex:'#ff4444', glow:'rgba(255,68,68,0.6)'},
@@ -9033,6 +9638,8 @@ let mrSoundCooldowns = {}; // hazard sound rate-limiting
 let mrTop3Done = false;    // true once 3rd place finishes — starts stuck check
 let mrTop3CheckTimer = null;
 let mrTicketsAwarded = false; // guards against double-awarding tickets
+let mrFirstFinishCountdown = 0;   // 30..0 — starts when first marble finishes
+let mrFirstFinishTimer = null;    // interval handle for the 30s countdown
 
 // Level themes — palette applied when generating map
 const MR_THEMES = {
@@ -9052,6 +9659,8 @@ const MR_THEMES = {
   jpnight:    { rampCol:'rgba(180,120,255,X)', pegCol:'rgba(255,160,220,X)', bumperCol:'rgba(120,180,255,X)', bgA:'#03010d', bgB:'#080118', wallCol:'rgba(180,120,255,0.5)', name:'Japanese Night'  },
   kitchen:    { rampCol:'rgba(255,200,100,X)', pegCol:'rgba(255,160,60,X)',  bumperCol:'rgba(255,100,80,X)',  bgA:'#120800', bgB:'#1e0f00', wallCol:'rgba(255,180,80,0.5)',  name:'Kitchen'        },
   midnightup: { rampCol:'rgba(80,120,255,X)',  pegCol:'rgba(180,80,255,X)',  bumperCol:'rgba(255,80,120,X)',  bgA:'#02020e', bgB:'#040418', wallCol:'rgba(80,120,255,0.5)',  name:'Midnight Uprise'},
+  autumn:     { rampCol:'rgba(200,100,30,X)',  pegCol:'rgba(220,140,40,X)',  bumperCol:'rgba(180,80,20,X)',   bgA:'#0d0500', bgB:'#180a00', wallCol:'rgba(200,100,30,0.5)', name:'Autumn Harvest' },
+  medieval:   { rampCol:'rgba(160,130,80,X)',  pegCol:'rgba(200,160,80,X)',  bumperCol:'rgba(220,100,30,X)',  bgA:'#050403', bgB:'#0d0a06', wallCol:'rgba(160,130,80,0.5)', name:'Medieval Keep'  },
 };
 
 function renderMarbleRace() {
@@ -9081,6 +9690,7 @@ function renderMarbleRace() {
   if (mrCountTimer)     { clearInterval(mrCountTimer);       mrCountTimer = null; }
   if (mrStuckCountTimer){ clearInterval(mrStuckCountTimer);  mrStuckCountTimer = null; mrStuckCountdown = 0; }
   if (mrTop3CheckTimer) { clearTimeout(mrTop3CheckTimer);    mrTop3CheckTimer = null; }
+  if (mrFirstFinishTimer){ clearInterval(mrFirstFinishTimer); mrFirstFinishTimer = null; mrFirstFinishCountdown = 0; }
 
   // If we left mid-race or mid-countdown, drop back to vote so the UI is never broken
   if (mrState === 'racing' || mrState === 'countdown') {
@@ -9091,6 +9701,7 @@ function renderMarbleRace() {
     mrCameraTarget = null;
     mrTop3Done = false;
     mrTicketsAwarded = false;
+    if (mrFirstFinishTimer){ clearInterval(mrFirstFinishTimer); mrFirstFinishTimer = null; mrFirstFinishCountdown = 0; }
   }
 
   c.innerHTML = `
@@ -9246,8 +9857,21 @@ function mrGenMap() { _mrTryGenMap(); }
 function mrGenMap_inner() {
   mrObstacles = [];
   mrGoals = [];
-  const W = mrWorldW, H = MR_H;
+  const W = mrWorldW;
   const rng = () => Math.random();
+
+  // ── Dynamic depth: every 3 races, randomise between 6–10 screens tall ──
+  // Default is 5 screens (MR_H * 5). We DON'T change MR_H itself (physics uses it
+  // as the viewport height). Instead we give the generator a taller canvas to fill.
+  if (mrRaceCount > 0 && mrRaceCount % 3 === 0) {
+    mrLevelScreens = 6 + Math.floor(rng() * 5); // 6..10
+  } else if (mrRaceCount % 3 !== 0 || mrRaceCount === 0) {
+    // Between milestone races keep the same depth; on the first race always reset
+    if (mrRaceCount === 0) mrLevelScreens = 5;
+  }
+  mrLevelH = MR_H * mrLevelScreens;
+  const H = mrLevelH;
+  const isDeepLevel = mrLevelScreens > 5;
 
   // Pick a random theme for this level
   const themeKeys = Object.keys(MR_THEMES);
@@ -9259,12 +9883,36 @@ function mrGenMap_inner() {
   // "gate points" the marble can always fall through. Obstacles are
   // placed only outside these gate corridors.
   // ─────────────────────────────────────────────────────────────
-  const ZONES = 9;
+  // Scale ZONES with depth: ~9 zones per 5 screens, proportional
+  const BASE_ZONES = 9;
+  const ZONES = Math.round(BASE_ZONES * mrLevelScreens / 5);
   const GATE_W = 60;   // width of guaranteed clear corridor per gate
   const zoneH = (H - 100) / ZONES;
 
+
   // Alternate gate X positions zigzag across track
   const gates = [];
+  // ── Theme-specific hazard pools (hoisted for use in special sections) ──
+  // ── One interactive hazard per zone — placed near gate but not IN it ──
+  // Theme-specific hazard pools
+  const themeHazards = {
+  forest:    ['buzzsaw','fallenTree','string'],
+  ice:       ['icePatch','icicle','icyBoulder','snowMachine'],
+  sakura:    ['sakuraPetal','leafPile'],
+  arctic:    ['snowAvalanche','crackingIceBridge','iceSpike','iceSlide','penguinBumper','frozenGear'],
+  sewers:    ['toxicSludge','pipeBlade','steamBurst','directionalPipe','drippingWater','ratStampede','drainTunnel'],
+  sunken:    ['waterCurrent','pressureZone','clamTrap','bubbleElevator'],
+  skatepark: ['rollingBoard','grindRail','spinRamp','halfPipe','boostRail','grafittiBumper','rotatingObstacle'],
+  beach:     ['beachBall','crabTrap','wavePush','sandRamp','umbrellaBumper'],
+  garden:    ['waterPuddle','thornBush','grassPatch','beeSting'],
+  jpnight:   ['swingingBamboo','paperLantern','shurikenWheel','sakuraWindTunnel','waterGardenCurrent','moonlitSection'],
+  kitchen:   ['grillPlatform','kitchenKnife','mixingBowl','toiletPaper'],
+  midnightup:['trafficCar','trafficLight','trafficCone','oilSpillage'],
+  autumn:    ['fallingAcorn','windGust','slippyLeaves','mushroomPad','pumpkinTrampoline','hollowLog','windmill','scarecrow','cornStalk'],
+  medieval:  ['swingingMace','arrowTrap','firePit','spikedGate','catapult','shieldBumper','castleGear','barrelRoller','knightStatue'],
+  };
+  const basePool = ['springboard','fan','gear','stickyzone','bridge','conveyor','seesaw','bouncywall','slide','rollerchain'];
+
   for (let z = 0; z < ZONES; z++) {
     const side = z % 2;
     const gx = side === 0
@@ -9316,26 +9964,9 @@ function mrGenMap_inner() {
       }
     }
 
-    // ── One interactive hazard per zone — placed near gate but not IN it ──
-    // Theme-specific hazard pools
-    const themeHazards = {
-      forest:    ['buzzsaw','fallenTree','string'],
-      ice:       ['icePatch','icicle','icyBoulder','snowMachine'],
-      sakura:    ['sakuraPetal','leafPile'],
-      arctic:    ['snowAvalanche','crackingIceBridge','iceSpike','iceSlide','penguinBumper','frozenGear'],
-      sewers:    ['toxicSludge','pipeBlade','steamBurst','directionalPipe','drippingWater','ratStampede','drainTunnel'],
-      sunken:    ['waterCurrent','pressureZone','clamTrap','bubbleElevator'],
-      skatepark: ['rollingBoard','grindRail','spinRamp','halfPipe','boostRail','grafittiBumper','rotatingObstacle'],
-      beach:     ['beachBall','crabTrap','wavePush','sandRamp','umbrellaBumper'],
-      garden:    ['waterPuddle','thornBush','grassPatch','beeSting'],
-      jpnight:   ['swingingBamboo','paperLantern','shurikenWheel','sakuraWindTunnel','waterGardenCurrent','moonlitSection'],
-      kitchen:   ['grillPlatform','kitchenKnife','mixingBowl','toiletPaper'],
-      midnightup:['trafficCar','trafficLight','trafficCone','oilSpillage'],
-    };
-    const basePool = ['springboard','fan','gear','stickyzone','bridge','conveyor','seesaw','bouncywall','slide','rollerchain'];
     const themePool = themeHazards[mrTheme] || [];
     // For themed levels always use the theme pool; for generic themes mix in base pool occasionally
-    const alwaysThemed = ['arctic','sewers','sunken','skatepark','beach','garden','jpnight','kitchen','midnightup','forest'].includes(mrTheme);
+    const alwaysThemed = ['arctic','sewers','sunken','skatepark','beach','garden','jpnight','kitchen','midnightup','forest','autumn','medieval'].includes(mrTheme);
     const hazardPool = themePool.length && (alwaysThemed || rng() < 0.75) ? themePool : basePool;
 
     // Pick 2 distinct hazards per zone to ensure full theme variety across a race
@@ -9539,7 +10170,7 @@ function mrGenMap_inner() {
         // Spawn a moonlit section at the tunnel exit — they are always connected
         const exitX = hx + Math.sin(tAngle)*tLen;
         const exitY = hy + Math.cos(tAngle)*tLen;
-        if (exitX > 20 && exitX < W-20 && exitY < MR_H - 40) {
+        if (exitX > 20 && exitX < W-20 && exitY < mrLevelH - 40) {
           mrObstacles.push({ type:'moonlitSection', x: exitX, y: exitY, r:24+rng()*10, phase:rng()*Math.PI*2, _theme:'jpnight' });
         }
         break;
@@ -9590,9 +10221,105 @@ function mrGenMap_inner() {
       case 'oilSpillage':
         mrObstacles.push({ type:'oilSpillage', x: hx, y: hy, w:55+rng()*30, phase:0, _theme:'midnightup' });
         break;
+      // ── Autumn Harvest ──
+      case 'fallingAcorn':
+        mrObstacles.push({ type:'fallingAcorn', x:hx, y:hy, r:8, vx:0, vy:0, fallen:false, bounces:0, _theme:'autumn' });
+        break;
+      case 'windGust':
+        mrObstacles.push({ type:'windGust', x:hx, y:hy, w:70+rng()*40, h:30+rng()*20, dir:rng()>0.5?1:-1, phase:0, strength:0.18+rng()*0.12, active:true, _theme:'autumn' });
+        break;
+      case 'slippyLeaves':
+        mrObstacles.push({ type:'slippyLeaves', x:hx, y:hy, w:60+rng()*30, phase:0, _theme:'autumn' });
+        break;
+      case 'mushroomPad':
+        mrObstacles.push({ type:'mushroomPad', x:hx, y:hy, r:20+rng()*8, bounce:0, _theme:'autumn' });
+        break;
+      case 'pumpkinTrampoline':
+        mrObstacles.push({ type:'pumpkinTrampoline', x:hx, y:hy, w:50+rng()*20, squish:0, _theme:'autumn' });
+        break;
+      case 'hollowLog': {
+        const logDir = rng()>0.5?1:-1;
+        mrObstacles.push({ type:'hollowLog', x:hx, y:hy, w:70+rng()*20, r:14, dir:logDir, marbleInside:null, _theme:'autumn' });
+        break;
+      }
+      case 'windmill':
+        mrObstacles.push({ type:'windmill', x:hx, y:hy, angle:0, speed:(rng()>0.5?1:-1)*(0.018+rng()*0.012), bladeLen:28+rng()*10, _theme:'autumn' });
+        break;
+      case 'scarecrow':
+        mrObstacles.push({ type:'scarecrow', x:hx, y:hy, wobble:0, wobbleV:0, _theme:'autumn' });
+        break;
+      case 'cornStalk':
+        mrObstacles.push({ type:'cornStalk', x:hx, y:hy, w:50+rng()*30, sway:0, swayV:0, _theme:'autumn' });
+        break;
+      // ── Medieval Keep ──
+      case 'swingingMace':
+        mrObstacles.push({ type:'swingingMace', x:hx, y:hy, len:40+rng()*15, angle:-0.5+rng()*1, angV:0, r:12, _theme:'medieval' });
+        break;
+      case 'arrowTrap':
+        mrObstacles.push({ type:'arrowTrap', x:hx, y:hy, dir:rng()>0.5?1:-1, cooldown:0, arrows:[], _theme:'medieval' });
+        break;
+      case 'firePit':
+        mrObstacles.push({ type:'firePit', x:hx, y:hy, w:50+rng()*20, phase:0, particles:[], _theme:'medieval' });
+        break;
+      case 'spikedGate':
+        mrObstacles.push({ type:'spikedGate', x:hx, y:hy, w:60+rng()*20, open:false, timer:0, openT:90+Math.floor(rng()*60), closeT:120+Math.floor(rng()*60), _theme:'medieval' });
+        break;
+      case 'catapult':
+        mrObstacles.push({ type:'catapult', x:hx, y:hy, angle:0.3, fired:false, cooldown:0, projectiles:[], _theme:'medieval' });
+        break;
+      case 'shieldBumper':
+        mrObstacles.push({ type:'shieldBumper', x:hx, y:hy, r:18+rng()*6, angle:rng()*Math.PI*2, _theme:'medieval' });
+        break;
+      case 'castleGear':
+        mrObstacles.push({ type:'castleGear', x:hx, y:hy, r:20+rng()*8, angle:0, speed:(rng()>0.5?1:-1)*0.022, teeth:8, _theme:'medieval' });
+        break;
+      case 'barrelRoller':
+        mrObstacles.push({ type:'barrelRoller', x:hx, y:hy, r:14+rng()*5, vx:(rng()>0.5?1:-1)*1.2, angle:0, _theme:'medieval' });
+        break;
+      case 'knightStatue':
+        mrObstacles.push({ type:'knightStatue', x:hx, y:hy, r:16, glow:0, _theme:'medieval' });
+        break;
     } // end switch(pick)
   } // end for(pick of picks)
   } // end zone loop
+
+  // ── Special section for deep levels ──────────────────────────
+  if (isDeepLevel) {
+    // Place one special section in the lower third of the extra depth
+    const specialY = MR_H * 5 + rng() * (H - MR_H * 5 - 200);
+    const specialType = Math.floor(rng() * 3);
+    const cx = W * 0.2 + rng() * W * 0.6;
+
+    if (specialType === 0) {
+      // Hazard gauntlet: a dense row of themed hazards
+      const themePool = (themeHazards[mrTheme] || []);
+      const pool = themePool.length ? themePool : ['springboard','fan','gear','bumper','conveyor'];
+      for (let gi = 0; gi < 5; gi++) {
+        const gx = W * 0.1 + gi * (W * 0.18);
+        const pick = pool[Math.floor(rng() * pool.length)];
+        const hx2 = gx, hy2 = specialY + (gi % 2) * 30;
+        // Spawn via simplified inline push (shared types only)
+        mrObstacles.push({ type: 'bumper', x: hx2, y: hy2, r: 11 + rng() * 5, angle: 0, speed: 0.025 + rng() * 0.02, _theme: mrTheme, _special: 'gauntlet' });
+      }
+      mrObstacles.push({ type: 'ramp', x: W * 0.25, y: specialY - 20, w: 60, angle: 0.35, _theme: mrTheme, _special: 'gauntlet' });
+      mrObstacles.push({ type: 'ramp', x: W * 0.75, y: specialY - 20, w: 60, angle: -0.35, _theme: mrTheme, _special: 'gauntlet' });
+    } else if (specialType === 1) {
+      // Speed ramp gauntlet: interlocked ramps for fast descent
+      for (let ri = 0; ri < 4; ri++) {
+        const side = ri % 2;
+        const rx = side === 0 ? 30 + rng() * (W * 0.35) : W * 0.65 + rng() * (W * 0.3 - 30);
+        const angle = side === 0 ? 0.45 + rng() * 0.1 : -(0.45 + rng() * 0.1);
+        mrObstacles.push({ type: 'ramp', x: rx, y: specialY + ri * 80, w: 70 + rng() * 20, angle, _theme: mrTheme, _special: 'speedramp' });
+      }
+      mrObstacles.push({ type: 'conveyor', x: cx, y: specialY + 200, w: 80 + rng() * 30, dir: rng() > 0.5 ? 1 : -1, speed: 2, _theme: mrTheme, _special: 'speedramp' });
+    } else {
+      // Bonus zone: springboards and low-friction slides for big air
+      mrObstacles.push({ type: 'springboard', x: W * 0.3, y: specialY, w: 45, power: 14, compressed: 0, _theme: mrTheme, _special: 'bonus' });
+      mrObstacles.push({ type: 'springboard', x: W * 0.7, y: specialY + 60, w: 45, power: 14, compressed: 0, _theme: mrTheme, _special: 'bonus' });
+      mrObstacles.push({ type: 'bouncywall', x: cx, y: specialY + 130, w: 80, angle: 0, _theme: mrTheme, _special: 'bonus' });
+      mrObstacles.push({ type: 'slide', x: W * 0.5, y: specialY + 210, w: 90, angle: rng() > 0.5 ? 0.3 : -0.3, _theme: mrTheme, _special: 'bonus' });
+    }
+  }
 
   // ── Bottom funnel ──
   mrObstacles.push({ type:'ramp',   x: 30,   y: H - 60, w: 90,  angle:  0.55, _theme: mrTheme });
@@ -9639,7 +10366,7 @@ function mrRampCollide(m, ox, oy, halfW, halfH, angle, bounceMult) {
 }
 
 function mrStepPhysics() {
-  const W = mrWorldW, H = MR_H;
+  const W = mrWorldW, H = mrLevelH;
   const GRAVITY = 0.08;
   const FRICTION = 0.992;
   const BOUNCE = 0.38;
@@ -9697,7 +10424,7 @@ function mrStepPhysics() {
       const _avaAge = Date.now() - o._triggeredAt;
       if (!o.balls) o.balls=[];
       o.balls.forEach(b => { b.x+=b.vx; b.y+=b.vy; b.vy+=0.07; b.vx*=0.99; });
-      o.balls = o.balls.filter(b => b.y < MR_H+40 && _avaAge < 15000);
+      o.balls = o.balls.filter(b => b.y < mrLevelH+40 && _avaAge < 15000);
       // Map real time to 0-900 range for alpha fade in draw code
       o.despawnT = Math.min(900, (_avaAge / 15000) * 900);
     }
@@ -9801,7 +10528,7 @@ function mrStepPhysics() {
       if (o.x < 16) { o.x=16; o.vx=Math.abs(o.vx); }
       if (o.x > mrWorldW-16) { o.x=mrWorldW-16; o.vx=-Math.abs(o.vx); }
       if (o.y < 20) { o.y=20; o.vy=Math.abs(o.vy); }
-      if (o.y > MR_H-20) { o.y=MR_H-20; o.vy=-Math.abs(o.vy); }
+      if (o.y > mrLevelH-20) { o.y=mrLevelH-20; o.vy=-Math.abs(o.vy); }
     }
     // Japanese Night
     if (o.type === 'swingingBamboo') {
@@ -10834,6 +11561,236 @@ function mrStepPhysics() {
           }
           break;
         }
+        // ── Autumn ──
+        case 'fallingAcorn': {
+          if (!o.fallen) {
+            o.vy = (o.vy||0) + 0.18;
+            o.x += (o.vx||0); o.y += o.vy;
+            if (o.y + o.r >= MR_H - 20) { o.y = MR_H - 20 - o.r; o.fallen = true; }
+          }
+          const adx=m.x-o.x, ady=m.y-o.y, ad=Math.hypot(adx,ady);
+          if (ad < m.r + o.r && ad > 0) {
+            const nx=adx/ad, ny=ady/ad; const pen=m.r+o.r-ad;
+            m.x+=nx*pen; m.y+=ny*pen;
+            const dot=m.vx*nx+m.vy*ny; if(dot<0){m.vx-=(1+0.5)*dot*nx;m.vy-=(1+0.5)*dot*ny;}
+            if (!o.fallen) { o.vx=(o.vx||0)-nx*2; o.vy=(o.vy||0)-ny*2; }
+            o.bounces=(o.bounces||0)+1;
+            mrPlayHazardSound('bump', o, 300);
+          }
+          break;
+        }
+        case 'windGust': {
+          o.phase=(o.phase||0)+0.02; o.timer=(o.timer||0)+1;
+          // Cycle: 3s active, 2s rest
+          const wCycle = o.timer % 300;
+          o.active = wCycle < 180;
+          if (o.active) {
+            const inX=m.x>o.x-o.w/2&&m.x<o.x+o.w/2, inY=m.y>o.y-o.h/2&&m.y<o.y+o.h/2;
+            if (inX&&inY) { m.vx+=o.dir*o.strength; m.vy-=0.04; mrPlayHazardSound('whoosh',o,500); }
+          }
+          break;
+        }
+        case 'slippyLeaves': {
+          o.phase=(o.phase||0)+0.03;
+          const lhw=o.w/2;
+          if (m.y+m.r>=o.y-4&&m.y+m.r<=o.y+4&&m.x>o.x-lhw&&m.x<o.x+lhw&&m.vy>=0) {
+            m.y=o.y-m.r-4; m.vy*=-0.15; m.vx*=1.08; // very slippery
+            mrPlayHazardSound('slide', o, 200);
+          }
+          break;
+        }
+        case 'mushroomPad': {
+          const mdx=m.x-o.x, mdy=m.y-o.y, md=Math.hypot(mdx,mdy);
+          if (md<m.r+o.r&&mdy<0&&m.vy>0) {
+            m.vy=-Math.abs(m.vy)*2.2-1.5; o.bounce=15;
+            mrPlayHazardSound('boing', o, 300);
+          }
+          if (o.bounce>0) o.bounce--;
+          break;
+        }
+        case 'pumpkinTrampoline': {
+          const phw=o.w/2;
+          if (m.y+m.r>=o.y-8&&m.y+m.r<=o.y+8&&m.x>o.x-phw&&m.x<o.x+phw&&m.vy>0) {
+            m.y=o.y-m.r-8; m.vy=-Math.abs(m.vy)*2.0-1.2; o.squish=12;
+            mrPlayHazardSound('boing', o, 300);
+          }
+          if (o.squish>0) o.squish--;
+          break;
+        }
+        case 'hollowLog': {
+          const lhw=(o.w||70)/2;
+          const inside=m.x>o.x-lhw&&m.x<o.x+lhw&&Math.abs(m.y-o.y)<o.r;
+          if (inside) { m.vx+=o.dir*0.12; m.vy*=0.98; o.marbleInside=m.id; }
+          else if (o.marbleInside===m.id) o.marbleInside=null;
+          break;
+        }
+        case 'windmill': {
+          o.angle=(o.angle||0)+o.speed;
+          const numBlades=4; const bLen=o.bladeLen||28;
+          for (let bi=0;bi<numBlades;bi++) {
+            const ba=o.angle+bi*Math.PI*2/numBlades;
+            const bx1=o.x, by1=o.y;
+            const bx2=o.x+Math.cos(ba)*bLen, by2=o.y+Math.sin(ba)*bLen;
+            const dx2=m.x-bx1, dy2=m.y-by1;
+            const bDx=bx2-bx1, bDy=by2-by1;
+            const t2=Math.max(0,Math.min(1,(dx2*bDx+dy2*bDy)/(bLen*bLen)));
+            const cx2=bx1+t2*bDx, cy2=by1+t2*bDy;
+            const dist=Math.hypot(m.x-cx2,m.y-cy2);
+            if (dist<m.r+5) {
+              const nx=(m.x-cx2)/dist, ny=(m.y-cy2)/dist;
+              m.x+=nx*(m.r+5-dist); m.y+=ny*(m.r+5-dist);
+              const spd=Math.hypot(o.speed*bLen,o.speed*bLen);
+              m.vx+=nx*spd*1.5+o.speed*bLen*0.04; m.vy+=ny*spd*1.5;
+              mrPlayHazardSound('bump',o,200);
+            }
+          }
+          break;
+        }
+        case 'scarecrow': {
+          o.wobbleV=(o.wobbleV||0)*0.95; o.wobble=(o.wobble||0)+o.wobbleV;
+          const sdx=m.x-o.x, sdy=m.y-o.y, sd=Math.hypot(sdx,sdy);
+          if (sd<m.r+18&&sd>0) {
+            const nx=sdx/sd,ny=sdy/sd; const pen=m.r+18-sd;
+            m.x+=nx*pen*0.5; m.y+=ny*pen*0.5;
+            m.vx+=nx*1.2; m.vy+=ny*0.8;
+            o.wobbleV+=sdx>0?0.08:-0.08;
+            mrPlayHazardSound('bump',o,400);
+          }
+          break;
+        }
+        case 'cornStalk': {
+          o.swayV=(o.swayV||0)*0.92; o.sway=(o.sway||0)+o.swayV;
+          o.sway=Math.max(-0.3,Math.min(0.3,o.sway));
+          const cw2=(o.w||50)/2;
+          if (m.y+m.r>=o.y-20&&m.y+m.r<=o.y+5&&m.x>o.x-cw2&&m.x<o.x+cw2&&m.vy>=0) {
+            m.y=o.y-20-m.r; m.vy*=-0.25; m.vx+=o.sway*2;
+            o.swayV+=m.vx*0.08;
+          }
+          break;
+        }
+        // ── Medieval ──
+        case 'swingingMace': {
+          o.angV=(o.angV||0)+(Math.sin(o.angle)*0.012); o.angV*=0.995;
+          o.angle=(o.angle||0)+o.angV;
+          const mx2=o.x+Math.sin(o.angle)*o.len, my2=o.y+Math.cos(o.angle)*o.len;
+          const mdx2=m.x-mx2, mdy2=m.y-my2, md2=Math.hypot(mdx2,mdy2);
+          if (md2<m.r+o.r&&md2>0) {
+            const nx=mdx2/md2, ny=mdy2/md2;
+            m.x+=nx*(m.r+o.r-md2); m.y+=ny*(m.r+o.r-md2);
+            const spd=Math.abs(o.angV)*o.len;
+            m.vx+=nx*spd*2.5; m.vy+=ny*spd*2.5;
+            mrPlayHazardSound('clang',o,300);
+          }
+          break;
+        }
+        case 'arrowTrap': {
+          o.cooldown=(o.cooldown||0)-1;
+          if (o.cooldown<=0 && Math.abs(m.y-o.y)<60 && m.x>o.x-80 && m.x<o.x+80) {
+            o.cooldown=120; o.arrows=(o.arrows||[]);
+            o.arrows.push({x:o.x, y:o.y, vx:o.dir*8, vy:-0.5, life:60});
+          }
+          (o.arrows||[]).forEach((a,ai)=>{
+            a.x+=a.vx; a.y+=a.vy; a.vy+=0.08; a.life--;
+            const dx=m.x-a.x, dy=m.y-a.y, d=Math.hypot(dx,dy);
+            if (d<m.r+4&&d>0) {
+              m.vx+=a.vx*0.3; m.vy+=a.vy*0.3; a.life=0;
+              mrPlayHazardSound('bump',o,150);
+            }
+          });
+          o.arrows=(o.arrows||[]).filter(a=>a.life>0);
+          break;
+        }
+        case 'firePit': {
+          o.phase=(o.phase||0)+0.05;
+          o.particles=(o.particles||[]).filter(p=>p.life>0);
+          if (Math.random()<0.3) {
+            const px=o.x+(Math.random()-0.5)*o.w;
+            o.particles.push({x:px,y:o.y,vx:(Math.random()-0.5)*1.5,vy:-1.5-Math.random()*2,life:1,r:3+Math.random()*3});
+          }
+          o.particles.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.05; p.life-=0.04; p.r*=0.97; });
+          const fhw=o.w/2;
+          if (m.y+m.r>=o.y-6&&m.y+m.r<=o.y+8&&m.x>o.x-fhw&&m.x<o.x+fhw&&m.vy>=0) {
+            m.y=o.y-6-m.r; m.vy=-Math.abs(m.vy)*0.5-0.5; m.vx*=0.85;
+            m._burning=(m._burning||0)+8; mrPlayHazardSound('sizzle',o,500);
+          }
+          if (m._burning>0) { m._burning--; m.vy-=0.06; m.vx+=(Math.random()-0.5)*0.3; }
+          break;
+        }
+        case 'spikedGate': {
+          o.timer=(o.timer||0)+1;
+          const cycle=(o.timer%(o.openT+o.closeT));
+          o.open=cycle<o.openT;
+          if (!o.open) {
+            const ghw=o.w/2;
+            if (m.y+m.r>=o.y-16&&m.y+m.r<=o.y+16&&m.x>o.x-ghw&&m.x<o.x+ghw) {
+              m.y=o.y-16-m.r; m.vy=-Math.abs(m.vy)*0.6; m.vx*=0.85;
+              mrPlayHazardSound('clang',o,400);
+            }
+          }
+          break;
+        }
+        case 'catapult': {
+          o.cooldown=(o.cooldown||0)-1;
+          o.projectiles=(o.projectiles||[]).filter(p=>p.life>0);
+          if (o.cooldown<=0&&Math.abs(m.y-o.y)<100) {
+            o.cooldown=200; o.angle=-0.8; o.fired=false;
+            o.projectiles.push({x:o.x,y:o.y-20,vx:(Math.random()-0.5)*4,vy:-6-Math.random()*3,life:90,r:8});
+          }
+          o.projectiles.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.2; p.life--;
+            const dx=m.x-p.x,dy=m.y-p.y,d=Math.hypot(dx,dy);
+            if(d<m.r+p.r&&d>0){const nx=dx/d,ny=dy/d;m.vx+=nx*4;m.vy+=ny*4;p.life=0;mrPlayHazardSound('bump',o,250);}
+          });
+          break;
+        }
+        case 'shieldBumper': {
+          const sdx=m.x-o.x,sdy=m.y-o.y,sd=Math.hypot(sdx,sdy);
+          if(sd<m.r+o.r&&sd>0){
+            const nx=sdx/sd,ny=sdy/sd; m.x+=nx*(m.r+o.r-sd); m.y+=ny*(m.r+o.r-sd);
+            const dot=m.vx*nx+m.vy*ny; if(dot<0){m.vx-=(1+0.85)*dot*nx;m.vy-=(1+0.85)*dot*ny;}
+            mrPlayHazardSound('clang',o,400);
+          }
+          break;
+        }
+        case 'castleGear': {
+          o.angle=(o.angle||0)+o.speed;
+          const teeth=o.teeth||8;
+          for(let ti=0;ti<teeth;ti++){
+            const ta=o.angle+ti*Math.PI*2/teeth;
+            const tx=o.x+Math.cos(ta)*(o.r+6), ty=o.y+Math.sin(ta)*(o.r+6);
+            const dx=m.x-tx,dy=m.y-ty,d=Math.hypot(dx,dy);
+            if(d<m.r+5&&d>0){
+              const nx=dx/d,ny=dy/d; m.x+=nx*(m.r+5-d); m.y+=ny*(m.r+5-d);
+              const tang=-Math.sin(ta)*o.speed*o.r, tangy=Math.cos(ta)*o.speed*o.r;
+              m.vx+=nx*2.5+tang*0.3; m.vy+=ny*2.5+tangy*0.3;
+              mrPlayHazardSound('clang',o,200);
+            }
+          }
+          // Core
+          const dx=m.x-o.x,dy=m.y-o.y,d=Math.hypot(dx,dy);
+          if(d<m.r+o.r&&d>0){const nx=dx/d,ny=dy/d;m.x+=nx*(m.r+o.r-d);m.y+=ny*(m.r+o.r-d);const dot=m.vx*nx+m.vy*ny;if(dot<0){m.vx-=1.6*dot*nx;m.vy-=1.6*dot*ny;}}
+          break;
+        }
+        case 'barrelRoller': {
+          o.x+=o.vx; o.angle=(o.angle||0)+o.vx*0.08;
+          if(o.x<o.r||o.x>mrWorldW-o.r) o.vx*=-1;
+          const bdx=m.x-o.x,bdy=m.y-o.y,bd=Math.hypot(bdx,bdy);
+          if(bd<m.r+o.r&&bd>0){
+            const nx=bdx/bd,ny=bdy/bd; m.x+=nx*(m.r+o.r-bd); m.y+=ny*(m.r+o.r-bd);
+            const dot=m.vx*nx+m.vy*ny; if(dot<0){m.vx-=(1+0.7)*dot*nx;m.vy-=(1+0.7)*dot*ny;} m.vx+=o.vx*0.4;
+            mrPlayHazardSound('bump',o,250);
+          }
+          break;
+        }
+        case 'knightStatue': {
+          o.glow=(o.glow||0)*0.92;
+          const kdx=m.x-o.x,kdy=m.y-o.y,kd=Math.hypot(kdx,kdy);
+          if(kd<m.r+o.r&&kd>0){
+            const nx=kdx/kd,ny=kdy/kd; m.x+=nx*(m.r+o.r-kd); m.y+=ny*(m.r+o.r-kd);
+            const dot=m.vx*nx+m.vy*ny; if(dot<0){m.vx-=(1+0.9)*dot*nx;m.vy-=(1+0.9)*dot*ny;}
+            o.glow=1; mrPlayHazardSound('clang',o,500);
+          }
+          break;
+        }
       }
     });
 
@@ -10864,10 +11821,28 @@ function mrStepPhysics() {
   const activeMarbles = mrMarbles.filter(m => !m.finished);
   const finishedCount = mrMarbles.length - activeMarbles.length;
 
-  // Top-3 done → give 4 s then force-clear
+  // ── First marble finishes → start the 30s countdown ──
+  if (finishedCount === 1 && mrFinishOrder.length === 1 && !mrFirstFinishTimer) {
+    mrFirstFinishCountdown = 30;
+    mrFirstFinishTimer = setInterval(() => {
+      mrFirstFinishCountdown--;
+      if (mrFirstFinishCountdown <= 10 && mrFirstFinishCountdown > 0) playSound('timer');
+      if (mrFirstFinishCountdown <= 0) {
+        clearInterval(mrFirstFinishTimer); mrFirstFinishTimer = null; mrFirstFinishCountdown = 0;
+        if (mrState === 'racing' && mrMarbles.some(m => !m.finished)) {
+          mrStartStuckCountdown();
+        }
+      }
+    }, 1000);
+  }
+
+  // Top-3 done → if 30s countdown already running, reduce it to max 15s remaining
   if (!mrTop3Done && mrFinishOrder.length >= 3) {
     mrTop3Done = true;
-    if (activeMarbles.length > 0) {
+    if (mrFirstFinishTimer && mrFirstFinishCountdown > 15) {
+      mrFirstFinishCountdown = 15;
+    } else if (!mrFirstFinishTimer && activeMarbles.length > 0) {
+      // No countdown started yet (shouldn't happen normally) — kick stuck check directly
       mrTop3CheckTimer = setTimeout(() => {
         if (mrState === 'racing' && mrMarbles.some(m => !m.finished)) {
           mrStartStuckCountdown();
@@ -10876,10 +11851,20 @@ function mrStepPhysics() {
     }
   }
 
-  // Even 1 finisher: if ALL remaining have been slow for > ~5 s (300 frames), force-clear
-  if (activeMarbles.length > 0 && finishedCount > 0 && mrStuckCountdown === 0 && !mrStuckCountTimer && !mrTop3CheckTimer) {
+  // No finisher yet: if ALL marbles have been very slow for >5s, trigger stuck countdown
+  if (activeMarbles.length > 0 && finishedCount === 0 && mrStuckCountdown === 0 && !mrStuckCountTimer) {
     const allSlow = activeMarbles.every(m => (m._stuckFrames || 0) > 300);
     if (allSlow) mrStartStuckCountdown();
+  }
+
+  // Even 1 finisher: if ALL remaining have been slow for > ~5 s (300 frames), force-clear
+  if (activeMarbles.length > 0 && finishedCount > 0 && mrStuckCountdown === 0 && !mrStuckCountTimer) {
+    const allSlow = activeMarbles.every(m => (m._stuckFrames || 0) > 300);
+    if (allSlow) {
+      // Speed up the countdown rather than immediately clearing
+      if (mrFirstFinishTimer && mrFirstFinishCountdown > 8) mrFirstFinishCountdown = 8;
+      else if (!mrFirstFinishTimer) mrStartStuckCountdown();
+    }
   }
 
   // Hard wall-clock timeout (90 s at 60fps)
@@ -10888,7 +11873,10 @@ function mrStepPhysics() {
       m.finished = true; m.finishRank = mrFinishOrder.length + 1; mrFinishOrder.push(m.id);
     });
   }
-  if (mrMarbles.every(m => m.finished)) setTimeout(() => mrEndRace(), 800);
+  if (mrMarbles.every(m => m.finished)) {
+    if (mrFirstFinishTimer) { clearInterval(mrFirstFinishTimer); mrFirstFinishTimer = null; mrFirstFinishCountdown = 0; }
+    setTimeout(() => mrEndRace(), 800);
+  }
 }
 
 function mrStartStuckCountdown() {
@@ -10989,7 +11977,7 @@ function mrScrollCamera() {
   }
 
   const rawTarget     = targetMarble.y - vertBias;
-  const maxCam        = MR_H - vpH;
+  const maxCam        = mrLevelH - vpH;
   const clampedTarget = Math.max(0, Math.min(maxCam, rawTarget));
 
   // Faster lerp (0.12) so camera keeps up on mobile
@@ -11372,7 +12360,7 @@ function mrDrawFrame() {
       window._mrFiesta = Array.from({length:30}, () => ({
         x:Math.random()*400,y:Math.random()*MR_H,vy:0.4+Math.random()*0.6,
         vx:(Math.random()-0.5)*0.6,r:0,col:cols[Math.floor(Math.random()*cols.length)],
-        w:3+Math.random()*3,h:2+Math.random()*2,rot:Math.random()*Math.PI*2,rotV:(Math.random()-0.5)*0.1
+        w:3+Math.random()*3,h:2+Math.random()*2,rot:Math.random()*Math.PI*2,rotV:(Math.random()-0.5)*0.06
       }));
     }
     window._mrFiesta.forEach(p=>{
@@ -11383,6 +12371,122 @@ function mrDrawFrame() {
       ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
       ctx.globalAlpha=1;ctx.restore();
     });
+  }
+
+  // ── Autumn Harvest — drifting leaves + warm vignette ──
+  if (mrTheme === 'autumn') {
+    if (!window._mrAutumnLeaves) {
+      const cols=['#c84000','#e06810','#d4a820','#a03000','#b84808','#e8901a','#903808'];
+      window._mrAutumnLeaves = Array.from({length:35}, () => ({
+        x: Math.random()*cssW, y: Math.random()*MR_H,
+        vx: (Math.random()-0.5)*0.8, vy: 0.3+Math.random()*0.5,
+        rot: Math.random()*Math.PI*2, rotV: (Math.random()-0.5)*0.05,
+        r: 4+Math.random()*5, col: cols[Math.floor(Math.random()*cols.length)],
+        phase: Math.random()*Math.PI*2, wobble: Math.random()*0.04
+      }));
+    }
+    window._mrAutumnLeaves.forEach(p => {
+      p.x += p.vx + Math.sin(p.phase)*0.4; p.y += p.vy;
+      p.rot += p.rotV; p.phase += p.wobble;
+      if (p.y > MR_H+12) { p.y=-12; p.x=Math.random()*cssW; }
+      if (p.x < -12) p.x=cssW+12; if (p.x > cssW+12) p.x=-12;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+      ctx.globalAlpha = 0.55+Math.sin(p.phase)*0.15;
+      ctx.fillStyle = p.col;
+      ctx.beginPath();
+      ctx.moveTo(0,-p.r); ctx.bezierCurveTo(p.r*0.8,-p.r*0.5,p.r*0.8,p.r*0.5,0,p.r);
+      ctx.bezierCurveTo(-p.r*0.8,p.r*0.5,-p.r*0.8,-p.r*0.5,0,-p.r);
+      ctx.fill();
+      // Leaf vein
+      ctx.strokeStyle='rgba(0,0,0,0.15)'; ctx.lineWidth=0.6;
+      ctx.beginPath(); ctx.moveTo(0,-p.r); ctx.lineTo(0,p.r); ctx.stroke();
+      ctx.globalAlpha=1; ctx.restore();
+    });
+    // Warm amber vignette on sides — cosy lighting feel
+    const aVL=ctx.createLinearGradient(0,0,55,0);
+    aVL.addColorStop(0,'rgba(180,80,10,0.18)'); aVL.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=aVL; ctx.fillRect(0,0,55,MR_H);
+    const aVR=ctx.createLinearGradient(cssW-55,0,cssW,0);
+    aVR.addColorStop(0,'rgba(0,0,0,0)'); aVR.addColorStop(1,'rgba(180,80,10,0.18)');
+    ctx.fillStyle=aVR; ctx.fillRect(cssW-55,0,55,MR_H);
+    // Bottom warm harvest glow
+    const aVB=ctx.createLinearGradient(0,MR_H-80,0,MR_H);
+    aVB.addColorStop(0,'rgba(0,0,0,0)'); aVB.addColorStop(1,'rgba(140,60,5,0.12)');
+    ctx.fillStyle=aVB; ctx.fillRect(0,MR_H-80,cssW,80);
+  }
+
+  // ── Medieval Keep — torch sparks + stone vignette + banner sway ──
+  if (mrTheme === 'medieval') {
+    if (!window._mrTorchSparks) {
+      window._mrTorchSparks = Array.from({length:40}, () => ({
+        x: Math.random()<0.5 ? 12+Math.random()*20 : cssW-32+Math.random()*20,
+        y: MR_H*0.1+Math.random()*MR_H*0.7,
+        vx:(Math.random()-0.5)*1.2, vy:-0.8-Math.random()*1.5,
+        life:1, decay:0.02+Math.random()*0.025,
+        col:['#ff8820','#ffc040','#ff4408','#ffdd80'][Math.floor(Math.random()*4)]
+      }));
+    }
+    // Respawn dead sparks
+    window._mrTorchSparks.forEach(s => {
+      s.x+=s.vx; s.y+=s.vy; s.vy+=0.04; s.life-=s.decay;
+      if (s.life<=0) {
+        s.x = Math.random()<0.5 ? 12+Math.random()*20 : cssW-32+Math.random()*20;
+        s.y = MR_H*0.15+Math.random()*MR_H*0.55;
+        s.vx=(Math.random()-0.5)*1.2; s.vy=-0.8-Math.random()*1.5;
+        s.life=1; s.decay=0.02+Math.random()*0.025;
+      }
+      ctx.save(); ctx.globalAlpha=s.life*0.75;
+      ctx.fillStyle=s.col; ctx.shadowBlur=6; ctx.shadowColor=s.col;
+      ctx.beginPath(); ctx.arc(s.x,s.y,1.5,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha=1; ctx.shadowBlur=0; ctx.restore();
+    });
+    // Draw wall torches on sides
+    const torchT=Date.now()*0.005;
+    [[18, MR_H*0.22],[18, MR_H*0.55],[cssW-18, MR_H*0.32],[cssW-18, MR_H*0.65]].forEach(([tx,ty])=>{
+      ctx.save(); ctx.translate(tx,ty);
+      // Bracket
+      ctx.fillStyle='rgba(100,85,60,0.9)';
+      ctx.beginPath(); ctx.roundRect(-4,-12,8,14,2); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(-6,-12,12,5,2); ctx.fill();
+      // Flame
+      const flk=Math.sin(torchT+tx)*3;
+      const fG=ctx.createLinearGradient(0,0,0,-18);
+      fG.addColorStop(0,'rgba(255,180,30,0.9)');
+      fG.addColorStop(0.5,'rgba(255,80,10,0.7)');
+      fG.addColorStop(1,'rgba(180,20,0,0)');
+      ctx.fillStyle=fG;
+      ctx.beginPath(); ctx.moveTo(-4,-2); ctx.quadraticCurveTo(-2+flk,-10,0+flk,-20); ctx.quadraticCurveTo(2+flk,-10,4,-2); ctx.fill();
+      // Glow halo
+      ctx.shadowBlur=18; ctx.shadowColor='rgba(255,140,20,0.5)';
+      ctx.fillStyle='rgba(255,160,40,0.12)';
+      ctx.beginPath(); ctx.arc(0,-8,16,0,Math.PI*2); ctx.fill();
+      ctx.shadowBlur=0; ctx.restore();
+    });
+    // Hanging castle banners — two sides
+    const banT=Date.now()*0.0015;
+    [[16,0],[cssW-16,0]].forEach(([bx,_],bi)=>{
+      const bSway=Math.sin(banT+bi*1.5)*3;
+      ctx.save(); ctx.translate(bx,8);
+      ctx.strokeStyle='rgba(100,85,60,0.7)'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(bSway,42); ctx.stroke();
+      // Banner cloth
+      ctx.fillStyle=bi===0?'rgba(140,20,20,0.75)':'rgba(20,40,120,0.75)';
+      ctx.beginPath();
+      ctx.moveTo(0,8); ctx.lineTo(bSway+12,10); ctx.lineTo(bSway+12,38); ctx.lineTo(bSway,40); ctx.lineTo(0,38); ctx.closePath();
+      ctx.fill();
+      // Gold trim
+      ctx.strokeStyle='rgba(200,175,80,0.7)'; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.moveTo(0,8); ctx.lineTo(bSway+12,10); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,38); ctx.lineTo(bSway+12,38); ctx.stroke();
+      ctx.restore();
+    });
+    // Stone vignette — dark edges like torch-lit dungeon
+    const mVL=ctx.createLinearGradient(0,0,40,0);
+    mVL.addColorStop(0,'rgba(20,14,8,0.35)'); mVL.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=mVL; ctx.fillRect(0,0,40,MR_H);
+    const mVR=ctx.createLinearGradient(cssW-40,0,cssW,0);
+    mVR.addColorStop(0,'rgba(0,0,0,0)'); mVR.addColorStop(1,'rgba(20,14,8,0.35)');
+    ctx.fillStyle=mVR; ctx.fillRect(cssW-40,0,40,MR_H);
   }
 
   // Stars / grid
@@ -12990,6 +14094,665 @@ function mrDrawFrame() {
         }
         ctx.shadowBlur=0; break;
       }
+
+      // ════ AUTUMN HARVEST ══════════════════════════════════════════
+      case 'fallingAcorn': {
+        ctx.translate(o.x, o.y);
+        const acT = Date.now() * 0.003;
+        // Cap — dark brown rounded dome
+        ctx.fillStyle = '#5a3010';
+        ctx.beginPath(); ctx.ellipse(0, -o.r-2, o.r*0.9, o.r*0.55, 0, Math.PI, 0); ctx.fill();
+        // Cap texture lines
+        ctx.strokeStyle='rgba(80,40,10,0.5)'; ctx.lineWidth=0.8;
+        for(let ai=-1;ai<=1;ai++){
+          ctx.beginPath(); ctx.moveTo(ai*o.r*0.4,-o.r-2); ctx.lineTo(ai*o.r*0.3,-o.r+2); ctx.stroke();
+        }
+        // Stem
+        ctx.strokeStyle='#7a4820'; ctx.lineWidth=1.5; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(0,-o.r-2); ctx.lineTo(0,-o.r-6); ctx.stroke();
+        // Body — warm brown oval with gradient
+        const aG=ctx.createRadialGradient(-2,-2,1,0,0,o.r);
+        aG.addColorStop(0,'#d4883a'); aG.addColorStop(0.5,'#b86820'); aG.addColorStop(1,'#7a4010');
+        ctx.fillStyle=aG;
+        ctx.beginPath(); ctx.ellipse(0, 0, o.r*0.8, o.r, 0, 0, Math.PI*2); ctx.fill();
+        // Highlight
+        ctx.fillStyle='rgba(255,200,120,0.3)';
+        ctx.beginPath(); ctx.ellipse(-2,-3,o.r*0.3,o.r*0.35,0,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0; break;
+      }
+      case 'windGust': {
+        ctx.translate(o.x, o.y);
+        if (!o.active) { ctx.shadowBlur=0; break; }
+        const wT=Date.now()*0.002, wPh=o.phase||0;
+        const wW=o.w||70, wH=o.h||30;
+        ctx.globalAlpha = 0.18 + Math.sin(wT)*0.06;
+        // Horizontal swirl lines
+        for(let wi=0;wi<4;wi++){
+          const wy=-wH/2+wi*(wH/3)+Math.sin(wT+wi)*4;
+          const lineG=ctx.createLinearGradient(-wW/2,wy,wW/2,wy);
+          lineG.addColorStop(0,'rgba(200,180,140,0)');
+          lineG.addColorStop(0.3,'rgba(210,190,150,0.7)');
+          lineG.addColorStop(0.7,'rgba(220,200,160,0.7)');
+          lineG.addColorStop(1,'rgba(200,180,140,0)');
+          ctx.strokeStyle=lineG; ctx.lineWidth=1.5+Math.sin(wT+wi*0.7)*0.5;
+          ctx.beginPath();
+          ctx.moveTo(-wW/2, wy);
+          ctx.bezierCurveTo(-wW/4, wy-8+Math.sin(wT+wi)*4, wW/4, wy+8+Math.cos(wT+wi)*4, wW/2, wy);
+          ctx.stroke();
+        }
+        // Leaf particles in wind
+        for(let li=0;li<5;li++){
+          const lx=-wW/2+((wT*60*o.dir+li*wW/5)%(wW))-wW/2;
+          const ly=Math.sin(wT*1.5+li*1.3)*wH*0.4+Math.cos(wT+li)*4;
+          ctx.save(); ctx.translate(lx,ly); ctx.rotate(wT*2+li);
+          ctx.fillStyle=['#c84000','#e07010','#d4a020','#a83000','#e05808'][li];
+          ctx.beginPath(); ctx.ellipse(0,0,4,2.5,0,0,Math.PI*2); ctx.fill();
+          ctx.restore();
+        }
+        ctx.globalAlpha=1; ctx.shadowBlur=0; break;
+      }
+      case 'slippyLeaves': {
+        ctx.translate(o.x, o.y);
+        const slW=o.w||60, slPh=o.phase||0;
+        const leafCols=['#c84000','#e06810','#d4a820','#a03000','#b84808','#e8901a'];
+        // Leaf pile — layered ellipse base
+        const lgr=ctx.createLinearGradient(-slW/2,-6,slW/2,6);
+        lgr.addColorStop(0,'rgba(120,60,10,0.5)'); lgr.addColorStop(0.5,'rgba(160,80,20,0.4)'); lgr.addColorStop(1,'rgba(120,60,10,0.5)');
+        ctx.fillStyle=lgr;
+        ctx.beginPath(); ctx.ellipse(0, 0, slW/2, 7, 0, 0, Math.PI*2); ctx.fill();
+        // Individual leaves on top
+        const leafCount=Math.floor(slW/10);
+        for(let li=0;li<leafCount;li++){
+          const lx=-slW/2+li*(slW/leafCount)+Math.sin(slPh+li)*3;
+          const ly=-3+Math.cos(slPh*0.7+li*1.4)*3;
+          const lrot=Math.sin(slPh*0.5+li)*0.6;
+          ctx.save(); ctx.translate(lx,ly); ctx.rotate(lrot);
+          ctx.fillStyle=leafCols[li%leafCols.length];
+          ctx.beginPath();
+          ctx.moveTo(0,-4); ctx.bezierCurveTo(4,-2,4,2,0,4); ctx.bezierCurveTo(-4,2,-4,-2,0,-4);
+          ctx.fill();
+          // Midrib
+          ctx.strokeStyle='rgba(0,0,0,0.2)'; ctx.lineWidth=0.6;
+          ctx.beginPath(); ctx.moveTo(0,-4); ctx.lineTo(0,4); ctx.stroke();
+          ctx.restore();
+        }
+        // Sheen to show slipperiness
+        ctx.fillStyle='rgba(255,220,150,0.08)';
+        ctx.beginPath(); ctx.ellipse(0,-2,slW/2,3,0,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0; break;
+      }
+      case 'mushroomPad': {
+        ctx.translate(o.x, o.y);
+        const mBounce=o.bounce||0;
+        const mSquish=mBounce>0?1+mBounce*0.04:1;
+        const mR=o.r||20;
+        // Stem — chunky white
+        ctx.fillStyle='rgba(245,240,235,0.95)';
+        ctx.beginPath(); ctx.roundRect(-mR*0.3, 0, mR*0.6, mR*0.5/mSquish, 4); ctx.fill();
+        // Underside gills
+        ctx.fillStyle='rgba(230,220,210,0.7)';
+        ctx.beginPath(); ctx.ellipse(0, 0, mR*0.85, mR*0.2, 0, 0, Math.PI*2); ctx.fill();
+        // Cap — red with white spots, squish on bounce
+        const capG=ctx.createRadialGradient(-mR*0.3,-mR*0.5,1,0,-mR*0.3,mR);
+        capG.addColorStop(0,'#ff4040'); capG.addColorStop(0.6,'#cc1010'); capG.addColorStop(1,'#880000');
+        ctx.fillStyle=capG;
+        ctx.save(); ctx.scale(1/mSquish, mSquish);
+        ctx.beginPath(); ctx.ellipse(0, -mR*0.3*mSquish, mR*mSquish, mR*0.55, 0, Math.PI, 0); ctx.fill();
+        ctx.restore();
+        // White spots
+        ctx.fillStyle='rgba(255,255,255,0.92)';
+        [[0,-mR*0.6,4],[-mR*0.45,-mR*0.35,3],[mR*0.42,-mR*0.38,3],[-mR*0.2,-mR*0.8,2.5],[mR*0.18,-mR*0.82,2]].forEach(([sx,sy,sr])=>{
+          ctx.beginPath(); ctx.arc(sx,sy,sr,0,Math.PI*2); ctx.fill();
+        });
+        ctx.shadowBlur=0; break;
+      }
+      case 'pumpkinTrampoline': {
+        ctx.translate(o.x, o.y);
+        const pSq=Math.max(0,o.squish||0);
+        const pW=o.w||50, pScX=1+pSq*0.06, pScY=1-pSq*0.08;
+        ctx.save(); ctx.scale(pScX, pScY);
+        // Pumpkin body — 5 ribs
+        const pCols=['#e05010','#cc4000','#e86010','#b83800','#d44808'];
+        for(let ri=0;ri<5;ri++){
+          const rx=(ri-2)*(pW/5.5);
+          const rG=ctx.createRadialGradient(rx-3,-4,1,rx,0,pW/5.5);
+          rG.addColorStop(0,'#ff8030'); rG.addColorStop(0.5,pCols[ri]); rG.addColorStop(1,'#802000');
+          ctx.fillStyle=rG;
+          ctx.beginPath(); ctx.ellipse(rx, 0, pW/5.5, 10, 0, 0, Math.PI*2); ctx.fill();
+        }
+        // Face — carved look
+        ctx.fillStyle='rgba(0,0,0,0.7)';
+        // Eyes
+        ctx.beginPath(); ctx.moveTo(-12,-3); ctx.lineTo(-7,-7); ctx.lineTo(-2,-3); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(2,-3); ctx.lineTo(7,-7); ctx.lineTo(12,-3); ctx.closePath(); ctx.fill();
+        // Smile
+        ctx.beginPath(); ctx.arc(0, 2, 8, 0.2, Math.PI-0.2); ctx.lineWidth=2; ctx.strokeStyle='rgba(0,0,0,0.7)'; ctx.stroke();
+        // Stem
+        ctx.restore();
+        ctx.fillStyle='#3a6010'; ctx.strokeStyle='#2a4808'; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.roundRect(-3, -12, 5, 8, 2); ctx.fill(); ctx.stroke();
+        // Vine curl
+        ctx.strokeStyle='#4a7818'; ctx.lineWidth=1.2;
+        ctx.beginPath(); ctx.moveTo(2,-10); ctx.bezierCurveTo(8,-14,12,-8,8,-5); ctx.stroke();
+        ctx.shadowBlur=0; break;
+      }
+      case 'hollowLog': {
+        ctx.translate(o.x, o.y);
+        const hlW=o.w||70, hlR=o.r||14;
+        // Log shadow
+        ctx.fillStyle='rgba(0,0,0,0.2)';
+        ctx.beginPath(); ctx.ellipse(0, hlR+4, hlW/2, 5, 0, 0, Math.PI*2); ctx.fill();
+        // Main log body — bark gradient
+        const logG=ctx.createLinearGradient(0,-hlR,0,hlR);
+        logG.addColorStop(0,'#7a4820'); logG.addColorStop(0.3,'#5a3010'); logG.addColorStop(0.7,'#4a2808'); logG.addColorStop(1,'#3a1c04');
+        ctx.fillStyle=logG;
+        ctx.beginPath(); ctx.roundRect(-hlW/2, -hlR, hlW, hlR*2, hlR*0.3); ctx.fill();
+        // Bark texture lines
+        ctx.strokeStyle='rgba(30,10,0,0.3)'; ctx.lineWidth=1;
+        for(let bi=0;bi<5;bi++){
+          const bx=-hlW/2+bi*(hlW/4)+10;
+          ctx.beginPath(); ctx.moveTo(bx,-hlR+2); ctx.bezierCurveTo(bx+3,-hlR/2,bx-3,hlR/2,bx,hlR-2); ctx.stroke();
+        }
+        // Left opening (dark oval)
+        const endG=ctx.createRadialGradient(-hlW/2,0,2,-hlW/2,0,hlR);
+        endG.addColorStop(0,'rgba(15,5,0,0.95)'); endG.addColorStop(0.6,'rgba(80,35,10,0.7)'); endG.addColorStop(1,'rgba(100,50,20,0.3)');
+        ctx.fillStyle=endG;
+        ctx.beginPath(); ctx.ellipse(-hlW/2, 0, hlR*0.65, hlR*0.75, 0, 0, Math.PI*2); ctx.fill();
+        // Right opening
+        const endG2=ctx.createRadialGradient(hlW/2,0,2,hlW/2,0,hlR);
+        endG2.addColorStop(0,'rgba(15,5,0,0.95)'); endG2.addColorStop(0.6,'rgba(80,35,10,0.7)'); endG2.addColorStop(1,'rgba(100,50,20,0.3)');
+        ctx.fillStyle=endG2;
+        ctx.beginPath(); ctx.ellipse(hlW/2, 0, hlR*0.65, hlR*0.75, 0, 0, Math.PI*2); ctx.fill();
+        // Ring grain on right end
+        ctx.strokeStyle='rgba(60,25,5,0.4)'; ctx.lineWidth=0.8;
+        for(let ri=1;ri<=3;ri++){
+          ctx.beginPath(); ctx.ellipse(hlW/2, 0, hlR*0.2*ri, hlR*0.25*ri, 0, 0, Math.PI*2); ctx.stroke();
+        }
+        // Moss patch on top
+        ctx.fillStyle='rgba(60,120,30,0.35)';
+        ctx.beginPath(); ctx.ellipse(0, -hlR, hlW*0.25, hlR*0.2, 0, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0; break;
+      }
+      case 'windmill': {
+        ctx.translate(o.x, o.y);
+        const wmA=o.angle||0, wmBL=o.bladeLen||28;
+        // Post / tower
+        const wmH=50;
+        const wmG=ctx.createLinearGradient(-5,0,5,0);
+        wmG.addColorStop(0,'rgba(180,150,100,0.95)'); wmG.addColorStop(1,'rgba(140,110,70,0.9)');
+        ctx.fillStyle=wmG;
+        ctx.beginPath(); ctx.moveTo(-7,wmH); ctx.lineTo(-4,0); ctx.lineTo(4,0); ctx.lineTo(7,wmH); ctx.closePath(); ctx.fill();
+        // Tower cross-brace
+        ctx.strokeStyle='rgba(120,90,50,0.6)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(-6,wmH*0.3); ctx.lineTo(6,wmH*0.6); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(6,wmH*0.3); ctx.lineTo(-6,wmH*0.6); ctx.stroke();
+        // Hub
+        ctx.fillStyle='rgba(200,170,120,0.95)';
+        ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle='rgba(140,100,60,0.8)'; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI*2); ctx.stroke();
+        // 4 blades
+        for(let bi=0;bi<4;bi++){
+          const ba=wmA+bi*Math.PI/2;
+          ctx.save(); ctx.rotate(ba);
+          // Blade shape — wider at tip
+          const blG=ctx.createLinearGradient(0,0,0,-wmBL);
+          blG.addColorStop(0,'rgba(220,195,140,0.9)'); blG.addColorStop(0.5,'rgba(200,170,110,0.85)'); blG.addColorStop(1,'rgba(180,150,90,0.8)');
+          ctx.fillStyle=blG;
+          ctx.beginPath();
+          ctx.moveTo(-2,0); ctx.lineTo(-wmBL*0.18,-wmBL); ctx.lineTo(wmBL*0.18,-wmBL); ctx.lineTo(2,0);
+          ctx.closePath(); ctx.fill();
+          // Blade rib
+          ctx.strokeStyle='rgba(150,110,60,0.5)'; ctx.lineWidth=0.8;
+          ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,-wmBL); ctx.stroke();
+          ctx.restore();
+        }
+        ctx.shadowBlur=0; break;
+      }
+      case 'scarecrow': {
+        ctx.translate(o.x, o.y);
+        const scW=o.wobble||0;
+        ctx.save(); ctx.rotate(scW*0.15);
+        // Pole
+        ctx.fillStyle='rgba(120,80,30,0.9)';
+        ctx.beginPath(); ctx.roundRect(-2,-45,4,55,2); ctx.fill();
+        // Cross arm
+        ctx.beginPath(); ctx.roundRect(-20,-30,40,4,2); ctx.fill();
+        // Shirt / body — patchy burlap
+        ctx.fillStyle='rgba(180,140,80,0.85)';
+        ctx.beginPath(); ctx.roundRect(-12,-28,24,22,4); ctx.fill();
+        // Shirt patches
+        ctx.fillStyle='rgba(160,40,20,0.6)';
+        ctx.beginPath(); ctx.roundRect(-10,-24,8,6,2); ctx.fill();
+        ctx.fillStyle='rgba(40,100,40,0.5)';
+        ctx.beginPath(); ctx.roundRect(3,-18,7,5,2); ctx.fill();
+        // Straw poking out
+        ctx.strokeStyle='rgba(210,180,80,0.7)'; ctx.lineWidth=1.2;
+        for(let si=-2;si<=2;si++){
+          ctx.beginPath(); ctx.moveTo(si*4,-6); ctx.lineTo(si*5,5); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(-12+si*2,-20); ctx.lineTo(-15+si*2,-28); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(12+si*2,-20); ctx.lineTo(15+si*2,-28); ctx.stroke();
+        }
+        // Hands — gloves
+        ctx.fillStyle='rgba(40,80,30,0.85)';
+        ctx.beginPath(); ctx.arc(-20,-28,5,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(20,-28,5,0,Math.PI*2); ctx.fill();
+        // Head — round burlap sack
+        ctx.fillStyle='rgba(200,170,100,0.9)';
+        ctx.beginPath(); ctx.arc(0,-40,10,0,Math.PI*2); ctx.fill();
+        // Face — stitched
+        ctx.strokeStyle='rgba(80,40,10,0.8)'; ctx.lineWidth=1.5; ctx.lineCap='round';
+        // Eyes (X marks)
+        ctx.beginPath(); ctx.moveTo(-4,-43); ctx.lineTo(-2,-41); ctx.moveTo(-2,-43); ctx.lineTo(-4,-41); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(2,-43); ctx.lineTo(4,-41); ctx.moveTo(4,-43); ctx.lineTo(2,-41); ctx.stroke();
+        // Zigzag mouth
+        ctx.beginPath(); ctx.moveTo(-4,-36); ctx.lineTo(-2,-38); ctx.lineTo(0,-36); ctx.lineTo(2,-38); ctx.lineTo(4,-36); ctx.stroke();
+        // Hat — wide brim straw hat
+        ctx.fillStyle='rgba(190,155,70,0.95)';
+        ctx.beginPath(); ctx.ellipse(0,-48,14,3,0,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(-7,-58,14,11,3); ctx.fill();
+        ctx.strokeStyle='rgba(150,110,40,0.6)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.ellipse(0,-48,14,3,0,0,Math.PI*2); ctx.stroke();
+        ctx.restore(); ctx.shadowBlur=0; break;
+      }
+      case 'cornStalk': {
+        ctx.translate(o.x, o.y);
+        const csW=o.w||50, csSw=o.sway||0;
+        const stalkCount=Math.max(3,Math.floor(csW/18));
+        for(let si=0;si<stalkCount;si++){
+          const sx=-csW/2+(si+0.5)*(csW/stalkCount);
+          const sHeight=45+Math.sin(si*1.7)*10;
+          const sSway=csSw*(1+si*0.1);
+          ctx.save(); ctx.translate(sx, 0);
+          // Stalk
+          ctx.strokeStyle='rgba(120,160,40,0.9)'; ctx.lineWidth=3; ctx.lineCap='round';
+          ctx.beginPath(); ctx.moveTo(0,0); ctx.quadraticCurveTo(sSway*8,-sHeight*0.5, sSway*12,-sHeight); ctx.stroke();
+          // Leaves
+          for(let li=0;li<2;li++){
+            const ly=-sHeight*(0.3+li*0.3);
+            const lDir=li%2===0?1:-1;
+            ctx.strokeStyle='rgba(100,150,30,0.75)'; ctx.lineWidth=2;
+            ctx.beginPath(); ctx.moveTo(sSway*8*(ly/(-sHeight)),-sHeight*(0.3+li*0.3));
+            ctx.quadraticCurveTo(lDir*18,ly-8,lDir*22,ly-2); ctx.stroke();
+          }
+          // Corn cob at top
+          ctx.fillStyle='rgba(220,180,30,0.9)';
+          const cobX=sSway*12, cobY=-sHeight;
+          ctx.beginPath(); ctx.ellipse(cobX, cobY-6, 5, 8, 0.15, 0, Math.PI*2); ctx.fill();
+          // Kernel rows
+          ctx.fillStyle='rgba(200,155,15,0.7)';
+          for(let ki=0;ki<3;ki++){
+            ctx.beginPath(); ctx.ellipse(cobX-2+ki*2, cobY-4+ki*1.5, 1.5, 2, 0, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(cobX-2+ki*2, cobY-8+ki*1.5, 1.5, 2, 0, 0, Math.PI*2); ctx.fill();
+          }
+          // Husk
+          ctx.strokeStyle='rgba(140,180,50,0.5)'; ctx.lineWidth=1.5;
+          ctx.beginPath(); ctx.moveTo(cobX,cobY-14); ctx.lineTo(cobX-6,cobY-8); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(cobX,cobY-14); ctx.lineTo(cobX+5,cobY-9); ctx.stroke();
+          ctx.restore();
+        }
+        ctx.shadowBlur=0; break;
+      }
+
+      // ════ MEDIEVAL KEEP ═══════════════════════════════════════════
+      case 'swingingMace': {
+        ctx.translate(o.x, o.y);
+        const smA=o.angle||0, smLen=o.len||40, smR=o.r||12;
+        // Pivot mount — stone block
+        ctx.fillStyle='rgba(140,130,110,0.9)';
+        ctx.beginPath(); ctx.roundRect(-6,-6,12,8,2); ctx.fill();
+        ctx.strokeStyle='rgba(80,70,55,0.6)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.roundRect(-6,-6,12,8,2); ctx.stroke();
+        // Chain — series of links
+        const linkCount=Math.floor(smLen/6);
+        for(let li=0;li<linkCount;li++){
+          const t=li/linkCount;
+          const lx=Math.sin(smA)*smLen*t, ly=Math.cos(smA)*smLen*t;
+          ctx.strokeStyle=li%2===0?'rgba(160,150,130,0.9)':'rgba(120,110,90,0.85)';
+          ctx.lineWidth=li%2===0?2.5:2;
+          ctx.beginPath(); ctx.arc(lx, ly, 2.5, smA, smA+Math.PI); ctx.stroke();
+        }
+        // Ball position
+        const bx=Math.sin(smA)*smLen, by=Math.cos(smA)*smLen;
+        // Mace ball — iron sphere with spikes
+        ctx.shadowBlur=8; ctx.shadowColor='rgba(180,80,20,0.4)';
+        const mbG=ctx.createRadialGradient(bx-smR*0.3,by-smR*0.3,1,bx,by,smR);
+        mbG.addColorStop(0,'rgba(160,150,130,0.95)'); mbG.addColorStop(0.6,'rgba(100,90,75,0.9)'); mbG.addColorStop(1,'rgba(60,50,40,0.9)');
+        ctx.fillStyle=mbG;
+        ctx.beginPath(); ctx.arc(bx, by, smR, 0, Math.PI*2); ctx.fill();
+        // Spikes — 8 around the ball
+        ctx.fillStyle='rgba(180,160,120,0.9)';
+        for(let si=0;si<8;si++){
+          const sa=si*Math.PI/4;
+          const sx=bx+Math.cos(sa)*(smR-2), sy=by+Math.sin(sa)*(smR-2);
+          const ex=bx+Math.cos(sa)*(smR+6), ey=by+Math.sin(sa)*(smR+6);
+          ctx.beginPath(); ctx.moveTo(sx-Math.sin(sa)*2,sy+Math.cos(sa)*2);
+          ctx.lineTo(ex,ey); ctx.lineTo(sx+Math.sin(sa)*2,sy-Math.cos(sa)*2); ctx.closePath(); ctx.fill();
+        }
+        ctx.shadowBlur=0; break;
+      }
+      case 'arrowTrap': {
+        ctx.translate(o.x, o.y);
+        const atDir=o.dir||1;
+        // Wall mount — stone block
+        const wx=atDir>0?-20:20;
+        ctx.fillStyle='rgba(130,120,100,0.9)';
+        ctx.beginPath(); ctx.roundRect(wx-8,-12,16,24,3); ctx.fill();
+        // Stone texture
+        ctx.strokeStyle='rgba(80,70,55,0.4)'; ctx.lineWidth=0.8;
+        ctx.beginPath(); ctx.moveTo(wx-8,0); ctx.lineTo(wx+8,0); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(wx,0); ctx.lineTo(wx,-12); ctx.stroke();
+        // Slot opening
+        ctx.fillStyle='rgba(20,15,10,0.8)';
+        ctx.beginPath(); ctx.roundRect(wx*0.4-2,-3,4,6,1); ctx.fill();
+        // Draw arrows in flight
+        (o.arrows||[]).forEach(a=>{
+          ctx.save(); ctx.translate(a.x-o.x, a.y-o.y);
+          const aAng=Math.atan2(a.vy,a.vx);
+          ctx.rotate(aAng);
+          ctx.strokeStyle='rgba(160,120,60,0.95)'; ctx.lineWidth=2; ctx.lineCap='round';
+          ctx.beginPath(); ctx.moveTo(-12,0); ctx.lineTo(6,0); ctx.stroke();
+          // Arrowhead
+          ctx.fillStyle='rgba(180,160,120,0.9)';
+          ctx.beginPath(); ctx.moveTo(6,0); ctx.lineTo(2,-3); ctx.lineTo(2,3); ctx.closePath(); ctx.fill();
+          // Fletching
+          ctx.strokeStyle='rgba(180,80,40,0.7)'; ctx.lineWidth=1.5;
+          ctx.beginPath(); ctx.moveTo(-10,0); ctx.lineTo(-14,-3); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(-10,0); ctx.lineTo(-14,3); ctx.stroke();
+          ctx.restore();
+        });
+        ctx.shadowBlur=0; break;
+      }
+      case 'firePit': {
+        ctx.translate(o.x, o.y);
+        const fpW=o.w||50, fpPh=o.phase||0;
+        // Stone ring base
+        const stoneAngles=[0,0.6,1.2,1.9,2.5,3.1,3.8,4.4,5.1,5.7];
+        stoneAngles.forEach(sa=>{
+          const sx=Math.cos(sa)*(fpW/2-4), sy=Math.sin(sa)*5;
+          ctx.fillStyle=`rgba(${110+Math.sin(sa)*20},${100+Math.cos(sa)*15},${80+Math.sin(sa+1)*15},0.9)`;
+          ctx.beginPath(); ctx.ellipse(sx, sy, 7, 5, sa, 0, Math.PI*2); ctx.fill();
+          ctx.strokeStyle='rgba(60,50,35,0.5)'; ctx.lineWidth=0.8;
+          ctx.beginPath(); ctx.ellipse(sx, sy, 7, 5, sa, 0, Math.PI*2); ctx.stroke();
+        });
+        // Ash/ember bed
+        ctx.fillStyle='rgba(40,20,10,0.6)';
+        ctx.beginPath(); ctx.ellipse(0, 0, fpW/2-6, 5, 0, 0, Math.PI*2); ctx.fill();
+        // Ember glow
+        const embG=ctx.createRadialGradient(0,0,0,0,0,fpW/3);
+        embG.addColorStop(0,`rgba(255,180,40,${0.6+Math.sin(fpPh*2)*0.2})`);
+        embG.addColorStop(0.5,`rgba(200,80,10,${0.4+Math.sin(fpPh)*0.15})`);
+        embG.addColorStop(1,'rgba(80,20,0,0)');
+        ctx.fillStyle=embG;
+        ctx.beginPath(); ctx.ellipse(0, 0, fpW/3, 4, 0, 0, Math.PI*2); ctx.fill();
+        // Logs
+        ctx.strokeStyle='rgba(100,55,20,0.9)'; ctx.lineWidth=5; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(-fpW*0.3,-2); ctx.lineTo(fpW*0.3,0); ctx.stroke();
+        ctx.strokeStyle='rgba(80,40,15,0.9)';
+        ctx.beginPath(); ctx.moveTo(-fpW*0.25,2); ctx.lineTo(fpW*0.28,-1); ctx.stroke();
+        // Flame particles
+        (o.particles||[]).forEach(p=>{
+          const fAlpha=p.life;
+          const fG=ctx.createRadialGradient(p.x-o.x,p.y-o.y,0,p.x-o.x,p.y-o.y,p.r);
+          fG.addColorStop(0,`rgba(255,240,180,${fAlpha*0.95})`);
+          fG.addColorStop(0.4,`rgba(255,120,20,${fAlpha*0.8})`);
+          fG.addColorStop(1,`rgba(180,30,0,0)`);
+          ctx.fillStyle=fG;
+          ctx.beginPath(); ctx.arc(p.x-o.x, p.y-o.y, p.r, 0, Math.PI*2); ctx.fill();
+        });
+        // Main flame — layered cones
+        const fT=Date.now()*0.004;
+        for(let fi=0;fi<3;fi++){
+          const fFlicker=Math.sin(fT+fi*1.2)*4;
+          const fH=18+fi*4+Math.sin(fT*1.3+fi)*3;
+          const fG2=ctx.createLinearGradient(0,0,0,-fH);
+          fG2.addColorStop(0,`rgba(255,200,40,${0.85-fi*0.15})`);
+          fG2.addColorStop(0.5,`rgba(255,80,10,${0.7-fi*0.12})`);
+          fG2.addColorStop(1,'rgba(180,20,0,0)');
+          ctx.fillStyle=fG2;
+          ctx.beginPath();
+          ctx.moveTo(-fpW*0.08,0);
+          ctx.quadraticCurveTo(-fpW*0.06+fFlicker,-fH*0.5, fFlicker*0.3,-fH);
+          ctx.quadraticCurveTo(fpW*0.06+fFlicker,-fH*0.5, fpW*0.08,0);
+          ctx.fill();
+        }
+        ctx.shadowBlur=0; break;
+      }
+      case 'spikedGate': {
+        ctx.translate(o.x, o.y);
+        const sgW=o.w||60, sgOpen=o.open;
+        const gateY=sgOpen?-40:0; // slides up when open
+        ctx.save(); ctx.translate(0, gateY);
+        // Gate frame — portcullis
+        const barSpacing=sgW/6;
+        // Vertical bars
+        ctx.strokeStyle='rgba(120,110,90,0.95)'; ctx.lineWidth=5; ctx.lineCap='square';
+        for(let bi=-2;bi<=2;bi++){
+          ctx.beginPath(); ctx.moveTo(bi*barSpacing,-22); ctx.lineTo(bi*barSpacing,8); ctx.stroke();
+          // Spike on top of each bar
+          ctx.fillStyle='rgba(160,145,110,0.95)';
+          ctx.beginPath(); ctx.moveTo(bi*barSpacing-3,-22); ctx.lineTo(bi*barSpacing,-34); ctx.lineTo(bi*barSpacing+3,-22); ctx.closePath(); ctx.fill();
+        }
+        // Horizontal crossbars
+        ctx.lineWidth=3;
+        ctx.beginPath(); ctx.moveTo(-sgW/2,-8); ctx.lineTo(sgW/2,-8); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-sgW/2+4,-18); ctx.lineTo(sgW/2-4,-18); ctx.stroke();
+        // Rivets
+        ctx.fillStyle='rgba(180,165,125,0.8)';
+        for(let bi=-2;bi<=2;bi++){
+          ctx.beginPath(); ctx.arc(bi*barSpacing,0-8,2.5,0,Math.PI*2); ctx.fill();
+          ctx.beginPath(); ctx.arc(bi*barSpacing,-18,2.5,0,Math.PI*2); ctx.fill();
+        }
+        // Red/green indicator glow
+        ctx.shadowBlur=10; ctx.shadowColor=sgOpen?'rgba(50,255,50,0.8)':'rgba(255,50,50,0.8)';
+        ctx.fillStyle=sgOpen?'rgba(60,255,60,0.6)':'rgba(255,60,60,0.6)';
+        ctx.beginPath(); ctx.arc(sgW/2+8,-5,5,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0;
+        ctx.restore();
+        // Side pillars — always static
+        ctx.fillStyle='rgba(140,130,105,0.9)';
+        [[-sgW/2-6,0],[sgW/2+6,0]].forEach(([px,py])=>{
+          ctx.beginPath(); ctx.roundRect(px-5,py-35,10,42,2); ctx.fill();
+          ctx.strokeStyle='rgba(90,80,60,0.5)'; ctx.lineWidth=1;
+          ctx.beginPath(); ctx.moveTo(px-5,py-15); ctx.lineTo(px+5,py-15); ctx.stroke();
+        });
+        ctx.shadowBlur=0; break;
+      }
+      case 'catapult': {
+        ctx.translate(o.x, o.y);
+        const catA=o.angle||0.3;
+        // Wheel base
+        ctx.fillStyle='rgba(120,85,40,0.95)';
+        ctx.beginPath(); ctx.roundRect(-24,0,48,10,3); ctx.fill();
+        // Wheels
+        ctx.fillStyle='rgba(90,60,25,0.9)';
+        [[-18,5],[18,5]].forEach(([wx,wy])=>{
+          ctx.beginPath(); ctx.arc(wx,wy,9,0,Math.PI*2); ctx.fill();
+          ctx.strokeStyle='rgba(60,40,15,0.7)'; ctx.lineWidth=2;
+          ctx.beginPath(); ctx.arc(wx,wy,9,0,Math.PI*2); ctx.stroke();
+          // Spokes
+          ctx.lineWidth=1.5;
+          for(let si=0;si<4;si++){
+            ctx.beginPath(); ctx.moveTo(wx,wy);
+            ctx.lineTo(wx+Math.cos(si*Math.PI/2)*8,wy+Math.sin(si*Math.PI/2)*8); ctx.stroke();
+          }
+        });
+        // Frame
+        ctx.strokeStyle='rgba(140,95,45,0.9)'; ctx.lineWidth=5; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(-10,0); ctx.lineTo(0,-18); ctx.lineTo(10,0); ctx.stroke();
+        // Pivot pin
+        ctx.fillStyle='rgba(180,155,100,0.9)';
+        ctx.beginPath(); ctx.arc(0,-18,4,0,Math.PI*2); ctx.fill();
+        // Throwing arm
+        ctx.save(); ctx.translate(0,-18); ctx.rotate(catA);
+        ctx.strokeStyle='rgba(130,90,40,0.95)'; ctx.lineWidth=5; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(0,-22); ctx.lineTo(0,14); ctx.stroke();
+        // Bucket/sling at top
+        ctx.fillStyle='rgba(100,70,30,0.85)';
+        ctx.beginPath(); ctx.arc(0,-22,6,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle='rgba(80,55,20,0.7)'; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.arc(0,-22,6,0,Math.PI*2); ctx.stroke();
+        ctx.restore();
+        // Rope/counterweight
+        ctx.strokeStyle='rgba(160,130,70,0.6)'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.moveTo(0,-18); ctx.lineTo(-8,-8); ctx.stroke();
+        ctx.fillStyle='rgba(100,75,35,0.8)';
+        ctx.beginPath(); ctx.arc(-8,-8,5,0,Math.PI*2); ctx.fill();
+        // Projectiles in flight
+        (o.projectiles||[]).forEach(p=>{
+          ctx.save(); ctx.translate(p.x-o.x, p.y-o.y);
+          const pbG=ctx.createRadialGradient(-1,-1,0,0,0,p.r);
+          pbG.addColorStop(0,'rgba(140,120,90,0.95)'); pbG.addColorStop(1,'rgba(80,60,40,0.85)');
+          ctx.fillStyle=pbG; ctx.beginPath(); ctx.arc(0,0,p.r,0,Math.PI*2); ctx.fill();
+          ctx.restore();
+        });
+        ctx.shadowBlur=0; break;
+      }
+      case 'shieldBumper': {
+        ctx.translate(o.x, o.y);
+        const shR=o.r||18;
+        // Shield body — kite shield shape
+        const shG=ctx.createRadialGradient(-3,-5,2,0,0,shR);
+        shG.addColorStop(0,'rgba(100,160,220,0.95)'); shG.addColorStop(0.4,'rgba(60,100,180,0.9)'); shG.addColorStop(1,'rgba(30,60,130,0.85)');
+        ctx.fillStyle=shG;
+        ctx.beginPath();
+        ctx.moveTo(0,-shR); ctx.bezierCurveTo(shR,-shR*0.5,shR,shR*0.2,0,shR*1.1);
+        ctx.bezierCurveTo(-shR,shR*0.2,-shR,-shR*0.5,0,-shR);
+        ctx.fill();
+        // Boss (centre dome)
+        const bossG=ctx.createRadialGradient(-2,-2,1,0,0,shR*0.28);
+        bossG.addColorStop(0,'rgba(240,220,160,0.95)'); bossG.addColorStop(1,'rgba(180,150,80,0.85)');
+        ctx.fillStyle=bossG;
+        ctx.beginPath(); ctx.arc(0,0,shR*0.28,0,Math.PI*2); ctx.fill();
+        // Cross divider
+        ctx.strokeStyle='rgba(200,180,100,0.7)'; ctx.lineWidth=2.5;
+        ctx.beginPath(); ctx.moveTo(0,-shR*0.9); ctx.lineTo(0,shR*0.8); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(-shR*0.75,-shR*0.1); ctx.lineTo(shR*0.75,-shR*0.1); ctx.stroke();
+        // Border
+        ctx.strokeStyle='rgba(200,180,100,0.8)'; ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.moveTo(0,-shR); ctx.bezierCurveTo(shR,-shR*0.5,shR,shR*0.2,0,shR*1.1);
+        ctx.bezierCurveTo(-shR,shR*0.2,-shR,-shR*0.5,0,-shR);
+        ctx.stroke();
+        ctx.shadowBlur=0; break;
+      }
+      case 'castleGear': {
+        ctx.translate(o.x, o.y);
+        const cgA=o.angle||0, cgR=o.r||20, cgT=o.teeth||8;
+        // Gear body — stone/iron
+        const cgG=ctx.createRadialGradient(-cgR*0.2,-cgR*0.2,2,0,0,cgR);
+        cgG.addColorStop(0,'rgba(180,170,145,0.95)'); cgG.addColorStop(0.5,'rgba(140,130,110,0.9)'); cgG.addColorStop(1,'rgba(100,90,75,0.85)');
+        ctx.fillStyle=cgG;
+        ctx.beginPath(); ctx.arc(0,0,cgR,0,Math.PI*2); ctx.fill();
+        // Teeth
+        for(let ti=0;ti<cgT;ti++){
+          const ta=cgA+ti*Math.PI*2/cgT;
+          ctx.save(); ctx.rotate(ta);
+          ctx.fillStyle='rgba(160,148,125,0.92)';
+          ctx.beginPath(); ctx.roundRect(-5,cgR-2,10,10,2); ctx.fill();
+          ctx.strokeStyle='rgba(90,80,60,0.5)'; ctx.lineWidth=0.8;
+          ctx.beginPath(); ctx.roundRect(-5,cgR-2,10,10,2); ctx.stroke();
+          ctx.restore();
+        }
+        // Inner ring detail
+        ctx.strokeStyle='rgba(90,80,65,0.5)'; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.arc(0,0,cgR*0.65,0,Math.PI*2); ctx.stroke();
+        // Spoke holes
+        for(let ti=0;ti<6;ti++){
+          const ha=cgA+ti*Math.PI/3;
+          ctx.fillStyle='rgba(70,60,50,0.5)';
+          ctx.beginPath(); ctx.arc(Math.cos(ha)*cgR*0.45, Math.sin(ha)*cgR*0.45, cgR*0.1, 0, Math.PI*2); ctx.fill();
+        }
+        // Hub
+        const hubG=ctx.createRadialGradient(-2,-2,1,0,0,cgR*0.2);
+        hubG.addColorStop(0,'rgba(200,185,155,0.95)'); hubG.addColorStop(1,'rgba(120,108,88,0.9)');
+        ctx.fillStyle=hubG;
+        ctx.beginPath(); ctx.arc(0,0,cgR*0.2,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle='rgba(80,70,55,0.6)'; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.arc(0,0,cgR*0.2,0,Math.PI*2); ctx.stroke();
+        ctx.shadowBlur=0; break;
+      }
+      case 'barrelRoller': {
+        ctx.translate(o.x, o.y);
+        const brR=o.r||14, brA=o.angle||0;
+        // Barrel shadow
+        ctx.fillStyle='rgba(0,0,0,0.2)';
+        ctx.beginPath(); ctx.ellipse(0,brR+2,brR*0.9,4,0,0,Math.PI*2); ctx.fill();
+        // Barrel body — oak staves
+        const brG=ctx.createRadialGradient(-brR*0.3,-brR*0.3,2,0,0,brR);
+        brG.addColorStop(0,'rgba(180,130,60,0.95)'); brG.addColorStop(0.5,'rgba(140,95,35,0.9)'); brG.addColorStop(1,'rgba(90,55,15,0.85)');
+        ctx.fillStyle=brG;
+        ctx.beginPath(); ctx.arc(0,0,brR,0,Math.PI*2); ctx.fill();
+        // Stave lines (rotating with barrel)
+        ctx.strokeStyle='rgba(100,65,20,0.5)'; ctx.lineWidth=1;
+        for(let si=0;si<5;si++){
+          const sa=brA+si*Math.PI/2.5;
+          ctx.beginPath(); ctx.moveTo(Math.cos(sa)*brR*0.3,Math.sin(sa)*brR*0.3);
+          ctx.lineTo(Math.cos(sa)*brR,Math.sin(sa)*brR); ctx.stroke();
+        }
+        // Iron hoops
+        ctx.strokeStyle='rgba(100,90,70,0.8)'; ctx.lineWidth=2.5;
+        ctx.beginPath(); ctx.arc(0,0,brR*0.88,0,Math.PI*2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(0,0,brR*0.55,0,Math.PI*2); ctx.stroke();
+        // Top/bottom iron rings
+        ctx.strokeStyle='rgba(120,110,90,0.7)'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.arc(0,0,brR,0,Math.PI*2); ctx.stroke();
+        // Highlight
+        ctx.fillStyle='rgba(220,180,110,0.15)';
+        ctx.beginPath(); ctx.arc(-brR*0.3,-brR*0.3,brR*0.4,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur=0; break;
+      }
+      case 'knightStatue': {
+        ctx.translate(o.x, o.y);
+        const ksGl=o.glow||0;
+        ctx.shadowBlur = ksGl*18; ctx.shadowColor='rgba(180,200,255,0.8)';
+        // Plinth/base
+        ctx.fillStyle='rgba(130,120,100,0.95)';
+        ctx.beginPath(); ctx.roundRect(-12,10,24,12,2); ctx.fill();
+        ctx.strokeStyle='rgba(80,70,55,0.5)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.roundRect(-12,10,24,12,2); ctx.stroke();
+        // Legs — armour
+        ctx.fillStyle='rgba(150,145,130,0.95)';
+        ctx.beginPath(); ctx.roundRect(-8,2,6,10,2); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(2,2,6,10,2); ctx.fill();
+        // Body / torso
+        const torsoG=ctx.createLinearGradient(-8,-10,8,2);
+        torsoG.addColorStop(0,'rgba(175,168,150,0.95)'); torsoG.addColorStop(1,'rgba(130,122,105,0.9)');
+        ctx.fillStyle=torsoG;
+        ctx.beginPath(); ctx.roundRect(-9,-10,18,13,3); ctx.fill();
+        // Tabard cross
+        ctx.fillStyle='rgba(180,30,30,0.7)';
+        ctx.beginPath(); ctx.roundRect(-1.5,-9,3,11,1); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(-7,-5,14,3,1); ctx.fill();
+        // Shield arm
+        ctx.fillStyle='rgba(80,100,160,0.85)';
+        ctx.beginPath();
+        ctx.moveTo(-9,-5); ctx.bezierCurveTo(-16,-4,-16,6,-9,6);
+        ctx.bezierCurveTo(-9,2,-9,-2,-9,-5); ctx.fill();
+        ctx.strokeStyle='rgba(200,180,100,0.7)'; ctx.lineWidth=1.2;
+        ctx.beginPath(); ctx.moveTo(-9,-5); ctx.bezierCurveTo(-16,-4,-16,6,-9,6); ctx.stroke();
+        // Sword arm raised
+        ctx.strokeStyle='rgba(160,155,135,0.9)'; ctx.lineWidth=4; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(8,-2); ctx.lineTo(12,-18); ctx.stroke();
+        // Sword blade
+        ctx.strokeStyle='rgba(200,195,175,0.95)'; ctx.lineWidth=2;
+        ctx.beginPath(); ctx.moveTo(12,-18); ctx.lineTo(16,-36); ctx.stroke();
+        ctx.fillStyle='rgba(220,200,120,0.9)';
+        ctx.beginPath(); ctx.arc(12,-18,3,0,Math.PI*2); ctx.fill(); // guard
+        // Helmet — great helm
+        const helmG=ctx.createRadialGradient(-2,-18,1,0,-18,10);
+        helmG.addColorStop(0,'rgba(185,178,158,0.95)'); helmG.addColorStop(1,'rgba(120,112,95,0.9)');
+        ctx.fillStyle=helmG;
+        ctx.beginPath(); ctx.arc(0,-18,10,Math.PI,0); ctx.fill();
+        ctx.beginPath(); ctx.roundRect(-10,-18,20,7,2); ctx.fill();
+        // Visor slit
+        ctx.fillStyle='rgba(20,15,10,0.8)';
+        ctx.beginPath(); ctx.roundRect(-7,-17,14,3,1); ctx.fill();
+        // Plume
+        ctx.strokeStyle='rgba(180,30,30,0.8)'; ctx.lineWidth=2; ctx.lineCap='round';
+        ctx.beginPath(); ctx.moveTo(0,-28); ctx.bezierCurveTo(4,-34,8,-30,5,-24); ctx.stroke();
+        ctx.shadowBlur=0; break;
+      }
     }
     ctx.restore();
   });
@@ -13242,6 +15005,78 @@ function mrDrawFrame() {
     ctx.textAlign='center'; ctx.restore();
   }
 
+  // ── First-finisher 30s countdown bar (below positions panel) ──
+  if (mrFirstFinishCountdown > 0 && mrState === 'racing') {
+    const barW = 104, barH = 22;
+    const bx = cssW - barW - 8;
+    // Position it just below the positions panel
+    const posRows = Math.min(5, mrMarbles.length);
+    const posBottom = 8 + posRows * 22 + 20 + 8 + 6; // ry0 + rh + gap
+    const by = posBottom;
+
+    const pct = mrFirstFinishCountdown / 30;
+    const urgent = mrFirstFinishCountdown <= 10;
+    const pulse = urgent ? 0.85 + Math.sin(Date.now() * 0.008) * 0.15 : 1;
+    ctx.save();
+
+    // Background pill
+    ctx.fillStyle = 'rgba(4,3,18,0.88)';
+    ctx.beginPath(); ctx.roundRect(bx, by, barW, barH, 11); ctx.fill();
+
+    // Animated fill bar
+    const fillW = Math.max(0, (barW - 4) * pct);
+    const barGrad = ctx.createLinearGradient(bx+2, by, bx+2+fillW, by);
+    if (urgent) {
+      barGrad.addColorStop(0, `rgba(255,80,80,${0.9*pulse})`);
+      barGrad.addColorStop(0.5, `rgba(255,140,60,${0.85*pulse})`);
+      barGrad.addColorStop(1, `rgba(255,200,40,${0.8*pulse})`);
+    } else {
+      barGrad.addColorStop(0, 'rgba(78,223,208,0.85)');
+      barGrad.addColorStop(0.5, 'rgba(120,160,255,0.8)');
+      barGrad.addColorStop(1, 'rgba(160,100,255,0.75)');
+    }
+    if (fillW > 4) {
+      ctx.fillStyle = barGrad;
+      ctx.beginPath(); ctx.roundRect(bx+2, by+2, fillW, barH-4, 9); ctx.fill();
+      // Shimmer highlight on fill
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.beginPath(); ctx.roundRect(bx+2, by+2, fillW, (barH-4)*0.45, 9); ctx.fill();
+    }
+
+    // Glowing border
+    ctx.shadowBlur = urgent ? 10*pulse : 6;
+    ctx.shadowColor = urgent ? `rgba(255,100,50,${0.7*pulse})` : 'rgba(78,223,208,0.4)';
+    ctx.strokeStyle = urgent ? `rgba(255,120,60,${0.8*pulse})` : 'rgba(78,223,208,0.45)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(bx, by, barW, barH, 11); ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Label: "FINISHING IN"
+    ctx.fillStyle = urgent ? `rgba(255,180,100,${0.9*pulse})` : 'rgba(255,255,255,0.45)';
+    ctx.font = `bold 6px ${SYS_FONT}`; ctx.textAlign = 'left';
+    ctx.fillText('FINISHING IN', bx+8, by+9);
+
+    // Countdown number — right-aligned, bold
+    ctx.shadowBlur = urgent ? 12*pulse : 6;
+    ctx.shadowColor = urgent ? `rgba(255,100,50,${0.8*pulse})` : 'rgba(120,200,255,0.6)';
+    ctx.fillStyle = urgent ? `rgba(255,${180-mrFirstFinishCountdown*8},60,${pulse})` : '#fff';
+    ctx.font = `800 11px ${SYS_FONT}`; ctx.textAlign = 'right';
+    ctx.fillText(`${mrFirstFinishCountdown}s`, bx + barW - 7, by + 15);
+    ctx.shadowBlur = 0;
+
+    // Particle sparkles along the fill edge when urgent
+    if (urgent && fillW > 10) {
+      const sparkT = Date.now() * 0.012;
+      for (let si = 0; si < 3; si++) {
+        const sx = bx + 2 + fillW + Math.sin(sparkT + si * 2.1) * 4;
+        const sy = by + barH/2 + Math.cos(sparkT*1.3 + si * 1.5) * 5;
+        ctx.fillStyle = `rgba(255,180,80,${0.6+Math.sin(sparkT+si)*0.4})`;
+        ctx.beginPath(); ctx.arc(sx, sy, 1.5+Math.sin(sparkT*2+si)*1, 0, Math.PI*2); ctx.fill();
+      }
+    }
+    ctx.restore();
+  }
+
   // ── TOP-LEFT: Podium (finishers so far) ──
   if (mrFinishOrder.length > 0 && (mrState === 'racing' || mrState === 'results')) {
     const fin = mrFinishOrder.slice(0,3).map(id=>MARBLE_COLORS.find(c=>c.id===id)).filter(Boolean);
@@ -13341,6 +15176,7 @@ function mrDrawIdle() {
   mrStuckCountdown = 0; mrTop3Done = false;
   if (mrStuckCountTimer) { clearInterval(mrStuckCountTimer); mrStuckCountTimer = null; }
   if (mrTop3CheckTimer) { clearTimeout(mrTop3CheckTimer); mrTop3CheckTimer = null; }
+  if (mrFirstFinishTimer) { clearInterval(mrFirstFinishTimer); mrFirstFinishTimer = null; mrFirstFinishCountdown = 0; }
   // Generate map now — players see this exact layout while voting
   mrGenMap(); mrSpawnMarbles(); mrFinishOrder = [];
   mrMarbles.forEach(m => { m.finished = false; });
@@ -13353,6 +15189,7 @@ function mrStartCountdown() {
   mrStuckCountdown = 0; mrTop3Done = false; mrTicketsAwarded = false;
   if (mrStuckCountTimer) { clearInterval(mrStuckCountTimer); mrStuckCountTimer = null; }
   if (mrTop3CheckTimer) { clearTimeout(mrTop3CheckTimer); mrTop3CheckTimer = null; }
+  if (mrFirstFinishTimer) { clearInterval(mrFirstFinishTimer); mrFirstFinishTimer = null; mrFirstFinishCountdown = 0; }
   // Reuse the exact map players saw during voting — do NOT regenerate
   mrFinishOrder = [];
   mrMarbles.forEach(m => { m.finished=false; m.trail=[]; m._stuckFrames=0; });
@@ -13411,7 +15248,10 @@ function mrEndRace() {
   mrStuckCountdown = 0; mrTop3Done = false;
   if (mrStuckCountTimer) { clearInterval(mrStuckCountTimer); mrStuckCountTimer = null; }
   if (mrTop3CheckTimer) { clearTimeout(mrTop3CheckTimer); mrTop3CheckTimer = null; }
+  if (mrFirstFinishTimer) { clearInterval(mrFirstFinishTimer); mrFirstFinishTimer = null; mrFirstFinishCountdown = 0; }
   mrState='results';
+  // Increment race counter — used by dynamic depth system
+  mrRaceCount++;
   const top3 = mrFinishOrder.slice(0,3).map(id=>MARBLE_COLORS.find(c=>c.id===id));
   // Award tickets — only once, only if we haven't already awarded this race
   if (!mrTicketsAwarded) {
@@ -13478,8 +15318,13 @@ function renderMRVoteUI() {
       '</div>';
   }).join('');
 
+  const deepLevelBadge = mrLevelScreens > 5
+    ? '<div style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(199,125,255,0.2),rgba(123,47,247,0.15));border:1px solid rgba(199,125,255,0.4);border-radius:99px;padding:4px 10px;font-size:10px;font-weight:700;color:#c77dff;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px">⬇️ Deep Level · ' + mrLevelScreens + '× tall</div>'
+    : '';
+
   ui.innerHTML =
     '<div style="padding:12px 14px 14px">' +
+    (deepLevelBadge ? '<div>' + deepLevelBadge + '</div>' : '') +
     // Daily races dock
     '<div style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">' +
       '<div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase">Daily Races</div>' +
@@ -17531,6 +19376,24 @@ loadState = function() {
 // ============================================================
 const UPDATE_LOGS = [
   {
+    version: '0.1.15',
+    date: 'March 2026',
+    emoji: '🌸',
+    title: 'Quint App, Messages Redesign, Japanese Night Fix & New Levels',
+    items: [
+      { tag:'new',     text:'Quint — Brand new relationship planner app: beautiful iOS 26 inspired UI, time-of-day adaptive backgrounds (London time), purple liquid progress bar that fills to the current hour, confetti ambience, and gentle sound effects.' },
+      { tag:'new',     text:'Quint — Admin Panel tab: create Events, Activities and Dates pushed live to the user\'s Quint app in real-time via Firestore without requiring a refresh.' },
+      { tag:'new',     text:'Quint — Stack pieces are rounded-rectangle bubbles with auto-fit text. The active stack piece at the current hour glows and animates for a cozy highlight effect.' },
+      { tag:'upgrade', text:'Messages — Full visual overhaul inspired by iPhone 15 / iOS 26: frosted-glass contact cards, iMessage-style blue/grey bubbles with tails, animated typing indicator, FaceTime/audio call buttons, reaction row, and dynamic status bar.' },
+      { tag:'fix',     text:'Marble Racer — Japanese Night level now generates correctly and always uses its themed hazard pool. The alwaysThemed list fix ensures jpnight never mixes generic obstacles.' },
+      { tag:'upgrade', text:'Marble Racer — Japanese Night hazards full visual overhaul: swinging bamboo with realistic node rings, glowing paper lanterns with inner flame, shuriken with shimmer blades, sakura wind tunnel with petal particles, water garden with lily pads and ripples, and moonlit section with star field.' },
+      { tag:'upgrade', text:'Marble Racer — Performance optimisations: ambient particle arrays capped, redundant canvas saves reduced, draw calls batched per-type where possible.' },
+      { tag:'new',     text:'Marble Racer — Autumn Harvest and Medieval Keep themes added with 9 unique hazards each, full physics, draw code, and ambient effects.' },
+      { tag:'fix',     text:'Marble Racer — First-finisher 30s countdown bar added below positions panel: drains left-to-right with urgent pulse at ≤10s, snaps to 15s when top 3 finish.' },
+      { tag:'fix',     text:'Marble Racer — Zero-finisher stuck detection: if no marbles have crossed the line and all are slow, the stuck countdown now fires correctly instead of hanging.' },
+    ]
+  },
+  {
     version: '0.1.14',
     date: 'March 2026',
     emoji: '🏁',
@@ -18016,7 +19879,7 @@ document.getElementById('princess-theme-modal').addEventListener('click', e => {
 
 // ── True globals: var avoids temporal dead zone for code above fbInit ──
 var ADMIN_EMAIL      = "Djrocky2021@gmail.com";
-var GAME_VERSION     = "0.1.14";
+var GAME_VERSION     = "0.1.15";
 var fbCurrentUser    = null;
 var fbDb             = null;
 // Raw GitHub URL — fetched periodically to detect new versions automatically
@@ -19850,6 +21713,44 @@ window._admClearUndoneHistory = async function() {
 
   } else if (tab === 'plinko') {
     await window._admRenderPlinkoTab(content);
+
+  } else if (tab === 'quint') {
+    content.innerHTML = `
+      <div class="adm-card" style="background:linear-gradient(135deg,rgba(199,125,255,0.1),rgba(123,47,247,0.06));border-color:rgba(199,125,255,0.3)">
+        <div class="adm-card-title" style="color:#c77dff">💜 Quint — Day Planner</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:14px">Changes push live to the user's Quint app in real-time — no refresh needed.</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="adm-row">
+            <input id="qe-time" class="adm-input" type="time" style="flex:0 0 100px">
+            <input id="qe-title" class="adm-input" placeholder="Title (e.g. Coffee ☕)" style="flex:1">
+          </div>
+          <div class="adm-row">
+            <select id="qe-type" class="adm-input" style="flex:0 0 120px">
+              <option value="event">📅 Event</option>
+              <option value="activity">🎉 Activity</option>
+              <option value="date">💕 Date</option>
+              <option value="reminder">🔔 Reminder</option>
+              <option value="note">📝 Note</option>
+            </select>
+            <input id="qe-emoji" class="adm-input" placeholder="Emoji (optional)" style="flex:0 0 90px;text-align:center">
+            <input id="qe-desc" class="adm-input" placeholder="Description (optional)" style="flex:1">
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onclick="window._quintAdmAdd()" class="adm-btn adm-btn-primary" style="flex:1;background:linear-gradient(135deg,#7b2ff7,#c77dff)">
+              ➕ Add to Stack
+            </button>
+            <button onclick="window._quintAdmClear()" class="adm-btn adm-btn-ghost">
+              🗑 Clear All
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="adm-card" id="quint-adm-stack-preview" style="border-color:rgba(199,125,255,0.2)">
+        <div class="adm-card-title" style="color:#c77dff">📋 Current Stack</div>
+        <div id="quint-adm-items" style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:rgba(255,255,255,0.5)">Loading…</div>
+      </div>`;
+    // Load existing quint items
+    window._quintAdmLoad();
 
   } else if (tab === 'support') {
     try {
