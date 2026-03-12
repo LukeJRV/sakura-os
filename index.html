@@ -17660,7 +17660,7 @@ function renderSettings() {
           <div style="font-size:13px;font-weight:900;color:#fff">Update Available</div>
           <div style="font-size:11px;color:rgba(160,136,250,0.9);font-weight:700">v${GAME_VERSION} → v${_vd.version}</div>
         </div>
-        <button onclick="localStorage.setItem('fbver_dismissed_${_vd.version}','1');window._latestVersionData=null;renderSettings()" style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.4);font-size:13px;cursor:pointer;flex-shrink:0">✕</button>
+        <button onclick="window._latestVersionData=null;renderSettings()" style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.4);font-size:13px;cursor:pointer;flex-shrink:0">✕</button>
       </div>
       ${_vd.notes ? `<div style="font-size:11px;color:rgba(255,255,255,0.55);line-height:1.6;margin-bottom:10px">${_vd.notes}</div>` : ''}
       <button onclick="window._applyLiveUpdate()" style="width:100%;padding:11px;border-radius:14px;background:linear-gradient(135deg,#a088fa,#fb99d5);border:none;color:#fff;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 4px 18px rgba(160,136,250,0.4);letter-spacing:0.2px">📥 Install Update</button>
@@ -20765,10 +20765,29 @@ const fbAnalytics = firebase.analytics();
 
 // ── Version / Update Detection ───────────────────────────────────────────────
 
-// Called once on login. Checks immediately then polls every 60 seconds.
+// On session start: purge any dismissed keys for versions we've already passed.
+// This means a dismissed notification for v0.1.16 never blocks v0.1.17+.
+(function _purgeStaleDismissedKeys() {
+  try {
+    const toRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('fbver_dismissed_')) {
+        // Keep only if the dismissed version equals the currently running version.
+        // Any version that is no longer running is stale — remove it.
+        const dismissedVer = k.replace('fbver_dismissed_', '');
+        if (dismissedVer !== GAME_VERSION) toRemove.push(k);
+      }
+    }
+    toRemove.forEach(k => localStorage.removeItem(k));
+  } catch(e) {}
+})();
+
+// Called once on login. Attaches Firestore real-time listener (primary)
+// and starts GitHub polling (safety net).
 function fbCheckVersion() {
-  _doVersionCheck();
-  // Also listen on Firestore as fallback (admin panel push still works)
+  // ── Primary: Firestore real-time push ──
+  // onSnapshot fires immediately with current value AND on every future change.
   fbDb.collection('config').doc('version').onSnapshot(snap => {
     if (!snap.exists) return;
     const d = snap.data();
@@ -20776,17 +20795,23 @@ function fbCheckVersion() {
       _handleUpdateAvailable(d.version, d.notes || '', d.url || GITHUB_RAW_URL);
     }
   }, () => {});
-  // Poll GitHub every 60 seconds while app is open
+
+  // ── Safety net: GitHub poll every 20 seconds ──
+  // Catches updates where admin forgot to write to Firestore.
+  // Uses Cache-Control header bypass trick AND a cache-busting query param.
   if (_versionPollTimer) clearInterval(_versionPollTimer);
-  _versionPollTimer = setInterval(_doVersionCheck, 60 * 1000);
+  _doVersionCheck(); // immediate first check
+  _versionPollTimer = setInterval(_doVersionCheck, 20 * 1000);
 }
 
 async function _doVersionCheck() {
   try {
-    const resp = await fetch(GITHUB_RAW_URL + '?_t=' + Date.now(), { cache: 'no-store' });
+    const resp = await fetch(GITHUB_RAW_URL + '?_t=' + Date.now(), {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+    });
     if (!resp.ok) return;
     const html = await resp.text();
-    // GAME_VERSION is declared near line 12503 — always present in file
     const match = html.match(/var GAME_VERSION\s*=\s*"([^"]+)"/);
     if (!match) return;
     const remoteVersion = match[1];
@@ -20799,9 +20824,13 @@ async function _doVersionCheck() {
 }
 
 function _handleUpdateAvailable(newVersion, notes, url) {
+  // Only block if already dismissed in THIS session for THIS exact version.
+  // The stale key purge above ensures old dismissed versions never block new ones.
   const dismissedKey = 'fbver_dismissed_' + newVersion;
   if (localStorage.getItem(dismissedKey)) return;
-  // Don't re-show if already displayed
+
+  // Deduplicate within session — but only if the version is exactly the same.
+  // If a newer version comes in mid-session, _latestVersionData will differ and it WILL show.
   if (window._latestVersionData && window._latestVersionData.version === newVersion) return;
 
   window._latestVersionData = { version: newVersion, notes, url: url || GITHUB_RAW_URL };
@@ -20839,7 +20868,6 @@ function fbShowUpdateBanner(newVersion, notes) {
     + '</div>'
     + '<button id="update-banner-btn">Update</button>';
   banner.querySelector('#update-banner-btn').addEventListener('click', () => {
-    localStorage.setItem('fbver_dismissed_' + newVersion, '1');
     banner.remove();
     openScreen('settings');
     renderSettings();
