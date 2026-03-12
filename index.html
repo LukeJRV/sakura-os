@@ -2395,13 +2395,11 @@ input[type=number] { -moz-appearance:textfield; }
   <div id="notif-drag-zone" style="position:absolute;top:0;left:0;width:60px;height:44px;z-index:9000;cursor:pointer" ontouchstart="notifPanelDragStart(event)" onmousedown="notifPanelDragStart(event)"></div>
 
   <!-- Notification Panel — full-screen iOS 15-style -->
-  <!-- Clipper: fixed to phone bounds, clips panel corners regardless of backdrop-filter compositing -->
-  <div id="notif-panel-clipper" style="position:absolute;inset:0;z-index:8900;border-radius:48px;overflow:hidden;pointer-events:none;">
-  <div id="notif-panel" style="position:absolute;inset:0;transform:translateY(-100%);transition:transform 0.48s cubic-bezier(0.32,0,0.15,1);will-change:transform;overflow:hidden;border-radius:48px;isolation:isolate;pointer-events:auto;">
+  <div id="notif-panel" style="position:absolute;inset:0;z-index:8900;transform:translateY(-100%);transition:transform 0.48s cubic-bezier(0.32,0,0.15,1);will-change:transform;overflow:hidden;border-radius:48px;backdrop-filter:blur(32px) saturate(160%);background:rgba(6,3,18,0.55);">
     <!-- Wallpaper blur layer -->
     <div id="notif-panel-wallpaper" style="position:absolute;inset:0;background:radial-gradient(ellipse at 20% 20%,#2a1a4e 0%,#000 50%,#1a0a2e 100%);filter:blur(0px);transform:scale(1.05);border-radius:48px;overflow:hidden;"></div>
-    <!-- Dark overlay -->
-    <div style="position:absolute;inset:0;background:rgba(6,3,18,0.55);backdrop-filter:blur(32px) saturate(160%);border-radius:48px;"></div>
+    <!-- Ambient darkening layer -->
+    <div style="position:absolute;inset:0;background:rgba(6,3,18,0.35);"></div>
     <!-- Ambient glow blobs -->
     <div style="position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(160,136,250,0.15) 0%,transparent 70%);top:-60px;left:50%;transform:translateX(-50%);pointer-events:none"></div>
     <div style="position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(252,119,144,0.08) 0%,transparent 70%);bottom:80px;right:-30px;pointer-events:none"></div>
@@ -2429,7 +2427,6 @@ input[type=number] { -moz-appearance:textfield; }
     <!-- Swipe handle at bottom -->
     <div id="notif-panel-swipe-handle" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:99px;background:rgba(255,255,255,0.3);cursor:pointer;z-index:10" ontouchstart="notifPanelSwipeUpStart(event)" onmousedown="notifPanelSwipeUpStart(event)"></div>
   </div>
-  </div><!-- end notif-panel-clipper -->
 
   <style>
     #notif-panel-list::-webkit-scrollbar { display:none; }
