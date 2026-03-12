@@ -20667,6 +20667,7 @@ const UPDATE_LOGS = [
     ]
   },
   {
+    version: '0.1.11',
     date: 'March 2026',
     emoji: '🎮',
     title: 'Claw Ragdolls, Marble Overhaul & Admin Live Views',
@@ -21080,6 +21081,8 @@ window._ulToggleStats = function() {
     if (typeof playSound === 'function') playSound('tick');
   }
 };
+
+function applySettings() {
   if (S.settings.uiScale !== 1) document.documentElement.style.setProperty('--ui-scale', S.settings.uiScale);
   if (S.settings.fontRainbow) document.documentElement.style.setProperty('--font-rainbow', 'rainbow 3s linear infinite');
   if (S.settings.fontGlow) document.documentElement.style.setProperty('--font-glow', '0 0 8px rgba(160,136,250,0.8)');
