@@ -388,6 +388,12 @@ button, a { touch-action: manipulation; }
   box-shadow:0 4px 16px rgba(0,0,0,0.5);
 }
 #ticket-progress-wrap:hover #ticket-tooltip { display:block; }
+@keyframes ticketBarTip {
+  0%   { opacity:0; transform:translateX(-50%) translateY(4px) scale(0.85); }
+  15%  { opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
+  70%  { opacity:1; transform:translateX(-50%) translateY(-6px) scale(1); }
+  100% { opacity:0; transform:translateX(-50%) translateY(-18px) scale(0.9); }
+}
 
 /* ===== SCREENS ===== */
 #screens {
@@ -606,9 +612,9 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:
 input[type=number] { -moz-appearance:textfield; }
 /* Emoji picker */
 #emoji-picker-overlay {
-  position:absolute;top:0;left:0;right:0;bottom:0;
+  position:fixed;top:0;left:0;right:0;bottom:0;
   background:rgba(0,0,0,0);
-  z-index:9999;
+  z-index:99999;
   display:flex;align-items:center;justify-content:center;
   transition:background 0.22s ease;
   pointer-events:none;
@@ -621,12 +627,12 @@ input[type=number] { -moz-appearance:textfield; }
   background:rgba(18,14,34,0.97);
   border:1.5px solid rgba(160,136,250,0.3);
   border-radius:22px;
-  width:calc(100% - 24px);
-  max-width:296px;
-  /* Height: search bar ~50px + grid fills remaining space */
-  height:72%;
-  max-height:420px;
-  min-height:280px;
+  width:min(340px, calc(100vw - 24px));
+  max-width:340px;
+  /* Use dvh to fill correctly on mobile/desktop without clipping */
+  height:min(480px, calc(100dvh - 120px));
+  max-height:min(480px, calc(100dvh - 120px));
+  min-height:260px;
   display:flex;flex-direction:column;overflow:hidden;
   box-shadow:0 24px 64px rgba(0,0,0,0.85), 0 0 0 0.5px rgba(255,255,255,0.06) inset;
   /* Spring entrance animation */
@@ -672,11 +678,11 @@ input[type=number] { -moz-appearance:textfield; }
   flex:1;
   /* Custom scrollbar */
   scrollbar-width:thin;
-  scrollbar-color:rgba(160,136,250,0.3) transparent;
+  scrollbar-color:#a088fa rgba(160,136,250,0.08);
 }
-.emoji-picker-grid::-webkit-scrollbar { width:3px; }
-.emoji-picker-grid::-webkit-scrollbar-track { background:transparent; }
-.emoji-picker-grid::-webkit-scrollbar-thumb { background:rgba(160,136,250,0.3);border-radius:99px; }
+.emoji-picker-grid::-webkit-scrollbar { width:5px; }
+.emoji-picker-grid::-webkit-scrollbar-track { background:rgba(160,136,250,0.06);border-radius:99px; }
+.emoji-picker-grid::-webkit-scrollbar-thumb { background:linear-gradient(180deg,#a088fa,#7b2ff7);border-radius:99px;box-shadow:0 0 6px rgba(160,136,250,0.4); }
 .emoji-picker-cell {
   font-size:21px;text-align:center;padding:5px 2px;border-radius:10px;
   cursor:pointer;transition:background 0.1s, transform 0.12s;
@@ -1420,20 +1426,23 @@ input[type=number] { -moz-appearance:textfield; }
   to   { opacity:1; transform:scale(1) translateY(0); }
 }
 .chat-bubble.sent {
-  background:linear-gradient(135deg,#0a84ff,#0066cc);
-  color:#fff;
+  background:var(--chat-sent-bg, linear-gradient(135deg,#0a84ff,#0066cc));
+  color:var(--chat-sent-color, #fff);
   margin-left:auto;
   border-bottom-right-radius:5px;
-  box-shadow:0 3px 12px rgba(10,132,255,0.35);
+  box-shadow:0 3px 12px var(--chat-sent-shadow, rgba(10,132,255,0.35));
 }
 .chat-bubble.recv {
-  background:rgba(44,44,46,0.92);
-  color:#f5f5f7;
+  background:var(--chat-recv-bg, rgba(44,44,46,0.92));
+  color:var(--chat-recv-color, #f5f5f7);
   margin-right:auto;
   border-bottom-left-radius:5px;
   backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,0.08);
+  border:1px solid var(--chat-recv-border, rgba(255,255,255,0.08));
   box-shadow:0 3px 10px rgba(0,0,0,0.25);
+}
+#screen-chat-convo {
+  background:var(--chat-bg, linear-gradient(180deg,#0a0a12 0%,#0d0d1a 100%));
 }
 .chat-bubble-time {
   font-size:10px; color:rgba(255,255,255,0.35);
@@ -2417,7 +2426,7 @@ input[type=number] { -moz-appearance:textfield; }
           <button class="back-btn" onclick="openScreen('home')" style="background:rgba(10,132,255,0.12);border:1px solid rgba(10,132,255,0.25);color:#0a84ff;border-radius:12px;width:34px;height:34px;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer">←</button>
           <div>
             <div style="font-size:17px;font-weight:700;color:#f5f5f7;letter-spacing:-0.3px">Messages</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.35)">${(S.contacts||[]).length} conversation${(S.contacts||[]).length!==1?'s':''}</div>
+            <div id="chat-list-subtitle" style="font-size:11px;color:rgba(255,255,255,0.35)">0 conversations</div>
           </div>
         </div>
         <div style="display:flex;gap:8px">
@@ -2445,6 +2454,7 @@ input[type=number] { -moz-appearance:textfield; }
           <div style="font-size:10px;color:#30d158;display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#30d158;display:inline-block"></span>Active now</div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0">
+          <button class="imsg-action-btn" onclick="openChatThemePicker()" title="Chat theme">🎨</button>
           <button class="imsg-action-btn" onclick="playSound('click')">📞</button>
           <button class="imsg-action-btn" onclick="playSound('click')">📹</button>
         </div>
@@ -2668,7 +2678,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== QUINT SCREEN ===== -->
-    <div id="screen-quint" class="screen" style="padding:0;flex-direction:column;overflow:hidden;position:relative;display:none">
+    <div id="screen-quint" class="screen" style="padding:0;flex-direction:column;overflow:hidden;position:relative;display:none;height:100%;min-height:0">
       <!-- Dynamic background (changes by time of day) -->
       <div id="quint-bg" style="position:absolute;inset:0;z-index:0;transition:all 2s ease"></div>
       <!-- Gentle confetti canvas -->
@@ -3559,6 +3569,36 @@ function updateTicketDisplay(delta) {
     anim.textContent = delta > 0 ? `+${delta} 🎟️` : `${delta} 🎟️`;
     anim.className = delta > 0 ? 'show-up' : 'show-down';
     setTimeout(() => anim.className = '', 1600);
+
+    // Show floating purple +N tooltip on the progress bar
+    if (delta > 0) {
+      const wrap = document.getElementById('ticket-progress-wrap');
+      if (wrap) {
+        const tip = document.createElement('div');
+        tip.textContent = `+${delta} 🎟️`;
+        tip.style.cssText = [
+          'position:absolute',
+          'top:-32px',
+          'left:50%',
+          'transform:translateX(-50%)',
+          'background:linear-gradient(135deg,rgba(123,47,247,0.95),rgba(160,136,250,0.95))',
+          'color:#fff',
+          'font-size:11px',
+          'font-weight:800',
+          'padding:4px 10px',
+          'border-radius:20px',
+          'white-space:nowrap',
+          'pointer-events:none',
+          'z-index:10000',
+          'box-shadow:0 3px 12px rgba(123,47,247,0.5),0 0 0 1px rgba(255,255,255,0.15) inset',
+          'animation:ticketBarTip 1.8s cubic-bezier(.4,0,.2,1) forwards',
+          'letter-spacing:0.3px',
+        ].join(';');
+        wrap.style.position = 'relative';
+        wrap.appendChild(tip);
+        setTimeout(() => tip.remove(), 1800);
+      }
+    }
   }
   
   document.getElementById('home-balance').textContent = `£${S.income.toFixed(2)}`;
@@ -3681,16 +3721,23 @@ function openScreen(id) {
   if (id !== 'plinko') _plinkoStopLiveBroadcast();
   // Stop live ticket chat listener when navigating away from support
   if (id !== 'support' && typeof _stopTicketChatListener === 'function') _stopTicketChatListener();
-  document.querySelectorAll('.screen').forEach(s => {
-    s.classList.remove('active');
-    s.style.display = 'none';
+
+  // Hide all screens efficiently (avoid triggering multiple reflows)
+  const allScreens = document.querySelectorAll('.screen');
+  allScreens.forEach(s => {
+    if (s.classList.contains('active') || s.style.display !== 'none') {
+      s.classList.remove('active');
+      s.style.display = 'none';
+    }
   });
+
   const el = document.getElementById(`screen-${id}`);
   if (!el) return;
   el.style.display = 'flex';
   el.classList.add('active');
   currentScreen = id;
-  renderScreen(id);
+  // Defer heavy render to next animation frame to allow the screen transition to paint first
+  requestAnimationFrame(() => renderScreen(id));
 }
 
 function renderScreen(id) {
@@ -3809,6 +3856,7 @@ function renderHome() {
   const pageApps = gridApps.slice(homePageIdx * APPS_PER_PAGE, (homePageIdx + 1) * APPS_PER_PAGE);
 
   grid.innerHTML = '';
+  grid._swipeBound = false; // reset so swipe/mouse listeners re-register on fresh DOM
 
   // Edit mode banner
   if (appEditMode) {
@@ -3865,51 +3913,53 @@ function renderHome() {
   grid._wheelFn=_wheelFn;
   grid.addEventListener('wheel',_wheelFn,{passive:false});
 
-  // Swipe to change page on home grid
-  let _swipeStartX = null;
-  let _swipeStartY = null;
-  let _swipeLocked = false;
-  grid.addEventListener('touchstart', e => {
-    _swipeStartX = e.touches[0].clientX;
-    _swipeStartY = e.touches[0].clientY;
-    _swipeLocked = false;
-  }, { passive: true });
-  grid.addEventListener('touchmove', e => {
-    if (_swipeStartX === null) return;
-    const dx = e.touches[0].clientX - _swipeStartX;
-    const dy = e.touches[0].clientY - _swipeStartY;
-    // Lock to horizontal if dx > dy (prevents accidental swipes while scrolling)
-    if (!_swipeLocked && Math.abs(dy) > Math.abs(dx) + 5) { _swipeStartX = null; return; }
-    if (Math.abs(dx) > 12) { _swipeLocked = true; e.preventDefault(); }
-  }, { passive: false });
-  grid.addEventListener('touchend', e => {
-    if (_swipeStartX === null) return;
-    const dx = e.changedTouches[0].clientX - _swipeStartX;
-    _swipeStartX = null; _swipeStartY = null; _swipeLocked = false;
-    if (Math.abs(dx) < 35) return;
-    playSound('click');
-    if (dx < 0 && homePageIdx < totalPages - 1) { homePageIdx++; renderHome(); }
-    if (dx > 0 && homePageIdx > 0) { homePageIdx--; renderHome(); }
-  });
+  // Swipe to change page on home grid — only attach once per grid element
+  if (!grid._swipeBound) {
+    grid._swipeBound = true;
+    let _swipeStartX = null;
+    let _swipeStartY = null;
+    let _swipeLocked = false;
+    grid.addEventListener('touchstart', e => {
+      _swipeStartX = e.touches[0].clientX;
+      _swipeStartY = e.touches[0].clientY;
+      _swipeLocked = false;
+    }, { passive: true });
+    grid.addEventListener('touchmove', e => {
+      if (_swipeStartX === null) return;
+      const dx = e.touches[0].clientX - _swipeStartX;
+      const dy = e.touches[0].clientY - _swipeStartY;
+      // Lock to horizontal if dx > dy (prevents accidental swipes while scrolling)
+      if (!_swipeLocked && Math.abs(dy) > Math.abs(dx) + 5) { _swipeStartX = null; return; }
+      if (Math.abs(dx) > 12) { _swipeLocked = true; e.preventDefault(); }
+    }, { passive: false });
+    grid.addEventListener('touchend', e => {
+      if (_swipeStartX === null) return;
+      const dx = e.changedTouches[0].clientX - _swipeStartX;
+      _swipeStartX = null; _swipeStartY = null; _swipeLocked = false;
+      if (Math.abs(dx) < 35) return;
+      const _tp = Math.ceil((S.appPositions || []).length / APPS_PER_PAGE) || 1;
+      playSound('click');
+      if (dx < 0 && homePageIdx < _tp - 1) { homePageIdx++; renderHome(); }
+      if (dx > 0 && homePageIdx > 0) { homePageIdx--; renderHome(); }
+    });
 
-  // Update calendar badge
-  setTimeout(_updateCalBadge, 50);
-
-  // Mouse drag swipe too
-  let _msStartX = null;
-  grid.addEventListener('mousedown', e => {
-    if (e.target.closest('.app-icon, .btn')) return;
-    _msStartX = e.clientX;
-  });
-  const _msEnd = (e) => {
-    if (_msStartX === null) return;
-    const dx = e.clientX - _msStartX;
-    _msStartX = null;
-    if (Math.abs(dx) < 50) return;
-    if (dx < 0 && homePageIdx < totalPages - 1) { homePageIdx++; renderHome(); }
-    if (dx > 0 && homePageIdx > 0) { homePageIdx--; renderHome(); }
-  };
-  grid.addEventListener('mouseup', _msEnd);
+    // Mouse drag swipe too
+    let _msStartX = null;
+    grid.addEventListener('mousedown', e => {
+      if (e.target.closest('.app-icon, .btn')) return;
+      _msStartX = e.clientX;
+    });
+    const _msEnd = (e) => {
+      if (_msStartX === null) return;
+      const dx = e.clientX - _msStartX;
+      _msStartX = null;
+      if (Math.abs(dx) < 50) return;
+      const _tp = Math.ceil((S.appPositions || []).length / APPS_PER_PAGE) || 1;
+      if (dx < 0 && homePageIdx < _tp - 1) { homePageIdx++; renderHome(); }
+      if (dx > 0 && homePageIdx > 0) { homePageIdx--; renderHome(); }
+    };
+    grid.addEventListener('mouseup', _msEnd);
+  }
 
   // Long press for edit mode on wallpaper
   let _lpTimer = null;
@@ -6063,6 +6113,13 @@ function renderChatList() {
   const c = document.getElementById('chat-list');
   if (!c) return;
 
+  // Update conversation count subtitle
+  const subtitle = document.getElementById('chat-list-subtitle');
+  if (subtitle) {
+    const n = (S.contacts || []).length;
+    subtitle.textContent = n + ' conversation' + (n !== 1 ? 's' : '');
+  }
+
   if (!S.contacts || S.contacts.length === 0) {
     c.innerHTML = `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:60px 20px;text-align:center">
@@ -6114,6 +6171,13 @@ function openChat(i) {
   activeChatContact = S.contacts[i];
   if (!S.messages[activeChatContact.id]) S.messages[activeChatContact.id] = [];
 
+  // Mark all messages as read and clear unread badge
+  let changed = false;
+  (S.messages[activeChatContact.id] || []).forEach(m => {
+    if (m.sender !== 'user' && !m.read) { m.read = true; changed = true; }
+  });
+  if (changed) { saveState(); updateBadges(); renderChatList(); }
+
   const nameEl = document.getElementById('chat-convo-name');
   const avatarEl = document.getElementById('chat-convo-avatar');
   if (nameEl) nameEl.textContent = activeChatContact.name;
@@ -6125,6 +6189,8 @@ function openChat(i) {
   document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
   const cv = document.getElementById('screen-chat-convo');
   if (cv) { cv.style.display = 'flex'; cv.classList.add('active'); currentScreen = 'chat-convo'; }
+  // Apply saved chat theme
+  requestAnimationFrame(() => _applyChatTheme(S.chatTheme || 'default'));
   renderChatMessages();
 }
 
@@ -6188,15 +6254,16 @@ async function sendChatMsg() {
   setTimeout(async () => {
     const response = await getAIChat(activeChatContact, text);
     window._chatTyping = false;
-    S.messages[activeChatContact.id].push({ sender:'ai', text: response, ts: Date.now() });
-    renderChatMessages(); saveState();
+    const newMsg = { sender:'ai', text: response, ts: Date.now(), read: true };
+    S.messages[activeChatContact.id].push(newMsg);
+    renderChatMessages(); saveState(); updateBadges();
     playSound('tick');
   }, 800 + Math.random() * 1200);
 }
 
 async function getAIChat(contact, userMsg) {
   try {
-    const history = (S.messages[contact.id] || []).slice(-10).map(m => ({
+    const history = (S.messages[contact.id] || []).slice(-20).map(m => ({
       role: m.sender === 'user' ? 'user' : 'assistant',
       content: m.text
     }));
@@ -6206,14 +6273,22 @@ async function getAIChat(contact, userMsg) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
-        system: `You are ${contact.name}, a real person texting a friend. Personality: ${contact.personality || 'friendly and casual'}. Keep replies short (1-3 sentences), casual, realistic like actual text messages. No asterisks or roleplay markers.`,
+        system: `You are ${contact.name}, texting a close friend. Personality: ${contact.personality || 'friendly, warm and casual'}. 
+Rules: 
+- Respond naturally like a real person texting — casual, warm, human. 
+- Vary your reply length: sometimes short (1 sentence), sometimes longer (3-5 sentences) when excited or telling a story.
+- Use occasional emoji naturally (not every message).
+- Ask follow-up questions to keep the conversation flowing.
+- Reference things mentioned earlier in the conversation to feel like you're paying attention.
+- Never use asterisks, roleplay markers, or AI-style formatting.
+- Never say you're an AI. Stay in character always.`,
         messages: history
       })
     });
     const data = await response.json();
     return data.content?.[0]?.text || '👋';
   } catch(e) {
-    const replies = ["Hey! 😊","Cool!","lol fr","Sounds good!","Haha yeah","That's wild 😂","No way!","For real tho 💀","omg yes","ngl that's kinda cute"];
+    const replies = ["Hey! 😊","omg tell me more!","lol fr 💀","sounds good to me","haha yeah I get that","that's actually wild 😂","no way!!","fr tho","omg yes same","ngl that's kinda wholesome","wait really??","I was literally just thinking about this","ok but also—","hahaha honestly same though"];
     return replies[Math.floor(Math.random() * replies.length)];
   }
 }
@@ -6232,6 +6307,79 @@ function addContact() {
   document.getElementById('contact-emoji').value = '';
   document.getElementById('contact-personality').value = '';
   renderChatList();
+}
+// ============================================================
+// CHAT THEMES
+// ============================================================
+const CHAT_THEMES = [
+  { id:'default',    name:'Default',     bg:'linear-gradient(180deg,#0a0a12 0%,#0d0d1a 100%)', sent:'linear-gradient(135deg,#0a84ff,#0066cc)', sentC:'#fff', recv:'rgba(44,44,46,0.92)', recvC:'#f5f5f7', recvB:'rgba(255,255,255,0.08)', sentS:'rgba(10,132,255,0.35)' },
+  { id:'sakura',     name:'🌸 Sakura',   bg:'linear-gradient(180deg,#1a0a15 0%,#0d0510 100%)', sent:'linear-gradient(135deg,#ff6b9d,#c44dff)', sentC:'#fff', recv:'rgba(80,30,55,0.92)', recvC:'#ffdcf0', recvB:'rgba(255,107,157,0.18)', sentS:'rgba(255,107,157,0.4)' },
+  { id:'midnight',   name:'🌙 Midnight', bg:'linear-gradient(180deg,#020110 0%,#05021a 100%)', sent:'linear-gradient(135deg,#7b2ff7,#c77dff)', sentC:'#fff', recv:'rgba(30,20,60,0.92)', recvC:'#e8d8ff', recvB:'rgba(123,47,247,0.2)', sentS:'rgba(123,47,247,0.45)' },
+  { id:'forest',     name:'🌿 Forest',   bg:'linear-gradient(180deg,#030e05 0%,#071508 100%)', sent:'linear-gradient(135deg,#22c55e,#16a34a)', sentC:'#fff', recv:'rgba(15,40,20,0.92)', recvC:'#d4fce8', recvB:'rgba(34,197,94,0.18)', sentS:'rgba(34,197,94,0.4)' },
+  { id:'sunset',     name:'🌅 Sunset',   bg:'linear-gradient(180deg,#1a0800 0%,#250d00 100%)', sent:'linear-gradient(135deg,#ff6b00,#ff9f0a)', sentC:'#fff', recv:'rgba(60,25,5,0.92)', recvC:'#fff0d8', recvB:'rgba(255,107,0,0.18)', sentS:'rgba(255,107,0,0.4)' },
+  { id:'ocean',      name:'🌊 Ocean',    bg:'linear-gradient(180deg,#000d1a 0%,#001428 100%)', sent:'linear-gradient(135deg,#0088cc,#00ccff)', sentC:'#fff', recv:'rgba(0,30,55,0.92)', recvC:'#d0f0ff', recvB:'rgba(0,136,204,0.2)', sentS:'rgba(0,136,204,0.4)' },
+  { id:'rose',       name:'🌹 Rose',     bg:'linear-gradient(180deg,#12020a 0%,#1a030f 100%)', sent:'linear-gradient(135deg,#e11d48,#fb7185)', sentC:'#fff', recv:'rgba(55,10,25,0.92)', recvC:'#ffe4ec', recvB:'rgba(225,29,72,0.2)', sentS:'rgba(225,29,72,0.4)' },
+  { id:'gold',       name:'✨ Gold',     bg:'linear-gradient(180deg,#0d0900 0%,#150e00 100%)', sent:'linear-gradient(135deg,#d97706,#fbbf24)', sentC:'#000', recv:'rgba(45,30,0,0.92)', recvC:'#fffbd0', recvB:'rgba(217,119,6,0.2)', sentS:'rgba(217,119,6,0.4)' },
+];
+
+function _applyChatTheme(themeId) {
+  const t = CHAT_THEMES.find(x => x.id === themeId) || CHAT_THEMES[0];
+  const cv = document.getElementById('screen-chat-convo');
+  if (!cv) return;
+  cv.style.background = t.bg;
+  const root = cv;
+  root.style.setProperty('--chat-bg', t.bg);
+  root.style.setProperty('--chat-sent-bg', t.sent);
+  root.style.setProperty('--chat-sent-color', t.sentC);
+  root.style.setProperty('--chat-sent-shadow', t.sentS);
+  root.style.setProperty('--chat-recv-bg', t.recv);
+  root.style.setProperty('--chat-recv-color', t.recvC);
+  root.style.setProperty('--chat-recv-border', t.recvB);
+}
+
+function openChatThemePicker() {
+  playSound('click');
+  const current = S.chatTheme || 'default';
+  const html = `<div style="padding:16px">
+    <div style="font-size:14px;font-weight:700;color:#f5f5f7;margin-bottom:14px;text-align:center">💬 Chat Theme</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      ${CHAT_THEMES.map(t => `
+        <div onclick="setChatTheme('${t.id}')" style="padding:10px 12px;border-radius:14px;background:${t.bg};border:2px solid ${t.id===current?'#a088fa':'rgba(255,255,255,0.1)'};cursor:pointer;transition:all 0.2s;position:relative">
+          <div style="font-size:12px;font-weight:700;color:${t.recvC || '#fff'};margin-bottom:6px">${t.name}</div>
+          <div style="display:flex;gap:4px">
+            <div style="height:16px;flex:1;border-radius:6px;background:${t.sent}"></div>
+            <div style="height:16px;flex:1;border-radius:6px;background:${t.recv}"></div>
+          </div>
+          ${t.id===current?'<div style="position:absolute;top:6px;right:8px;font-size:10px;color:#a088fa;font-weight:900">✓</div>':''}
+        </div>`).join('')}
+    </div>
+  </div>`;
+  const overlay = document.createElement('div');
+  overlay.id = 'chat-theme-overlay';
+  overlay.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px)';
+  overlay.innerHTML = `<div style="width:100%;background:rgba(18,14,34,0.98);border-radius:22px 22px 0 0;border:1px solid rgba(160,136,250,0.2);max-height:70%;overflow-y:auto">${html}<button onclick="document.getElementById('chat-theme-overlay').remove()" style="width:calc(100% - 32px);margin:0 16px 16px;padding:12px;border-radius:14px;background:rgba(160,136,250,0.15);border:1px solid rgba(160,136,250,0.3);color:#a088fa;font-size:14px;font-weight:700;cursor:pointer">Done</button></div>`;
+  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
+  const cv = document.getElementById('screen-chat-convo');
+  if (cv) cv.appendChild(overlay);
+}
+
+function setChatTheme(id) {
+  S.chatTheme = id; saveState();
+  _applyChatTheme(id);
+  // Update checkmarks
+  document.querySelectorAll('#chat-theme-overlay [onclick^="setChatTheme"]').forEach(el => {
+    const tid = el.getAttribute('onclick').match(/'(\w+)'/)?.[1];
+    el.style.borderColor = tid === id ? '#a088fa' : 'rgba(255,255,255,0.1)';
+    const check = el.querySelector('[style*="position:absolute"]');
+    if (check) check.remove();
+    if (tid === id) {
+      const ck = document.createElement('div');
+      ck.style.cssText = 'position:absolute;top:6px;right:8px;font-size:10px;color:#a088fa;font-weight:900';
+      ck.textContent = '✓';
+      el.appendChild(ck);
+    }
+  });
+  playSound('click');
 }
 // ============================================================
 // QUINT — Relationship Day Planner
@@ -8495,6 +8643,7 @@ let mClawAnimFrame = null;
 let mClawBridgeX   = 170;   // horizontal position of bridge
 let mClawDropY     = 72;    // current cable-end Y (animated)
 let mClawState     = 'moving'; // moving | dropping | closing | rising | delivering | resetting
+let mClawRiggedResult = undefined; // undefined = not yet decided for this drop
 let mClawDir       = 1;
 let mClawSpeed     = 1.3;
 // clawBoxItems is now S.clawBoxItems (persisted to Firestore)
@@ -8804,6 +8953,7 @@ function renderClaw() {
 function mClawDrop() {
   if (mClawState !== 'moving') return;
   if (S.clawCredits <= 0) { showNotif('❌','No credits!','Buy in Shop'); playSound('error'); return; }
+  mClawRiggedResult = undefined; // reset rig decision for this drop
   S.clawCredits--; saveState(); playSound('whoosh');
   const cc = document.querySelector('#claw-content .claw-credit-count');
   if (cc) cc.textContent = S.clawCredits;
@@ -8904,8 +9054,18 @@ function mClawTick(canvas) {
       mClawDropY -= 3.5;
       mFingerTarget = 1;  // keep closed during rise
 
-      // Actively drag any prize that's inside the grip radius upward with the claw
-      if (mClawWorld && window.Matter) {
+      // Rigged claw logic — real claw machines only grip ~30% of the time.
+      // Determine success on first frame of rising state (once per drop).
+      if (mClawRiggedResult === undefined) {
+        // ~28% base win rate, slightly better with more credits spent (but still rigged)
+        const baseWinRate = (S.clawSettings?.winRate ?? 28) / 100;
+        mClawRiggedResult = Math.random() < baseWinRate;
+        // If rigged to fail, relax finger grip slightly so prizes slip out
+        if (!mClawRiggedResult) mFingerTarget = 0.35; // partially open = grip too weak
+      }
+
+      // Only drag prize upward if the rig allows a win
+      if (mClawRiggedResult && mClawWorld && window.Matter) {
         const clawTipY = mClawDropY + 50; // approximate tip of closed fingers
         Matter.Composite.allBodies(mClawWorld).forEach(b => {
           if (b.label !== 'prize') return;
@@ -9014,7 +9174,7 @@ function mClawTick(canvas) {
     case 'resetting':
       mFingerTarget = 0;
       mClawBridgeX += (170 - mClawBridgeX) * 0.06;
-      if (Math.abs(mClawBridgeX - 170) < 2) { mClawBridgeX = 170; mClawState = 'moving'; }
+      if (Math.abs(mClawBridgeX - 170) < 2) { mClawBridgeX = 170; mClawState = 'moving'; mClawRiggedResult = undefined; }
       break;
   }
 
@@ -10138,8 +10298,9 @@ function mrGenMap_inner() {
       mrObstacles.push({ type:'ramp', x: (gRight + W) * 0.5, y: yBase + 18 + rng() * 20, w: 50 + rng() * 15, angle: -(0.28 + rng() * 0.1), _theme: mrTheme });
     }
 
-    // ── Pegs — only outside gate corridor ──
-    for (let p = 0; p < 3; p++) {
+    // ── Pegs — only outside gate corridor — more dense on extended levels ──
+    const pegCount = isDeepLevel ? 5 : 3;
+    for (let p = 0; p < pegCount; p++) {
       let px;
       if (rng() > 0.5 && gLeft > 50) {
         px = 15 + rng() * (gLeft - 20);
@@ -10151,8 +10312,8 @@ function mrGenMap_inner() {
       mrObstacles.push({ type:'peg', x: px, y: yBase + 10 + rng() * (zoneH - 20), r: 5 + rng() * 3, _theme: mrTheme });
     }
 
-    // ── Bumper — outside gate ──
-    if (z % 3 === 0) {
+    // ── Bumper — outside gate — every zone on extended levels ──
+    if (z % 3 === 0 || (isDeepLevel && z % 2 === 0)) {
       const bx = rng() > 0.5
         ? Math.min(gLeft - 20, 60 + rng() * 40)
         : Math.max(gRight + 20, W - 60 - rng() * 40);
@@ -10166,10 +10327,11 @@ function mrGenMap_inner() {
     const alwaysThemed = ['arctic','sewers','sunken','skatepark','beach','garden','jpnight','kitchen','midnightup','forest','autumn','medieval'].includes(mrTheme);
     const hazardPool = themePool.length && (alwaysThemed || rng() < 0.75) ? themePool : basePool;
 
-    // Pick 2 distinct hazards per zone to ensure full theme variety across a race
+    // Pick 2-3 distinct hazards per zone; extended levels get 3 for density
     const picks = [];
     const poolCopy = hazardPool.slice();
-    for (let pi = 0; pi < 2 && poolCopy.length; pi++) {
+    const hazardPicks = isDeepLevel ? 3 : 2;
+    for (let pi = 0; pi < hazardPicks && poolCopy.length; pi++) {
       const idx = Math.floor(rng() * poolCopy.length);
       picks.push(poolCopy.splice(idx, 1)[0]);
     }
@@ -12242,11 +12404,11 @@ function mrDrawFrame() {
   ctx.save();
   ctx.translate(0, -camY);
 
-  // Background
+  // Background — fill the FULL level height so extended levels have complete coverage
   const th = MR_THEMES[mrTheme] || MR_THEMES.space;
-  const bg = ctx.createLinearGradient(0, 0, 0, MR_H);
+  const bg = ctx.createLinearGradient(0, 0, 0, mrLevelH);
   bg.addColorStop(0, th.bgA); bg.addColorStop(0.5, th.bgA); bg.addColorStop(1, th.bgB);
-  ctx.fillStyle = bg; ctx.fillRect(0, 0, cssW, MR_H);
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, cssW, mrLevelH);
 
   // ── Arctic skybox effects ──
   if (mrTheme === 'arctic') {
@@ -12278,7 +12440,7 @@ function mrDrawFrame() {
     window._mrBlizzard.forEach(p => {
       p.x += p.vx; p.y += p.vy + Math.sin(Date.now()*0.002+p.y*0.02)*0.3;
       if (p.x > cssW+10) p.x = -10;
-      if (p.y > MR_H+10) { p.y = -10; p.x = Math.random()*cssW; }
+      if (p.y > mrLevelH+10) { p.y = -10; p.x = Math.random()*cssW; }
       ctx.globalAlpha = p.alpha * 0.7;
       ctx.fillStyle = '#e8f4ff';
       ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
@@ -12297,10 +12459,10 @@ function mrDrawFrame() {
 
   // ── Sunken Depths water vignette ──
   if (mrTheme === 'sunken') {
-    const uvG = ctx.createRadialGradient(cssW/2, MR_H/2, MR_H*0.3, cssW/2, MR_H/2, MR_H*0.8);
+    const uvG = ctx.createRadialGradient(cssW/2, mrLevelH/2, mrLevelH*0.3, cssW/2, mrLevelH/2, mrLevelH*0.8);
     uvG.addColorStop(0,'rgba(0,0,0,0)');
     uvG.addColorStop(1,'rgba(0,20,60,0.35)');
-    ctx.fillStyle=uvG; ctx.fillRect(0,0,cssW,MR_H);
+    ctx.fillStyle=uvG; ctx.fillRect(0,0,cssW,mrLevelH);
   }
 
   // ── Skate Park — sunset sky with warm horizon glow ──
@@ -12470,14 +12632,14 @@ function mrDrawFrame() {
 
   // ── Japanese Night — moonlit sky, stars, sakura petal storm ──
   if (mrTheme === 'jpnight') {
-    // Deep indigo sky gradient at top
-    const jnSky = ctx.createLinearGradient(0, 0, 0, 120);
+    // Deep indigo sky gradient covering full level
+    const jnSky = ctx.createLinearGradient(0, 0, 0, mrLevelH);
     jnSky.addColorStop(0, 'rgba(40,20,100,0.35)');
-    jnSky.addColorStop(0.6, 'rgba(20,8,60,0.18)');
+    jnSky.addColorStop(0.3, 'rgba(20,8,60,0.18)');
     jnSky.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = jnSky; ctx.fillRect(0, 0, cssW, 120);
+    ctx.fillStyle = jnSky; ctx.fillRect(0, 0, cssW, mrLevelH);
 
-    // Moon — top right
+    // Moon — top right (fixed in world space)
     const moonX = cssW * 0.82, moonY = 28;
     ctx.shadowBlur = 30; ctx.shadowColor = 'rgba(220,210,255,0.6)';
     const moonG = ctx.createRadialGradient(moonX-4, moonY-4, 1, moonX, moonY, 18);
@@ -12490,22 +12652,25 @@ function mrDrawFrame() {
     ctx.strokeStyle = 'rgba(200,190,255,0.12)'; ctx.lineWidth = 8;
     ctx.beginPath(); ctx.arc(moonX, moonY, 26, 0, Math.PI*2); ctx.stroke();
 
-    // Stars — stable seeded positions
+    // Stars — distributed across full level height
     const starT2 = Date.now() * 0.0005;
-    for(let si=0; si<22; si++){
-      const sx = (si*131+17) % cssW;
-      const sy = (si*79+11) % 90;
-      const salpha = 0.3 + Math.sin(starT2+si*1.3)*0.2;
-      ctx.globalAlpha = salpha;
-      ctx.fillStyle = 'rgba(220,210,255,0.9)';
-      ctx.beginPath(); ctx.arc(sx, sy, 0.9+Math.sin(si)*0.4, 0, Math.PI*2); ctx.fill();
+    const starRows = Math.max(1, Math.ceil(mrLevelH / MR_H));
+    for (let sr = 0; sr < starRows; sr++) {
+      for(let si=0; si<22; si++){
+        const sx = (si*131+17) % cssW;
+        const sy = sr * MR_H + (si*79+11) % 90;
+        const salpha = 0.3 + Math.sin(starT2+si*1.3+sr*0.7)*0.2;
+        ctx.globalAlpha = salpha;
+        ctx.fillStyle = 'rgba(220,210,255,0.9)';
+        ctx.beginPath(); ctx.arc(sx, sy, 0.9+Math.sin(si)*0.4, 0, Math.PI*2); ctx.fill();
+      }
     }
     ctx.globalAlpha = 1;
 
     // Sakura petal storm — 10s on / 10s off cycle
     if (!window._mrJPPetals) {
       window._mrJPPetals = Array.from({length:55}, () => ({
-        x: Math.random()*cssW, y: Math.random()*MR_H,
+        x: Math.random()*cssW, y: Math.random()*mrLevelH,
         vx: -0.4-Math.random()*0.7, vy: 0.5+Math.random()*0.9,
         rot: Math.random()*Math.PI*2, rotV: (Math.random()-0.5)*0.08,
         r: 2+Math.random()*2.5, alpha: 0.3+Math.random()*0.4,
@@ -12528,7 +12693,7 @@ function mrDrawFrame() {
         // Gentle horizontal sway
         p.x += Math.sin(p.phase) * 0.3;
         if (p.x < -10) p.x = cssW + 10;
-        if (p.y > MR_H + 10) { p.y = -10; p.x = Math.random()*cssW; }
+        if (p.y > mrLevelH + 10) { p.y = -10; p.x = Math.random()*cssW; }
         ctx.save();
         ctx.globalAlpha = p.alpha * stormFade;
         ctx.translate(p.x, p.y); ctx.rotate(p.rot);
@@ -12541,13 +12706,13 @@ function mrDrawFrame() {
       });
     }
 
-    // Soft purple vignette on sides for depth
+    // Soft purple vignette on sides for depth across full level
     const jnVL = ctx.createLinearGradient(0, 0, 20, 0);
     jnVL.addColorStop(0, 'rgba(60,20,120,0.2)'); jnVL.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = jnVL; ctx.fillRect(0, 0, 20, MR_H);
+    ctx.fillStyle = jnVL; ctx.fillRect(0, 0, 20, mrLevelH);
     const jnVR = ctx.createLinearGradient(cssW-20, 0, cssW, 0);
     jnVR.addColorStop(0, 'rgba(0,0,0,0)'); jnVR.addColorStop(1, 'rgba(60,20,120,0.2)');
-    ctx.fillStyle = jnVR; ctx.fillRect(cssW-20, 0, 20, MR_H);
+    ctx.fillStyle = jnVR; ctx.fillRect(cssW-20, 0, 20, mrLevelH);
   }
 
   // ── Midnight Fiesta confetti ──
@@ -15850,6 +16015,8 @@ function renderCoinPusher() {
       // Engine already running — just swap in the new canvas and resume
       try {
         Matter.Render.stop(cpRender);
+        // Remove old overlay listener before re-adding to prevent duplicates
+        Matter.Events.off(cpRender, 'afterRender', cpDrawOverlay);
         cpRender.canvas = canvas;
         cpRender.context = canvas.getContext('2d');
         cpRender.options.width = CP_W;
@@ -16041,8 +16208,10 @@ function cpMakePrize(def, x, y) {
   let b;
   if (def.r) b = Bodies.circle(x, y, def.r, opts);
   else b = Bodies.rectangle(x, y, def.w, def.h, { ...opts, chamfer: { radius: 5 } });
+  if (!def.mass || isNaN(def.mass)) def.mass = 0.002; // guard against missing mass
   Body.setMass(b, def.mass);
   b._prizeData = def;
+  b.label = 'cpPrize';
   return b;
 }
 
@@ -17828,9 +17997,9 @@ function _renderThemes(c, ctx) {
               ${t.preview.map(col => `<div style="width:12px;height:40px;background:${col};border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>`).join('')}
             </div>
             <div style="flex:1;min-width:0">
-              <div style="display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden">
-                <div style="font-size:13px;font-weight:700;color:${t.legendary?'#ffd700':'var(--fg)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex-shrink:1">${t.name}</div>
-                ${t.mythic ? '<span style="font-size:8px;font-weight:900;background:linear-gradient(135deg,#00c8ff,#8800ff,#ff0088);color:#fff;padding:2px 6px;border-radius:4px;letter-spacing:0.5px;animation:ticketShimmer 1.5s linear infinite;background-size:200%">✦ MYTHIC ✦</span>' : t.mythic ? '<span style="font-size:8px;font-weight:900;background:linear-gradient(135deg,#00c8ff,#8800ff,#ff0088);color:#fff;padding:2px 6px;border-radius:4px;letter-spacing:0.5px">✦ MYTHIC ✦</span>' : t.legendary ? '<span style="font-size:8px;font-weight:900;background:linear-gradient(135deg,#b8860b,#ffd700);color:#000;padding:2px 5px;border-radius:4px;letter-spacing:0.5px">LEGENDARY</span>' : ''}
+              <div style="display:flex;align-items:center;gap:4px;min-width:0;overflow:hidden;flex-wrap:nowrap">
+                <div style="font-size:13px;font-weight:700;color:${t.legendary?'#ffd700':'var(--fg)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 0">${t.name}</div>
+                ${t.mythic ? '<span style="font-size:7px;font-weight:900;background:linear-gradient(135deg,#00c8ff,#8800ff,#ff0088);color:#fff;padding:2px 5px;border-radius:4px;letter-spacing:0.3px;white-space:nowrap;flex-shrink:0;animation:ticketShimmer 1.5s linear infinite;background-size:200%">✦ MYTHIC ✦</span>' : t.legendary ? '<span style="font-size:7px;font-weight:900;background:linear-gradient(135deg,#b8860b,#ffd700);color:#000;padding:2px 4px;border-radius:4px;letter-spacing:0.3px;white-space:nowrap;flex-shrink:0">LEGEND</span>' : ''}
               </div>
               <div style="font-size:10px;margin-top:2px;color:${active?'var(--accent1)':owned?'#4caf6e':t.legendary?'#ffd700':'var(--gold)'}">
                 ${active ? '✓ Active' : owned ? '✓ Owned' : '🎟️ '+t.cost+' tickets'}
