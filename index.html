@@ -346,22 +346,34 @@ button, a { touch-action: manipulation; }
 #ticket-progress-wrap {
   flex:1;
   height: calc(10px * var(--ui-scale));
-  background:rgba(0,0,0,0.4);
-  border-radius:99px;
-  overflow:hidden;
   position:relative;
   cursor:pointer;
+  /* overflow must be VISIBLE so tooltip can escape the bar bounds */
+  overflow:visible;
+}
+/* Inner track clip — keeps the rounded bar look without clipping the tooltip */
+#ticket-progress-wrap::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  border-radius:99px;
   border:1px solid rgba(255,255,255,0.06);
   box-shadow: 0 1px 4px rgba(0,0,0,0.4), inset 0 1px 2px rgba(0,0,0,0.3);
+  pointer-events:none;
+  z-index:0;
 }
 #ticket-progress-fill {
+  position:absolute;
+  inset:0;
+  right:auto; /* width controlled via JS */
   height:100%;
   background: var(--ticket-bar-gradient, linear-gradient(90deg, var(--accent1), var(--pink), var(--gold)));
   border-radius:99px;
   transition: width 0.6s cubic-bezier(.4,0,.2,1);
   box-shadow: var(--ticket-glow, 0 0 8px var(--accent1));
-  position:relative;
   overflow:hidden;
+  z-index:1;
 }
 #ticket-progress-fill::after {
   content:'';
@@ -374,7 +386,7 @@ button, a { touch-action: manipulation; }
 }
 #ticket-tooltip {
   position:absolute;
-  top:calc(100% + 6px); right:0;
+  bottom:calc(100% + 8px); right:0;
   background:rgba(15,12,28,0.97);
   border:1px solid rgba(160,136,250,0.3);
   border-radius:10px;
@@ -386,6 +398,14 @@ button, a { touch-action: manipulation; }
   display:none;
   z-index:9999;
   box-shadow:0 4px 16px rgba(0,0,0,0.5);
+  pointer-events:none;
+}
+#ticket-tooltip::after {
+  content:'';
+  position:absolute;
+  top:100%; right:12px;
+  border:5px solid transparent;
+  border-top-color:rgba(160,136,250,0.3);
 }
 #ticket-progress-wrap:hover #ticket-tooltip { display:block; }
 @keyframes ticketPip {
@@ -423,10 +443,14 @@ button, a { touch-action: manipulation; }
 #screen-quint {
   overflow: hidden !important;
   padding: 0 !important;
+  position: absolute !important;
+  top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
 }
 #screen-quint > div[style*="flex:1"] {
   min-height: 0;
+  flex: 1 1 0% !important;
 }
+#quint-stacks { min-height: 0; }
 
 /* ===== HOME SCREEN ===== */
 #screen-home {
@@ -2683,7 +2707,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== QUINT SCREEN ===== -->
-    <div id="screen-quint" class="screen" style="padding:0;flex-direction:column;overflow:hidden;position:relative;display:none">
+    <div id="screen-quint" class="screen" style="padding:0;flex-direction:column;overflow:hidden;display:none">
       <!-- Dynamic background (changes by time of day) -->
       <div id="quint-bg" style="position:absolute;inset:0;z-index:0;transition:all 2s ease"></div>
       <!-- Gentle confetti canvas -->
@@ -3551,6 +3575,21 @@ function updateTicketDisplay(delta) {
   if (fill) fill.style.width = pct + '%';
   if (count) count.textContent = S.tickets;
   if (tooltip) tooltip.textContent = `${S.tickets} / ${S.maxTickets} tickets`;
+  // Touch: show tooltip on tap-hold (mobile doesn't have hover)
+  const wrap = document.getElementById('ticket-progress-wrap');
+  if (wrap && !wrap._tooltipTouchBound) {
+    wrap._tooltipTouchBound = true;
+    let _ttTimer;
+    wrap.addEventListener('touchstart', e => {
+      _ttTimer = setTimeout(() => {
+        if (tooltip) { tooltip.style.display = 'block'; }
+      }, 120);
+    }, {passive:true});
+    wrap.addEventListener('touchend', () => {
+      clearTimeout(_ttTimer);
+      setTimeout(() => { if (tooltip) tooltip.style.display = ''; }, 1200);
+    }, {passive:true});
+  }
   // Play sound at 100%
   if (pct >= 100 && prevPct < 100 && delta > 0) {
     playSound('bell'); launchConfetti();
@@ -10211,13 +10250,18 @@ function mrGenMap_inner() {
       case 'thornBush':    mrObstacles.push({type:'thornBush',x:hx,y:hy,w:45+rng()*20,_theme:'garden'}); break;
       case 'grassPatch':   mrObstacles.push({type:'grassPatch',x:hx,y:hy,w:55+rng()*20,_theme:'garden'}); break;
       case 'beeSting':     mrObstacles.push({type:'beeSting',x:hx+rng()*30-15,y:hy,vx:rng()>0.5?1.5:-1.5,vy:(rng()-0.5)*0.8,buzz:0,_theme:'garden'}); break;
-      case 'swingingBamboo':mrObstacles.push({type:'swingingBamboo',x:hx,y:hy,len:55+rng()*25,angle:(rng()-0.5)*0.4,angV:0,restitution:0.82+rng()*0.12,_theme:'jpnight'}); break;
+      case 'swingingBamboo':mrObstacles.push({type:'swingingBamboo',x:hx,y:hy,len:45+rng()*20,angle:(rng()-0.5)*0.5,angV:(rng()-0.5)*0.04,restitution:0.82+rng()*0.12,_theme:'jpnight'}); break;
       case 'paperLantern': mrObstacles.push({type:'paperLantern',x:hx,y:hy,r:13+rng()*5,phase:rng()*Math.PI*2,colorIdx:Math.floor(rng()*4),lit:true,flickerT:0,_theme:'jpnight'}); break;
       case 'shurikenWheel':mrObstacles.push({type:'shurikenWheel',x:hx,y:hy,r:15+rng()*6,angle:0,speed:(rng()>0.5?1:-1)*(0.04+rng()*0.03),_theme:'jpnight'}); break;
-      case 'sakuraWindTunnel':{const tD=rng()>0.5?1:-1,tL=90+rng()*50,tA=tD*(0.3+rng()*0.35);
-        mrObstacles.push({type:'sakuraWindTunnel',x:hx,y:hy,len:tL,angle:tA,w:28+rng()*10,phase:0,petals:[],_theme:'jpnight'});
-        const eX=hx+Math.sin(tA)*tL,eY=hy+Math.cos(tA)*tL;
-        if(eX>20&&eX<W-20&&eY<mrLevelH-40)mrObstacles.push({type:'moonlitSection',x:eX,y:eY,r:24+rng()*10,phase:rng()*Math.PI*2,_theme:'jpnight'});
+      case 'sakuraWindTunnel':{
+        // Tunnel runs mostly vertically (nearly straight down), angle is small tilt only
+        const tD=rng()>0.5?1:-1, tL=80+rng()*40;
+        // Small tilt so wind pushes gently sideways — doesn't redirect marbles into walls
+        const tA=tD*(0.08+rng()*0.12);
+        mrObstacles.push({type:'sakuraWindTunnel',x:hx,y:hy,len:tL,angle:tA,w:32+rng()*10,phase:0,petals:[],_theme:'jpnight'});
+        const eX=hx+Math.sin(tA)*tL, eY=hy+Math.cos(tA)*tL;
+        if(eX>20&&eX<W-20&&eY<mrLevelH-40)
+          mrObstacles.push({type:'moonlitSection',x:eX,y:eY,r:22+rng()*8,phase:rng()*Math.PI*2,_theme:'jpnight'});
         break;}
       case 'waterGardenCurrent':mrObstacles.push({type:'waterGardenCurrent',x:hx,y:hy,w:65+rng()*20,h:22+rng()*10,dir:rng()>0.5?1:-1,phase:0,ripples:[],_theme:'jpnight'}); break;
       case 'moonlitSection':mrObstacles.push({type:'moonlitSection',x:hx,y:hy,r:28+rng()*12,phase:rng()*Math.PI*2,_theme:'jpnight'}); break;
@@ -10257,9 +10301,38 @@ function mrGenMap_inner() {
   for (let z = 0; z < ZONES; z++) {
     const isLeft = z % 2 === 0;
     const gx = isLeft
-      ? W * 0.16 + rng() * (W * 0.22)   // left zone: 16–38% of width
-      : W * 0.62 + rng() * (W * 0.22);  // right zone: 62–84% of width
+      ? W * 0.16 + rng() * (W * 0.18)   // left zone: 16–34% of width
+      : W * 0.66 + rng() * (W * 0.18);  // right zone: 66–84% of width
     gates.push({ x: gx, y: 60 + z * zoneH + zoneH * 0.5 });
+  }
+
+  // Helper: check if a point is inside the gate safe corridor
+  function _inGateSafe(px, py, gz, margin) {
+    const g = gates[gz] || gates[gz-1];
+    if (!g) return false;
+    const m = margin || GATE_W * 0.55;
+    return Math.abs(px - g.x) < m && Math.abs(py - g.y) < zoneH * 0.6;
+  }
+
+  // Helper: place peg row (decorative, away from path)
+  function _pegRow(xArr, y) {
+    xArr.forEach(px => {
+      if (px > 10 && px < W-10)
+        mrObstacles.push({type:'peg', x:px, y, r:4+rng()*2.5, _theme:mrTheme});
+    });
+  }
+
+  // Helper: place a tunnel corridor (visual walls + physics guide)
+  // A tunnel is two parallel ramps forming a channel marbles flow through
+  function _placeTunnel(cx, yTop, tunnelW, tunnelH, angle) {
+    const wallHalfW = 6;
+    const cos = Math.cos(angle), sin = Math.sin(angle);
+    // Left wall of tunnel
+    mrObstacles.push({type:'ramp', x: cx - (tunnelW/2+wallHalfW)*cos, y: yTop - (tunnelW/2+wallHalfW)*sin,
+      w: tunnelH, angle: angle + Math.PI/2, _theme: mrTheme, _isTunnel: true});
+    // Right wall of tunnel
+    mrObstacles.push({type:'ramp', x: cx + (tunnelW/2+wallHalfW)*cos, y: yTop + (tunnelW/2+wallHalfW)*sin,
+      w: tunnelH, angle: angle + Math.PI/2, _theme: mrTheme, _isTunnel: true});
   }
 
   // ── 2. Zone loop: place structured elements per zone ──
@@ -10270,99 +10343,236 @@ function mrGenMap_inner() {
     const gLeft  = gate.x - GATE_W / 2;
     const gRight = gate.x + GATE_W / 2;
     const gateIsLeft = gate.x < W / 2;
+    const oppSideX = gateIsLeft ? W * 0.62 + rng() * W * 0.26 : W * 0.12 + rng() * W * 0.26;
 
-    // ── Guide ramps: hug walls, angle toward next gate ──
-    const rAL = nextG.x > W * 0.5 ? 0.30 + rng() * 0.12 :  0.20 + rng() * 0.08;
-    const rAR = nextG.x < W * 0.5 ? -(0.30 + rng() * 0.12) : -(0.20 + rng() * 0.08);
-    if (gLeft > 42) {
-      mrObstacles.push({type:'ramp', x:Math.max(20,gLeft*0.42), y:yBase+12+rng()*18,
-        w:44+rng()*18, angle:rAL, _theme:mrTheme});
+    // ── Guide ramps: form a funnel toward gate from zone above ──
+    // Left guide ramp — angles toward gate
+    const rAL = nextG.x > W * 0.5 ? 0.30 + rng() * 0.14 :  0.18 + rng() * 0.10;
+    const rAR = nextG.x < W * 0.5 ? -(0.30 + rng() * 0.14) : -(0.18 + rng() * 0.10);
+    if (gLeft > 38) {
+      const rx = Math.max(18, gLeft * 0.38);
+      mrObstacles.push({type:'ramp', x:rx, y:yBase+10+rng()*14, w:50+rng()*16, angle:rAL, _theme:mrTheme});
     }
-    if (gRight < W - 42) {
-      mrObstacles.push({type:'ramp', x:Math.min(W-20,gRight+(W-gRight)*0.52), y:yBase+12+rng()*18,
-        w:44+rng()*18, angle:rAR, _theme:mrTheme});
+    if (gRight < W - 38) {
+      const rx = Math.min(W-18, gRight + (W-gRight)*0.55);
+      mrObstacles.push({type:'ramp', x:rx, y:yBase+10+rng()*14, w:50+rng()*16, angle:rAR, _theme:mrTheme});
     }
 
-    // ── Wall pegs: near outer edges only, never centre ──
-    const pegC = isDeepLevel ? 2 : 1;
+    // ── Zone type determines inner structure (rotates every zone) ──
+    const zoneType = (z + Math.floor(rng()*2)) % 5;
+
+    if (zoneType === 0) {
+      // Ramp cascade: 2 connected ramps creating a waterfall path on the off-gate side
+      const cascX = gateIsLeft ? W*0.72+rng()*W*0.16 : W*0.12+rng()*W*0.16;
+      const cascY = yBase + zoneH * 0.2;
+      const cascAng = gateIsLeft ? -(0.32+rng()*0.10) : (0.32+rng()*0.10);
+      mrObstacles.push({type:'ramp', x:cascX, y:cascY, w:52+rng()*14, angle:cascAng, _theme:mrTheme});
+      mrObstacles.push({type:'ramp', x:cascX+(gateIsLeft?-32:32), y:cascY+40+rng()*10,
+        w:48+rng()*12, angle:-cascAng*0.7, _theme:mrTheme});
+
+    } else if (zoneType === 1) {
+      // Slalom corridor: alternating pegs forming a clear slalom path
+      const slalomX = oppSideX;
+      const rows = 3;
+      for (let sr=0; sr<rows; sr++) {
+        const side = sr % 2;
+        const px1 = slalomX + (side===0?-18:18);
+        const px2 = slalomX + (side===0?12:-12);
+        const py = yBase + zoneH*(0.18 + sr*0.22);
+        if (!_inGateSafe(px1, py, z, GATE_W*0.7)) _pegRow([px1, px2], py);
+      }
+
+    } else if (zoneType === 2) {
+      // Conveyor shelf: a platform obstacle on the off-gate side
+      const shelfX = Math.max(18, Math.min(W-18, oppSideX));
+      const shelfY = yBase + zoneH * 0.38 + rng() * zoneH * 0.18;
+      if (!_inGateSafe(shelfX, shelfY, z, GATE_W)) {
+        if (rng() > 0.5)
+          mrObstacles.push({type:'conveyor', x:shelfX, y:shelfY, w:54+rng()*18, dir:rng()>0.5?1:-1, beltPhase:0});
+        else
+          mrObstacles.push({type:'seesaw', cx:shelfX, y:shelfY, w:56+rng()*16, angle:0, angV:0});
+      }
+
+    } else if (zoneType === 3) {
+      // Bumper cluster: 2-3 bumpers on off-gate side forming a deflection pocket
+      const bCX = Math.max(18, Math.min(W-18, oppSideX));
+      const bCY = yBase + zoneH*0.30;
+      const offsets = [[-16,0],[16,0],[0,30]];
+      offsets.forEach(([ox,oy],bi) => {
+        const bx = bCX+ox, by = bCY+oy;
+        if (bx>12&&bx<W-12&&!_inGateSafe(bx,by,z,GATE_W*0.8))
+          mrObstacles.push({type:'bumper',x:bx,y:by,r:9+rng()*4,angle:0,speed:0.022+rng()*0.018,_theme:mrTheme});
+      });
+
+    } else {
+      // Open zone: just a single themed hazard and decorative pegs
+      const fp = _pickN(hazardPool, 1);
+      const fX = Math.max(16, Math.min(W-16, oppSideX));
+      const fY = yBase + zoneH * 0.40 + (rng()-0.5) * zoneH * 0.20;
+      if (fp[0] && !_inGateSafe(fX, fY, z, GATE_W)) {
+        // For Japanese Night, don't place bamboo too close to gate or it blocks path
+        const safeHazard = (mrTheme === 'jpnight' && fp[0] === 'swingingBamboo')
+          ? (Math.abs(fX - gate.x) > GATE_W * 1.2 ? fp[0] : 'paperLantern')
+          : fp[0];
+        _ph(safeHazard, fX, fY);
+      }
+    }
+
+    // ── Themed feature always on opposite side (in addition to zone structure) ──
+    if (z % 2 === 0) {
+      const fX2 = Math.max(16, Math.min(W-16, gateIsLeft ? W*0.65+rng()*W*0.22 : W*0.13+rng()*W*0.22));
+      const fY2 = yBase + zoneH * 0.68 + (rng()-0.5) * zoneH * 0.16;
+      if (!_inGateSafe(fX2, fY2, z, GATE_W)) {
+        const tp = _pickN(hazardPool, 1)[0];
+        if (tp) {
+          // Safety: swingingBamboo in jpnight must be far from gate
+          const safeTp = (mrTheme === 'jpnight' && tp === 'swingingBamboo')
+            ? (Math.abs(fX2 - gate.x) > GATE_W * 1.4 ? tp : 'moonlitSection')
+            : tp;
+          _ph(safeTp, fX2, fY2);
+        }
+      }
+    }
+
+    // ── Peg row: scattered near walls only ──
     for (let side = 0; side < 2; side++) {
-      for (let pi = 0; pi < pegC; pi++) {
-        const px = side === 0
-          ? 10 + rng() * Math.max(1, gLeft * 0.5)
-          : Math.min(W-10, gRight + (W-gRight)*(0.5+pi*0.3));
-        if (px > 10 && px < W - 10) {
-          mrObstacles.push({type:'peg', x:px, y:yBase+18+rng()*(zoneH-32),
-            r:4.5+rng()*2.5, _theme:mrTheme});
-        }
-      }
+      const px = side === 0
+        ? 8 + rng() * Math.max(4, gLeft * 0.45)
+        : Math.min(W-8, gRight + (W-gRight)*0.55+rng()*(W-gRight)*0.3);
+      if (px > 10 && px < W-10 && !_inGateSafe(px, yBase+zoneH*0.5, z, GATE_W*0.5))
+        mrObstacles.push({type:'peg', x:px, y:yBase+22+rng()*(zoneH-40), r:4+rng()*2.5, _theme:mrTheme});
     }
 
-    // ── Themed feature: OPPOSITE side from gate, one per zone ──
-    const fX = gateIsLeft
-      ? W * 0.60 + rng() * (W * 0.30)
-      : W * 0.10 + rng() * (W * 0.30);
-    const fY = yBase + zoneH * 0.42 + (rng()-0.5) * zoneH * 0.22;
-    const fp = _pickN(hazardPool, 1);
-    if (fp[0]) _ph(fp[0], Math.max(16,Math.min(W-16,fX)), Math.max(yBase+12,Math.min(yBase+zoneH-12,fY)));
-
-    // ── Bumper accent every 3 zones: flanking the gate ──
-    if (z % 3 === 0) {
+    // ── Every 3 zones: gate bumper guard (deflects marbles toward gate) ──
+    if (z % 3 === 0 && z > 0) {
       const bS = rng() > 0.5 ? 1 : -1;
-      const bx = gate.x + bS * (GATE_W * 0.75 + rng() * 18);
-      if (bx > 14 && bx < W - 14) {
-        mrObstacles.push({type:'bumper', x:bx, y:yBase+zoneH*0.65+rng()*zoneH*0.15,
-          r:9+rng()*4, angle:0, speed:0.022+rng()*0.018, _theme:mrTheme});
-      }
-    }
-
-    // ── Crossing element every 2 zones: seesaw or conveyor spanning the track ──
-    if (z % 2 === 1) {
-      const cX = W * 0.5 + (rng()-0.5) * W * 0.12;
-      const cY = yBase + zoneH * 0.78;
-      if (Math.abs(cX - gate.x) > GATE_W * 0.6) {
-        if (rng() > 0.55) {
-          mrObstacles.push({type:'seesaw', cx:cX, y:cY, w:58+rng()*22, angle:0, angV:0});
-        } else {
-          mrObstacles.push({type:'conveyor', x:cX, y:cY, w:52+rng()*20, dir:rng()>0.5?1:-1, beltPhase:0});
-        }
-      }
+      const bx = gate.x + bS * (GATE_W * 0.85 + rng() * 22);
+      if (bx > 14 && bx < W - 14)
+        mrObstacles.push({type:'bumper', x:bx, y:yBase+zoneH*0.72+rng()*zoneH*0.12,
+          r:10+rng()*4, angle:0, speed:0.022+rng()*0.018, _theme:mrTheme});
     }
   } // end zone loop
 
-  // ── 3. Extended level: one structured arena per extra screen ──
+  // ── 3. Extended level: structured rooms per extra screen ──
   if (isDeepLevel) {
     const extraScreens = mrLevelScreens - 5;
     for (let sec = 0; sec < extraScreens; sec++) {
-      const aTop = MR_H * 5 + sec * MR_H + MR_H * 0.15;
-      const aType = Math.floor(rng() * 4);
-      const cx2 = W * 0.5;
+      const aTop = MR_H * 5 + sec * MR_H + MR_H * 0.08;
+      const aBot = aTop + MR_H * 0.88;
+      const cx2  = W * 0.5;
+      // Pick room type — cycle through 6 types for variety
+      const roomType = (sec + Math.floor(rng()*2)) % 6;
 
-      if (aType === 0) {
-        // Gauntlet row: 4 themed features evenly spaced + entry ramps
-        _pickN(hazardPool, 4).forEach((p,i) => _ph(p, W*(0.12+i*0.25), aTop+(i%2)*40));
-        mrObstacles.push({type:'ramp',x:W*0.22,y:aTop-22,w:60,angle:0.40,_theme:mrTheme});
-        mrObstacles.push({type:'ramp',x:W*0.78,y:aTop-22,w:60,angle:-0.40,_theme:mrTheme});
-      } else if (aType === 1) {
-        // Speed corridor: alternating slalom ramps for fast descent
-        for (let ri=0;ri<5;ri++){
-          const rS=ri%2,rx=rS===0?22+rng()*W*0.28:W*0.72+rng()*W*0.22-18;
-          mrObstacles.push({type:'ramp',x:rx,y:aTop+ri*60,w:64+rng()*18,
-            angle:rS===0?0.42+rng()*0.1:-(0.42+rng()*0.1),_theme:mrTheme});
+      if (roomType === 0) {
+        // ── ZIGZAG SLALOM ROOM: alternating ramp pairs creating an S-curve path ──
+        const rCount = 6;
+        for (let ri = 0; ri < rCount; ri++) {
+          const side = ri % 2;
+          const ry = aTop + ri * (MR_H * 0.14);
+          const rx = side === 0 ? W*0.18+rng()*W*0.12 : W*0.70+rng()*W*0.12;
+          const ang = side === 0 ? 0.40+rng()*0.08 : -(0.40+rng()*0.08);
+          mrObstacles.push({type:'ramp',x:rx,y:ry,w:68+rng()*18,angle:ang,_theme:mrTheme});
         }
-      } else if (aType === 2) {
-        // Bumper arena: diamond pattern + themed feature in centre
-        [[cx2,aTop],[cx2-50,aTop+45],[cx2+50,aTop+45],[cx2,aTop+90],[cx2-50,aTop+135],[cx2+50,aTop+135]]
-          .forEach(([bx,by])=>mrObstacles.push({type:'bumper',x:bx,y:by,r:11+rng()*4,angle:0,speed:0.022+rng()*0.016,_theme:mrTheme}));
-        const ap=_pickN(hazardPool,1)[0]; if(ap)_ph(ap,cx2,aTop+180);
+        // Themed hazards in the pockets between ramps
+        _pickN(hazardPool, 2).forEach((p,i) => {
+          const hx = i===0 ? W*0.70+rng()*W*0.18 : W*0.12+rng()*W*0.18;
+          const hy = aTop + (i===0?MR_H*0.22:MR_H*0.50);
+          _ph(p, hx, hy);
+        });
+
+      } else if (roomType === 1) {
+        // ── FUNNEL GAUNTLET: narrowing walls funneling into an obstacle pit ──
+        // Entry ramps — wide funnel opening
+        mrObstacles.push({type:'ramp',x:W*0.18,y:aTop,w:80,angle:0.45,_theme:mrTheme});
+        mrObstacles.push({type:'ramp',x:W*0.82,y:aTop,w:80,angle:-0.45,_theme:mrTheme});
+        // Mid walls guide inward
+        mrObstacles.push({type:'ramp',x:W*0.22,y:aTop+MR_H*0.25,w:72,angle:0.38,_theme:mrTheme});
+        mrObstacles.push({type:'ramp',x:W*0.78,y:aTop+MR_H*0.25,w:72,angle:-0.38,_theme:mrTheme});
+        // Obstacle pit in the narrowed middle
+        const pitHazards = _pickN(hazardPool, 3);
+        pitHazards.forEach((p,i) => _ph(p, W*(0.28+i*0.22), aTop+MR_H*0.48+rng()*30));
+        // Exit ramp spreading back out
+        mrObstacles.push({type:'ramp',x:W*0.30,y:aTop+MR_H*0.70,w:70,angle:-0.35,_theme:mrTheme});
+        mrObstacles.push({type:'ramp',x:W*0.70,y:aTop+MR_H*0.70,w:70,angle:0.35,_theme:mrTheme});
+
+      } else if (roomType === 2) {
+        // ── BUMPER PINBALL ROOM: diamond bumper layout with side channels ──
+        const bGrid = [
+          [cx2,aTop+MR_H*0.12],
+          [cx2-48,aTop+MR_H*0.26],[cx2+48,aTop+MR_H*0.26],
+          [cx2,aTop+MR_H*0.40],
+          [cx2-48,aTop+MR_H*0.54],[cx2+48,aTop+MR_H*0.54],
+          [cx2,aTop+MR_H*0.68],
+        ];
+        bGrid.forEach(([bx,by]) =>
+          mrObstacles.push({type:'bumper',x:bx,y:by,r:12+rng()*4,angle:0,speed:0.022+rng()*0.016,_theme:mrTheme}));
+        // Side channel ramps to guide marbles through
+        mrObstacles.push({type:'ramp',x:24,y:aTop+MR_H*0.18,w:52,angle:0.28,_theme:mrTheme});
+        mrObstacles.push({type:'ramp',x:W-24,y:aTop+MR_H*0.38,w:52,angle:-0.28,_theme:mrTheme});
+        // Themed feature at the exit
+        const af=_pickN(hazardPool,1)[0]; if(af) _ph(af,cx2,aTop+MR_H*0.80);
+
+      } else if (roomType === 3) {
+        // ── SPEED RUN CORRIDOR: straight ramp channel for fast descent ──
+        // Wall ramps on both sides creating a narrow channel
+        for (let ri=0; ri<7; ri++) {
+          const ry = aTop + ri * (MR_H * 0.12);
+          const side = ri % 2;
+          // Alternating left/right ledges that deflect toward centre
+          if (side===0) {
+            mrObstacles.push({type:'ramp',x:W*0.14,y:ry,w:60,angle:0.35,_theme:mrTheme});
+          } else {
+            mrObstacles.push({type:'ramp',x:W*0.86,y:ry,w:60,angle:-0.35,_theme:mrTheme});
+          }
+        }
+        // Seesaws in the channel for interaction
+        mrObstacles.push({type:'seesaw',cx:cx2,y:aTop+MR_H*0.33,w:66,angle:0,angV:0});
+        mrObstacles.push({type:'seesaw',cx:cx2,y:aTop+MR_H*0.66,w:60,angle:0,angV:0});
+        const sf=_pickN(hazardPool,2); sf.forEach((p,i)=>_ph(p,W*(0.25+i*0.5),aTop+MR_H*0.50+rng()*25));
+
+      } else if (roomType === 4) {
+        // ── THEMED SHOWCASE ROOM: multiple themed hazards with connecting ramp paths ──
+        const showcaseHazards = _pickN(hazardPool, 5);
+        // Left column
+        _ph(showcaseHazards[0]||hazardPool[0], W*0.20, aTop+MR_H*0.18);
+        _ph(showcaseHazards[1]||hazardPool[0], W*0.22, aTop+MR_H*0.55);
+        // Right column
+        _ph(showcaseHazards[2]||hazardPool[0], W*0.80, aTop+MR_H*0.30);
+        _ph(showcaseHazards[3]||hazardPool[0], W*0.78, aTop+MR_H*0.65);
+        // Centre feature
+        _ph(showcaseHazards[4]||hazardPool[0], cx2, aTop+MR_H*0.45);
+        // Connecting ramps between columns
+        mrObstacles.push({type:'ramp',x:W*0.38,y:aTop+MR_H*0.12,w:56,angle:0.30,_theme:mrTheme});
+        mrObstacles.push({type:'ramp',x:W*0.62,y:aTop+MR_H*0.38,w:56,angle:-0.30,_theme:mrTheme});
+        mrObstacles.push({type:'ramp',x:W*0.40,y:aTop+MR_H*0.64,w:52,angle:0.25,_theme:mrTheme});
+        mrObstacles.push({type:'ramp',x:W*0.60,y:aTop+MR_H*0.75,w:52,angle:-0.25,_theme:mrTheme});
+
       } else {
-        // Bounce cascade: ramps → springboards → themed reward at bottom
-        mrObstacles.push({type:'ramp',x:W*0.24,y:aTop,w:70,angle:0.48,_theme:mrTheme});
-        mrObstacles.push({type:'ramp',x:W*0.76,y:aTop+55,w:70,angle:-0.48,_theme:mrTheme});
-        mrObstacles.push({type:'springboard',x:cx2,y:aTop+118,w:50,hits:0,armed:false,springT:0});
-        mrObstacles.push({type:'springboard',x:cx2-55,y:aTop+158,w:46,hits:0,armed:false,springT:0});
-        mrObstacles.push({type:'springboard',x:cx2+55,y:aTop+158,w:46,hits:0,armed:false,springT:0});
-        const bp=_pickN(hazardPool,1)[0]; if(bp)_ph(bp,cx2,aTop+210);
+        // ── BOUNCE GAUNTLET: springboard cascade leading to themed reward pit ──
+        // Entry funnel
+        mrObstacles.push({type:'ramp',x:W*0.22,y:aTop,w:74,angle:0.50,_theme:mrTheme});
+        mrObstacles.push({type:'ramp',x:W*0.78,y:aTop,w:74,angle:-0.50,_theme:mrTheme});
+        // Springboard staircase — each one launches marbles upward/sideways
+        const sbPositions = [
+          [cx2, aTop+MR_H*0.20],
+          [cx2-60, aTop+MR_H*0.36],
+          [cx2+60, aTop+MR_H*0.36],
+          [cx2, aTop+MR_H*0.52],
+          [cx2-44, aTop+MR_H*0.64],
+          [cx2+44, aTop+MR_H*0.64],
+        ];
+        sbPositions.forEach(([sx,sy]) =>
+          mrObstacles.push({type:'springboard',x:sx,y:sy,w:48+rng()*14,hits:0,armed:false,springT:0}));
+        // Bumper guards flanking springboards
+        [[cx2-28,aTop+MR_H*0.45],[cx2+28,aTop+MR_H*0.45]].forEach(([bx,by])=>
+          mrObstacles.push({type:'bumper',x:bx,y:by,r:10,angle:0,speed:0.025,_theme:mrTheme}));
+        // Themed reward at the bottom
+        const bp=_pickN(hazardPool,2); bp.forEach((p,i)=>_ph(p,W*(0.30+i*0.40),aTop+MR_H*0.80));
       }
+
+      // Every extended room gets a clean exit ramp at bottom
+      mrObstacles.push({type:'ramp',x:W*0.28,y:aBot-22,w:64,angle:0.38,_theme:mrTheme});
+      mrObstacles.push({type:'ramp',x:W*0.72,y:aBot-22,w:64,angle:-0.38,_theme:mrTheme});
     }
   }
 
