@@ -2391,17 +2391,92 @@ input[type=number] { -moz-appearance:textfield; }
   </div>
   
   <!-- Notification Panel Drag Zone (top-left corner) -->
-  <div id="notif-drag-zone" style="position:absolute;top:0;left:0;width:48px;height:36px;z-index:9000;cursor:pointer" ontouchstart="notifPanelDragStart(event)" onmousedown="notifPanelDragStart(event)"></div>
+  <div id="notif-drag-zone" style="position:absolute;top:0;left:0;width:60px;height:44px;z-index:9000;cursor:pointer" ontouchstart="notifPanelDragStart(event)" onmousedown="notifPanelDragStart(event)"></div>
 
-  <!-- Notification Panel -->
-  <div id="notif-panel" style="position:absolute;top:0;left:0;right:0;z-index:8900;transform:translateY(-100%);transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);background:rgba(18,10,40,0.96);backdrop-filter:blur(28px) saturate(180%);border-bottom:1px solid rgba(160,136,250,0.25);border-radius:0 0 24px 24px;padding:48px 16px 16px;box-shadow:0 16px 48px rgba(0,0,0,0.6)">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px">Notifications</div>
-      <button onclick="notifPanelClearAll()" style="font-size:11px;color:#a088fa;background:rgba(160,136,250,0.12);border:1px solid rgba(160,136,250,0.25);border-radius:8px;padding:4px 10px;cursor:pointer;font-weight:700">Clear All</button>
+  <!-- Notification Panel — full-screen iOS 15-style -->
+  <div id="notif-panel" style="position:absolute;inset:0;z-index:8900;transform:translateY(-100%);transition:transform 0.48s cubic-bezier(0.32,0,0.15,1);will-change:transform;overflow:hidden;border-radius:48px;">
+    <!-- Wallpaper blur layer -->
+    <div id="notif-panel-wallpaper" style="position:absolute;inset:0;background:radial-gradient(ellipse at 20% 20%,#2a1a4e 0%,#000 50%,#1a0a2e 100%);filter:blur(0px);transform:scale(1.05)"></div>
+    <!-- Dark overlay -->
+    <div style="position:absolute;inset:0;background:rgba(6,3,18,0.55);backdrop-filter:blur(32px) saturate(160%)"></div>
+    <!-- Ambient glow blobs -->
+    <div style="position:absolute;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(160,136,250,0.15) 0%,transparent 70%);top:-60px;left:50%;transform:translateX(-50%);pointer-events:none"></div>
+    <div style="position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(252,119,144,0.08) 0%,transparent 70%);bottom:80px;right:-30px;pointer-events:none"></div>
+    <!-- Content -->
+    <div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;padding:0">
+      <!-- Status bar area -->
+      <div style="height:44px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 20px 6px">
+        <span id="notif-panel-time" style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.9);letter-spacing:-0.2px"></span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button onclick="notifPanelClearAll()" style="font-size:10px;font-weight:800;color:#a088fa;background:rgba(160,136,250,0.15);border:1px solid rgba(160,136,250,0.3);border-radius:20px;padding:4px 12px;cursor:pointer;letter-spacing:0.2px;backdrop-filter:blur(8px)">Clear All</button>
+        </div>
+      </div>
+      <!-- Time display -->
+      <div style="text-align:center;padding:12px 0 6px">
+        <div id="notif-panel-big-time" style="font-size:72px;font-weight:200;color:#fff;letter-spacing:-4px;line-height:1;font-family:-apple-system,BlinkMacSystemFont,sans-serif;text-shadow:0 0 40px rgba(160,136,250,0.3)"></div>
+        <div id="notif-panel-date" style="font-size:17px;font-weight:500;color:rgba(255,255,255,0.7);margin-top:4px;letter-spacing:0.1px"></div>
+      </div>
+      <!-- Notifications header -->
+      <div style="padding:16px 20px 8px;display:flex;align-items:center;gap:8px">
+        <div style="width:3px;height:16px;border-radius:99px;background:linear-gradient(180deg,#a088fa,#fc7790)"></div>
+        <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,0.5);letter-spacing:1px;text-transform:uppercase">Notifications</div>
+      </div>
+      <!-- Scrollable notification list -->
+      <div id="notif-panel-list" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0 16px 80px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none"></div>
     </div>
-    <div id="notif-panel-list" style="display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto"></div>
-    <div style="width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2);margin:14px auto 0"></div>
+    <!-- Swipe handle at bottom -->
+    <div id="notif-panel-swipe-handle" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:99px;background:rgba(255,255,255,0.3);cursor:pointer;z-index:10" ontouchstart="notifPanelSwipeUpStart(event)" onmousedown="notifPanelSwipeUpStart(event)"></div>
   </div>
+
+  <style>
+    #notif-panel-list::-webkit-scrollbar { display:none; }
+    @keyframes notifSlideIn {
+      from { opacity:0; transform:translateY(20px) scale(0.96); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
+    }
+    @keyframes notifRingColor {
+      0%   { stroke: #a088fa; }
+      33%  { stroke: #fc7790; }
+      66%  { stroke: #4edfd0; }
+      100% { stroke: #a088fa; }
+    }
+    @keyframes notifRingSpin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+    .notif-dismiss-btn-wrap {
+      position:relative;width:28px;height:28px;flex-shrink:0;cursor:pointer;
+    }
+    .notif-dismiss-btn-wrap svg.ring-bg { position:absolute;inset:0; }
+    .notif-dismiss-btn-wrap svg.ring-spin {
+      position:absolute;inset:0;
+      animation:notifRingSpin 2.4s linear infinite;
+      transform-origin:center;
+    }
+    .notif-dismiss-btn-wrap .ring-arc {
+      animation: notifRingColor 3s linear infinite;
+      opacity:0.7;
+      transition:opacity 0.2s;
+    }
+    .notif-dismiss-btn-wrap:hover .ring-arc { opacity:1; }
+    .notif-dismiss-btn-wrap .x-icon {
+      position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+      font-size:11px;font-weight:900;color:rgba(255,255,255,0.7);
+      transition:color 0.2s;
+    }
+    .notif-dismiss-btn-wrap:hover .x-icon { color:#fff; }
+    .notif-item {
+      display:flex;align-items:center;gap:12px;
+      background:rgba(255,255,255,0.07);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:18px;padding:13px 14px;
+      position:relative;overflow:hidden;
+      animation:notifSlideIn 0.35s cubic-bezier(0.32,0,0.15,1) both;
+      backdrop-filter:blur(12px);
+    }
+    .notif-item::before {
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(135deg,rgba(160,136,250,0.06) 0%,transparent 60%);
+      pointer-events:none;
+    }
+  </style>
 
   <!-- Status Bar -->
   <div id="statusbar">
@@ -9829,6 +9904,21 @@ function mClawTick(canvas) {
   const PROX=22, MID=15, TIP=11;
   const SPLAY=0.52, CURL=1.25, TIPINWARD=0.85;
 
+  // Draw hub-to-finger socket connectors BEFORE fingers (so they sit behind)
+  FOFF.forEach((xOff, fi) => {
+    const sd = fi===0?-1:fi===2?1:0.07;
+    const proxA = sd * SPLAY * (1-mFingerAngle);
+    ctx.save();
+    ctx.translate(xOff, 8);
+    ctx.rotate(proxA);
+    ctx.fillStyle='#28184a';
+    ctx.beginPath(); ctx.roundRect(-4,0,8,8,2); ctx.fill();
+    ctx.strokeStyle='rgba(140,120,220,0.6)'; ctx.lineWidth=0.8; ctx.stroke();
+    ctx.fillStyle='rgba(160,136,250,0.2)';
+    ctx.beginPath(); ctx.roundRect(-3,1,6,3,1.5); ctx.fill();
+    ctx.restore();
+  });
+
   FOFF.forEach((xOff, fi) => {
     const sd = fi===0?-1:fi===2?1:0.07;
     const proxA = sd * SPLAY * (1-mFingerAngle);
@@ -9841,41 +9931,51 @@ function mClawTick(canvas) {
     const px4=px3+Math.sin(tipA)*TIP,   py4=py3+Math.cos(tipA)*TIP;
 
     ctx.lineCap='round';
-    // Outer shadow
-    ctx.strokeStyle='rgba(0,0,0,0.5)'; ctx.lineWidth=8;
-    ctx.beginPath(); ctx.moveTo(px1+1,py1+2); ctx.lineTo(px4+1,py4+2); ctx.stroke();
+    // Full shadow per-segment — fills any visual gap between pieces
+    ctx.strokeStyle='rgba(0,0,0,0.55)'; ctx.lineWidth=10;
+    ctx.beginPath(); ctx.moveTo(px1+1,py1+2); ctx.lineTo(px2+1,py2+2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px2+1,py2+2); ctx.lineTo(px3+1,py3+2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px3+1,py3+2); ctx.lineTo(px4+1,py4+2); ctx.stroke();
 
-    // Proximal segment
+    // Proximal segment — fully connected stroke hub→proximal joint
     const pCol = fi===1?'#7858c0':'#6848b0';
     ctx.strokeStyle=pCol; ctx.lineWidth=7;
     ctx.beginPath(); ctx.moveTo(px1,py1); ctx.lineTo(px2,py2); ctx.stroke();
     ctx.strokeStyle='rgba(200,190,255,0.45)'; ctx.lineWidth=1.5;
     ctx.beginPath(); ctx.moveTo(px1-0.8,py1); ctx.lineTo(px2-0.8,py2); ctx.stroke();
 
-    // Proximal joint
+    // Proximal joint — dark metal collar ring + glowing pin + bolt dot
+    ctx.beginPath(); ctx.arc(px2,py2,8,0,Math.PI*2);
+    ctx.fillStyle='#1a1030'; ctx.fill();
+    ctx.strokeStyle='rgba(80,60,140,0.9)'; ctx.lineWidth=1.5; ctx.stroke();
     const jG=ctx.createRadialGradient(px2-1.5,py2-1.5,0,px2,py2,6);
     jG.addColorStop(0,'#fff'); jG.addColorStop(0.4,'#d0c8ff'); jG.addColorStop(1,'#7060b8');
     ctx.beginPath(); ctx.arc(px2,py2,6,0,Math.PI*2); ctx.fillStyle=jG; ctx.fill();
     ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.beginPath(); ctx.arc(px2,py2,2,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.fill();
 
-    // Distal segment
+    // Distal segment — fully connected proximal joint→distal joint
     ctx.strokeStyle='#8868d0'; ctx.lineWidth=5.5;
     ctx.beginPath(); ctx.moveTo(px2,py2); ctx.lineTo(px3,py3); ctx.stroke();
     ctx.strokeStyle='rgba(210,202,255,0.4)'; ctx.lineWidth=1.2;
     ctx.beginPath(); ctx.moveTo(px2-0.6,py2); ctx.lineTo(px3-0.6,py3); ctx.stroke();
 
-    // Distal joint
+    // Distal joint — dark metal collar ring + glowing pin + bolt dot
+    ctx.beginPath(); ctx.arc(px3,py3,6,0,Math.PI*2);
+    ctx.fillStyle='#1a1030'; ctx.fill();
+    ctx.strokeStyle='rgba(80,60,140,0.8)'; ctx.lineWidth=1.2; ctx.stroke();
     const jG2=ctx.createRadialGradient(px3-1,py3-1,0,px3,py3,4.5);
-    jG2.addColorStop(0,'#fff'); jG2.addColorStop(1,'#9070c0');
+    jG2.addColorStop(0,'#fff'); jG2.addColorStop(0.6,'#b0a0e8'); jG2.addColorStop(1,'#9070c0');
     ctx.beginPath(); ctx.arc(px3,py3,4.5,0,Math.PI*2); ctx.fillStyle=jG2; ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.35)'; ctx.lineWidth=0.8; ctx.stroke();
+    ctx.beginPath(); ctx.arc(px3,py3,1.5,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fill();
 
-    // Tip claw
+    // Tip segment — distal joint→tip
     ctx.strokeStyle='#a080e0'; ctx.lineWidth=4;
     ctx.beginPath(); ctx.moveTo(px3,py3); ctx.lineTo(px4,py4); ctx.stroke();
-    // Tip point (sharp)
-    ctx.fillStyle='rgba(220,210,255,0.9)';
+    ctx.fillStyle='rgba(220,210,255,0.95)';
     ctx.beginPath(); ctx.arc(px4,py4,2.5,0,Math.PI*2); ctx.fill();
-    ctx.strokeStyle='rgba(255,255,255,0.7)'; ctx.lineWidth=0.8; ctx.stroke();
+    ctx.strokeStyle='rgba(255,255,255,0.75)'; ctx.lineWidth=0.8; ctx.stroke();
   });
 
   ctx.restore();
@@ -18735,36 +18835,87 @@ function showNotif(icon, title, msg) {
 }
 
 // ── Notification Panel ──────────────────────────────────────────
+// IMPORTANT: The notification panel only shows IMPORTANT/SYSTEM notifications.
+// Regular game spam (showNotif toasts) are NOT added here — only explicit important calls to notifPanelAddImportant().
 if (!window._notifPanelItems) window._notifPanelItems = [];
 let _notifPanelOpen = false;
 let _notifPanelDragStartY = 0;
 let _notifPanelDragging = false;
+let _notifPanelDragStartYUp = 0;
+let _notifPanelDraggingUp = false;
 
-function notifPanelAdd(icon, title, msg) {
+// Only truly important notifications go in the panel (broadcasts, logins, major events)
+function notifPanelAddImportant(icon, title, msg) {
   window._notifPanelItems.unshift({ id: Date.now(), icon, title, msg, ts: new Date() });
-  if (window._notifPanelItems.length > 20) window._notifPanelItems.pop();
+  if (window._notifPanelItems.length > 30) window._notifPanelItems.pop();
   if (_notifPanelOpen) notifPanelRender();
+}
+
+// Keep notifPanelAdd as a no-op so game toasts don't pollute the panel
+function notifPanelAdd(icon, title, msg) {
+  // intentionally empty — panel is for important notifications only
+}
+
+function _notifDismissBtn(id) {
+  return `<div class="notif-dismiss-btn-wrap" onclick="notifPanelDismiss(${id})" title="Dismiss">
+    <svg class="ring-bg" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="14" cy="14" r="12" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" fill="rgba(160,136,250,0.1)"/>
+    </svg>
+    <svg class="ring-spin" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle class="ring-arc" cx="14" cy="14" r="12" stroke="#a088fa" stroke-width="2" fill="none"
+        stroke-dasharray="28 48" stroke-linecap="round"/>
+    </svg>
+    <div class="x-icon">✕</div>
+  </div>`;
 }
 
 function notifPanelRender() {
   const list = document.getElementById('notif-panel-list');
   if (!list) return;
+  _notifPanelUpdateTime();
   const items = window._notifPanelItems;
   if (!items.length) {
-    list.innerHTML = `<div style="text-align:center;padding:20px 0;color:rgba(255,255,255,0.25);font-size:13px">No notifications</div>`;
+    list.innerHTML = `<div style="text-align:center;padding:48px 0 20px;color:rgba(255,255,255,0.2);font-size:14px;font-weight:500;letter-spacing:0.2px">
+      <div style="font-size:36px;margin-bottom:12px;opacity:0.4">🔔</div>
+      No notifications
+    </div>`;
     return;
   }
-  list.innerHTML = items.map(n => `
-    <div data-notif-id="${n.id}" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:10px 12px;position:relative;overflow:hidden;touch-action:pan-y">
-      <div style="font-size:22px;flex-shrink:0">${n.icon}</div>
+  list.innerHTML = items.map((n, i) => `
+    <div class="notif-item" data-notif-id="${n.id}" style="animation-delay:${i * 0.04}s">
+      <div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(145deg,rgba(160,136,250,0.2),rgba(252,119,144,0.15));border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${n.icon}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:2px">${n.title}</div>
-        ${n.msg ? `<div style="font-size:11px;color:rgba(255,255,255,0.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.msg}</div>` : ''}
-        <div style="font-size:9px;color:rgba(255,255,255,0.25);margin-top:3px">${n.ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>
+        <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;letter-spacing:-0.1px">${n.title}</div>
+        ${n.msg ? `<div style="font-size:11px;color:rgba(255,255,255,0.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.msg}</div>` : ''}
+        <div style="font-size:10px;color:rgba(160,136,250,0.6);margin-top:4px;font-weight:600">${n.ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>
       </div>
-      <button onclick="notifPanelDismiss(${n.id})" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:rgba(255,255,255,0.4);font-size:11px;cursor:pointer;padding:3px 7px;flex-shrink:0">✕</button>
+      ${_notifDismissBtn(n.id)}
     </div>
   `).join('');
+}
+
+function _notifPanelUpdateTime() {
+  const now = new Date();
+  const bigTime  = document.getElementById('notif-panel-big-time');
+  const smallTime = document.getElementById('notif-panel-time');
+  const dateEl   = document.getElementById('notif-panel-date');
+  const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  if (bigTime)   bigTime.textContent  = timeStr;
+  if (smallTime) smallTime.textContent = timeStr;
+  if (dateEl) {
+    const days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    dateEl.textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+  }
+  // Mirror wallpaper into panel background
+  const panelWp = document.getElementById('notif-panel-wallpaper');
+  if (panelWp) {
+    const hw = document.getElementById('home-wallpaper');
+    if (hw) {
+      const bg = hw.style.background || hw.style.backgroundImage;
+      if (bg) panelWp.style.background = bg;
+    }
+  }
 }
 
 function notifPanelDismiss(id) {
@@ -18777,63 +18928,99 @@ function notifPanelClearAll() {
   notifPanelRender();
 }
 
+let _notifTimeInterval = null;
+
 function notifPanelShow() {
   const panel = document.getElementById('notif-panel');
   if (!panel) return;
   _notifPanelOpen = true;
+  _notifPanelUpdateTime();
   notifPanelRender();
-  panel.style.transition = 'transform 0.38s cubic-bezier(0.4,0,0.2,1)';
-  panel.style.transform = 'translateY(0)';
-  // Backdrop
-  let bd = document.getElementById('notif-panel-backdrop');
-  if (!bd) {
-    bd = document.createElement('div');
-    bd.id = 'notif-panel-backdrop';
-    bd.style.cssText = 'position:absolute;inset:0;z-index:8850;background:rgba(0,0,0,0.4)';
-    bd.addEventListener('click', notifPanelHide);
-    bd.addEventListener('touchstart', notifPanelHide, { passive: true });
-    document.getElementById('phone').appendChild(bd);
+  panel.style.transition = 'transform 0.48s cubic-bezier(0.32,0,0.15,1)';
+  panel.style.transform  = 'translateY(0)';
+  // Mirror wallpaper
+  const panelWp = document.getElementById('notif-panel-wallpaper');
+  if (panelWp) {
+    const hw = document.getElementById('home-wallpaper');
+    if (hw) {
+      const bg = hw.style.background || getComputedStyle(hw).background;
+      if (bg) panelWp.style.background = bg;
+    }
   }
+  _notifTimeInterval = setInterval(_notifPanelUpdateTime, 10000);
 }
 
 function notifPanelHide() {
   const panel = document.getElementById('notif-panel');
   if (!panel) return;
   _notifPanelOpen = false;
-  panel.style.transition = 'transform 0.32s cubic-bezier(0.4,0,0.2,1)';
-  panel.style.transform = 'translateY(-100%)';
-  const bd = document.getElementById('notif-panel-backdrop');
-  if (bd) bd.remove();
+  panel.style.transition = 'transform 0.42s cubic-bezier(0.32,0,0.15,1)';
+  panel.style.transform  = 'translateY(-100%)';
+  if (_notifTimeInterval) { clearInterval(_notifTimeInterval); _notifTimeInterval = null; }
 }
 
+// Drag down from top-left to open — eased physics
 function notifPanelDragStart(e) {
+  if (_notifPanelOpen) return;
   _notifPanelDragging = true;
   _notifPanelDragStartY = (e.touches ? e.touches[0].clientY : e.clientY);
   const panel = document.getElementById('notif-panel');
   if (panel) panel.style.transition = 'none';
   const onMove = (e2) => {
     if (!_notifPanelDragging) return;
-    const y = (e2.touches ? e2.touches[0].clientY : e2.clientY);
+    const y  = (e2.touches ? e2.touches[0].clientY : e2.clientY);
     const dy = y - _notifPanelDragStartY;
-    if (!_notifPanelOpen && dy > 0) {
-      if (panel) panel.style.transform = `translateY(calc(-100% + ${Math.min(dy, 280)}px))`;
+    if (dy > 0) {
+      const pct  = Math.min(dy / 320, 1);
+      const ease = 1 - Math.pow(1 - pct, 2.5);
+      if (panel) panel.style.transform = `translateY(calc(-100% + ${ease * 100}%))`;
     }
   };
   const onEnd = (e2) => {
     if (!_notifPanelDragging) return;
     _notifPanelDragging = false;
-    const y = (e2.changedTouches ? e2.changedTouches[0].clientY : e2.clientY);
+    const y  = (e2.changedTouches ? e2.changedTouches[0].clientY : e2.clientY);
     const dy = y - _notifPanelDragStartY;
-    if (dy > 60) notifPanelShow(); else notifPanelHide();
+    if (dy > 80) notifPanelShow(); else notifPanelHide();
     document.removeEventListener('mousemove', onMove);
-    document.removeEventListener('mouseup', onEnd);
+    document.removeEventListener('mouseup',   onEnd);
     document.removeEventListener('touchmove', onMove);
-    document.removeEventListener('touchend', onEnd);
+    document.removeEventListener('touchend',  onEnd);
   };
   document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', onEnd);
+  document.addEventListener('mouseup',   onEnd);
   document.addEventListener('touchmove', onMove, { passive: true });
-  document.addEventListener('touchend', onEnd);
+  document.addEventListener('touchend',  onEnd);
+}
+
+// Swipe up on handle bar to close
+function notifPanelSwipeUpStart(e) {
+  if (!_notifPanelOpen) return;
+  _notifPanelDraggingUp = true;
+  _notifPanelDragStartYUp = (e.touches ? e.touches[0].clientY : e.clientY);
+  const panel = document.getElementById('notif-panel');
+  if (panel) panel.style.transition = 'none';
+  const onMove = (e2) => {
+    if (!_notifPanelDraggingUp) return;
+    const y  = (e2.touches ? e2.touches[0].clientY : e2.clientY);
+    const dy = y - _notifPanelDragStartYUp;
+    if (dy < 0 && panel) panel.style.transform = `translateY(${Math.max(dy, -window.innerHeight) * 0.6}px)`;
+  };
+  const onEnd = (e2) => {
+    if (!_notifPanelDraggingUp) return;
+    _notifPanelDraggingUp = false;
+    const y  = (e2.changedTouches ? e2.changedTouches[0].clientY : e2.clientY);
+    const dy = y - _notifPanelDragStartYUp;
+    if (dy < -60) notifPanelHide(); else notifPanelShow();
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup',   onEnd);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend',  onEnd);
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup',   onEnd);
+  document.addEventListener('touchmove', onMove, { passive: true });
+  document.addEventListener('touchend',  onEnd);
 }
 
 function showBroadcastNotif(icon, title, msg) {
