@@ -4697,11 +4697,6 @@ function walletOverviewHTML() {
   </div>`;
 }
 
-
-  const amt = parseFloat(prompt('Add income (£):'));
-  if (!isNaN(amt) && amt>0) { S.income += amt; saveState(); playSound('coin'); renderWalletContent(); showNotif('💰','Income added',`+£${amt.toFixed(2)}`); }
-}
-
 function walletExpensesHTML() {
   const catColors = {'Food':'#fc7790','Transport':'#f6bb4e','Shopping':'#a088fa','Entertainment':'#4edfd0','Bills':'#6f96ff','Health':'#4caf6e','Other':'#c0b9f5'};
   const grouped = {};
