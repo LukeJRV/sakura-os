@@ -385,34 +385,51 @@ button, a { touch-action: manipulation; }
   to { left:200%; }
 }
 #ticket-tooltip {
-  position:absolute;
-  bottom:calc(100% + 8px); right:0;
-  background:rgba(15,12,28,0.97);
-  border:1px solid rgba(160,136,250,0.3);
-  border-radius:10px;
-  padding:5px 10px;
-  font-size:10px;
-  font-weight:600;
-  color:var(--fg);
-  white-space:nowrap;
-  display:none;
-  z-index:9999;
-  box-shadow:0 4px 16px rgba(0,0,0,0.5);
-  pointer-events:none;
+  position: absolute;
+  top: calc(100% + 10px);
+  background: linear-gradient(135deg, rgba(24,14,52,0.98), rgba(36,20,70,0.98));
+  border: 1px solid rgba(160,136,250,0.45);
+  border-radius: 12px;
+  padding: 5px 12px 5px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #e8e0ff;
+  white-space: nowrap;
+  display: none;
+  z-index: 9999;
+  box-shadow:
+    0 8px 24px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(160,136,250,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.07);
+  pointer-events: none;
+  letter-spacing: 0.1px;
+  backdrop-filter: blur(12px);
+  /* arrow will be above the tooltip (pointing up) */
+}
+#ticket-tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-bottom-color: rgba(160,136,250,0.45);
 }
 #ticket-tooltip::after {
-  content:'';
-  position:absolute;
-  top:100%; right:12px;
-  border:5px solid transparent;
-  border-top-color:rgba(160,136,250,0.3);
+  content: '';
+  position: absolute;
+  bottom: calc(100% - 1px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-bottom-color: rgba(24,14,52,0.98);
 }
-#ticket-progress-wrap:hover #ticket-tooltip { display:block; }
+#ticket-progress-wrap:hover #ticket-tooltip { display: block; }
 @keyframes ticketPip {
-  0%   { opacity:0; transform:translateX(-50%) translateY(0px) scale(0.7); }
-  15%  { opacity:1; transform:translateX(-50%) translateY(-4px) scale(1.05); }
-  70%  { opacity:1; transform:translateX(-50%) translateY(-12px) scale(1); }
-  100% { opacity:0; transform:translateX(-50%) translateY(-22px) scale(0.85); }
+  0%   { opacity: 0; transform: translateX(-50%) translateY(0px) scale(0.75); }
+  12%  { opacity: 1; transform: translateX(-50%) translateY(3px) scale(1.08); }
+  55%  { opacity: 1; transform: translateX(-50%) translateY(14px) scale(1); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(26px) scale(0.88); }
 }
 
 /* ===== SCREENS ===== */
@@ -3595,10 +3612,14 @@ function updateTicketDisplay(delta) {
   if (fill) fill.style.width = pct + '%';
   if (count) count.textContent = S.tickets;
   if (tooltip) {
-    tooltip.textContent = `${S.tickets} / ${S.maxTickets} tickets`;
-    tooltip.style.left = Math.min(pct, 96) + '%';
+    tooltip.textContent = `${S.tickets} / ${S.maxTickets} 🎟️`;
+    // At 100% clamp to centre; otherwise follow fill end, clamped so tooltip stays on-screen
+    const clampedPct = pct >= 100 ? 50 : Math.max(8, Math.min(pct, 92));
+    tooltip.style.left = clampedPct + '%';
     tooltip.style.right = 'auto';
     tooltip.style.transform = 'translateX(-50%)';
+    tooltip.style.top = 'calc(100% + 10px)';
+    tooltip.style.bottom = 'auto';
   }
   // Touch: show tooltip on tap-hold (mobile doesn't have hover)
   const wrap = document.getElementById('ticket-progress-wrap');
@@ -3645,8 +3666,26 @@ function updateTicketDisplay(delta) {
         const old = wrap.querySelector('.tbpip'); if (old) old.remove();
         const pip = document.createElement('div');
         pip.className = 'tbpip';
-        pip.textContent = '+' + delta + ' 🎟️';
-        pip.style.cssText = 'position:absolute;bottom:calc(100% + 6px);left:' + Math.min(pct, 92) + '%;white-space:nowrap;pointer-events:none;z-index:10000;background:linear-gradient(135deg,#7b2ff7,#a259ff);color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;box-shadow:0 2px 12px rgba(123,47,247,0.5);animation:ticketPip 1.8s ease forwards;letter-spacing:0.3px;transform:translateX(-50%);';
+        pip.innerHTML = `<span style="opacity:0.75;margin-right:3px">+${delta}</span><span>🎟️</span>`;
+        pip.style.cssText = [
+          'position:absolute',
+          'top:calc(100% + 8px)',
+          'left:' + Math.min(pct, 92) + '%',
+          'white-space:nowrap',
+          'pointer-events:none',
+          'z-index:10000',
+          'background:linear-gradient(135deg,#5b21b6,#7c3aed,#a855f7,#c084fc)',
+          'color:#fff',
+          'font-size:11px',
+          'font-weight:800',
+          'padding:4px 11px 4px 9px',
+          'border-radius:99px',
+          'border:1px solid rgba(192,132,252,0.5)',
+          'box-shadow:0 4px 18px rgba(124,58,237,0.6),0 0 0 1px rgba(168,85,247,0.2),inset 0 1px 0 rgba(255,255,255,0.15)',
+          'animation:ticketPip 1.9s cubic-bezier(0.22,1,0.36,1) forwards',
+          'letter-spacing:0.2px',
+          'transform:translateX(-50%)',
+        ].join(';');
         wrap.appendChild(pip);
         setTimeout(() => pip.remove(), 1900);
       }
