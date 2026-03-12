@@ -2605,7 +2605,7 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== QUINT SCREEN ===== -->
-    <div id="screen-quint" class="screen" style="padding:0;flex-direction:column;overflow:hidden;position:relative">
+    <div id="screen-quint" class="screen" style="padding:0;flex-direction:column;overflow:hidden;position:relative;display:none">
       <!-- Dynamic background (changes by time of day) -->
       <div id="quint-bg" style="position:absolute;inset:0;z-index:0;transition:all 2s ease"></div>
       <!-- Gentle confetti canvas -->
@@ -2616,7 +2616,7 @@ input[type=number] { -moz-appearance:textfield; }
           <button onclick="openScreen('home')" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:12px;width:34px;height:34px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">←</button>
           <div style="text-align:center">
             <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px">💜 Quint</div>
-            <div id="quint-time-label" style="font-size:11px;color:rgba(255,255,255,0.6)"></div>
+            <div id="quint-time-label" style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.75);letter-spacing:0.2px;margin-top:2px"></div>
           </div>
           <div style="width:34px"></div>
         </div>
@@ -3348,9 +3348,57 @@ function playSound(type) {
   } catch(e) {}
 }
 
-// ============================================================
-// TIME & STATUS BAR
-// ============================================================
+// ── Desktop-only keyboard typing sounds (iPhone users have native sounds) ──
+// Detect non-touch device (desktop/laptop only)
+const _isDesktop = !('ontouchstart' in window) && !navigator.maxTouchPoints;
+if (_isDesktop) {
+  // Subtle mechanical key click: a short noise burst + pitch drop
+  function _playKeySound() {
+    try {
+      const ctx = getAudioCtx();
+      // White noise burst (key impact)
+      const bufSize = ctx.sampleRate * 0.02;
+      const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufSize);
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      const filt = ctx.createBiquadFilter();
+      filt.type = 'bandpass';
+      filt.frequency.value = 3200 + Math.random() * 800;
+      filt.Q.value = 0.8;
+      const gn = ctx.createGain();
+      gn.gain.setValueAtTime(0.045, ctx.currentTime);
+      gn.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+      src.connect(filt); filt.connect(gn); gn.connect(ctx.destination);
+      src.start(); src.stop(ctx.currentTime + 0.04);
+      // Subtle tonal click underneath (key mechanism tone)
+      const o = ctx.createOscillator();
+      const og = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(820 + Math.random() * 160, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.035);
+      og.gain.setValueAtTime(0.03, ctx.currentTime);
+      og.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.035);
+      o.connect(og); og.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime + 0.035);
+    } catch(e) {}
+  }
+  // Throttle: max one sound per 40ms to avoid overwhelming fast typists
+  let _lastKeySound = 0;
+  document.addEventListener('keydown', e => {
+    // Only fire for printable keys + backspace/delete/space/enter (not modifier-only combos)
+    const skip = e.ctrlKey || e.metaKey || e.altKey;
+    const isTypingKey = !skip && (e.key.length === 1 || ['Backspace','Delete','Enter','Tab'].includes(e.key));
+    if (!isTypingKey) return;
+    const now = performance.now();
+    if (now - _lastKeySound < 40) return;
+    _lastKeySound = now;
+    _playKeySound();
+  }, { passive: true });
+}
+
+
 function updateTime() {
   const now = new Date();
   const h = now.getHours();
@@ -3522,7 +3570,6 @@ function _updateCalBadge() {
 // ============================================================
 let currentScreen = 'home';
 function openScreen(id) {
-  playSound('click');
   // Stop CP auto-save when navigating away from coin pusher
   if (id !== 'coinpusher') {
     const prevScreen = document.querySelector('.screen.active');
@@ -6173,7 +6220,11 @@ function renderQuint() {
   const bg = document.getElementById('quint-bg');
   if (bg) bg.style.background = theme.bg;
   const label = document.getElementById('quint-time-label');
-  if (label) label.textContent = theme.label + ' · ' + String(hour).padStart(2,'0') + ':' + String(minute).padStart(2,'0');
+  if (label) {
+    const _ampm = hour < 12 ? 'AM' : 'PM';
+    const _h12 = hour % 12 || 12;
+    label.textContent = theme.label + ' · ' + _h12 + ':' + String(minute).padStart(2,'0') + ' ' + _ampm;
+  }
 
   // Start confetti
   setTimeout(() => {
@@ -6206,10 +6257,39 @@ function _quintRenderBar(curHour, curMinute) {
   const hours = [];
   for (let h = START_H; h <= END_H; h += 2) hours.push(h);
 
-  labelsEl.innerHTML = hours.map(h => {
-    const label = h === 0 ? '12a' : h < 12 ? h + 'a' : h === 12 ? '12p' : (h - 12) + 'p';
-    const isCur = Math.abs(h - curHour) <= 1;
-    return `<div style="font-size:9px;font-weight:${isCur?'700':'500'};color:${isCur?'#c77dff':'rgba(255,255,255,0.35)'};line-height:1;text-align:right">${label}</div>`;
+  // Sunset gradient colors mapped across the day (top=early, bottom=late)
+  const sunsetColors = [
+    '#4a90d9', // 6am - dawn blue
+    '#6bb8f0', // 8am - morning sky
+    '#87ceeb', // 10am - day sky
+    '#f8d568', // 12pm - noon gold
+    '#f6a94a', // 2pm - afternoon amber
+    '#f07c3e', // 4pm - pre-sunset orange
+    '#e8524a', // 6pm - sunset red
+    '#c23b8a', // 8pm - dusk magenta
+    '#7b2ff7', // 10pm - night purple
+  ];
+  function sunsetColor(h) {
+    const t = (h - START_H) / SPAN;
+    const idx = t * (sunsetColors.length - 1);
+    const lo = Math.floor(idx), hi = Math.min(sunsetColors.length - 1, lo + 1);
+    const frac = idx - lo;
+    // Linear interpolate hex colors
+    const parse = c => [parseInt(c.slice(1,3),16), parseInt(c.slice(3,5),16), parseInt(c.slice(5,7),16)];
+    const a = parse(sunsetColors[lo]), b2 = parse(sunsetColors[hi]);
+    const r = Math.round(a[0] + (b2[0]-a[0])*frac);
+    const g = Math.round(a[1] + (b2[1]-a[1])*frac);
+    const bl = Math.round(a[2] + (b2[2]-a[2])*frac);
+    return `rgb(${r},${g},${bl})`;
+  }
+
+  labelsEl.innerHTML = hours.map((h, i) => {
+    const ampm = h < 12 ? 'a' : 'p';
+    const h12 = h % 12 || 12;
+    const label = h12 + ampm;
+    const isCur = curHour >= h && curHour < h + 2;
+    const color = sunsetColor(h);
+    return `<div style="font-size:${isCur?'11':'10'}px;font-weight:${isCur?'800':'600'};color:${color};line-height:1;text-align:right;text-shadow:${isCur?'0 0 8px '+color:'none'};transition:all .3s;letter-spacing:-0.3px">${label}</div>`;
   }).join('');
 
   // Calculate fill percentage
@@ -6332,7 +6412,7 @@ window._quintAdmAdd = async function() {
   const time = document.getElementById('qe-time')?.value || '';
   const title = document.getElementById('qe-title')?.value.trim() || '';
   const type = document.getElementById('qe-type')?.value || 'event';
-  const emoji = document.getElementById('qe-emoji')?.value.trim() || '';
+  const emoji = document.getElementById('quint-emoji-val')?.value.trim() || '';
   const desc = document.getElementById('qe-desc')?.value.trim() || '';
   if (!title) { showNotif('⚠️', 'Missing title', 'Please enter a title for the stack item'); return; }
   if (!fbDb) { showNotif('⚠️', 'Not connected', 'Firestore not available'); return; }
@@ -6345,10 +6425,23 @@ window._quintAdmAdd = async function() {
     playSound('success');
     // Clear fields
     if (document.getElementById('qe-title')) document.getElementById('qe-title').value = '';
-    if (document.getElementById('qe-emoji')) document.getElementById('qe-emoji').value = '';
+    if (document.getElementById('quint-emoji-val')) document.getElementById('quint-emoji-val').value = '';
+    const prev = document.getElementById('quint-emoji-prev'); if (prev) prev.textContent = '💜';
     if (document.getElementById('qe-desc')) document.getElementById('qe-desc').value = '';
     window._quintAdmLoad();
   } catch(e) { showNotif('❌', 'Error', e.message); }
+};
+
+// Time stepper: step by ±30 minutes
+window._quintTimeStep = function(deltaMinutes) {
+  const el = document.getElementById('qe-time');
+  if (!el) return;
+  const [h, m] = (el.value || '12:00').split(':').map(Number);
+  let total = (h * 60 + (m || 0) + deltaMinutes + 1440) % 1440;
+  // Snap to nearest 30-min boundary
+  total = Math.round(total / 30) * 30 % 1440;
+  const nh = Math.floor(total / 60), nm = total % 60;
+  el.value = String(nh).padStart(2,'0') + ':' + String(nm).padStart(2,'0');
 };
 
 window._quintAdmDelete = async function(idx) {
@@ -6379,7 +6472,11 @@ setInterval(() => {
     const bg = document.getElementById('quint-bg');
     if (bg) bg.style.background = theme.bg;
     const label = document.getElementById('quint-time-label');
-    if (label) label.textContent = theme.label + ' · ' + String(hour).padStart(2,'0') + ':' + String(minute).padStart(2,'0');
+    if (label) {
+    const _ampm = hour < 12 ? 'AM' : 'PM';
+    const _h12 = hour % 12 || 12;
+    label.textContent = theme.label + ' · ' + _h12 + ':' + String(minute).padStart(2,'0') + ' ' + _ampm;
+  }
     _quintRenderBar(hour, minute);
   }
 }, 60000);
@@ -11807,7 +11904,7 @@ function mrStepPhysics() {
     });
 
     // Finish line
-    if (m.y + m.r >= MR_H - 20 && !m.finished) {
+    if (m.y + m.r >= mrLevelH - 20 && !m.finished) {
       m.finished = true;
       m.finishRank = mrFinishOrder.length + 1;
       mrFinishOrder.push(m.id);
@@ -11958,12 +12055,12 @@ function mrScrollCamera() {
       targetMarble = active.sort((a, b) => b.y - a.y)[0];
     } else {
       // All finished — settle camera on finish line
-      targetMarble = { y: MR_H - 22 };
+      targetMarble = { y: mrLevelH - 22 };
     }
   }
 
   // --- Bias toward finish line as marble approaches it ---
-  const finishY     = MR_H - 22;
+  const finishY     = mrLevelH - 22;
   const distToFin   = finishY - targetMarble.y;
   // vertBias: how far above centre the marble sits (0.40 = 40% from top)
   // When ≤200px from finish, smoothly shift the focal point downward so the
@@ -14758,10 +14855,10 @@ function mrDrawFrame() {
   });
 
   // ══ FINISH LINE — design preserved exactly ══
-  const flY = MR_H - 22, flH = 22;
+  const flY = mrLevelH - 22, flH = 22;
   const now2 = Date.now();
   const pulse = 0.65 + 0.35 * Math.sin(now2 * 0.005);
-  const flBeam = ctx.createLinearGradient(0, flY-30, 0, MR_H);
+  const flBeam = ctx.createLinearGradient(0, flY-30, 0, mrLevelH);
   flBeam.addColorStop(0,'rgba(246,187,78,0)');
   flBeam.addColorStop(0.4,`rgba(246,187,78,${0.12*pulse})`);
   flBeam.addColorStop(1,`rgba(246,187,78,${0.25*pulse})`);
@@ -15379,7 +15476,7 @@ function mrDrawLevelPreview() {
 
   // Scale factor: map MR_W × MR_H world into cssW × cssH preview
   const scaleX = cssW / mrWorldW;
-  const scaleY = cssH / MR_H;
+  const scaleY = cssH / mrLevelH;
 
   const th = MR_THEMES[mrTheme] || MR_THEMES.space;
 
@@ -15482,7 +15579,7 @@ function mrDrawLevelPreview() {
   });
 
   // Finish line strip at bottom
-  const flY = (MR_H - 22) * scaleY;
+  const flY = (mrLevelH - 22) * scaleY;
   const sqS = 5;
   const cols3 = Math.ceil(cssW / sqS);
   for (let col = 0; col < cols3; col++) {
@@ -21719,25 +21816,42 @@ window._admClearUndoneHistory = async function() {
       <div class="adm-card" style="background:linear-gradient(135deg,rgba(199,125,255,0.1),rgba(123,47,247,0.06));border-color:rgba(199,125,255,0.3)">
         <div class="adm-card-title" style="color:#c77dff">💜 Quint — Day Planner</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:14px">Changes push live to the user's Quint app in real-time — no refresh needed.</div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div class="adm-row">
-            <input id="qe-time" class="adm-input" type="time" style="flex:0 0 100px">
-            <input id="qe-title" class="adm-input" placeholder="Title (e.g. Coffee ☕)" style="flex:1">
+        <div style="display:flex;flex-direction:column;gap:12px">
+
+          <!-- Row 1: emoji picker + title -->
+          <div class="adm-row" style="gap:10px;align-items:stretch">
+            <div id="quint-emoji-prev" onclick="openEmojiPicker('quint-emoji-val','quint-emoji-prev')"
+              style="width:48px;height:48px;border-radius:14px;background:rgba(199,125,255,0.12);border:2px dashed rgba(199,125,255,0.4);display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;flex-shrink:0;transition:background .2s">💜</div>
+            <input id="quint-emoji-val" type="hidden" value="">
+            <input id="qe-title" class="adm-input" placeholder="Title (e.g. Coffee date ☕)" style="flex:1">
           </div>
-          <div class="adm-row">
-            <select id="qe-type" class="adm-input" style="flex:0 0 120px">
+
+          <!-- Row 2: type select + description -->
+          <div class="adm-row" style="gap:8px">
+            <select id="qe-type" class="adm-input" style="flex:0 0 130px">
               <option value="event">📅 Event</option>
               <option value="activity">🎉 Activity</option>
               <option value="date">💕 Date</option>
               <option value="reminder">🔔 Reminder</option>
               <option value="note">📝 Note</option>
             </select>
-            <input id="qe-emoji" class="adm-input" placeholder="Emoji (optional)" style="flex:0 0 90px;text-align:center">
             <input id="qe-desc" class="adm-input" placeholder="Description (optional)" style="flex:1">
           </div>
-          <div style="display:flex;gap:8px">
-            <button onclick="window._quintAdmAdd()" class="adm-btn adm-btn-primary" style="flex:1;background:linear-gradient(135deg,#7b2ff7,#c77dff)">
-              ➕ Add to Stack
+
+          <!-- Row 3: time picker with up/down arrows -->
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.5px;text-transform:uppercase">Time</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button onclick="window._quintTimeStep(-30)" style="width:36px;height:36px;border-radius:10px;background:rgba(199,125,255,0.12);border:1px solid rgba(199,125,255,0.3);color:#c77dff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0" title="−30 min">▼</button>
+              <input id="qe-time" class="adm-input" type="time" style="flex:1;text-align:center;font-size:15px;font-weight:700;letter-spacing:0.5px">
+              <button onclick="window._quintTimeStep(30)" style="width:36px;height:36px;border-radius:10px;background:rgba(199,125,255,0.12);border:1px solid rgba(199,125,255,0.3);color:#c77dff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0" title="+30 min">▲</button>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div style="display:flex;gap:8px;margin-top:2px">
+            <button onclick="window._quintAdmAdd()" class="adm-btn adm-btn-primary" style="flex:1;background:linear-gradient(135deg,#7b2ff7,#c77dff);border:none;color:#fff;font-weight:800">
+              ➕ Push to Stack
             </button>
             <button onclick="window._quintAdmClear()" class="adm-btn adm-btn-ghost">
               🗑 Clear All
