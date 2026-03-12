@@ -3847,6 +3847,9 @@ function updateTicketDisplay(delta) {
   if (pct >= 100 && prevPct < 100 && delta > 0) {
     playSound('bell'); launchConfetti();
     showNotif('🎉','Progress Complete!','You filled the ticket bar!');
+    if (typeof notifPanelAddImportant === 'function' && typeof _NOTIF_BUBBLES !== 'undefined') {
+      notifPanelAddImportant('🎉', 'Ticket Goal Reached!', S.tickets + ' / ' + (S.maxTickets || 100) + ' 🎟️', _NOTIF_BUBBLES.tickets);
+    }
   }
   // Render battery notch marks
   _renderTicketBarMarks();
@@ -18952,17 +18955,7 @@ setInterval(function _calUpcomingCheck() {
 }, 60000);
 
 // ── Ticket goal reached ───────────────────────────────────────
-let _ticketGoalNotifLastPct = -1;
-const __ticketDisplayOrig = updateTicketDisplay;
-function updateTicketDisplay(delta) {
-  const prevPct = _ticketGoalNotifLastPct;
-  __ticketDisplayOrig(delta);
-  const pct = Math.min((S.tickets / (S.maxTickets || 100)) * 100, 100);
-  _ticketGoalNotifLastPct = pct;
-  if (pct >= 100 && prevPct >= 0 && prevPct < 100 && delta > 0) {
-    notifPanelAddImportant('\u{1F389}', 'Ticket Goal Reached!', S.tickets + ' / ' + (S.maxTickets || 100) + ' \u{1F3DF}\uFE0F', _NOTIF_BUBBLES.tickets);
-  }
-}
+// Ticket goal notification is handled inside updateTicketDisplay directly
 
 // ── Admin broadcast → panel ──────────────────────────────────
 const __origShowBroadcastNotif = showBroadcastNotif;
