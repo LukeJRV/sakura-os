@@ -10028,10 +10028,12 @@ let mrStuckCountTimer = null;  // interval handle
 
 function _mrValidateLevel() {
   // Simulate a "ghost marble" falling straight down through gates
-  // Returns true if at least one path from top to finish exists within 2000 steps
-  const W = mrWorldW, H = MR_H;
+  // Returns true if at least one path from top to finish exists
+  // Step budget scales with level height so deep levels validate correctly
+  const W = mrWorldW, H = mrLevelH;
+  const maxSteps = Math.ceil(3500 * mrLevelScreens / 5);
   let x = W/2, y = 10, vy = 0, vx = 0;
-  for (let step = 0; step < 2000; step++) {
+  for (let step = 0; step < maxSteps; step++) {
     vy += 0.1; vx *= 0.99;
     x += vx; y += vy;
     if (x < 8) { x = 8; vx = Math.abs(vx)*0.5; }
@@ -10409,12 +10411,14 @@ function mrGenMap_inner() {
       const fp = _pickN(hazardPool, 1);
       const fX = Math.max(16, Math.min(W-16, oppSideX));
       const fY = yBase + zoneH * 0.40 + (rng()-0.5) * zoneH * 0.20;
-      if (fp[0] && !_inGateSafe(fX, fY, z, GATE_W)) {
+      // For alwaysThemed levels, always place — use zone top if gate blocks the preferred Y
+      const fYuse = (!_inGateSafe(fX, fY, z, GATE_W)) ? fY : (yBase + zoneH * 0.12 + rng() * zoneH * 0.1);
+      if (fp[0] && (!_inGateSafe(fX, fYuse, z, GATE_W) || alwaysThemed)) {
         // For Japanese Night, don't place bamboo too close to gate or it blocks path
         const safeHazard = (mrTheme === 'jpnight' && fp[0] === 'swingingBamboo')
           ? (Math.abs(fX - gate.x) > GATE_W * 1.2 ? fp[0] : 'paperLantern')
           : fp[0];
-        _ph(safeHazard, fX, fY);
+        _ph(safeHazard, fX, fYuse);
       }
     }
 
@@ -10422,14 +10426,16 @@ function mrGenMap_inner() {
     if (z % 2 === 0) {
       const fX2 = Math.max(16, Math.min(W-16, gateIsLeft ? W*0.65+rng()*W*0.22 : W*0.13+rng()*W*0.22));
       const fY2 = yBase + zoneH * 0.68 + (rng()-0.5) * zoneH * 0.16;
-      if (!_inGateSafe(fX2, fY2, z, GATE_W)) {
+      // For alwaysThemed levels, always place a hazard — use alternate Y if gate-safe blocks
+      const fY2alt = _inGateSafe(fX2, fY2, z, GATE_W) ? (yBase + zoneH * 0.15) : fY2;
+      if (!_inGateSafe(fX2, fY2alt, z, GATE_W) || alwaysThemed) {
         const tp = _pickN(hazardPool, 1)[0];
         if (tp) {
           // Safety: swingingBamboo in jpnight must be far from gate
           const safeTp = (mrTheme === 'jpnight' && tp === 'swingingBamboo')
             ? (Math.abs(fX2 - gate.x) > GATE_W * 1.4 ? tp : 'moonlitSection')
             : tp;
-          _ph(safeTp, fX2, fY2);
+          _ph(safeTp, fX2, fY2alt);
         }
       }
     }
@@ -15488,9 +15494,11 @@ function mrStartCountdown() {
       clearInterval(mrCountTimer); mrCountTimer=null;
       mrState='racing'; mrRaceTime=0; mrCameraY=0; mrCameraTarget=null;
       const ui2=document.getElementById('mr-ui');
+      const themeEmojiRace = {space:'🌌',sakura:'🌸',neon:'🌈',sunset:'🌅',ice:'❄️',forest:'🌲',arctic:'🏔️',sewers:'🕳️',sunken:'🌊',fiesta:'🎉',skatepark:'🛹',beach:'🏖️',garden:'🌻',jpnight:'🌙',kitchen:'🍳',midnightup:'🚗',autumn:'🍂',medieval:'⚔️'}[mrTheme]||'🔮';
+      const thName = (MR_THEMES[mrTheme]||MR_THEMES.space).name;
       if(ui2) ui2.innerHTML=`<div style="padding:8px 16px">
         <div id="mr-commentary" style="font-size:13px;font-weight:800;color:#4edfd0;min-height:20px;text-align:center;letter-spacing:-0.2px">🏁 Race started!</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px;text-align:center">Your pick: <span style="color:${MARBLE_COLORS.find(c=>c.id===mrVotedColor)?.hex||'#fff'};font-weight:700">${MARBLE_COLORS.find(c=>c.id===mrVotedColor)?.label||'?'}</span> &nbsp;·&nbsp; Tap marble to follow</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px;text-align:center">Your pick: <span style="color:${MARBLE_COLORS.find(c=>c.id===mrVotedColor)?.hex||'#fff'};font-weight:700">${MARBLE_COLORS.find(c=>c.id===mrVotedColor)?.label||'?'}</span> &nbsp;·&nbsp; <span style="color:rgba(255,255,255,0.45)">${themeEmojiRace} ${thName}</span> &nbsp;·&nbsp; Tap marble to follow</div>
         <div id="mr-cam-panel" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;justify-content:center"></div>
       </div>`;
       mrRunRace();
@@ -15584,29 +15592,22 @@ function renderMRVoteUI() {
       '</div>';
   }).join('');
 
-  const deepLevelBadge = mrLevelScreens > 5
-    ? '<div style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(199,125,255,0.2),rgba(123,47,247,0.15));border:1px solid rgba(199,125,255,0.4);border-radius:99px;padding:4px 10px;font-size:10px;font-weight:700;color:#c77dff;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px">⬇️ Deep Level · ' + mrLevelScreens + '× tall</div>'
-    : '';
+  const themeEmoji2 = {space:'🌌',sakura:'🌸',neon:'🌈',sunset:'🌅',ice:'❄️',forest:'🌲',arctic:'🏔️',sewers:'🕳️',sunken:'🌊',fiesta:'🎉',skatepark:'🛹',beach:'🏖️',garden:'🌻',jpnight:'🌙',kitchen:'🍳',midnightup:'🚗',autumn:'🍂',medieval:'⚔️'}[mrTheme]||'🔮';
+  const themeBadge = '<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;background:linear-gradient(135deg,rgba(255,255,255,0.09),rgba(255,255,255,0.03));border:1px solid rgba(255,255,255,0.14);margin-bottom:10px;animation:mrThemePop 0.4s ease">' +
+    '<span style="font-size:14px">' + themeEmoji2 + '</span>' +
+    '<span style="font-size:11px;font-weight:800;color:#fff;letter-spacing:-0.1px">' + th.name + '</span>' +
+    (mrLevelScreens > 5 ? '<span style="font-size:9px;font-weight:700;color:#c77dff;background:rgba(199,125,255,0.15);border:1px solid rgba(199,125,255,0.3);border-radius:99px;padding:1px 6px;margin-left:2px">⬇️ ' + mrLevelScreens + '×</span>' : '') +
+    '</div>';
 
   ui.innerHTML =
     '<div style="padding:12px 14px 14px">' +
-    (deepLevelBadge ? '<div>' + deepLevelBadge + '</div>' : '') +
+    '<div style="text-align:center">' + themeBadge + '</div>' +
     // Daily races dock
     '<div style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">' +
       '<div><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase">Daily Races</div>' +
       '<div style="font-size:16px;font-weight:900;color:#fff;margin-top:2px">' + racesCountHTML + '</div></div>' +
       '<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:130px">' + adminDockHTML + '</div>' +
     '</div>' +
-    // Level preview canvas — HIDDEN (kept for future use, set display:none to re-enable)
-    /* LEVEL_PREVIEW_START
-    '<div style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:16px;overflow:hidden;margin-bottom:12px">' +
-      '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px 6px">' +
-        '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase">Level Preview</div>' +
-        '<div style="background:' + th.bgA + ';border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:2px 8px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.7)">' + th.name + '</div>' +
-      '</div>' +
-      '<canvas id="mr-preview-canvas" style="display:block;width:100%;height:120px"></canvas>' +
-    '</div>' +
-    LEVEL_PREVIEW_END */
     // Pick label + rewards
     '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px">Pick your marble</div>' +
     '<div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px">🥇 10🎟 &nbsp;·&nbsp; 🥈 5🎟 &nbsp;·&nbsp; 🥉 3🎟</div>' +
