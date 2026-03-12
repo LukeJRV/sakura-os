@@ -2423,6 +2423,7 @@ input[type=number] { -moz-appearance:textfield; }
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(160,136,250,0.2),rgba(252,119,144,0.15));border:1px solid rgba(160,136,250,0.35);color:#c0b9f5;font-weight:800" onclick="admSwitchTab('claw',this)">🦾 Claw</button>
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(78,223,208,0.15),rgba(160,136,250,0.1));border:1px solid rgba(78,223,208,0.3);color:#4edfd0;font-weight:800" onclick="admSwitchTab('plinko',this)">🎯 Plinko</button>
         <button class="adm-tab" style="background:linear-gradient(135deg,rgba(199,125,255,0.2),rgba(123,47,247,0.15));border:1px solid rgba(199,125,255,0.4);color:#c77dff;font-weight:800" onclick="admSwitchTab('quint',this)">💜 Quint</button>
+        <button class="adm-tab" style="background:linear-gradient(135deg,rgba(76,175,110,0.2),rgba(78,223,208,0.15));border:1px solid rgba(76,175,110,0.4);color:#4caf6e;font-weight:800" onclick="admSwitchTab('walletctrl',this)">💷 Wallet</button>
       </div>
     </div>
     <div class="adm-body" id="admin-content"></div>
@@ -2631,6 +2632,9 @@ input[type=number] { -moz-appearance:textfield; }
         <div class="wallet-tabs" id="wallet-tabs">
           <div class="wallet-tab active" onclick="switchWalletTab('overview',this)">Home</div>
           <div class="wallet-tab" onclick="switchWalletTab('expenses',this)">Payments</div>
+          <div class="wallet-tab" onclick="switchWalletTab('activity',this)">Activity</div>
+          <div class="wallet-tab" onclick="switchWalletTab('goals',this)">Goals</div>
+          <div class="wallet-tab" onclick="switchWalletTab('insights',this)">Insights</div>
           <div class="wallet-tab" onclick="switchWalletTab('budgets',this)">Budgets</div>
           <div class="wallet-tab" onclick="switchWalletTab('cards',this)">Cards</div>
           <div class="wallet-tab" onclick="switchWalletTab('charts',this)">Charts</div>
@@ -3624,7 +3628,9 @@ const DEFAULT_STATE = {
   appDownloads: {},
   cpMachineState: null,
   cpSettings: null,
-  cpCustomPrizes: []
+  cpCustomPrizes: [],
+  savingsGoals: [],
+  walletActivityPeriod: 'month'
 };
 
 let S = JSON.parse(JSON.stringify(DEFAULT_STATE));
@@ -4482,8 +4488,79 @@ function switchWalletTab(tab, el) {
   walletTab = tab;
   document.querySelectorAll('.wallet-tab').forEach(t => t.classList.remove('active'));
   if (el) el.classList.add('active');
+  else {
+    const btn = document.querySelector(`.wallet-tab[onclick*="'${tab}'"]`);
+    if (btn) btn.classList.add('active');
+  }
   renderWalletContent();
 }
+
+// ── Wallet tab: scroll wheel + touch drag ──────────────────────
+(function() {
+  function initWalletTabGestures() {
+    const bar = document.getElementById('wallet-tabs');
+    if (!bar || bar._sakuraGestures) return;
+    bar._sakuraGestures = true;
+
+    const tabOrder = ['overview','expenses','activity','goals','insights','budgets','cards','charts','princess'];
+
+    function getCurrentIdx() {
+      return tabOrder.indexOf(walletTab);
+    }
+    function goTo(idx) {
+      idx = Math.max(0, Math.min(tabOrder.length - 1, idx));
+      if (idx === getCurrentIdx()) return;
+      const tabs = bar.querySelectorAll('.wallet-tab');
+      switchWalletTab(tabOrder[idx], tabs[idx] || null);
+      // Scroll active tab into view
+      if (tabs[idx]) tabs[idx].scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+    }
+
+    // ── Mouse wheel ──
+    bar.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      const delta = e.deltaY || e.deltaX;
+      goTo(getCurrentIdx() + (delta > 0 ? 1 : -1));
+    }, { passive: false });
+
+    // ── Touch drag ──
+    let touchStartX = 0, touchStartY = 0, touchLocked = false;
+    bar.addEventListener('touchstart', function(e) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchLocked = false;
+    }, { passive: true });
+    bar.addEventListener('touchmove', function(e) {
+      if (touchLocked) return;
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 18) {
+        touchLocked = true;
+        goTo(getCurrentIdx() + (dx < 0 ? 1 : -1));
+      }
+    }, { passive: true });
+  }
+
+  // Init after DOM ready and re-init if wallet screen is opened
+  document.addEventListener('DOMContentLoaded', initWalletTabGestures);
+  const _origOpenScreen = window.openScreen;
+  if (typeof _origOpenScreen === 'function') {
+    window.openScreen = function(s) {
+      _origOpenScreen(s);
+      if (s === 'wallet') requestAnimationFrame(initWalletTabGestures);
+    };
+  } else {
+    // openScreen not yet defined — patch after load
+    window.addEventListener('load', function() {
+      setTimeout(initWalletTabGestures, 300);
+      const orig = window.openScreen;
+      if (orig) window.openScreen = function(s) {
+        orig(s);
+        if (s === 'wallet') requestAnimationFrame(initWalletTabGestures);
+      };
+    });
+  }
+})();
 
 function openWalletCardCustomize() {
   let ov = document.getElementById('wallet-card-cust');
@@ -4555,6 +4632,9 @@ function renderWalletContent() {
   switch(walletTab) {
     case 'overview': c.innerHTML = walletOverviewHTML(); break;
     case 'expenses': c.innerHTML = walletExpensesHTML(); break;
+    case 'activity': c.innerHTML = walletActivityHTML(); setTimeout(renderActivityChart, 60); _walletPlaySound('swipe'); break;
+    case 'goals':    c.innerHTML = walletGoalsHTML(); setTimeout(renderGoalRings, 60); _walletPlaySound('swipe'); break;
+    case 'insights': c.innerHTML = walletInsightsHTML(); setTimeout(renderInsightsCharts, 60); _walletPlaySound('swipe'); break;
     case 'budgets': c.innerHTML = walletBudgetsHTML(); break;
     case 'charts': c.innerHTML = walletChartsHTML(); setTimeout(renderWalletCharts, 50); break;
     case 'performance': c.innerHTML = walletPerformanceHTML(); setTimeout(renderPerformanceCharts, 50); break;
@@ -4936,6 +5016,570 @@ function confirmAddBankAccount() {
   showNotif('🏦','Account added!', name);
 }
 
+
+// ═══════════════════════════════════════════════════════════════
+// 💹 ACTIVITY TAB — spending timeline + grouped transactions
+// ═══════════════════════════════════════════════════════════════
+function walletActivityHTML() {
+  const period = S.walletActivityPeriod || 'month';
+  const now = new Date();
+  const catColors = {'Food':'#fc7790','Transport':'#f6bb4e','Shopping':'#a088fa','Entertainment':'#4edfd0','Bills':'#6f96ff','Health':'#4caf6e','Other':'#c0b9f5'};
+
+  // Filter expenses by period
+  let filtered = [...S.expenses];
+  if (period === 'week') {
+    const cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 7);
+    filtered = filtered.filter(e => {
+      if (!e.date) return true;
+      const parts = e.date.split('/'); if (parts.length < 3) return true;
+      const d = new Date(parts[2], parts[1]-1, parts[0]);
+      return d >= cutoff;
+    });
+  } else if (period === 'month') {
+    const cutoff = new Date(now); cutoff.setDate(cutoff.getDate() - 30);
+    filtered = filtered.filter(e => {
+      if (!e.date) return true;
+      const parts = e.date.split('/'); if (parts.length < 3) return true;
+      const d = new Date(parts[2], parts[1]-1, parts[0]);
+      return d >= cutoff;
+    });
+  } else if (period === 'year') {
+    filtered = filtered.filter(e => {
+      if (!e.date) return true;
+      const parts = e.date.split('/'); if (parts.length < 3) return true;
+      return parseInt(parts[2]) === now.getFullYear();
+    });
+  }
+
+  const totalOut = filtered.reduce((a,b) => a+b.amount, 0);
+  const totalIn  = S.income;
+  const net = totalIn - S.expenses.reduce((a,b)=>a+b.amount,0);
+
+  // Group by date
+  const grouped = {};
+  [...filtered].reverse().forEach(e => {
+    const k = e.date || 'Today';
+    if (!grouped[k]) grouped[k] = [];
+    grouped[k].push(e);
+  });
+
+  return `<div style="background:#04060e;min-height:100%;padding-bottom:90px">
+
+    <!-- ── Period Picker ─────────────────────────── -->
+    <div style="padding:16px 16px 0;display:flex;gap:8px">
+      ${['week','month','year'].map(p => `
+        <button onclick="S.walletActivityPeriod='${p}';saveState();switchWalletTab('activity',document.querySelector('.wallet-tab[onclick*=activity]'))" style="flex:1;padding:8px 0;border-radius:12px;border:1px solid ${period===p?'rgba(160,136,250,0.45)':'rgba(255,255,255,0.07)'};background:${period===p?'linear-gradient(135deg,rgba(160,136,250,0.22),rgba(199,125,255,0.14))':'rgba(255,255,255,0.03)'};color:${period===p?'#c0a0ff':'rgba(255,255,255,0.38)'};font-size:12px;font-weight:800;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px">${p.charAt(0).toUpperCase()+p.slice(1)}</button>
+      `).join('')}
+    </div>
+
+    <!-- ── Summary Pills ─────────────────────────── -->
+    <div style="padding:12px 16px;display:flex;gap:8px">
+      <div style="flex:1;padding:14px 12px;border-radius:18px;background:linear-gradient(135deg,rgba(76,175,110,0.13),rgba(78,223,208,0.07));border:1px solid rgba(76,175,110,0.2)">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Income</div>
+        <div style="font-size:20px;font-weight:900;color:#4caf6e;letter-spacing:-0.5px">+£${totalIn.toFixed(2)}</div>
+      </div>
+      <div style="flex:1;padding:14px 12px;border-radius:18px;background:linear-gradient(135deg,rgba(252,119,144,0.13),rgba(231,129,97,0.07));border:1px solid rgba(252,119,144,0.2)">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Spent</div>
+        <div style="font-size:20px;font-weight:900;color:#fc7790;letter-spacing:-0.5px">−£${totalOut.toFixed(2)}</div>
+      </div>
+      <div style="flex:1;padding:14px 12px;border-radius:18px;background:linear-gradient(135deg,rgba(160,136,250,0.13),rgba(199,125,255,0.07));border:1px solid rgba(160,136,250,0.2)">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Net</div>
+        <div style="font-size:20px;font-weight:900;color:${net>=0?'#a088fa':'#fc7790'};letter-spacing:-0.5px">${net>=0?'+':''}£${net.toFixed(2)}</div>
+      </div>
+    </div>
+
+    <!-- ── Spending Area Chart ───────────────────── -->
+    <div style="margin:0 16px 14px;background:linear-gradient(145deg,#0d0820,#080515);border:1px solid rgba(160,136,250,0.14);border-radius:24px;padding:16px;overflow:hidden">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,0.85)">Spending Trend</div>
+        <div style="font-size:10px;font-weight:700;color:rgba(160,136,250,0.7)">${filtered.length} transaction${filtered.length!==1?'s':''}</div>
+      </div>
+      <canvas id="wallet-activity-chart" height="130" style="width:100%;display:block;border-radius:8px"></canvas>
+    </div>
+
+    <!-- ── Transactions by Date ──────────────────── -->
+    <div style="padding:0 16px">
+      <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">Transactions</div>
+      ${filtered.length === 0 ? `<div style="text-align:center;padding:60px 20px"><div style="font-size:48px;margin-bottom:12px">📭</div><div style="font-size:14px;font-weight:600;color:rgba(255,255,255,0.25)">No transactions this period</div></div>` : ''}
+      ${Object.entries(grouped).map(([date, items]) => `
+        <div style="margin-bottom:18px">
+          <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,0.28);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding:0 2px">${date}</div>
+          <div style="background:rgba(255,255,255,0.022);border:1px solid rgba(255,255,255,0.05);border-radius:20px;overflow:hidden">
+            ${items.map((e,i) => {
+              const col = catColors[e.category||'Other'] || '#c0b9f5';
+              const globalIdx = S.expenses.indexOf(e);
+              return `<div class="w-txn-in w-txn-row" style="animation-delay:${i*0.04}s;border-radius:0;border:none;${i<items.length-1?'border-bottom:1px solid rgba(255,255,255,0.04)':''}">
+                <div style="width:42px;height:42px;border-radius:14px;background:${col}14;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid ${col}20">${e.emoji||'📦'}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.title}</div>
+                  <div style="font-size:10px;color:${col};margin-top:2px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px">${e.category||'Other'}</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0">
+                  <div style="font-size:14px;font-weight:900;color:#fc7790">−£${e.amount.toFixed(2)}</div>
+                  <button onclick="removeExpense(${globalIdx})" style="font-size:9px;color:rgba(252,119,144,0.5);background:none;border:none;cursor:pointer;margin-top:2px;padding:0">remove</button>
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderActivityChart() {
+  const canvas = document.getElementById('wallet-activity-chart');
+  if (!canvas) return;
+  const period = S.walletActivityPeriod || 'month';
+  const now = new Date();
+
+  // Build daily buckets
+  let days = period === 'week' ? 7 : period === 'month' ? 30 : 12;
+  let buckets = [];
+  for (let i = days - 1; i >= 0; i--) {
+    if (period === 'year') {
+      const m = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      buckets.push({ label: m.toLocaleString('en',{month:'short'}), total: 0 });
+    } else {
+      const d = new Date(now); d.setDate(d.getDate() - i);
+      buckets.push({ label: period === 'week' ? d.toLocaleString('en',{weekday:'short'}) : d.getDate().toString(), total: 0 });
+    }
+  }
+
+  S.expenses.forEach(e => {
+    if (!e.date) { if (buckets.length) buckets[buckets.length-1].total += e.amount; return; }
+    const parts = e.date.split('/');
+    if (parts.length < 3) return;
+    const d = new Date(parts[2], parts[1]-1, parts[0]);
+    if (period === 'year') {
+      const monthsDiff = (now.getFullYear()-d.getFullYear())*12 + (now.getMonth()-d.getMonth());
+      const idx = (days-1) - monthsDiff;
+      if (idx >= 0 && idx < buckets.length) buckets[idx].total += e.amount;
+    } else {
+      const daysDiff = Math.floor((now - d) / 86400000);
+      const idx = (days-1) - daysDiff;
+      if (idx >= 0 && idx < buckets.length) buckets[idx].total += e.amount;
+    }
+  });
+
+  const W = canvas.offsetWidth || 300;
+  canvas.width = W * 2; canvas.height = 260;
+  canvas.style.width = '100%'; canvas.style.height = '130px';
+  const ctx = canvas.getContext('2d');
+  const scale = 2;
+  ctx.scale(scale, scale);
+  const w = W, h = 130;
+  const maxVal = Math.max(...buckets.map(b=>b.total), 1);
+  const padL = 8, padR = 8, padT = 12, padB = 28;
+  const chartW = w - padL - padR;
+  const chartH = h - padT - padB;
+  const stepX = chartW / Math.max(buckets.length - 1, 1);
+
+  const pts = buckets.map((b,i) => ({
+    x: padL + i * stepX,
+    y: padT + chartH - (b.total / maxVal) * chartH
+  }));
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, padT, 0, h - padB);
+  grad.addColorStop(0, 'rgba(160,136,250,0.35)');
+  grad.addColorStop(1, 'rgba(160,136,250,0.01)');
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, h - padB);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(pts[pts.length-1].x, h - padB);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  pts.forEach((p,i) => i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
+  ctx.strokeStyle = '#a088fa';
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // Dots on non-zero
+  pts.forEach((p,i) => {
+    if (buckets[i].total === 0) return;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 3.5, 0, Math.PI*2);
+    ctx.fillStyle = '#c0a0ff';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+
+  // X axis labels
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.font = `${10}px Inter,sans-serif`;
+  ctx.textAlign = 'center';
+  const step = Math.ceil(buckets.length / 7);
+  buckets.forEach((b,i) => {
+    if (i % step === 0 || i === buckets.length-1) {
+      ctx.fillText(b.label, pts[i].x, h - 6);
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🎯 GOALS TAB — savings goals with animated rings
+// ═══════════════════════════════════════════════════════════════
+function walletGoalsHTML() {
+  const goals = S.savingsGoals || [];
+  return `<div style="background:#04060e;min-height:100%;padding-bottom:90px">
+
+    <!-- ── Header ────────────────────────────────── -->
+    <div style="padding:16px 16px 0;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div>
+        <div style="font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.4px">Savings Goals</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.32);margin-top:3px">${goals.length} goal${goals.length!==1?'s':''} active</div>
+      </div>
+      <button onclick="openAddGoalModal()" style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,rgba(160,136,250,0.22),rgba(199,125,255,0.14));border:1px solid rgba(160,136,250,0.35);color:#c0a0ff;font-size:20px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center">+</button>
+    </div>
+
+    <!-- ── Summary ring row ───────────────────────── -->
+    ${goals.length > 0 ? `
+    <div style="padding:0 16px 14px;display:flex;gap:10px;overflow-x:auto;scrollbar-width:none">
+      ${goals.slice(0,4).map((g,i) => {
+        const pct = g.target > 0 ? Math.min((g.saved/g.target)*100,100) : 0;
+        const col = ['#a088fa','#fc7790','#4edfd0','#f6bb4e'][i%4];
+        return `<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px">
+          <div style="position:relative;width:64px;height:64px">
+            <canvas class="goal-ring-mini" data-pct="${pct}" data-col="${col}" width="128" height="128" style="width:64px;height:64px"></canvas>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px">${g.emoji||'🎯'}</div>
+          </div>
+          <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.45);text-align:center;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${g.name}</div>
+        </div>`;
+      }).join('')}
+    </div>` : ''}
+
+    <!-- ── Goal Cards ─────────────────────────────── -->
+    <div style="padding:0 16px;display:flex;flex-direction:column;gap:12px">
+      ${goals.length === 0 ? `
+        <div style="text-align:center;padding:70px 20px">
+          <div style="font-size:52px;margin-bottom:14px">🎯</div>
+          <div style="font-size:16px;font-weight:800;color:rgba(255,255,255,0.5);margin-bottom:6px">No savings goals yet</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.25);margin-bottom:22px">Set a target and track your progress</div>
+          <button onclick="openAddGoalModal()" style="padding:12px 28px;border-radius:16px;background:linear-gradient(135deg,#a088fa,#c97bff);border:none;color:#fff;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 6px 24px rgba(160,136,250,0.4)">+ Create Goal</button>
+        </div>
+      ` : goals.map((g,i) => {
+        const pct = g.target > 0 ? Math.min((g.saved/g.target)*100,100) : 0;
+        const col = ['#a088fa','#fc7790','#4edfd0','#f6bb4e'][i%4];
+        const remaining = Math.max(0, g.target - g.saved);
+        const daysLeft = g.deadline ? Math.max(0, Math.ceil((new Date(g.deadline)-new Date())/86400000)) : null;
+        const statusCol = pct>=100?'#4caf6e':pct>=70?col:'rgba(255,255,255,0.5)';
+        return `<div style="background:linear-gradient(145deg,rgba(255,255,255,0.03),rgba(160,136,250,0.02));border:1px solid rgba(255,255,255,0.07);border-radius:24px;padding:18px;position:relative;overflow:hidden" onclick="openGoalDetail(${i})">
+          <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,${col}0d 0%,transparent 70%);pointer-events:none"></div>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+            <div style="position:relative;width:56px;height:56px;flex-shrink:0">
+              <canvas class="goal-ring-main" data-idx="${i}" data-pct="${pct}" data-col="${col}" width="112" height="112" style="width:56px;height:56px"></canvas>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px">${g.emoji||'🎯'}</div>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:15px;font-weight:800;color:rgba(255,255,255,0.92);letter-spacing:-0.2px">${g.name}</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px">${daysLeft !== null ? (daysLeft === 0 ? '⏰ Due today' : `⏳ ${daysLeft} days left`) : 'No deadline'}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:18px;font-weight:900;color:${col}">£${g.saved.toFixed(0)}</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px">of £${g.target.toFixed(0)}</div>
+            </div>
+          </div>
+          <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;margin-bottom:10px">
+            <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${col},${col}88);border-radius:99px;transition:width 1.2s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px ${col}44"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:11px;font-weight:800;color:${statusCol}">${Math.round(pct)}% complete${pct>=100?' 🎉':''}</div>
+            <div style="display:flex;gap:6px">
+              <button onclick="event.stopPropagation();openGoalDeposit(${i})" style="padding:6px 12px;border-radius:10px;background:${col}1a;border:1px solid ${col}33;color:${col};font-size:11px;font-weight:800;cursor:pointer">+ Add</button>
+              <button onclick="event.stopPropagation();removeGoal(${i})" style="padding:6px 10px;border-radius:10px;background:rgba(252,119,144,0.1);border:1px solid rgba(252,119,144,0.2);color:rgba(252,119,144,0.7);font-size:11px;cursor:pointer">✕</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  <!-- ── Add Goal Modal ─────────────────────────── -->
+  <div id="add-goal-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('add-goal-modal')">
+    <div class="modal">
+      <div class="modal-title">🎯 New Savings Goal</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div onclick="openEmojiPicker('goal-emoji-val','goal-emoji-prev')" id="goal-emoji-prev" style="width:48px;height:48px;border-radius:14px;background:rgba(160,136,250,0.12);border:2px dashed rgba(160,136,250,0.35);display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer">🎯</div>
+        <input type="hidden" id="goal-emoji-val" value="🎯">
+        <input class="input" id="goal-name-input" placeholder="Goal name (e.g. New iPhone)" style="flex:1">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Target (£)</div>
+          <input class="input" id="goal-target-input" type="number" placeholder="500" min="1">
+        </div>
+        <div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Deadline</div>
+          <input class="input" id="goal-deadline-input" type="date">
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Starting amount (£)</div>
+        <input class="input" id="goal-saved-input" type="number" placeholder="0" min="0">
+      </div>
+      <div class="modal-row">
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeModal('add-goal-modal')">Cancel</button>
+        <button class="btn btn-primary btn-sm" style="flex:1" onclick="saveNewGoal()">Create Goal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Deposit Modal ─────────────────────────── -->
+  <div id="goal-deposit-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('goal-deposit-modal')">
+    <div class="modal">
+      <div class="modal-title">💰 Add to Goal</div>
+      <input type="hidden" id="goal-deposit-idx">
+      <input class="input" id="goal-deposit-amount" type="number" placeholder="Amount (£)" min="0.01" step="0.01" style="margin-bottom:16px">
+      <div class="modal-row">
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeModal('goal-deposit-modal')">Cancel</button>
+        <button class="btn btn-primary btn-sm" style="flex:1" onclick="confirmGoalDeposit()">Add</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderGoalRings() {
+  document.querySelectorAll('.goal-ring-mini, .goal-ring-main').forEach(canvas => {
+    const pct = parseFloat(canvas.dataset.pct) || 0;
+    const col = canvas.dataset.col || '#a088fa';
+    const size = canvas.width;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,size,size);
+    const cx = size/2, cy = size/2, r = size*0.38, lw = size*0.1;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = lw;
+    ctx.stroke();
+    if (pct > 0) {
+      const grad = ctx.createLinearGradient(0,0,size,size);
+      grad.addColorStop(0, col);
+      grad.addColorStop(1, col+'88');
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, -Math.PI/2, -Math.PI/2 + (pct/100)*Math.PI*2);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = lw;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+  });
+}
+
+function openAddGoalModal() {
+  _walletPlaySound('swipe');
+  const m = document.getElementById('add-goal-modal');
+  if (m) m.style.display = 'flex';
+}
+
+function openGoalDeposit(i) {
+  _walletPlaySound('swipe');
+  const m = document.getElementById('goal-deposit-modal');
+  if (!m) return;
+  document.getElementById('goal-deposit-idx').value = i;
+  document.getElementById('goal-deposit-amount').value = '';
+  m.style.display = 'flex';
+}
+
+function openGoalDetail(i) { /* future */ }
+
+function saveNewGoal() {
+  const name   = document.getElementById('goal-name-input')?.value?.trim();
+  const target = parseFloat(document.getElementById('goal-target-input')?.value) || 0;
+  const saved  = parseFloat(document.getElementById('goal-saved-input')?.value) || 0;
+  const deadline = document.getElementById('goal-deadline-input')?.value || null;
+  const emoji  = document.getElementById('goal-emoji-val')?.value || '🎯';
+  if (!name || target <= 0) { showNotif('⚠️','Fill in name and target',''); return; }
+  if (!S.savingsGoals) S.savingsGoals = [];
+  S.savingsGoals.push({ name, emoji, target, saved: Math.min(saved, target), deadline });
+  saveState();
+  _walletPlaySound('income');
+  closeModal('add-goal-modal');
+  switchWalletTab('goals', document.querySelector('.wallet-tab[onclick*="goals"]'));
+  showNotif('🎯','Goal created!', name);
+}
+
+function confirmGoalDeposit() {
+  const i = parseInt(document.getElementById('goal-deposit-idx')?.value);
+  const amt = parseFloat(document.getElementById('goal-deposit-amount')?.value);
+  if (isNaN(i) || isNaN(amt) || amt <= 0) { showNotif('⚠️','Enter a valid amount',''); return; }
+  if (!S.savingsGoals || !S.savingsGoals[i]) return;
+  S.savingsGoals[i].saved = Math.min(S.savingsGoals[i].saved + amt, S.savingsGoals[i].target);
+  saveState();
+  _walletPlaySound('income');
+  closeModal('goal-deposit-modal');
+  const done = S.savingsGoals[i].saved >= S.savingsGoals[i].target;
+  switchWalletTab('goals', document.querySelector('.wallet-tab[onclick*="goals"]'));
+  if (done) { showNotif('🎉','Goal complete!', S.savingsGoals[i].name + ' achieved!'); _walletPlaySound('goal_done'); launchConfetti(); }
+  else showNotif('💰','Added!', `+£${amt.toFixed(2)} to ${S.savingsGoals[i].name}`);
+}
+
+function removeGoal(i) {
+  if (!S.savingsGoals) return;
+  S.savingsGoals.splice(i, 1);
+  saveState();
+  playSound('click');
+  switchWalletTab('goals', document.querySelector('.wallet-tab[onclick*="goals"]'));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 📊 INSIGHTS TAB — donut breakdown + monthly statement
+// ═══════════════════════════════════════════════════════════════
+function walletInsightsHTML() {
+  const now = new Date();
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ label: d.toLocaleString('en',{month:'short'}), year: d.getFullYear(), month: d.getMonth() });
+  }
+  const totalExp  = S.expenses.reduce((a,b) => a+b.amount, 0);
+  const catColors = {'Food':'#fc7790','Transport':'#f6bb4e','Shopping':'#a088fa','Entertainment':'#4edfd0','Bills':'#6f96ff','Health':'#4caf6e','Other':'#c0b9f5'};
+  const catTotals = {};
+  S.expenses.forEach(e => { const c = e.category||'Other'; catTotals[c] = (catTotals[c]||0) + e.amount; });
+  const cats = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
+
+  const savingsRate = S.income > 0 ? Math.max(0, ((S.income-totalExp)/S.income*100)) : 0;
+  const avgPerTxn   = S.expenses.length > 0 ? totalExp / S.expenses.length : 0;
+  const topCat      = cats[0];
+
+  // Monthly breakdown
+  const monthlyTotals = months.map(m => {
+    const t = S.expenses.filter(e => {
+      if (!e.date) return false;
+      const p = e.date.split('/');
+      return parseInt(p[1])-1 === m.month && parseInt(p[2]) === m.year;
+    }).reduce((a,b)=>a+b.amount,0);
+    return { ...m, total: t };
+  });
+  const maxMonth = Math.max(...monthlyTotals.map(m=>m.total), 1);
+
+  return `<div style="background:#04060e;min-height:100%;padding-bottom:90px">
+
+    <!-- ── Key Stats ──────────────────────────────── -->
+    <div style="padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="padding:16px;border-radius:20px;background:linear-gradient(135deg,rgba(160,136,250,0.12),rgba(199,125,255,0.06));border:1px solid rgba(160,136,250,0.2)">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">Savings Rate</div>
+        <div style="font-size:26px;font-weight:900;color:#a088fa;letter-spacing:-0.8px">${savingsRate.toFixed(0)}%</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px">${savingsRate >= 20 ? '💚 Healthy' : savingsRate >= 10 ? '🟡 Fair' : '🔴 Low'}</div>
+      </div>
+      <div style="padding:16px;border-radius:20px;background:linear-gradient(135deg,rgba(246,187,78,0.12),rgba(231,129,97,0.06));border:1px solid rgba(246,187,78,0.2)">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">Avg Transaction</div>
+        <div style="font-size:26px;font-weight:900;color:#f6bb4e;letter-spacing:-0.8px">£${avgPerTxn.toFixed(0)}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px">${S.expenses.length} total txns</div>
+      </div>
+      <div style="padding:16px;border-radius:20px;background:linear-gradient(135deg,rgba(252,119,144,0.12),rgba(231,129,97,0.06));border:1px solid rgba(252,119,144,0.2)">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">Top Category</div>
+        <div style="font-size:22px;font-weight:900;color:#fc7790;letter-spacing:-0.3px">${topCat ? topCat[0] : '—'}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px">${topCat ? '£'+topCat[1].toFixed(2) : 'No data'}</div>
+      </div>
+      <div style="padding:16px;border-radius:20px;background:linear-gradient(135deg,rgba(78,223,208,0.12),rgba(111,150,255,0.06));border:1px solid rgba(78,223,208,0.2)">
+        <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">Net Balance</div>
+        <div style="font-size:22px;font-weight:900;color:#4edfd0;letter-spacing:-0.3px">${S.income-totalExp>=0?'':'−'}£${Math.abs(S.income-totalExp).toFixed(0)}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px">${S.income-totalExp>=0?'Surplus':'Deficit'}</div>
+      </div>
+    </div>
+
+    <!-- ── Donut Chart ────────────────────────────── -->
+    ${cats.length > 0 ? `
+    <div style="margin:0 16px 14px;padding:20px;background:linear-gradient(145deg,#0d0820,#080515);border:1px solid rgba(160,136,250,0.14);border-radius:24px">
+      <div style="font-size:14px;font-weight:800;color:rgba(255,255,255,0.85);margin-bottom:16px">Spending Breakdown</div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="position:relative;flex-shrink:0">
+          <canvas id="wallet-insights-donut" width="140" height="140" style="width:130px;height:130px"></canvas>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="font-size:18px;font-weight:900;color:#fff">£${totalExp.toFixed(0)}</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:700;text-transform:uppercase;letter-spacing:0.5px">total</div>
+          </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:7px;min-width:0">
+          ${cats.slice(0,5).map(([cat,amt]) => {
+            const pct = totalExp > 0 ? (amt/totalExp*100).toFixed(0) : 0;
+            const col = catColors[cat] || '#c0b9f5';
+            return `<div style="display:flex;align-items:center;gap:7px">
+              <div style="width:8px;height:8px;border-radius:3px;background:${col};flex-shrink:0"></div>
+              <div style="flex:1;min-width:0;font-size:11px;font-weight:700;color:rgba(255,255,255,0.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${cat}</div>
+              <div style="font-size:10px;font-weight:800;color:${col};flex-shrink:0">${pct}%</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>` : ''}
+
+    <!-- ── Monthly Bars ───────────────────────────── -->
+    <div style="margin:0 16px 14px;padding:18px;background:linear-gradient(145deg,rgba(255,255,255,0.025),rgba(0,0,0,0.1));border:1px solid rgba(255,255,255,0.055);border-radius:24px">
+      <div style="font-size:14px;font-weight:800;color:rgba(255,255,255,0.85);margin-bottom:16px">6-Month Spending</div>
+      <div style="display:flex;align-items:flex-end;gap:6px;height:90px">
+        ${monthlyTotals.map(m => {
+          const h = maxMonth > 0 ? Math.max((m.total/maxMonth)*78, m.total>0?4:0) : 0;
+          const isThis = m.month === now.getMonth() && m.year === now.getFullYear();
+          return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+            <div title="£${m.total.toFixed(2)}" style="width:100%;height:${h}px;border-radius:6px 6px 2px 2px;background:${isThis?'linear-gradient(180deg,#a088fa,#c97bff)':'rgba(160,136,250,0.28)'};transition:height 1s cubic-bezier(.4,0,.2,1);min-height:${m.total>0?4:0}px;box-shadow:${isThis?'0 0 12px rgba(160,136,250,0.4)':'none'}"></div>
+            <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,${isThis?'0.7':'0.28'})">${m.label}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- ── Category detail list ───────────────────── -->
+    ${cats.length > 0 ? `
+    <div style="margin:0 16px;padding:18px;background:rgba(255,255,255,0.022);border:1px solid rgba(255,255,255,0.05);border-radius:24px">
+      <div style="font-size:14px;font-weight:800;color:rgba(255,255,255,0.85);margin-bottom:14px">Category Details</div>
+      ${cats.map(([cat,amt]) => {
+        const pct = totalExp > 0 ? (amt/totalExp*100) : 0;
+        const col = catColors[cat] || '#c0b9f5';
+        return `<div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+            <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.8)">${cat}</div>
+            <div style="font-size:12px;font-weight:800;color:${col}">£${amt.toFixed(2)} <span style="font-size:10px;color:rgba(255,255,255,0.3)">(${pct.toFixed(0)}%)</span></div>
+          </div>
+          <div style="height:5px;background:rgba(255,255,255,0.05);border-radius:99px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${col},${col}77);border-radius:99px;transition:width 1s"></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>` : `<div style="text-align:center;padding:40px 20px"><div style="font-size:40px;margin-bottom:12px">📊</div><div style="font-size:14px;font-weight:600;color:rgba(255,255,255,0.25)">Add some expenses to see insights</div></div>`}
+  </div>`;
+}
+
+function renderInsightsCharts() {
+  const canvas = document.getElementById('wallet-insights-donut');
+  if (!canvas) return;
+  const catColors = {'Food':'#fc7790','Transport':'#f6bb4e','Shopping':'#a088fa','Entertainment':'#4edfd0','Bills':'#6f96ff','Health':'#4caf6e','Other':'#c0b9f5'};
+  const catTotals = {};
+  S.expenses.forEach(e => { const c = e.category||'Other'; catTotals[c]=(catTotals[c]||0)+e.amount; });
+  const cats = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
+  const total = cats.reduce((a,b)=>a+b[1],0);
+  if (total === 0) return;
+
+  const size = 140, ctx = canvas.getContext('2d');
+  const cx = size/2, cy = size/2, outerR = size*0.46, innerR = size*0.29;
+  let angle = -Math.PI/2;
+  ctx.clearRect(0,0,size,size);
+  cats.forEach(([cat,amt]) => {
+    const slice = (amt/total)*Math.PI*2;
+    const col = catColors[cat] || '#c0b9f5';
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, outerR, angle, angle+slice);
+    ctx.closePath();
+    ctx.fillStyle = col;
+    ctx.fill();
+    angle += slice;
+  });
+  // Inner hole
+  ctx.beginPath();
+  ctx.arc(cx, cy, innerR, 0, Math.PI*2);
+  ctx.fillStyle = '#0d0820';
+  ctx.fill();
+}
+
+
 // ── Wallet sound effects ────────────────────────────────────
 function _walletPlaySound(type) {
   try {
@@ -4983,6 +5627,26 @@ function _walletPlaySound(type) {
       o.type='sine'; o.frequency.setValueAtTime(540,t); o.frequency.exponentialRampToValueAtTime(290,t+0.1);
       g.gain.setValueAtTime(0.07,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.1);
       o.start(t); o.stop(t+0.1);
+    } else if (type === 'goal_done') {
+      // Triumphant ascending arpeggio
+      [523,659,784,1047].forEach((f,i) => {
+        const o=ctx.createOscillator(), gn=ctx.createGain();
+        o.connect(gn); gn.connect(ctx.destination);
+        o.type='sine'; o.frequency.setValueAtTime(f,t+i*0.1);
+        gn.gain.setValueAtTime(0,t+i*0.1); gn.gain.linearRampToValueAtTime(0.14,t+i*0.1+0.02);
+        gn.gain.exponentialRampToValueAtTime(0.001,t+i*0.1+0.35);
+        o.start(t+i*0.1); o.stop(t+i*0.1+0.35);
+      });
+    } else if (type === 'insight') {
+      const o=ctx.createOscillator(); o.connect(g);
+      o.type='sine'; o.frequency.setValueAtTime(700,t); o.frequency.linearRampToValueAtTime(900,t+0.1);
+      g.gain.setValueAtTime(0.08,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.18);
+      o.start(t); o.stop(t+0.18);
+    } else if (type === 'activity') {
+      const o=ctx.createOscillator(); o.connect(g);
+      o.type='triangle'; o.frequency.setValueAtTime(500,t); o.frequency.linearRampToValueAtTime(700,t+0.12);
+      g.gain.setValueAtTime(0.09,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.18);
+      o.start(t); o.stop(t+0.18);
     }
   } catch(e) {}
 }
@@ -5435,6 +6099,65 @@ function switchShopTab(tab, el) {
   }
   renderShopContent();
 }
+
+// ── Shop tab: scroll wheel + touch drag ───────────────────────
+(function() {
+  function initShopTabGestures() {
+    const bar = document.getElementById('shop-tab-row');
+    if (!bar || bar._sakuraGestures) return;
+    bar._sakuraGestures = true;
+
+    const tabOrder = ['rewards','sakura','themes','gacha-sell','claw-credits'];
+
+    function getCurrentIdx() {
+      return tabOrder.indexOf(shopTab);
+    }
+    function goTo(idx) {
+      idx = Math.max(0, Math.min(tabOrder.length - 1, idx));
+      if (idx === getCurrentIdx()) return;
+      const btn = bar.querySelector(`.shop-pill-tab[data-tab="${tabOrder[idx]}"]`);
+      switchShopTab(tabOrder[idx], btn || null);
+      if (btn) btn.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+    }
+
+    // ── Mouse wheel ──
+    bar.addEventListener('wheel', function(e) {
+      e.preventDefault();
+      const delta = e.deltaY || e.deltaX;
+      goTo(getCurrentIdx() + (delta > 0 ? 1 : -1));
+    }, { passive: false });
+
+    // ── Touch drag ──
+    let touchStartX = 0, touchStartY = 0, touchLocked = false;
+    bar.addEventListener('touchstart', function(e) {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+      touchLocked = false;
+    }, { passive: true });
+    bar.addEventListener('touchmove', function(e) {
+      if (touchLocked) return;
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 18) {
+        touchLocked = true;
+        goTo(getCurrentIdx() + (dx < 0 ? 1 : -1));
+      }
+    }, { passive: true });
+  }
+
+  document.addEventListener('DOMContentLoaded', initShopTabGestures);
+  window.addEventListener('load', function() {
+    setTimeout(initShopTabGestures, 300);
+    const orig = window.openScreen;
+    if (orig && !orig._shopPatched) {
+      orig._shopPatched = true;
+      window.openScreen = function(s) {
+        orig(s);
+        if (s === 'marblerace') requestAnimationFrame(initShopTabGestures);
+      };
+    }
+  });
+})();
 
 function stepNum(id, delta, min) {
   const el = document.getElementById(id);
@@ -22379,6 +23102,51 @@ window._fbApplyBroadcast = function(d, docId) {
         }
       }
       break;
+    // ── Live Wallet Control broadcasts ────────────────────────
+    case 'wallet_set_income':
+      if (d.targetUid === fbCurrentUser?.uid || d.targetUid === 'all') {
+        S.income = typeof d.income === 'number' ? d.income : S.income;
+        saveState();
+        const walletScreenI = document.getElementById('screen-wallet');
+        if (walletScreenI && walletScreenI.style.display !== 'none') renderWalletContent();
+        const homeBalEl = document.getElementById('home-balance');
+        if (homeBalEl) homeBalEl.textContent = '£' + S.income.toFixed(2);
+        _walletPlaySound('income');
+        showNotif('💷','Balance updated!', 'Income set to £' + S.income.toFixed(2));
+      }
+      break;
+    case 'wallet_add_expense':
+      if (d.targetUid === fbCurrentUser?.uid || d.targetUid === 'all') {
+        if (!S.expenses) S.expenses = [];
+        if (d.expense) S.expenses.push(d.expense);
+        saveState();
+        const walletScreenE = document.getElementById('screen-wallet');
+        if (walletScreenE && walletScreenE.style.display !== 'none') renderWalletContent();
+        _walletPlaySound('expense');
+        showNotif('💸','New expense!', (d.expense?.title||'Expense') + ' −£' + (d.expense?.amount||0).toFixed(2));
+      }
+      break;
+    case 'wallet_add_goal':
+      if (d.targetUid === fbCurrentUser?.uid || d.targetUid === 'all') {
+        if (!S.savingsGoals) S.savingsGoals = [];
+        if (d.goal) S.savingsGoals.push(d.goal);
+        saveState();
+        const walletScreenG = document.getElementById('screen-wallet');
+        if (walletScreenG && walletScreenG.style.display !== 'none') renderWalletContent();
+        _walletPlaySound('income');
+        showNotif('🎯','New goal added!', d.goal?.name || 'Savings goal');
+      }
+      break;
+    case 'wallet_reset':
+      if (d.targetUid === fbCurrentUser?.uid || d.targetUid === 'all') {
+        S.income = 0; S.expenses = []; S.budgets = []; S.savingsGoals = []; S.bankAccounts = [];
+        saveState();
+        const walletScreenR = document.getElementById('screen-wallet');
+        if (walletScreenR && walletScreenR.style.display !== 'none') renderWalletContent();
+        _walletPlaySound('close');
+        showNotif('🔄','Wallet reset','Your wallet has been cleared');
+      }
+      break;
     case 'set_princess_budget':
       if (typeof fbCurrentUser !== 'undefined' && fbCurrentUser && d.targetUid === fbCurrentUser.uid) {
         if (!S.budgetPrincess) S.budgetPrincess = { name:'Princess Budget', limit:0, spent:0 };
@@ -23449,6 +24217,84 @@ window._admClearUndoneHistory = async function() {
       </div>`;
     // Load existing quint items
     window._quintAdmLoad();
+
+  } else if (tab === 'walletctrl') {
+    // ── Admin Wallet Control ──────────────────────────────────
+    let playerList = [];
+    try {
+      const snap = await fbDb.collection('players').get();
+      snap.forEach(doc => {
+        const d = doc.data();
+        playerList.push({ id: doc.id, name: d.displayName || d.email || doc.id, state: d.state || {} });
+      });
+    } catch(e) { console.warn(e); }
+
+    content.innerHTML = `
+      <div class="adm-card" style="background:linear-gradient(135deg,rgba(76,175,110,0.1),rgba(78,223,208,0.05));border-color:rgba(76,175,110,0.3)">
+        <div class="adm-card-title" style="color:#4caf6e">💷 Live Wallet Control</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:14px;line-height:1.6">
+          All changes push instantly to the player's open wallet in real-time — no refresh needed.
+        </div>
+
+        <!-- Player selector -->
+        <div style="margin-bottom:14px">
+          <div style="font-size:10px;color:rgba(255,255,255,0.45);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px">Select Player</div>
+          <select id="adm-wc-player" class="adm-input" style="width:100%">
+            <option value="">— Choose a player —</option>
+            ${playerList.map(p => `<option value="${p.id}" data-income="${p.state.income||0}" data-expenses="${p.state.expenses ? p.state.expenses.length : 0}">${p.name}</option>`).join('')}
+          </select>
+        </div>
+
+        <!-- Action tabs -->
+        <div style="display:flex;gap:6px;margin-bottom:14px">
+          ${['income','expense','goal','reset'].map(a => `
+            <button onclick="document.querySelectorAll('.adm-wc-action').forEach(e=>e.style.display='none');document.getElementById('adm-wc-${a}').style.display='block';this.parentNode.querySelectorAll('button').forEach(b=>{b.style.background='rgba(255,255,255,0.05)';b.style.color='rgba(255,255,255,0.45)'});this.style.background='rgba(76,175,110,0.25)';this.style.color='#4caf6e'"
+              style="flex:1;padding:7px 4px;border-radius:10px;border:1px solid rgba(76,175,110,0.2);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.45);font-size:10px;font-weight:800;cursor:pointer;transition:all 0.2s;text-transform:capitalize"
+            >${a}</button>
+          `).join('')}
+        </div>
+
+        <!-- Income panel -->
+        <div id="adm-wc-income" class="adm-wc-action">
+          <div style="font-size:10px;color:rgba(255,255,255,0.45);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px">Set Income Balance (£)</div>
+          <input id="adm-wc-income-val" class="adm-input" type="number" placeholder="e.g. 2500.00" min="0" step="0.01" style="margin-bottom:10px">
+          <button onclick="window._admSetWalletIncome()" style="width:100%;padding:12px;border-radius:14px;background:linear-gradient(135deg,#4caf6e,#4edfd0);border:none;color:#001a10;font-size:13px;font-weight:900;cursor:pointer">💷 Set Income Live</button>
+        </div>
+
+        <!-- Expense panel -->
+        <div id="adm-wc-expense" class="adm-wc-action" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <input id="adm-wc-exp-title" class="adm-input" placeholder="Title (e.g. Shop)">
+            <input id="adm-wc-exp-amount" class="adm-input" type="number" placeholder="Amount (£)" min="0.01" step="0.01">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+            <select id="adm-wc-exp-cat" class="adm-input">
+              ${['Food','Transport','Shopping','Entertainment','Bills','Health','Other'].map(c=>`<option>${c}</option>`).join('')}
+            </select>
+            <input id="adm-wc-exp-emoji" class="adm-input" placeholder="Emoji 📦" maxlength="4">
+          </div>
+          <button onclick="window._admAddWalletExpense()" style="width:100%;padding:12px;border-radius:14px;background:linear-gradient(135deg,#fc7790,#c97bff);border:none;color:#fff;font-size:13px;font-weight:900;cursor:pointer">💸 Add Expense Live</button>
+        </div>
+
+        <!-- Goal panel -->
+        <div id="adm-wc-goal" class="adm-wc-action" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <input id="adm-wc-goal-name" class="adm-input" placeholder="Goal name">
+            <input id="adm-wc-goal-target" class="adm-input" type="number" placeholder="Target (£)" min="1">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+            <input id="adm-wc-goal-saved" class="adm-input" type="number" placeholder="Saved so far (£)" min="0">
+            <input id="adm-wc-goal-emoji" class="adm-input" placeholder="Emoji 🎯" maxlength="4">
+          </div>
+          <button onclick="window._admAddWalletGoal()" style="width:100%;padding:12px;border-radius:14px;background:linear-gradient(135deg,#a088fa,#fc7790);border:none;color:#fff;font-size:13px;font-weight:900;cursor:pointer">🎯 Add Goal Live</button>
+        </div>
+
+        <!-- Reset panel -->
+        <div id="adm-wc-reset" class="adm-wc-action" style="display:none">
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6;margin-bottom:14px">⚠️ This will clear ALL wallet data (income, expenses, budgets, goals) for the selected player.</div>
+          <button onclick="window._admResetWallet()" style="width:100%;padding:12px;border-radius:14px;background:linear-gradient(135deg,rgba(252,119,144,0.3),rgba(231,129,97,0.2));border:1px solid rgba(252,119,144,0.4);color:#fc7790;font-size:13px;font-weight:900;cursor:pointer">🗑️ Reset Wallet Data</button>
+        </div>
+      </div>`;
 
   } else if (tab === 'support') {
     try {
@@ -24730,6 +25576,95 @@ window._admResetPlayer = async function(uid) {
     showNotif('⚠️','Failed', e.message);
   }
 }
+
+// ═══════════════════════════════════════════════════════════════
+// 💷 ADMIN WALLET CONTROL — Live real-time pushes via Firestore
+// ═══════════════════════════════════════════════════════════════
+
+window._admGetWalletPlayer = function() {
+  const uid = document.getElementById('adm-wc-player')?.value;
+  if (!uid) { showNotif('⚠️','Select a player first',''); return null; }
+  return uid;
+};
+
+window._admPushWalletBroadcast = async function(uid, type, payload) {
+  await fbDb.collection('broadcasts').add({
+    type,
+    active: true,
+    targetUid: uid,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    ...payload
+  });
+};
+
+window._admSetWalletIncome = async function() {
+  const uid = window._admGetWalletPlayer(); if (!uid) return;
+  const income = parseFloat(document.getElementById('adm-wc-income-val')?.value);
+  if (isNaN(income) || income < 0) { showNotif('⚠️','Enter a valid amount',''); return; }
+  try {
+    await fbDb.collection('players').doc(uid).update({ 'state.income': income });
+    await window._admPushWalletBroadcast(uid, 'wallet_set_income', { income });
+    showNotif('✅','Income set live!', '£' + income.toFixed(2));
+    playSound('success');
+  } catch(e) { showNotif('⚠️','Failed', e.message); }
+};
+
+window._admAddWalletExpense = async function() {
+  const uid = window._admGetWalletPlayer(); if (!uid) return;
+  const title   = document.getElementById('adm-wc-exp-title')?.value?.trim();
+  const amount  = parseFloat(document.getElementById('adm-wc-exp-amount')?.value);
+  const category= document.getElementById('adm-wc-exp-cat')?.value || 'Other';
+  const emoji   = document.getElementById('adm-wc-exp-emoji')?.value || '📦';
+  if (!title || isNaN(amount) || amount <= 0) { showNotif('⚠️','Fill in title and amount',''); return; }
+  try {
+    const doc = await fbDb.collection('players').doc(uid).get();
+    const state = doc.data()?.state || {};
+    const expenses = state.expenses || [];
+    const newExp = { title, emoji, amount, category, date: new Date().toLocaleDateString('en-GB') };
+    expenses.push(newExp);
+    await fbDb.collection('players').doc(uid).update({ 'state.expenses': expenses });
+    await window._admPushWalletBroadcast(uid, 'wallet_add_expense', { expense: newExp });
+    showNotif('✅','Expense added live!', title + ' −£' + amount.toFixed(2));
+    playSound('success');
+  } catch(e) { showNotif('⚠️','Failed', e.message); }
+};
+
+window._admAddWalletGoal = async function() {
+  const uid = window._admGetWalletPlayer(); if (!uid) return;
+  const name   = document.getElementById('adm-wc-goal-name')?.value?.trim();
+  const target = parseFloat(document.getElementById('adm-wc-goal-target')?.value);
+  const saved  = parseFloat(document.getElementById('adm-wc-goal-saved')?.value) || 0;
+  const emoji  = document.getElementById('adm-wc-goal-emoji')?.value || '🎯';
+  if (!name || isNaN(target) || target <= 0) { showNotif('⚠️','Fill in name and target',''); return; }
+  try {
+    const doc = await fbDb.collection('players').doc(uid).get();
+    const state = doc.data()?.state || {};
+    const goals = state.savingsGoals || [];
+    const newGoal = { name, emoji, target, saved: Math.min(saved, target), deadline: null };
+    goals.push(newGoal);
+    await fbDb.collection('players').doc(uid).update({ 'state.savingsGoals': goals });
+    await window._admPushWalletBroadcast(uid, 'wallet_add_goal', { goal: newGoal });
+    showNotif('✅','Goal pushed live!', name + ' £' + target.toFixed(2));
+    playSound('success');
+  } catch(e) { showNotif('⚠️','Failed', e.message); }
+};
+
+window._admResetWallet = async function() {
+  const uid = window._admGetWalletPlayer(); if (!uid) return;
+  if (!confirm('Reset wallet data for this player?')) return;
+  try {
+    await fbDb.collection('players').doc(uid).update({
+      'state.income': 0,
+      'state.expenses': [],
+      'state.budgets': [],
+      'state.savingsGoals': [],
+      'state.bankAccounts': []
+    });
+    await window._admPushWalletBroadcast(uid, 'wallet_reset', {});
+    showNotif('✅','Wallet reset!','All wallet data cleared');
+    playSound('success');
+  } catch(e) { showNotif('⚠️','Failed', e.message); }
+};
 
 window._admPushVersion = async function() {
   const ver   = document.getElementById('adm-ver-num')?.value?.trim();
