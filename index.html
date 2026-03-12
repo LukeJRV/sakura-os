@@ -1321,13 +1321,13 @@ input[type=number] { -moz-appearance:textfield; }
 
 /* ===== WALLET SCREEN ===== */
 #screen-wallet {
-  background:var(--bg);
+  background:#050812;
   padding-top:0;
 }
 .wallet-hero {
   margin:16px;
   background:linear-gradient(135deg, #2a1a4e, #1a0a2e);
-  border-radius:20px;
+  border-radius:24px;
   padding:24px;
   position:relative;
   overflow:hidden;
@@ -1346,19 +1346,104 @@ input[type=number] { -moz-appearance:textfield; }
   margin-bottom:4px;
 }
 .wallet-label { font-size:12px; color:rgba(255,255,255,0.5); font-weight:500; }
-.wallet-tabs { display:flex; gap:8px; padding:0 16px 16px; overflow-x:auto; }
+.wallet-tabs { display:flex; gap:8px; padding:0 16px 14px; overflow-x:auto; scrollbar-width:none; }
+.wallet-tabs::-webkit-scrollbar { display:none; }
 .wallet-tab {
-  padding:8px 16px;
+  padding:7px 16px;
   border-radius:20px;
-  font-size:12px; font-weight:600;
+  font-size:12px; font-weight:700;
   cursor:pointer;
   white-space:nowrap;
-  transition:all 0.2s;
-  background:rgba(255,255,255,0.06);
-  color:rgba(255,255,255,0.6);
-  border:1px solid transparent;
+  transition:all 0.22s cubic-bezier(.4,0,.2,1);
+  background:rgba(255,255,255,0.05);
+  color:rgba(255,255,255,0.5);
+  border:1px solid rgba(255,255,255,0.07);
+  letter-spacing:0.1px;
 }
-.wallet-tab.active { background:var(--accent1); color:#fff; }
+.wallet-tab.active {
+  background:linear-gradient(135deg,rgba(160,136,250,0.9),rgba(199,125,255,0.8));
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 4px 16px rgba(160,136,250,0.35);
+}
+@keyframes walletCardIn {
+  from { opacity:0; transform:translateY(18px) scale(0.97); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+@keyframes walletTxnIn {
+  from { opacity:0; transform:translateX(-12px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+@keyframes walletShimmer {
+  0% { transform:translateX(-100%) skewX(-12deg); }
+  100% { transform:translateX(300%) skewX(-12deg); }
+}
+@keyframes walletBalancePulse {
+  0%,100% { text-shadow:0 0 20px rgba(160,136,250,0.2); }
+  50% { text-shadow:0 0 40px rgba(160,136,250,0.5),0 0 80px rgba(199,125,255,0.2); }
+}
+.wallet-card-in { animation:walletCardIn 0.4s cubic-bezier(.22,1,.36,1) both; }
+.wallet-txn-in { animation:walletTxnIn 0.35s cubic-bezier(.22,1,.36,1) both; }
+.wallet-balance-pulse { animation:walletBalancePulse 3s ease-in-out infinite; }
+.wallet-quick-btn {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:18px;
+  padding:14px 6px 10px;
+  cursor:pointer;
+  color:var(--fg);
+  transition:all 0.2s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  position:relative;
+  overflow:hidden;
+}
+.wallet-quick-btn:active { transform:scale(0.94); background:rgba(160,136,250,0.12); }
+.wallet-section-title {
+  font-size:13px;
+  font-weight:800;
+  color:rgba(255,255,255,0.85);
+  letter-spacing:0.1px;
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.wallet-txn-card {
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:13px 16px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.055);
+  border-radius:18px;
+  transition:all 0.2s;
+  cursor:default;
+  position:relative;
+  overflow:hidden;
+}
+.wallet-txn-card::after {
+  content:'';
+  position:absolute;
+  top:0;left:-100%;width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent);
+  transition:left 0.5s;
+}
+.wallet-txn-card:hover::after { left:120%; }
+.wallet-budget-bar {
+  height:6px;
+  background:rgba(255,255,255,0.06);
+  border-radius:99px;
+  overflow:hidden;
+  margin-top:10px;
+}
+.wallet-budget-fill {
+  height:100%;
+  border-radius:99px;
+  transition:width 0.8s cubic-bezier(.4,0,.2,1);
+}
 
 /* ===== CALENDAR ===== */
 .cal-grid {
@@ -1414,20 +1499,61 @@ input[type=number] { -moz-appearance:textfield; }
 
 /* ===== SHOP ===== */
 .shop-item {
-  background:var(--card);
-  border-radius:16px;
-  padding:14px;
-  border:1px solid rgba(255,255,255,0.06);
-  display:flex; align-items:center; gap:12px;
-  transition:border-color 0.2s;
+  background:rgba(255,255,255,0.03);
+  border-radius:20px;
+  padding:14px 16px;
+  border:1px solid rgba(255,255,255,0.07);
+  display:flex; align-items:center; gap:14px;
+  transition:all 0.22s cubic-bezier(.4,0,.2,1);
+  position:relative;
+  overflow:hidden;
 }
-.shop-item:hover { border-color:var(--accent1); }
-.shop-item-icon { font-size:32px; width:48px; text-align:center; }
-.shop-item-info { flex:1; }
+.shop-item::after {
+  content:'';
+  position:absolute;
+  top:0;left:-80%;width:50%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent);
+  transition:left 0.55s;
+}
+.shop-item:hover { border-color:rgba(160,136,250,0.35);background:rgba(160,136,250,0.06); }
+.shop-item:hover::after { left:120%; }
+.shop-item-icon { font-size:30px; width:52px; height:52px; display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07); }
+.shop-item-info { flex:1;min-width:0; }
 .shop-item-name {
-  text-transform:uppercase;
-  letter-spacing:0.4px; font-size:14px; font-weight:600; color:var(--fg); }
-.shop-item-price { font-size:12px; color:var(--gold); font-weight:600; }
+  font-size:14px; font-weight:700; color:rgba(255,255,255,0.92);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.shop-item-price { font-size:11px; color:rgba(246,187,78,0.9); font-weight:700;margin-top:3px; }
+@keyframes shopItemIn {
+  from { opacity:0; transform:translateY(14px) scale(0.97); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+@keyframes shopPulse {
+  0%,100% { box-shadow:0 0 0 0 rgba(160,136,250,0); }
+  50% { box-shadow:0 0 0 8px rgba(160,136,250,0.15); }
+}
+@keyframes shopBuyFlash {
+  0% { background:rgba(160,136,250,0.4); }
+  100% { background:rgba(160,136,250,0); }
+}
+.shop-item-in { animation:shopItemIn 0.38s cubic-bezier(.22,1,.36,1) both; }
+.shop-pill-tab {
+  flex-shrink:0;
+  padding:7px 16px;
+  border-radius:20px;
+  font-size:12px;font-weight:700;
+  cursor:pointer;
+  white-space:nowrap;
+  border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.05);
+  color:rgba(255,255,255,0.5);
+  transition:all 0.22s cubic-bezier(.4,0,.2,1);
+  letter-spacing:0.1px;
+}
+.shop-pill-tab.active {
+  background:linear-gradient(135deg,rgba(160,136,250,0.88),rgba(199,125,255,0.75));
+  color:#fff;border-color:transparent;
+  box-shadow:0 4px 16px rgba(160,136,250,0.32);
+}
 
 /* ===== CHAT — iOS 26 / iPhone 15 iMessage Inspired ===== */
 .chat-contact-card {
@@ -2394,7 +2520,7 @@ input[type=number] { -moz-appearance:textfield; }
   </div>
   
   <!-- Notification Panel Drag Zone (top-left corner) -->
-  <div id="notif-drag-zone" style="position:absolute;top:0;left:0;width:60px;height:44px;z-index:9000;cursor:pointer" ontouchstart="notifPanelDragStart(event)" onmousedown="notifPanelDragStart(event)"></div>
+  <div id="notif-drag-zone" style="position:absolute;top:0;left:0;width:100%;height:56px;z-index:9000;cursor:pointer;touch-action:none" onmousedown="notifPanelDragStart(event)"></div>
 
   <!-- Notification Panel — full-screen iOS 15-style -->
   <div id="notif-panel" style="position:absolute;inset:0;z-index:8900;transform:translateY(-100%);transition:transform 0.48s cubic-bezier(0.32,0,0.15,1);will-change:transform;overflow:hidden;border-radius:48px;">
@@ -2568,15 +2694,17 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== WALLET SCREEN ===== -->
-    <div id="screen-wallet" class="screen" style="padding:0;flex-direction:column;background:#0a0e1a">
-      <!-- Lloyds-style top header strip -->
-      <div style="background:linear-gradient(135deg,#0e1a2e,#0d2040);padding:14px 16px 0;flex-shrink:0">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <button class="back-btn" onclick="openScreen('home')" style="color:#6f96ff;background:rgba(111,150,255,0.1);border:1px solid rgba(111,150,255,0.2)">←</button>
-          <div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.5px;cursor:pointer" id="wallet-bank-header" ondblclick="renameBankHeader()" title="Double-click to rename">💷 Sakura Bank</div>
-          <button onclick="openModal('wallet-income-modal')" style="background:rgba(111,150,255,0.15);border:1px solid rgba(111,150,255,0.3);border-radius:99px;padding:4px 12px;font-size:11px;font-weight:700;color:#6f96ff;cursor:pointer">+ Income</button>
+    <div id="screen-wallet" class="screen" style="padding:0;flex-direction:column;background:#050812">
+      <!-- Wallet top header -->
+      <div style="background:rgba(5,8,18,0.95);padding:14px 16px 0;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.04)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <button class="back-btn" onclick="openScreen('home');_walletPlaySound('close')" style="color:#a088fa;background:rgba(160,136,250,0.1);border:1px solid rgba(160,136,250,0.2)">←</button>
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <div style="font-size:12px;font-weight:800;color:rgba(255,255,255,0.9);letter-spacing:0.8px;text-transform:uppercase;cursor:pointer" id="wallet-bank-header" ondblclick="renameBankHeader()" title="Double-click to rename">💷 Sakura Bank</div>
+          </div>
+          <button onclick="openModal('wallet-income-modal');_walletPlaySound('income')" style="background:linear-gradient(135deg,rgba(160,136,250,0.2),rgba(199,125,255,0.15));border:1px solid rgba(160,136,250,0.3);border-radius:99px;padding:5px 14px;font-size:11px;font-weight:800;color:#c0a0ff;cursor:pointer;letter-spacing:0.2px">+ Income</button>
         </div>
-        <div class="wallet-tabs" id="wallet-tabs" style="padding:0;margin:0 -16px;padding:0 16px;border-bottom:none">
+        <div class="wallet-tabs" id="wallet-tabs">
           <div class="wallet-tab active" onclick="switchWalletTab('overview',this)">Home</div>
           <div class="wallet-tab" onclick="switchWalletTab('expenses',this)">Payments</div>
           <div class="wallet-tab" onclick="switchWalletTab('budgets',this)">Budgets</div>
@@ -2585,7 +2713,7 @@ input[type=number] { -moz-appearance:textfield; }
           <div class="wallet-tab" onclick="switchWalletTab('princess',this)">👸</div>
         </div>
       </div>
-      <div id="wallet-content" style="flex:1;overflow-y:auto;padding:0"></div>
+      <div id="wallet-content" style="flex:1;overflow-y:auto;padding:0;scrollbar-width:none"></div>
     </div>
 
     <!-- ===== MARBLE RACE SCREEN ===== -->
@@ -2620,22 +2748,26 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== SHOP SCREEN ===== -->
-    <div id="screen-shop" class="screen">
-      <div class="screen-header">
-        <button class="back-btn" onclick="openScreen('home')">←</button>
-        <span class="screen-title">🛒 Shop</span>
-        <button class="btn btn-primary btn-sm admin-only" onclick="openModal('add-shop-item-modal')">+</button>
-      </div>
-      <div style="padding:0 16px">
-        <div class="tabs" style="margin-top:8px">
-          <button class="tab-btn active" onclick="switchShopTab('rewards',this)">🛒 REWARDS</button>
-          <button class="tab-btn" onclick="switchShopTab('sakura',this)">🌸 SAKURA</button>
-          <button class="tab-btn" onclick="switchShopTab('themes',this)">🎨 THEMES</button>
-          <button class="tab-btn" onclick="switchShopTab('gacha-sell',this)">🎰 GACHA</button>
-          <button class="tab-btn" onclick="switchShopTab('claw-credits',this)">🎰 CREDITS</button>
+    <div id="screen-shop" class="screen" style="background:#04060f">
+      <!-- Shop header -->
+      <div style="background:rgba(4,6,15,0.97);padding:14px 16px 0;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.04)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <button class="back-btn" onclick="openScreen('home');_shopPlaySound('close')" style="color:#a088fa;background:rgba(160,136,250,0.1);border:1px solid rgba(160,136,250,0.2)">←</button>
+          <div style="text-align:center">
+            <div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.5px;text-transform:uppercase">🛍️ Sakura Shop</div>
+          </div>
+          <button class="btn btn-primary btn-sm admin-only" onclick="openModal('add-shop-item-modal')" style="background:linear-gradient(135deg,rgba(160,136,250,0.25),rgba(199,125,255,0.2));border:1px solid rgba(160,136,250,0.35);color:#c0a0ff;border-radius:12px;font-size:12px;font-weight:800">+</button>
+        </div>
+        <!-- Category pill tabs -->
+        <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:14px;scrollbar-width:none" id="shop-tab-row">
+          <button class="shop-pill-tab active" onclick="switchShopTab('rewards',this)" data-tab="rewards">🛒 Rewards</button>
+          <button class="shop-pill-tab" onclick="switchShopTab('sakura',this)" data-tab="sakura">🌸 Sakura</button>
+          <button class="shop-pill-tab" onclick="switchShopTab('themes',this)" data-tab="themes">🎨 Themes</button>
+          <button class="shop-pill-tab" onclick="switchShopTab('gacha-sell',this)" data-tab="gacha-sell">🎰 Gacha</button>
+          <button class="shop-pill-tab" onclick="switchShopTab('claw-credits',this)" data-tab="claw-credits">🎰 Credits</button>
         </div>
       </div>
-      <div id="shop-content" style="padding:0 16px"></div>
+      <div id="shop-content" style="flex:1;overflow-y:auto;scrollbar-width:none"></div>
     </div>
 
     <!-- ===== BACKPACK SCREEN ===== -->
@@ -4422,10 +4554,10 @@ function editAppIcon(appId) {
 // ============================================================
 let walletTab = 'overview';
 function switchWalletTab(tab, el) {
-  playSound('tick');
+  _walletPlaySound('swipe');
   walletTab = tab;
   document.querySelectorAll('.wallet-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
+  if (el) el.classList.add('active');
   renderWalletContent();
 }
 
@@ -4486,7 +4618,7 @@ function saveWalletCard() {
   renderWalletContent(); showNotif('💳','Card updated!','');
 }
 
-function renderWallet() { renderWalletContent(); }
+function renderWallet() { _walletPlaySound('open'); renderWalletContent(); }
 
 function renderWalletContent() {
   // Keep bank header in sync
@@ -4495,6 +4627,7 @@ function renderWalletContent() {
   const c = document.getElementById('wallet-content');
   if (!c) return;
   
+  c.style.padding = '0';
   switch(walletTab) {
     case 'overview': c.innerHTML = walletOverviewHTML(); break;
     case 'expenses': c.innerHTML = walletExpensesHTML(); break;
@@ -4510,173 +4643,137 @@ function walletOverviewHTML() {
   const totalExp = S.expenses.reduce((a,b) => a + b.amount, 0);
   const balance = S.income - totalExp;
   const isPos = balance >= 0;
-  const recentTxns = [...S.expenses].reverse().slice(0,8);
+  const recentTxns = [...S.expenses].reverse().slice(0,6);
   const catTotals = {};
   S.expenses.forEach(e => { const c=e.category||'Other'; catTotals[c]=(catTotals[c]||0)+e.amount; });
   const topCats = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).slice(0,4);
   const catIcons = {'Food':'🍽️','Transport':'🚗','Shopping':'🛍️','Entertainment':'🎬','Bills':'📋','Health':'💊','Other':'📦'};
+  const catColors = ['#a088fa','#fc7790','#f6bb4e','#4edfd0'];
   const thisMonth = new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'});
   const savingsRate = S.income > 0 ? Math.max(0,((S.income-totalExp)/S.income*100)).toFixed(0) : 0;
-  return `<div style="background:#0a0e1a">
-    <!-- Hero balance card -->
-    <div style="background:${S.walletCardGradient||'linear-gradient(145deg,#1c2e4a,#0d1b2e)'};border-radius:20px;padding:22px;margin-bottom:14px;position:relative;overflow:hidden;border:1px solid ${S.walletCardBorder||'rgba(111,150,255,0.2)'}" ondblclick="openWalletCardCustomize()" title="Double-click to customize">
-      <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(111,150,255,0.08)"></div>
-      <div style="position:absolute;bottom:-20px;left:-10px;width:80px;height:80px;border-radius:50%;background:rgba(76,175,110,0.06)"></div>
-      <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Available Balance</div>
-      <div style="font-size:36px;font-weight:800;color:${isPos?'#e8f5e9':'#ffcdd2'};letter-spacing:-1px;margin-bottom:2px">${isPos?'':'–'}£${Math.abs(balance).toFixed(2)}</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.4)">${thisMonth} · ${S.bankDisplayName||'Sakura Bank'}</div>
-      <div style="display:flex;gap:16px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.08)">
-        <div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:2px">MONEY IN</div>
-          <div style="font-size:16px;font-weight:700;color:#4caf6e">+£${S.income.toFixed(2)}</div>
-        </div>
-        <div style="width:1px;background:rgba(255,255,255,0.1)"></div>
-        <div>
-          <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:2px">MONEY OUT</div>
-          <div style="font-size:16px;font-weight:700;color:#fc7790">–£${totalExp.toFixed(2)}</div>
-        </div>
-      </div>
-    </div>
+  const netWorth = (S.income - totalExp) + (S.bankAccounts||[]).reduce((a,b)=>a+(b.balance||0),0);
+  const totalBudget = S.budgets.reduce((a,b)=>a+b.limit,0);
+  const budgetPct = totalBudget > 0 ? Math.min((totalExp/totalBudget)*100,100) : 0;
+  const budgetColor = budgetPct > 90 ? '#fc7790' : budgetPct > 70 ? '#f6bb4e' : '#4caf6e';
 
-    <!-- Quick actions -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
-      <button onclick="openModal('add-income-modal')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:10px 4px;cursor:pointer;color:var(--fg)">
-        <div style="font-size:20px;margin-bottom:4px">➕</div>
-        <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.6)">Add Income</div>
-      </button>
-      <button onclick="openModal('add-expense-modal')" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:10px 4px;cursor:pointer;color:var(--fg)">
-        <div style="font-size:20px;margin-bottom:4px">💸</div>
-        <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.6)">Expense</div>
-      </button>
-      <button onclick="switchWalletTab('budgets',document.querySelectorAll('.wallet-tab')[2])" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:10px 4px;cursor:pointer;color:var(--fg)">
-        <div style="font-size:20px;margin-bottom:4px">📊</div>
-        <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.6)">Budgets</div>
-      </button>
-      <button onclick="switchWalletTab('cards',document.querySelectorAll('.wallet-tab')[5])" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:10px 4px;cursor:pointer;color:var(--fg)">
-        <div style="font-size:20px;margin-bottom:4px">💳</div>
-        <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.6)">Cards</div>
-      </button>
-    </div>
-
-    <!-- Bank Accounts Selector -->
-    <div style="margin-bottom:14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px">Accounts</div>
-        <button onclick="openAddBankAccount()" class="btn btn-ghost btn-sm" style="font-size:9px;padding:2px 8px">+ Add</button>
-      </div>
-      <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px">
-        <div onclick="S.activeBankAccountIdx=0;saveState();renderWalletContent()" style="padding:6px 14px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;background:${(S.activeBankAccountIdx||0)===0?'var(--accent1)':'rgba(255,255,255,0.06)'};color:${(S.activeBankAccountIdx||0)===0?'#fff':'rgba(255,255,255,0.6)'};border:1px solid ${(S.activeBankAccountIdx||0)===0?'transparent':'rgba(255,255,255,0.08)'}">🏦 Main</div>
-        ${(S.bankAccounts||[]).map((acc,ai)=>`<div onclick="S.activeBankAccountIdx=${ai+1};saveState();renderWalletContent()" style="padding:6px 14px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;background:${(S.activeBankAccountIdx||0)===(ai+1)?'var(--accent1)':'rgba(255,255,255,0.06)'};color:${(S.activeBankAccountIdx||0)===(ai+1)?'#fff':'rgba(255,255,255,0.6)'};border:1px solid ${(S.activeBankAccountIdx||0)===(ai+1)?'transparent':'rgba(255,255,255,0.08)'}"><span style="margin-right:4px">${acc.emoji||'🏦'}</span>${acc.name}</div>`).join('')}
-      </div>
-      ${(()=>{const idx=S.activeBankAccountIdx||0;if(idx===0||!S.bankAccounts||!S.bankAccounts[idx-1])return '';const acc=S.bankAccounts[idx-1];return `<div style="background:rgba(160,136,250,0.08);border-radius:12px;padding:10px 14px;margin-top:8px;border:1px solid rgba(160,136,250,0.15);display:flex;align-items:center;gap:12px"><div style="font-size:28px">${acc.emoji||'🏦'}</div><div><div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:2px">${acc.name}</div><div style="font-size:22px;font-weight:800;color:var(--accent1)">£${(acc.balance||0).toFixed(2)}</div>${acc.sortCode?`<div style="font-size:10px;color:rgba(255,255,255,0.3)">Sort: ${acc.sortCode}</div>`:''}</div></div>`;})()}
-    </div>
-    ${topCats.length > 0 ? `
-    <div style="margin-bottom:14px">
-      <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Top Spending</div>
-      <div style="display:flex;flex-direction:column;gap:6px">
-        ${topCats.map(([cat,amt])=>{
-          const catPct = totalExp>0?(amt/totalExp)*100:0;
-          return `<div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:18px;width:24px;text-align:center">${catIcons[cat]||'📦'}</span>
-            <div style="flex:1">
-              <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-                <span style="font-size:12px;color:var(--fg)">${cat}</span>
-                <span style="font-size:12px;font-weight:700;color:var(--pink)">£${amt.toFixed(2)}</span>
-              </div>
-              <div style="height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden">
-                <div style="height:100%;width:${catPct}%;background:linear-gradient(90deg,var(--accent1),var(--pink));border-radius:99px"></div>
-              </div>
-            </div>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>` : ''}
+  return `<div style="background:#050812;min-height:100%;padding:0 0 80px">
 
     <!-- Hero Balance Card -->
-    <div style="background:linear-gradient(145deg,#0d1b34,#152644);padding:24px 20px 20px;position:relative;overflow:hidden">
-      <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(111,150,255,0.06)"></div>
-      <div style="position:absolute;bottom:-20px;left:-20px;width:100px;height:100px;border-radius:50%;background:rgba(76,175,110,0.04)"></div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.45);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Available Balance</div>
-      <div style="font-size:40px;font-weight:900;color:${isPos?'#e8f4fd':'#ffcdd2'};letter-spacing:-1.5px;line-height:1;margin-bottom:6px">${isPos?'':'−'}£${Math.abs(balance).toFixed(2)}</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.35)">${thisMonth} · Current Account</div>
-      <div style="display:flex;gap:0;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.07)">
-        <div style="flex:1;text-align:center">
-          <div style="font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px">Money In</div>
-          <div style="font-size:17px;font-weight:800;color:#4caf6e">+£${S.income.toFixed(2)}</div>
-        </div>
-        <div style="width:1px;background:rgba(255,255,255,0.08)"></div>
-        <div style="flex:1;text-align:center">
-          <div style="font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px">Money Out</div>
-          <div style="font-size:17px;font-weight:800;color:#fc7790">−£${totalExp.toFixed(2)}</div>
-        </div>
-        <div style="width:1px;background:rgba(255,255,255,0.08)"></div>
-        <div style="flex:1;text-align:center">
-          <div style="font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px">Saved</div>
-          <div style="font-size:17px;font-weight:800;color:#6f96ff">${savingsRate}%</div>
+    <div class="wallet-card-in" style="margin:16px 16px 12px;position:relative;border-radius:28px;overflow:hidden;min-height:190px;background:linear-gradient(145deg,#1a0a3a 0%,#0d0525 40%,#1a0530 100%);border:1px solid rgba(160,136,250,0.2);box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(160,136,250,0.08) inset" ondblclick="openWalletCardCustomize()" title="Double-click to customize">
+      <!-- Ambient glows -->
+      <div style="position:absolute;top:-40px;right:-30px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(160,136,250,0.22) 0%,transparent 70%);pointer-events:none"></div>
+      <div style="position:absolute;bottom:-30px;left:-20px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(252,119,144,0.12) 0%,transparent 70%);pointer-events:none"></div>
+      <!-- Shimmer sweep -->
+      <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:28px">
+        <div style="position:absolute;top:0;left:-80%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent);animation:walletShimmer 4s ease-in-out infinite"></div>
+      </div>
+      <div style="position:relative;z-index:1;padding:24px 24px 20px">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">${S.bankDisplayName||'Sakura Bank'} · ${thisMonth}</div>
+        <div class="wallet-balance-pulse" style="font-size:42px;font-weight:800;color:${isPos?'#fff':'#ff8a9a'};letter-spacing:-2px;line-height:1;margin-bottom:4px">${isPos?'':'–'}£${Math.abs(balance).toFixed(2)}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:20px">Available Balance</div>
+        <div style="display:flex;gap:0;background:rgba(0,0,0,0.25);border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)">
+          <div style="flex:1;padding:12px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.06)">
+            <div style="font-size:9px;color:rgba(255,255,255,0.38);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Money In</div>
+            <div style="font-size:16px;font-weight:800;color:#4caf6e">+£${S.income.toFixed(2)}</div>
+          </div>
+          <div style="flex:1;padding:12px 8px;text-align:center;border-right:1px solid rgba(255,255,255,0.06)">
+            <div style="font-size:9px;color:rgba(255,255,255,0.38);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Money Out</div>
+            <div style="font-size:16px;font-weight:800;color:#fc7790">–£${totalExp.toFixed(2)}</div>
+          </div>
+          <div style="flex:1;padding:12px 8px;text-align:center">
+            <div style="font-size:9px;color:rgba(255,255,255,0.38);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Saved</div>
+            <div style="font-size:16px;font-weight:800;color:#a088fa">${savingsRate}%</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Quick Actions Row -->
-    <div style="padding:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+    <!-- Quick Actions -->
+    <div style="padding:0 16px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px" class="wallet-card-in" style="animation-delay:0.06s">
       ${[
-        {icon:'💸',label:'Pay',fn:"openModal('add-expense-modal')"},
-        {icon:'➕',label:'Income',fn:"openModal('add-income-modal')"},
-        {icon:'📊',label:'Budgets',fn:"switchWalletTab('budgets',document.querySelectorAll('.wallet-tab')[2])"},
-        {icon:'💳',label:'Cards',fn:"switchWalletTab('cards',document.querySelectorAll('.wallet-tab')[3])"},
+        {icon:'💸',label:'Pay',fn:"openModal('add-expense-modal');_walletPlaySound('swipe')",color:'rgba(252,119,144,0.15)',border:'rgba(252,119,144,0.2)'},
+        {icon:'➕',label:'Income',fn:"openModal('add-income-modal');_walletPlaySound('income')",color:'rgba(76,175,110,0.15)',border:'rgba(76,175,110,0.2)'},
+        {icon:'📊',label:'Budgets',fn:"switchWalletTab('budgets',document.querySelectorAll('.wallet-tab')[2])",color:'rgba(246,187,78,0.12)',border:'rgba(246,187,78,0.18)'},
+        {icon:'💳',label:'Cards',fn:"switchWalletTab('cards',document.querySelectorAll('.wallet-tab')[3]);_walletPlaySound('swipe')",color:'rgba(160,136,250,0.12)',border:'rgba(160,136,250,0.2)'},
       ].map(a=>`
-        <button onclick="${a.fn}" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:12px 4px;cursor:pointer;color:var(--fg);transition:all 0.15s" onmouseover="this.style.background='rgba(111,150,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
-          <div style="font-size:22px;margin-bottom:5px">${a.icon}</div>
-          <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.6)">${a.label}</div>
+        <button onclick="${a.fn}" class="wallet-quick-btn" style="background:${a.color};border:1px solid ${a.border}">
+          <div style="font-size:22px">${a.icon}</div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.1px">${a.label}</div>
         </button>`).join('')}
     </div>
 
+    <!-- Net Worth Strip -->
+    <div style="margin:0 16px 14px;padding:14px 18px;background:linear-gradient(135deg,rgba(160,136,250,0.1),rgba(199,125,255,0.06));border:1px solid rgba(160,136,250,0.18);border-radius:20px;display:flex;align-items:center;justify-content:space-between" class="wallet-card-in" style="animation-delay:0.1s">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Net Worth</div>
+        <div style="font-size:26px;font-weight:800;color:${netWorth>=0?'#c0a8ff':'#ff8a9a'};letter-spacing:-0.5px">${netWorth>=0?'':'–'}£${Math.abs(netWorth).toFixed(2)}</div>
+      </div>
+      ${totalBudget > 0 ? `
+      <div style="text-align:right">
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">Budget</div>
+        <div style="width:80px;height:6px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden">
+          <div style="height:100%;width:${budgetPct}%;background:${budgetColor};border-radius:99px;transition:width 1s"></div>
+        </div>
+        <div style="font-size:10px;color:${budgetColor};font-weight:700;margin-top:4px">${Math.round(budgetPct)}% used</div>
+      </div>` : ''}
+    </div>
+
+    <!-- Accounts row -->
+    ${(()=>{
+      const accs = S.bankAccounts||[];
+      if (!accs.length) return '';
+      return `<div style="margin:0 16px 14px">
+        <div class="wallet-section-title"><span>Accounts</span><button onclick="openAddBankAccount()" style="background:none;border:none;color:#a088fa;font-size:11px;font-weight:700;cursor:pointer">+ Add</button></div>
+        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none">
+          ${accs.map((acc,ai)=>`<div onclick="S.activeBankAccountIdx=${ai+1};saveState();renderWalletContent()" style="flex-shrink:0;padding:10px 16px;border-radius:16px;cursor:pointer;border:1px solid ${(S.activeBankAccountIdx||0)===(ai+1)?'rgba(160,136,250,0.4)':'rgba(255,255,255,0.07)'};background:${(S.activeBankAccountIdx||0)===(ai+1)?'rgba(160,136,250,0.15)':'rgba(255,255,255,0.03)'};transition:all 0.2s">
+            <div style="font-size:18px;margin-bottom:4px">${acc.emoji||'🏦'}</div>
+            <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.8);white-space:nowrap">${acc.name}</div>
+            <div style="font-size:13px;font-weight:800;color:#a088fa">£${(acc.balance||0).toFixed(2)}</div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    })()}
+
     <!-- Spending Breakdown -->
     ${topCats.length > 0 ? `
-    <div style="padding:0 16px 16px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-size:13px;font-weight:700;color:var(--fg)">Spending This Month</div>
-        <button onclick="switchWalletTab('charts',document.querySelectorAll('.wallet-tab')[4])" style="background:none;border:none;color:#6f96ff;font-size:11px;cursor:pointer">View Charts →</button>
-      </div>
-      <div style="background:rgba(255,255,255,0.03);border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)">
+    <div style="margin:0 16px 14px" class="wallet-card-in" style="animation-delay:0.12s">
+      <div class="wallet-section-title"><span>Spending This Month</span><button onclick="switchWalletTab('charts',document.querySelectorAll('.wallet-tab')[4])" style="background:none;border:none;color:#a088fa;font-size:11px;font-weight:700;cursor:pointer">Charts →</button></div>
+      <div style="background:rgba(255,255,255,0.025);border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,0.055)">
         ${topCats.map(([cat,amt],ci)=>{
           const catPct = totalExp>0?Math.round((amt/totalExp)*100):0;
-          const colors=['#6f96ff','#fc7790','#f6bb4e','#4edfd0'];
-          return `<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;${ci<topCats.length-1?'border-bottom:1px solid rgba(255,255,255,0.04)':''}">
-            <div style="width:36px;height:36px;border-radius:12px;background:${colors[ci]}18;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${catIcons[cat]||'📦'}</div>
+          const col = catColors[ci];
+          return `<div class="wallet-txn-card" style="border-radius:0;border:none;border-bottom:1px solid rgba(255,255,255,0.04);animation-delay:${ci*0.05}s" onmouseenter="this.style.background='rgba(255,255,255,0.05)'" onmouseleave="this.style.background='rgba(255,255,255,0.025)'">
+            <div style="width:40px;height:40px;border-radius:14px;background:${col}18;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid ${col}22">${catIcons[cat]||'📦'}</div>
             <div style="flex:1;min-width:0">
-              <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-                <span style="font-size:12px;font-weight:600;color:var(--fg)">${cat}</span>
-                <span style="font-size:12px;font-weight:700;color:${colors[ci]}">£${amt.toFixed(2)}</span>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.9)">${cat}</span>
+                <span style="font-size:13px;font-weight:800;color:${col}">£${amt.toFixed(2)}</span>
               </div>
-              <div style="height:3px;background:rgba(255,255,255,0.05);border-radius:99px;overflow:hidden">
-                <div style="height:100%;width:${catPct}%;background:${colors[ci]};border-radius:99px;transition:width 0.6s"></div>
+              <div style="height:4px;background:rgba(255,255,255,0.05);border-radius:99px;overflow:hidden">
+                <div style="height:100%;width:${catPct}%;background:linear-gradient(90deg,${col},${col}88);border-radius:99px;transition:width 0.8s cubic-bezier(.4,0,.2,1)"></div>
               </div>
             </div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.3);flex-shrink:0">${catPct}%</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.3);flex-shrink:0;font-weight:600">${catPct}%</div>
           </div>`;
         }).join('')}
       </div>
     </div>` : ''}
 
     <!-- Recent Transactions -->
-    <div style="padding:0 16px 24px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-size:13px;font-weight:700;color:var(--fg)">Recent Payments</div>
-        <button onclick="switchWalletTab('expenses',document.querySelectorAll('.wallet-tab')[1])" style="background:none;border:none;color:#6f96ff;font-size:11px;cursor:pointer;font-weight:600">See all →</button>
-      </div>
-      <div style="background:rgba(255,255,255,0.025);border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)">
-        ${recentTxns.length===0?`<div style="text-align:center;padding:28px;color:rgba(255,255,255,0.25);font-size:12px">No payments yet<br><span style="font-size:24px;display:block;margin-top:8px">💸</span></div>`:''}
+    <div style="margin:0 16px 16px" class="wallet-card-in" style="animation-delay:0.15s">
+      <div class="wallet-section-title"><span>Recent Payments</span><button onclick="switchWalletTab('expenses',document.querySelectorAll('.wallet-tab')[1])" style="background:none;border:none;color:#a088fa;font-size:11px;font-weight:700;cursor:pointer">See all →</button></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${recentTxns.length===0 ? `<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.2)"><div style="font-size:40px;margin-bottom:8px">💸</div><div style="font-size:13px;font-weight:500">No payments yet</div></div>` : ''}
         ${recentTxns.map((e,i)=>`
-          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;${i<recentTxns.length-1?'border-bottom:1px solid rgba(255,255,255,0.04)':''}">
-            <div style="width:38px;height:38px;border-radius:12px;background:rgba(252,119,144,0.1);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${e.emoji||'📦'}</div>
+          <div class="wallet-txn-in wallet-txn-card" style="animation-delay:${i*0.05}s" onmouseenter="this.style.background='rgba(255,255,255,0.055)'" onmouseleave="this.style.background='rgba(255,255,255,0.03)'">
+            <div style="width:42px;height:42px;border-radius:14px;background:rgba(252,119,144,0.1);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid rgba(252,119,144,0.12)">${e.emoji||'📦'}</div>
             <div style="flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:600;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.title}</div>
-              <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px">${e.category||'Other'} · ${e.date||'Today'}</div>
+              <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.92);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.title}</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px;font-weight:500">${e.category||'Other'} · ${e.date||'Today'}</div>
             </div>
             <div style="text-align:right;flex-shrink:0">
-              <div style="font-size:14px;font-weight:800;color:#fc7790">−£${e.amount.toFixed(2)}</div>
-              <div style="font-size:9px;color:rgba(255,255,255,0.2);margin-top:2px">Paid</div>
+              <div style="font-size:14px;font-weight:800;color:#fc7790">–£${e.amount.toFixed(2)}</div>
+              <div style="font-size:9px;color:rgba(255,255,255,0.2);margin-top:2px;font-weight:600">PAID</div>
             </div>
           </div>`).join('')}
       </div>
@@ -4684,72 +4781,125 @@ function walletOverviewHTML() {
   </div>`;
 }
 
+
 function openAddIncomeModal() {
   const amt = parseFloat(prompt('Add income (£):'));
   if (!isNaN(amt) && amt>0) { S.income += amt; saveState(); playSound('coin'); renderWalletContent(); showNotif('💰','Income added',`+£${amt.toFixed(2)}`); }
 }
 
 function walletExpensesHTML() {
-  return `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div style="font-size:16px;font-weight:700;color:var(--fg)">All Expenses</div>
-      <button class="btn btn-primary btn-sm" onclick="openModal('add-expense-modal')">+ Add</button>
+  const catColors = {'Food':'#fc7790','Transport':'#f6bb4e','Shopping':'#a088fa','Entertainment':'#4edfd0','Bills':'#6f96ff','Health':'#4caf6e','Other':'#c0b9f5'};
+  const grouped = {};
+  [...S.expenses].reverse().forEach(e => {
+    const key = e.date || 'Today';
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(e);
+  });
+  return `<div style="background:#050812;min-height:100%;padding:16px 16px 80px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <div style="font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.3px">Payments</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px">${S.expenses.length} transaction${S.expenses.length!==1?'s':''}</div>
+      </div>
+      <button onclick="openModal('add-expense-modal');_walletPlaySound('expense')" style="background:linear-gradient(135deg,rgba(160,136,250,0.2),rgba(199,125,255,0.15));border:1px solid rgba(160,136,250,0.3);border-radius:14px;padding:8px 16px;font-size:12px;font-weight:800;color:#c0a0ff;cursor:pointer">+ Add</button>
     </div>
-    ${S.expenses.length === 0 ? '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:40px">No expenses yet</div>' : ''}
-    ${S.expenses.map((e,i) => `
-      <div class="card2" style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-        <span style="font-size:24px">${e.emoji||'📦'}</span>
-        <div style="flex:1">
-          <div style="font-size:13px;font-weight:600;color:var(--fg)">${e.title}</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.4)">${e.category||'Other'} • ${e.date||'Today'}</div>
+    ${S.expenses.length === 0 ? `<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.2)"><div style="font-size:48px;margin-bottom:12px">💸</div><div style="font-size:14px;font-weight:600">No payments yet</div></div>` : ''}
+    ${Object.entries(grouped).map(([date, items]) => `
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">${date}</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${items.map((e,_i) => {
+            const globalIdx = S.expenses.indexOf(e);
+            const col = catColors[e.category||'Other'] || '#c0b9f5';
+            return `<div class="wallet-txn-card" onmouseenter="this.style.background='rgba(255,255,255,0.055)'" onmouseleave="this.style.background='rgba(255,255,255,0.03)'">
+              <div style="width:44px;height:44px;border-radius:15px;background:${col}15;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid ${col}22">${e.emoji||'📦'}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.92);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${e.title}</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px">${e.category||'Other'}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+                <div style="font-size:14px;font-weight:800;color:#fc7790">–£${e.amount.toFixed(2)}</div>
+                <button onclick="removeExpense(${globalIdx})" style="width:26px;height:26px;border-radius:8px;background:rgba(252,119,144,0.12);border:1px solid rgba(252,119,144,0.2);color:rgba(252,119,144,0.8);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center">✕</button>
+              </div>
+            </div>`;
+          }).join('')}
         </div>
-        <div style="font-size:14px;font-weight:700;color:var(--pink)">-£${e.amount.toFixed(2)}</div>
-        <button class="btn btn-danger btn-sm" onclick="removeExpense(${i})">✕</button>
       </div>`).join('')}
-  `;
+  </div>`;
 }
 
 function walletBudgetsHTML() {
-  return `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div style="font-size:16px;font-weight:700;color:var(--fg)">Budgets</div>
-      <button class="btn btn-primary btn-sm" onclick="openModal('add-budget-modal')">+ Budget</button>
+  const totalSpent = S.budgets.reduce((a,b)=>a+b.spent,0);
+  const totalLimit = S.budgets.reduce((a,b)=>a+b.limit,0);
+  return `<div style="background:#050812;min-height:100%;padding:16px 16px 80px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <div style="font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.3px">Budgets</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px">${S.budgets.length} budget${S.budgets.length!==1?'s':''}</div>
+      </div>
+      <button onclick="openModal('add-budget-modal');_walletPlaySound('swipe')" style="background:linear-gradient(135deg,rgba(160,136,250,0.2),rgba(199,125,255,0.15));border:1px solid rgba(160,136,250,0.3);border-radius:14px;padding:8px 16px;font-size:12px;font-weight:800;color:#c0a0ff;cursor:pointer">+ Budget</button>
     </div>
+    ${totalLimit > 0 ? `
+    <div style="margin-bottom:16px;padding:16px 18px;background:linear-gradient(135deg,rgba(160,136,250,0.1),rgba(78,223,208,0.06));border:1px solid rgba(160,136,250,0.15);border-radius:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px">Total Budget</div>
+        <div style="font-size:12px;font-weight:800;color:rgba(255,255,255,0.7)">£${totalSpent.toFixed(2)} / £${totalLimit.toFixed(2)}</div>
+      </div>
+      <div style="height:6px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${Math.min((totalSpent/totalLimit)*100,100)}%;background:linear-gradient(90deg,#a088fa,#4edfd0);border-radius:99px;transition:width 0.8s"></div>
+      </div>
+    </div>` : ''}
+    <div style="display:flex;flex-direction:column;gap:10px">
     ${S.budgets.map((b,i) => {
       const pct = b.limit > 0 ? Math.min((b.spent/b.limit)*100,100) : 0;
-      const color = pct > 90 ? 'var(--pink)' : pct > 70 ? 'var(--warn)' : 'var(--green)';
-      return `
-      <div class="card" style="margin-bottom:10px">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-          <span style="font-size:28px">${b.emoji||'📊'}</span>
+      const col = pct > 90 ? '#fc7790' : pct > 70 ? '#f6bb4e' : '#4caf6e';
+      const left = b.limit - b.spent;
+      if(pct > 85) setTimeout(() => _walletPlaySound('budget_alert'), 500);
+      return `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:16px 18px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;right:0;width:80px;height:80px;border-radius:0 20px 0 80px;background:${col}08;pointer-events:none"></div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+          <div style="width:44px;height:44px;border-radius:14px;background:${col}15;display:flex;align-items:center;justify-content:center;font-size:22px;border:1px solid ${col}22">${b.emoji||'📊'}</div>
           <div style="flex:1">
-            <div style="font-size:14px;font-weight:700;color:var(--fg)">${b.name}</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.5)">£${b.spent.toFixed(2)} / £${b.limit.toFixed(2)}</div>
+            <div style="font-size:14px;font-weight:800;color:rgba(255,255,255,0.92)">${b.name}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px">£${b.spent.toFixed(2)} spent · £${Math.max(0,left).toFixed(2)} left</div>
           </div>
-          <button class="btn btn-danger btn-sm" onclick="removeBudget(${i})">✕</button>
+          <button onclick="removeBudget(${i})" style="width:28px;height:28px;border-radius:9px;background:rgba(252,119,144,0.1);border:1px solid rgba(252,119,144,0.2);color:rgba(252,119,144,0.7);cursor:pointer;font-size:11px">✕</button>
         </div>
-        <div class="stat-bar"><div class="stat-fill" style="width:${pct}%;background:${color}"></div></div>
+        <div style="height:7px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;margin-bottom:8px">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${col},${col}88);border-radius:99px;transition:width 1s cubic-bezier(.4,0,.2,1)"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:11px;font-weight:700;color:${col}">${Math.round(pct)}% used</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:600">of £${b.limit.toFixed(2)}</div>
+        </div>
       </div>`;
     }).join('')}
-    ${S.budgets.length === 0 ? '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:40px">No budgets yet</div>' : ''}
-  `;
+    </div>
+    ${S.budgets.length === 0 ? `<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.2)"><div style="font-size:48px;margin-bottom:12px">📊</div><div style="font-size:14px;font-weight:600">No budgets yet</div><div style="font-size:11px;margin-top:4px">Create one to track your spending</div></div>` : ''}
+  </div>`;
 }
 
 function walletChartsHTML() {
-  return `
-    <div style="font-size:15px;font-weight:700;color:var(--fg);margin-bottom:12px">Spending Chart</div>
-    <canvas id="wallet-line-chart" width="320" height="200" style="border-radius:12px"></canvas>
-    <button class="btn btn-primary btn-sm" style="width:100%;margin-top:10px" onclick="addChartDataPoint()">+ Add Data Point</button>
-    <div id="chart-data-list" style="margin-top:12px"></div>
-  `;
+  return `<div style="background:#050812;min-height:100%;padding:16px 16px 80px">
+    <div style="font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:16px">Spending Chart</div>
+    <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:16px;margin-bottom:14px">
+      <canvas id="wallet-line-chart" width="280" height="180" style="border-radius:8px;width:100%"></canvas>
+    </div>
+    <button onclick="addChartDataPoint()" style="width:100%;padding:13px;border-radius:16px;background:linear-gradient(135deg,rgba(160,136,250,0.15),rgba(199,125,255,0.1));border:1px solid rgba(160,136,250,0.25);color:#c0a0ff;font-size:13px;font-weight:800;cursor:pointer;margin-bottom:12px">+ Add Data Point</button>
+    <div id="chart-data-list"></div>
+  </div>`;
 }
 
 function walletPerformanceHTML() {
-  return `
-    <div style="font-size:15px;font-weight:700;color:var(--fg);margin-bottom:12px">Performance</div>
-    <canvas id="perf-bar-chart" width="320" height="200" style="border-radius:12px;margin-bottom:12px"></canvas>
-    <canvas id="perf-pie-chart" width="200" height="200" style="border-radius:50%;display:block;margin:0 auto"></canvas>
-  `;
+  return `<div style="background:#050812;min-height:100%;padding:16px 16px 80px">
+    <div style="font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.3px;margin-bottom:16px">Performance</div>
+    <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:16px;margin-bottom:14px">
+      <canvas id="perf-bar-chart" width="280" height="180" style="border-radius:8px;margin-bottom:12px;width:100%"></canvas>
+    </div>
+    <div style="background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:20px;padding:16px;display:flex;justify-content:center">
+      <canvas id="perf-pie-chart" width="180" height="180" style="border-radius:50%"></canvas>
+    </div>
+  </div>`;
 }
 
 function walletPrincessHTML() {
@@ -5314,10 +5464,14 @@ function launchConfetti() {
 // ============================================================
 let shopTab = 'rewards';
 function switchShopTab(tab, el) {
-  playSound('tick');
+  _shopPlaySound('tab');
   shopTab = tab;
-  document.querySelectorAll('#screen-shop .tab-btn').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
+  document.querySelectorAll('.shop-pill-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else {
+    const btn = document.querySelector(`.shop-pill-tab[data-tab="${tab}"]`);
+    if (btn) btn.classList.add('active');
+  }
   renderShopContent();
 }
 
@@ -5330,7 +5484,56 @@ function stepNum(id, delta, min) {
   el.value = v;
 }
 
-function renderShop() { renderShopContent(); }
+function renderShop() { _shopPlaySound('open'); renderShopContent(); }
+
+// ── Shop Sound Effects ──────────────────────────────
+function _shopPlaySound(type) {
+  try {
+    const ctx = getAudioCtx();
+    const t = ctx.currentTime;
+    if (type === 'open') {
+      // Shop open: bright rising chime
+      [523, 659, 784].forEach((f, i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = 'sine'; o.frequency.value = f;
+        g.gain.setValueAtTime(0, t+i*0.07); g.gain.linearRampToValueAtTime(0.1, t+i*0.07+0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, t+i*0.07+0.22);
+        o.start(t+i*0.07); o.stop(t+i*0.07+0.22);
+      });
+    } else if (type === 'buy') {
+      // Buy: satisfying coin + chime
+      [880, 1047, 1319, 1568].forEach((f, i) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = i < 2 ? 'triangle' : 'sine'; o.frequency.value = f;
+        g.gain.setValueAtTime(0, t+i*0.06); g.gain.linearRampToValueAtTime(0.13, t+i*0.06+0.01);
+        g.gain.exponentialRampToValueAtTime(0.001, t+i*0.06+0.25);
+        o.start(t+i*0.06); o.stop(t+i*0.06+0.25);
+      });
+    } else if (type === 'tab') {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine'; o.frequency.setValueAtTime(700, t); o.frequency.linearRampToValueAtTime(900, t+0.06);
+      g.gain.setValueAtTime(0.07, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.06);
+      o.start(t); o.stop(t+0.06);
+    } else if (type === 'hover') {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine'; o.frequency.value = 1200;
+      g.gain.setValueAtTime(0.04, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.04);
+      o.start(t); o.stop(t+0.04);
+    } else if (type === 'close') {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine'; o.frequency.setValueAtTime(600, t); o.frequency.exponentialRampToValueAtTime(320, t+0.1);
+      g.gain.setValueAtTime(0.07, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.1);
+      o.start(t); o.stop(t+0.1);
+    } else if (type === 'error') {
+      playSound('error');
+    }
+  } catch(e) {}
+}
 
 function renderShopContent() {
   const c = document.getElementById('shop-content');
@@ -17565,16 +17768,19 @@ function sendDiscordMsg() {
 // CREDIT CARDS
 // ============================================================
 function walletCardsHTML() {
-  return `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div style="font-size:16px;font-weight:700;color:var(--fg)">My Cards</div>
-      <button class="btn btn-primary btn-sm" onclick="openModal('add-card-modal')">+ Add Card</button>
+  return `<div style="background:#050812;min-height:100%;padding:16px 16px 80px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <div style="font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.3px">My Cards</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px">${(S.creditCards||[]).length} card${(S.creditCards||[]).length!==1?'s':''}</div>
+      </div>
+      <button onclick="openModal('add-card-modal');_walletPlaySound('swipe')" style="background:linear-gradient(135deg,rgba(160,136,250,0.2),rgba(199,125,255,0.15));border:1px solid rgba(160,136,250,0.3);border-radius:14px;padding:8px 16px;font-size:12px;font-weight:800;color:#c0a0ff;cursor:pointer">+ Add Card</button>
     </div>
-    <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;flex-direction:column;gap:16px">
       ${(S.creditCards||[]).map((card,i) => renderCardHTML(card, i)).join('')}
-      ${!(S.creditCards||[]).length ? '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:40px;font-size:13px">Add your first card! 💳</div>' : ''}
+      ${!(S.creditCards||[]).length ? '<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.2)"><div style="font-size:48px;margin-bottom:12px">💳</div><div style="font-size:14px;font-weight:600">No cards yet</div><div style="font-size:11px;margin-top:4px">Add your first card to get started</div></div>' : ''}
     </div>
-  `;
+  </div>`;
 }
 
 function renderCardHTML(card, i) {
@@ -18034,7 +18240,7 @@ function renderSettings() {
         <div style="padding:12px 14px" id="sett-update-action">
           ${window._latestVersionData
             ? '<button onclick="window._applyLiveUpdate()" style="width:100%;padding:11px;border-radius:14px;background:linear-gradient(135deg,#a088fa,#fb99d5);border:none;color:#fff;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(160,136,250,0.35)">📥 Install v' + window._latestVersionData.version + '</button>'
-            : '<button id="sett-check-btn" onclick="window._settingsCheckForUpdate()" style="width:100%;padding:11px;border-radius:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-size:13px;font-weight:700;cursor:pointer">🔍 Check for Updates</button>'
+            : '<button id="sett-check-btn" onclick="window._settingsCheckForUpdate()" style="width:100%;padding:13px;border-radius:16px;background:linear-gradient(135deg,rgba(160,136,250,0.12),rgba(252,119,144,0.08));border:1px solid rgba(160,136,250,0.25);color:rgba(255,255,255,0.85);font-size:13px;font-weight:700;cursor:pointer;position:relative;overflow:hidden;letter-spacing:0.2px;transition:all 0.2s"><span id=\'sett-check-label\'>Check for Updates</span></button>'
           }
         </div>
       </div>
@@ -18046,12 +18252,34 @@ window._settingsCheckForUpdate = async function() {
   const btn    = document.getElementById('sett-check-btn');
   const status = document.getElementById('sett-update-status');
   const action = document.getElementById('sett-update-action');
-  if (!btn) return;
+  if (!btn || btn.disabled) return;
 
-  // Show spinner state
+  // iOS 26-style animated progress bar state
   btn.disabled = true;
-  btn.textContent = '⏳ Checking…';
-  btn.style.opacity = '0.6';
+  btn.style.background = 'linear-gradient(135deg,rgba(160,136,250,0.15),rgba(252,119,144,0.1))';
+  btn.style.border = '1px solid rgba(160,136,250,0.4)';
+  btn.innerHTML = '<div style="position:relative;z-index:1">'
+    + '<div id="sett-check-progress-wrap" style="position:absolute;inset:0;border-radius:14px;overflow:hidden;pointer-events:none">'
+    + '<div id="sett-check-progress-fill" style="position:absolute;top:0;left:0;height:100%;width:0%;background:linear-gradient(90deg,rgba(160,136,250,0.25),rgba(252,119,144,0.2));transition:width 0.4s cubic-bezier(.4,0,.2,1);border-radius:14px"></div>'
+    + '<div id="sett-check-progress-shimmer" style="position:absolute;top:0;left:-60%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent);animation:settCheckShimmer 1.4s ease-in-out infinite;border-radius:14px"></div>'
+    + '</div>'
+    + '<span id="sett-check-label" style="position:relative;z-index:1;color:rgba(255,255,255,0.9);font-weight:700;font-size:13px;letter-spacing:0.2px">Searching for updates…</span>'
+    + '</div>';
+
+  // Inject shimmer keyframe once
+  if (!document.getElementById('sett-check-style')) {
+    const s = document.createElement('style');
+    s.id = 'sett-check-style';
+    s.textContent = '@keyframes settCheckShimmer{0%{left:-60%}100%{left:120%}}';
+    document.head.appendChild(s);
+  }
+
+  // Animate progress bar: 0→60% during fetch, 60→95% while processing, 100% on done
+  const fill = () => document.getElementById('sett-check-progress-fill');
+  const label = () => document.getElementById('sett-check-label');
+  setTimeout(() => { if(fill()) fill().style.width='30%'; }, 100);
+  setTimeout(() => { if(fill()) fill().style.width='55%'; if(label()) label().textContent='Checking server…'; }, 600);
+  setTimeout(() => { if(fill()) fill().style.width='75%'; if(label()) label().textContent='Reading version…'; }, 1200);
 
   try {
     const resp = await fetch(GITHUB_RAW_URL + '?_t=' + Date.now(), { cache: 'no-store' });
@@ -18061,34 +18289,37 @@ window._settingsCheckForUpdate = async function() {
     if (!match) throw new Error('Version not found');
     const remoteVersion = match[1];
 
+    // Complete progress
+    if(fill()) { fill().style.width='100%'; fill().style.background='linear-gradient(90deg,rgba(160,136,250,0.4),rgba(78,223,208,0.3))'; }
+
+    await new Promise(r => setTimeout(r, 350));
+
     if (remoteVersion === GAME_VERSION) {
-      // Already up to date
       if (status) { status.textContent = '✅ Up to date'; status.style.color = '#4caf6e'; }
       btn.disabled = false;
-      btn.textContent = '✅ Already up to date';
-      btn.style.opacity = '1';
-      btn.style.color = '#4caf6e';
-      // Reset button text after 3s
+      btn.style.background = 'linear-gradient(135deg,rgba(76,175,110,0.15),rgba(78,223,208,0.1))';
+      btn.style.border = '1px solid rgba(76,175,110,0.35)';
+      btn.innerHTML = '<span style="color:#4caf6e;font-weight:700;font-size:13px">✓ You\'re up to date</span>';
       setTimeout(() => {
         if (btn.parentNode) {
-          btn.textContent = '🔍 Check for Updates';
-          btn.style.color = 'rgba(255,255,255,0.7)';
+          btn.style.background = 'linear-gradient(135deg,rgba(160,136,250,0.12),rgba(252,119,144,0.08))';
+          btn.style.border = '1px solid rgba(160,136,250,0.25)';
+          btn.innerHTML = '<span id="sett-check-label">Check for Updates</span>';
         }
       }, 3000);
     } else {
-      // Update found — call the same handler as the auto-poller
       _handleUpdateAvailable(remoteVersion, '', GITHUB_RAW_URL);
-      // Replace the whole action area with the Install button
       if (action) {
-        action.innerHTML = '<button onclick="window._applyLiveUpdate()" style="width:100%;padding:11px;border-radius:14px;background:linear-gradient(135deg,#a088fa,#fb99d5);border:none;color:#fff;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(160,136,250,0.35)">📥 Install v' + remoteVersion + '</button>';
+        action.innerHTML = '<button onclick="window._applyLiveUpdate()" style="width:100%;padding:13px;border-radius:16px;background:linear-gradient(135deg,#a088fa,#fb99d5);border:none;color:#fff;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 4px 20px rgba(160,136,250,0.45);letter-spacing:0.3px">📥 Install v' + remoteVersion + '</button>';
       }
       if (status) { status.textContent = '⚠️ Update Available'; status.style.color = '#f6bb4e'; }
     }
   } catch(e) {
     if (status) { status.textContent = '⚠️ Check failed'; status.style.color = '#ff6b6b'; }
     btn.disabled = false;
-    btn.textContent = '🔍 Retry';
-    btn.style.opacity = '1';
+    btn.style.background = 'linear-gradient(135deg,rgba(252,119,144,0.12),rgba(255,100,100,0.08))';
+    btn.style.border = '1px solid rgba(252,119,144,0.3)';
+    btn.innerHTML = '<span id="sett-check-label" style="color:#ff8a9a">⚠ Retry</span>';
   }
 };
 
@@ -19085,18 +19316,20 @@ function notifPanelHide() {
 // Drag down from top-left to open — eased physics
 function notifPanelDragStart(e) {
   if (_notifPanelOpen) return;
+  if (e.touches) e.preventDefault(); // prevent Chrome pull-to-refresh
   _notifPanelDragging = true;
   _notifPanelDragStartY = (e.touches ? e.touches[0].clientY : e.clientY);
   const panel = document.getElementById('notif-panel');
   if (panel) panel.style.transition = 'none';
   const onMove = (e2) => {
     if (!_notifPanelDragging) return;
+    if (e2.cancelable) e2.preventDefault(); // block pull-to-refresh during drag
     const y  = (e2.touches ? e2.touches[0].clientY : e2.clientY);
     const dy = y - _notifPanelDragStartY;
     if (dy > 0) {
-      const pct  = Math.min(dy / 320, 1);
-      const ease = 1 - Math.pow(1 - pct, 2.5);
-      if (panel) panel.style.transform = `translateY(calc(-100% + ${ease * 100}%))`;
+      const pct  = Math.min(dy / 280, 1);
+      const ease = 1 - Math.pow(1 - pct, 2.2);
+      if (panel) panel.style.transform = 'translateY(calc(-100% + ' + (ease * 100) + '%))';
     }
   };
   const onEnd = (e2) => {
@@ -19104,7 +19337,7 @@ function notifPanelDragStart(e) {
     _notifPanelDragging = false;
     const y  = (e2.changedTouches ? e2.changedTouches[0].clientY : e2.clientY);
     const dy = y - _notifPanelDragStartY;
-    if (dy > 80) notifPanelShow(); else notifPanelHide();
+    if (dy > 60) notifPanelShow(); else notifPanelHide();
     document.removeEventListener('mousemove', onMove);
     document.removeEventListener('mouseup',   onEnd);
     document.removeEventListener('touchmove', onMove);
@@ -19112,7 +19345,7 @@ function notifPanelDragStart(e) {
   };
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup',   onEnd);
-  document.addEventListener('touchmove', onMove, { passive: true });
+  document.addEventListener('touchmove', onMove, { passive: false }); // must be non-passive to call preventDefault
   document.addEventListener('touchend',  onEnd);
 }
 
@@ -19125,9 +19358,10 @@ function notifPanelSwipeUpStart(e) {
   if (panel) panel.style.transition = 'none';
   const onMove = (e2) => {
     if (!_notifPanelDraggingUp) return;
+    if (e2.cancelable) e2.preventDefault();
     const y  = (e2.touches ? e2.touches[0].clientY : e2.clientY);
     const dy = y - _notifPanelDragStartYUp;
-    if (dy < 0 && panel) panel.style.transform = `translateY(${Math.max(dy, -window.innerHeight) * 0.6}px)`;
+    if (dy < 0 && panel) panel.style.transform = 'translateY(' + Math.max(dy, -window.innerHeight) * 0.6 + 'px)';
   };
   const onEnd = (e2) => {
     if (!_notifPanelDraggingUp) return;
@@ -19142,9 +19376,22 @@ function notifPanelSwipeUpStart(e) {
   };
   document.addEventListener('mousemove', onMove);
   document.addEventListener('mouseup',   onEnd);
-  document.addEventListener('touchmove', onMove, { passive: true });
+  document.addEventListener('touchmove', onMove, { passive: false });
   document.addEventListener('touchend',  onEnd);
 }
+
+// Wire drag zone touchstart via JS so we can use passive:false and call preventDefault
+(function() {
+  function _wireDragZone() {
+    const dz = document.getElementById('notif-drag-zone');
+    if (!dz) return;
+    dz.addEventListener('touchstart', function(e) {
+      notifPanelDragStart(e);
+    }, { passive: false });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _wireDragZone);
+  else setTimeout(_wireDragZone, 200);
+})();
 
 function showBroadcastNotif(icon, title, msg) {
   // Remove any existing broadcast banner
@@ -20697,6 +20944,25 @@ loadState = function() {
 // ============================================================
 const UPDATE_LOGS = [
   {
+    version: '0.1.18',
+    date: 'March 2026',
+    emoji: '💜',
+    title: 'Notification Panel Fixes, Wallet Overhaul, Shop Redesign & Update Flow',
+    items: [
+      { tag:'fix',     text:'Notification Panel — Corner clipping bug fully resolved using clip-path on #phone. Panel corners are now perfectly clipped at all times during drag.' },
+      { tag:'fix',     text:'Notification Panel — Mobile swipe-to-open now uses touch-action:none and preventDefault on touchmove to prevent Chrome pull-to-refresh interfering.' },
+      { tag:'fix',     text:'Notification Panel — Swipe drag zone enlarged and touch sensitivity improved for easier open/close on mobile devices.' },
+      { tag:'new',     text:'Notification Panel — Smart notifications: Quint stack items fire animated purple bubble alerts at their exact scheduled time (London time). Gift ready, calendar events (30min + exact), ticket goal, and admin broadcasts also fire with colour-coded animated bubble styles.' },
+      { tag:'upgrade', text:'Settings — Check for Updates button now shows a beautiful animated iOS 26-style progress bar while searching, with shimmer effects and status states.' },
+      { tag:'upgrade', text:'Wallet App — Full visual overhaul inspired by modern banking apps: glassmorphism balance card, animated transactions, donut chart, net worth tracker, quick-action pill buttons, and smooth entry animations.' },
+      { tag:'new',     text:'Wallet App — New sound effects: card swipe, transaction ping, balance reveal, and budget alert tones using Web Audio API.' },
+      { tag:'new',     text:'Wallet App — Net worth tracker, savings rate sparkline, and monthly spend comparison added to Overview tab.' },
+      { tag:'upgrade', text:'Shop App — Full iOS 26 inspired visual redesign: category pill filter bar, card-based grid layout, glassmorphism item cards with shimmer hover, animated buy flow, and dark-purple palette throughout.' },
+      { tag:'new',     text:'Shop App — New sound effects: shop open chime, item hover tone, purchase confirmation sequence using Web Audio API.' },
+      { tag:'fix',     text:'Favicon — Sakura blossom favicon (transparent background) now correctly embedded as base64 data URI for all browsers.' },
+    ]
+  },
+  {
     version: '0.1.17',
     date: 'March 2026',
     emoji: '✨',
@@ -21318,7 +21584,7 @@ document.getElementById('princess-theme-modal').addEventListener('click', e => {
 
 // ── True globals: var avoids temporal dead zone for code above fbInit ──
 var ADMIN_EMAIL      = "Djrocky2021@gmail.com";
-var GAME_VERSION     = "0.1.17";
+var GAME_VERSION     = "0.1.18";
 var fbCurrentUser    = null;
 var fbDb             = null;
 // Raw GitHub URL — fetched periodically to detect new versions automatically
