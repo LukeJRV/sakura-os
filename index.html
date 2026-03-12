@@ -4689,7 +4689,7 @@ function walletOverviewHTML() {
     </div>
 
     <!-- Quick Actions -->
-    <div style="padding:0 16px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px" class="wallet-card-in" style="animation-delay:0.06s">
+    <div class="wallet-card-in" style="padding:0 16px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;animation-delay:0.06s">
       ${[
         {icon:'💸',label:'Pay',fn:"openModal('add-expense-modal');_walletPlaySound('swipe')",color:'rgba(252,119,144,0.15)',border:'rgba(252,119,144,0.2)'},
         {icon:'➕',label:'Income',fn:"openModal('add-income-modal');_walletPlaySound('income')",color:'rgba(76,175,110,0.15)',border:'rgba(76,175,110,0.2)'},
@@ -4703,7 +4703,7 @@ function walletOverviewHTML() {
     </div>
 
     <!-- Net Worth Strip -->
-    <div style="margin:0 16px 14px;padding:14px 18px;background:linear-gradient(135deg,rgba(160,136,250,0.1),rgba(199,125,255,0.06));border:1px solid rgba(160,136,250,0.18);border-radius:20px;display:flex;align-items:center;justify-content:space-between" class="wallet-card-in" style="animation-delay:0.1s">
+    <div class="wallet-card-in" style="margin:0 16px 14px;padding:14px 18px;background:linear-gradient(135deg,rgba(160,136,250,0.1),rgba(199,125,255,0.06));border:1px solid rgba(160,136,250,0.18);border-radius:20px;display:flex;align-items:center;justify-content:space-between;animation-delay:0.1s">
       <div>
         <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Net Worth</div>
         <div style="font-size:26px;font-weight:800;color:${netWorth>=0?'#c0a8ff':'#ff8a9a'};letter-spacing:-0.5px">${netWorth>=0?'':'–'}£${Math.abs(netWorth).toFixed(2)}</div>
@@ -4736,7 +4736,7 @@ function walletOverviewHTML() {
 
     <!-- Spending Breakdown -->
     ${topCats.length > 0 ? `
-    <div style="margin:0 16px 14px" class="wallet-card-in" style="animation-delay:0.12s">
+    <div class="wallet-card-in" style="margin:0 16px 14px;animation-delay:0.12s">
       <div class="wallet-section-title"><span>Spending This Month</span><button onclick="switchWalletTab('charts',document.querySelectorAll('.wallet-tab')[4])" style="background:none;border:none;color:#a088fa;font-size:11px;font-weight:700;cursor:pointer">Charts →</button></div>
       <div style="background:rgba(255,255,255,0.025);border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,0.055)">
         ${topCats.map(([cat,amt],ci)=>{
@@ -4760,7 +4760,7 @@ function walletOverviewHTML() {
     </div>` : ''}
 
     <!-- Recent Transactions -->
-    <div style="margin:0 16px 16px" class="wallet-card-in" style="animation-delay:0.15s">
+    <div class="wallet-card-in" style="margin:0 16px 16px;animation-delay:0.15s">
       <div class="wallet-section-title"><span>Recent Payments</span><button onclick="switchWalletTab('expenses',document.querySelectorAll('.wallet-tab')[1])" style="background:none;border:none;color:#a088fa;font-size:11px;font-weight:700;cursor:pointer">See all →</button></div>
       <div style="display:flex;flex-direction:column;gap:8px">
         ${recentTxns.length===0 ? `<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.2)"><div style="font-size:40px;margin-bottom:8px">💸</div><div style="font-size:13px;font-weight:500">No payments yet</div></div>` : ''}
@@ -5538,126 +5538,139 @@ function _shopPlaySound(type) {
 function renderShopContent() {
   const c = document.getElementById('shop-content');
   if (!c) return;
+  c.style.padding = '0';
   
   if (shopTab === 'rewards') {
-    // Check timers
     const now = Date.now();
     S.shopItems.forEach(item => { if (item.expiresAt && now > item.expiresAt) item.expired = true; });
     const shopSettings = S.shopSettings || {};
-    c.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-size:16px;font-weight:700;color:var(--fg)">🛒 Reward Shop</div>
-        <div style="display:flex;gap:5px">
-          <button class="btn btn-ghost btn-sm" onclick="openShopSettings()">⚙️</button>
-          ${isAdmin() ? `<button class="btn btn-primary btn-sm" onclick="openModal('add-shop-item-modal')">+ Add</button>` : ''}
+    const available = S.shopItems.filter(item => !(item.originalStock === 0 && item.purchased));
+    c.innerHTML = `<div style="background:#04060f;min-height:100%;padding:16px 16px 80px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.3px">Reward Shop</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px">${available.length} item${available.length!==1?'s':''} available</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="openShopSettings()" style="width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);cursor:pointer;font-size:14px">⚙</button>
+          ${isAdmin() ? `<button onclick="openModal('add-shop-item-modal');_shopPlaySound('tab')" style="padding:7px 14px;border-radius:11px;background:linear-gradient(135deg,rgba(160,136,250,0.2),rgba(199,125,255,0.15));border:1px solid rgba(160,136,250,0.3);color:#c0a0ff;font-size:11px;font-weight:800;cursor:pointer">+ Add</button>` : ''}
         </div>
       </div>
-      ${shopSettings.rotation && shopSettings.rotation!=='none' ? `<div style="font-size:11px;color:var(--gold);margin-bottom:8px;padding:5px 10px;background:rgba(246,187,78,0.1);border-radius:8px;border:1px solid rgba(246,187,78,0.2)">🔄 ${shopSettings.rotation==='daily'?'Daily':'Weekly'} rotation active</div>` : ''}
-      ${S.shopItems.length === 0 ? '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:40px">Add reward items to buy!</div>' : ''}
-      <div style="display:flex;flex-direction:column;gap:8px">
+      ${shopSettings.rotation && shopSettings.rotation!=='none' ? `<div style="font-size:11px;color:rgba(246,187,78,0.9);margin-bottom:12px;padding:8px 14px;background:rgba(246,187,78,0.08);border-radius:12px;border:1px solid rgba(246,187,78,0.15);font-weight:700">🔄 ${shopSettings.rotation==='daily'?'Daily':'Weekly'} rotation active</div>` : ''}
+      ${available.length === 0 ? `<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.2)"><div style="font-size:48px;margin-bottom:12px">🛒</div><div style="font-size:14px;font-weight:600">No items yet</div><div style="font-size:11px;margin-top:4px">Add reward items to the shop</div></div>` : ''}
+      <div style="display:flex;flex-direction:column;gap:10px">
         ${S.shopItems.map((item,i) => {
+          if (item.originalStock === 0 && item.purchased) return '';
           const isExpired = item.expiresAt && now > item.expiresAt;
           const isOut = item.stock === 0 && item.originalStock > 0;
           const isPurchased = (item.purchased && item.originalStock > 0 && item.stock === 0) || (item.purchased && item.originalStock === 0);
-          // Single-use items (originalStock===0) that are purchased should never render
-          if (item.originalStock === 0 && item.purchased) return '';
           const tagStyle = item.tag ? getTagStyle(item.tag) : null;
           const timeLeft = item.expiresAt && !isExpired ? Math.max(0, Math.floor((item.expiresAt - now)/60000)) : null;
-          const outTagStyle = 'position:absolute;top:-8px;left:10px;background:linear-gradient(135deg,#3a2060,#4a1e72);color:#c0b9f5;font-size:9px;font-weight:800;padding:2px 8px;border-radius:99px;z-index:2;text-transform:uppercase;letter-spacing:0.5px;box-shadow:0 2px 8px rgba(100,70,180,0.5);border:1px solid rgba(160,136,250,0.3)';
-          const borderCol = isOut ? 'rgba(252,119,144,0.5)' : isExpired ? 'rgba(255,255,255,0.1)' : '';
-          return `
-          <div id="shop-item-card-${i}" class="shop-item" style="position:relative;overflow:visible${isOut?';border-color:rgba(120,90,200,0.5);background:rgba(80,50,160,0.07)':''}${isExpired?';opacity:0.4':''}">
-            ${isOut ? `<div style="${outTagStyle}">OUT OF STOCK</div>` : tagStyle ? `<div style="position:absolute;top:-8px;left:10px;background:${tagStyle.bg};color:${tagStyle.text};font-size:9px;font-weight:800;padding:2px 7px;border-radius:99px;z-index:2;text-transform:uppercase;letter-spacing:0.5px;box-shadow:0 2px 6px rgba(0,0,0,0.3)">${item.tag}</div>` : ''}
-            <div class="shop-item-icon" style="${isOut?'filter:grayscale(0.5)':''}">${item.emoji||'🎁'}</div>
+          return `<div id="shop-item-card-${i}" class="shop-item shop-item-in" style="animation-delay:${i*0.04}s;${isExpired?'opacity:0.4;':isOut?'border-color:rgba(120,90,200,0.4);background:rgba(60,40,120,0.06);':''}position:relative;overflow:visible">
+            ${isOut ? `<div style="position:absolute;top:-9px;left:12px;background:linear-gradient(135deg,#2a1060,#3a1870);color:#b0a8e8;font-size:8px;font-weight:800;padding:2px 10px;border-radius:99px;z-index:2;text-transform:uppercase;letter-spacing:0.8px;border:1px solid rgba(160,136,250,0.25)">OUT OF STOCK</div>`
+              : tagStyle ? `<div style="position:absolute;top:-9px;left:12px;background:${tagStyle.bg};color:${tagStyle.text};font-size:8px;font-weight:800;padding:2px 10px;border-radius:99px;z-index:2;text-transform:uppercase;letter-spacing:0.8px;box-shadow:0 2px 8px rgba(0,0,0,0.3)">${item.tag}</div>` : ''}
+            <div class="shop-item-icon" style="${isOut?'filter:grayscale(0.6);opacity:0.7':''}">${item.emoji||'🎁'}</div>
             <div class="shop-item-info">
               <div class="shop-item-name">${item.name}</div>
-              <div class="shop-item-price" style="${isOut?'color:rgba(160,136,250,0.7)':''}">🎟️ ${item.price} tickets${item.stock>0?` · ${item.stock} left`:item.stock===0?' · OUT':item.originalStock>0?` · ∞`:''}</div>
-              ${timeLeft!==null ? `<div style="font-size:10px;color:var(--pink)">⏱️ ${timeLeft}m left</div>` : ''}
+              <div class="shop-item-price">🎟️ ${item.price} tickets${item.stock>0?' · '+item.stock+' left':item.originalStock>0?' · OUT':''}</div>
+              ${timeLeft!==null ? `<div style="font-size:10px;color:#fc7790;font-weight:700;margin-top:2px">⏱ ${timeLeft}m left</div>` : ''}
             </div>
-            <div style="display:flex;gap:6px;align-items:center">
-              ${isPurchased||isOut||isExpired ? `<div style="font-size:11px;color:rgba(255,255,255,0.3);padding:4px 8px;cursor:default" ${isOut && item.outOfStockAt ? `onmouseenter="showBpTip(this,'⏰ Expires in ${Math.max(0,Math.round((item.outOfStockAt+86400000-Date.now())/60000))}m · Auto-removed after 24h')" onmouseleave="hideBpTip()"` : ''}>${isExpired?'Expired':isOut?'Sold Out':'Bought'}</div>` : 
-                `<button class="btn btn-gold btn-sm shop-buy-btn" id="sbtn_${i}" onclick="buyShopItemWithEffect(${i},this)">Buy</button>`}
-              ${isAdmin() ? '<button class="btn btn-danger btn-sm" onclick="removeShopItem('+i+')">✕</button>' : ''}
+            <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+              ${isPurchased||isOut||isExpired
+                ? `<div style="font-size:10px;color:rgba(255,255,255,0.25);padding:6px 10px;background:rgba(255,255,255,0.04);border-radius:10px;font-weight:700">${isExpired?'Expired':isOut?'Sold Out':'Bought'}</div>`
+                : `<button id="sbtn_${i}" onclick="buyShopItemWithEffect(${i},this);_shopPlaySound('buy')" style="padding:8px 16px;border-radius:13px;background:linear-gradient(135deg,rgba(246,187,78,0.9),rgba(230,150,20,0.85));border:none;color:#1a0a00;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(246,187,78,0.3);transition:all 0.2s" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">Buy</button>`}
+              ${isAdmin() ? `<button onclick="removeShopItem(${i})" style="width:28px;height:28px;border-radius:9px;background:rgba(252,119,144,0.1);border:1px solid rgba(252,119,144,0.2);color:rgba(252,119,144,0.7);cursor:pointer;font-size:11px;flex-shrink:0">✕</button>` : ''}
             </div>
           </div>`;
         }).join('')}
-      </div>`;
+      </div>
+    </div>`;
+
   } else if (shopTab === 'sakura') {
-    c.innerHTML = `
-      <div style="text-align:center;padding:16px;background:linear-gradient(135deg,rgba(251,171,216,0.1),rgba(202,124,237,0.1));border-radius:16px;border:1px solid rgba(251,171,216,0.2);margin-bottom:16px">
-        <div style="font-size:32px">🌸</div>
-        <div style="font-size:18px;font-weight:700;color:#ffdcf0">Princess Sakura</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.5)">Gift Shop</div>
+    c.innerHTML = `<div style="background:#04060f;min-height:100%;padding:16px 16px 80px">
+      <div style="border-radius:24px;padding:24px 20px;background:linear-gradient(145deg,#2a0520,#150a2e);border:1px solid rgba(251,171,216,0.25);position:relative;overflow:hidden;margin-bottom:18px;box-shadow:0 12px 40px rgba(251,171,216,0.1)">
+        <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(251,171,216,0.15) 0%,transparent 70%)"></div>
+        <div style="font-size:40px;margin-bottom:8px">🌸</div>
+        <div style="font-size:20px;font-weight:800;color:#ffdcf0;margin-bottom:4px">Princess Sakura</div>
+        <div style="font-size:12px;color:rgba(251,171,216,0.6);font-weight:600">Gift Shop · Send gifts with tickets</div>
       </div>
-      <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-        ${isAdmin() ? '<button class="btn btn-pink btn-sm" onclick="openModal(\'add-sakura-modal\')">+ Add Gift</button>' : ''}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,0.85)">${S.sakuraItems.length} gift${S.sakuraItems.length!==1?'s':''} available</div>
+        ${isAdmin() ? `<button onclick="openModal('add-sakura-modal')" style="padding:7px 14px;border-radius:12px;background:rgba(251,171,216,0.12);border:1px solid rgba(251,171,216,0.25);color:#fbabd8;font-size:11px;font-weight:800;cursor:pointer">+ Add Gift</button>` : ''}
       </div>
-      <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;flex-direction:column;gap:10px">
         ${S.sakuraItems.map((item,i) => `
-          <div class="shop-item" style="border-color:rgba(251,171,216,0.3)">
-            <div class="shop-item-icon">${item.emoji||'🌸'}</div>
+          <div class="shop-item shop-item-in" style="animation-delay:${i*0.05}s;border-color:rgba(251,171,216,0.15);background:rgba(251,171,216,0.03)" onmouseenter="this.style.borderColor='rgba(251,171,216,0.35)'" onmouseleave="this.style.borderColor='rgba(251,171,216,0.15)'">
+            <div class="shop-item-icon" style="background:rgba(251,171,216,0.1);border-color:rgba(251,171,216,0.15)">${item.emoji||'🌸'}</div>
             <div class="shop-item-info">
               <div class="shop-item-name">${item.name}</div>
-              <div class="shop-item-price" style="color:#fbabd8">🎟️ ${item.price} tickets</div>
+              <div class="shop-item-price" style="color:rgba(251,171,216,0.85)">🎟️ ${item.price} tickets</div>
             </div>
-            <div style="display:flex;gap:6px">
-              <button class="btn btn-pink btn-sm" onclick="buySakuraItem(${i})">Gift 🌸</button>
-              ${isAdmin() ? '<button class="btn btn-danger btn-sm" onclick="removeSakuraItem('+i+')">✕</button>' : ''}
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              <button onclick="buySakuraItem(${i});_shopPlaySound('buy')" style="padding:8px 14px;border-radius:13px;background:linear-gradient(135deg,rgba(251,171,216,0.9),rgba(252,119,144,0.8));border:none;color:#fff;font-size:11px;font-weight:900;cursor:pointer;white-space:nowrap">Gift 🌸</button>
+              ${isAdmin() ? `<button onclick="removeSakuraItem(${i})" style="width:28px;height:28px;border-radius:9px;background:rgba(252,119,144,0.1);border:1px solid rgba(252,119,144,0.2);color:rgba(252,119,144,0.7);cursor:pointer;font-size:11px">✕</button>` : ''}
             </div>
           </div>`).join('')}
-        ${S.sakuraItems.length === 0 ? '<div style="text-align:center;color:rgba(255,255,255,0.4);padding:40px">Add gifts for Princess Sakura!</div>' : ''}
-      </div>`;
+        ${S.sakuraItems.length === 0 ? `<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.2)"><div style="font-size:40px;margin-bottom:10px">🌸</div><div style="font-size:14px;font-weight:600">No gifts yet</div></div>` : ''}
+      </div>
+    </div>`;
+
   } else if (shopTab === 'themes') {
     themeShopPage = 0;
     _renderThemes(c, 'shop');
+
   } else if (shopTab === 'gacha-sell') {
     const _RC = {common:'#c0b9f5',uncommon:'#4caf6e',rare:'#6f96ff',epic:'#ca7ced',legendary:'#f6bb4e'};
     const _won = S.gachaWonItems||[];
-    c.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    c.innerHTML = `<div style="background:#04060f;min-height:100%;padding:16px 16px 80px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
         <div>
-          <div style="font-size:16px;font-weight:700;color:var(--fg)">🎰 Gacha Collection</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">${_won.length} item${_won.length!==1?'s':''} acquired</div>
+          <div style="font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.3px">Gacha Collection</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px">${_won.length} item${_won.length!==1?'s':''} acquired</div>
         </div>
-        ${_won.length>0?'<button class="btn btn-ghost btn-sm" style="font-size:10px" onclick="clearGachaWon()">🗑️ Clear</button>':''}
+        ${_won.length>0?'<button onclick="clearGachaWon()" style="padding:7px 12px;border-radius:11px;background:rgba(252,119,144,0.1);border:1px solid rgba(252,119,144,0.2);color:rgba(252,119,144,0.8);font-size:11px;font-weight:700;cursor:pointer">🗑 Clear</button>':''}
       </div>
-      <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;flex-direction:column;gap:10px">
         ${_won.slice().reverse().map((b,ri)=>{
           const origIdx=_won.length-1-ri;
           const col=b.color||_RC[b.rarity]||'#a088fa';
           const mult={common:1,uncommon:2,rare:5,epic:10,legendary:25}[b.rarity]||1;
           const sp=Math.max(5,(b.tickets||0)+mult*10);
           const wd=b.wonAt?new Date(b.wonAt).toLocaleDateString():'';
-          return '<div class="shop-item" style="border-color:'+col+'44;background:'+col+'0a">'
-            +'<div class="shop-item-icon" style="background:'+col+'22;border-radius:12px">'+b.emoji+'</div>'
-            +'<div class="shop-item-info">'
-            +'<div class="shop-item-name">'+b.name+'</div>'
-            +'<div style="font-size:10px;font-weight:700;color:'+col+';text-transform:uppercase;margin-top:2px">'+b.rarity+(b.tickets?' · 🎟️'+b.tickets:'')+'</div>'
-            +(wd?'<div style="font-size:9px;color:rgba(255,255,255,0.3)">Won '+wd+'</div>':'')
-            +'</div>'
-            +'<button class="btn btn-gold btn-sm" onclick="sellGachaWon('+origIdx+','+sp+')" style="font-size:10px">Sell<br>+'+sp+'🎟️</button>'
-            +'</div>';
+          return `<div class="shop-item shop-item-in" style="animation-delay:${ri*0.04}s;border-color:${col}30;background:${col}08" onmouseenter="this.style.borderColor='${col}55'" onmouseleave="this.style.borderColor='${col}30'">
+            <div class="shop-item-icon" style="background:${col}18;border-color:${col}22">${b.emoji}</div>
+            <div class="shop-item-info">
+              <div class="shop-item-name">${b.name}</div>
+              <div style="font-size:10px;font-weight:700;color:${col};text-transform:uppercase;letter-spacing:0.5px;margin-top:3px">${b.rarity}${b.tickets?' · 🎟️'+b.tickets:''}</div>
+              ${wd?`<div style="font-size:9px;color:rgba(255,255,255,0.25);margin-top:2px">Won ${wd}</div>`:''}
+            </div>
+            <button onclick="sellGachaWon(${origIdx},${sp});_shopPlaySound('buy')" style="padding:8px 12px;border-radius:13px;background:linear-gradient(135deg,rgba(246,187,78,0.88),rgba(220,140,20,0.82));border:none;color:#1a0a00;font-size:11px;font-weight:900;cursor:pointer;white-space:nowrap;flex-shrink:0">Sell<br>+${sp}🎟️</button>
+          </div>`;
         }).join('')}
-        ${_won.length===0?'<div style="text-align:center;color:rgba(255,255,255,0.4);padding:40px 20px"><div style="font-size:36px;margin-bottom:8px">🎰</div><div style="font-weight:600;margin-bottom:4px">No items won yet</div><div style="font-size:11px">Spin the Gacha Machine to earn items.</div></div>':''}
-      </div>`;
-  } else if (shopTab === 'claw-credits') {
-    c.innerHTML = `
-      <div style="text-align:center;margin-bottom:16px">
-        <div style="font-size:48px">🎰</div>
-        <div style="font-size:18px;font-weight:700;color:var(--fg)">Claw Machine Credits</div>
-        <div style="font-size:14px;color:rgba(255,255,255,0.5)">You have: ${S.clawCredits} credits</div>
+        ${_won.length===0?`<div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.2)"><div style="font-size:48px;margin-bottom:12px">🎰</div><div style="font-size:14px;font-weight:600">No items won yet</div><div style="font-size:11px;margin-top:4px">Spin the Gacha Machine to earn items</div></div>`:''}
       </div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        ${[{n:1,cost:5},{n:5,cost:20},{n:10,cost:35},{n:25,cost:75}].map(p => `
-          <div class="shop-item">
-            <div class="shop-item-icon">🎰</div>
+    </div>`;
+
+  } else if (shopTab === 'claw-credits') {
+    c.innerHTML = `<div style="background:#04060f;min-height:100%;padding:16px 16px 80px">
+      <div style="border-radius:24px;padding:28px 20px 20px;background:linear-gradient(145deg,#0e0520,#05020f);border:1px solid rgba(160,136,250,0.2);text-align:center;margin-bottom:20px;position:relative;overflow:hidden">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(160,136,250,0.12) 0%,transparent 70%);pointer-events:none"></div>
+        <div style="font-size:48px;margin-bottom:10px">🎰</div>
+        <div style="font-size:20px;font-weight:800;color:#fff;margin-bottom:4px">Claw Machine Credits</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.4)">You have <span style="color:#f6bb4e;font-weight:800">${S.clawCredits}</span> credits</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${[{n:1,cost:5,icon:'1️⃣'},{n:5,cost:20,icon:'🖐️'},{n:10,cost:35,icon:'🔟'},{n:25,cost:75,icon:'💥'}].map((p,pi) => `
+          <div class="shop-item shop-item-in" style="animation-delay:${pi*0.06}s">
+            <div class="shop-item-icon" style="font-size:26px">${p.icon}</div>
             <div class="shop-item-info">
               <div class="shop-item-name">${p.n} Credit${p.n>1?'s':''}</div>
-              <div class="shop-item-price">🎟️ ${p.cost} tickets</div>
+              <div class="shop-item-price">🎟️ ${p.cost} tickets${p.n>=10?' · Best Value':p.n>=5?' · Popular':''}</div>
             </div>
-            <button class="btn btn-gold btn-sm" onclick="buyClawCredits(${p.n},${p.cost})">Buy</button>
+            <button onclick="buyClawCredits(${p.n},${p.cost});_shopPlaySound('buy')" style="padding:8px 16px;border-radius:13px;background:linear-gradient(135deg,rgba(246,187,78,0.9),rgba(230,150,20,0.85));border:none;color:#1a0a00;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(246,187,78,0.25)">Buy</button>
           </div>`).join('')}
-      </div>`;
+      </div>
+    </div>`;
   }
 }
 
@@ -18093,7 +18106,7 @@ function renderSettings() {
         <div style="font-size:28px">🌸</div>
         <div style="flex:1">
           <div style="font-size:13px;font-weight:900;color:#fff">Update Available</div>
-          <div style="font-size:11px;color:rgba(160,136,250,0.9);font-weight:700">v${GAME_VERSION} → v${_vd.version}</div>
+          <div style="font-size:11px;color:rgba(160,136,250,0.9);font-weight:700">${GAME_VERSION} → ${_vd.version}</div>
         </div>
         <button onclick="localStorage.setItem('fbver_dismissed_${_vd.version}','1');window._latestVersionData=null;renderSettings()" style="width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.4);font-size:13px;cursor:pointer;flex-shrink:0">✕</button>
       </div>
@@ -18239,7 +18252,7 @@ function renderSettings() {
         </div>
         <div style="padding:12px 14px" id="sett-update-action">
           ${window._latestVersionData
-            ? '<button onclick="window._applyLiveUpdate()" style="width:100%;padding:11px;border-radius:14px;background:linear-gradient(135deg,#a088fa,#fb99d5);border:none;color:#fff;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(160,136,250,0.35)">📥 Install v' + window._latestVersionData.version + '</button>'
+            ? '<button onclick="window._applyLiveUpdate()" style="width:100%;padding:11px;border-radius:14px;background:linear-gradient(135deg,#a088fa,#fb99d5);border:none;color:#fff;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(160,136,250,0.35)">📥 Install ' + window._latestVersionData.version + '</button>'
             : '<button id="sett-check-btn" onclick="window._settingsCheckForUpdate()" style="width:100%;padding:13px;border-radius:16px;background:linear-gradient(135deg,rgba(160,136,250,0.12),rgba(252,119,144,0.08));border:1px solid rgba(160,136,250,0.25);color:rgba(255,255,255,0.85);font-size:13px;font-weight:700;cursor:pointer;position:relative;overflow:hidden;letter-spacing:0.2px;transition:all 0.2s"><span id=\'sett-check-label\'>Check for Updates</span></button>'
           }
         </div>
@@ -18310,7 +18323,7 @@ window._settingsCheckForUpdate = async function() {
     } else {
       _handleUpdateAvailable(remoteVersion, '', GITHUB_RAW_URL);
       if (action) {
-        action.innerHTML = '<button onclick="window._applyLiveUpdate()" style="width:100%;padding:13px;border-radius:16px;background:linear-gradient(135deg,#a088fa,#fb99d5);border:none;color:#fff;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 4px 20px rgba(160,136,250,0.45);letter-spacing:0.3px">📥 Install v' + remoteVersion + '</button>';
+        action.innerHTML = '<button onclick="window._applyLiveUpdate()" style="width:100%;padding:13px;border-radius:16px;background:linear-gradient(135deg,#a088fa,#fb99d5);border:none;color:#fff;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 4px 20px rgba(160,136,250,0.45);letter-spacing:0.3px">📥 Install ' + remoteVersion + '</button>';
       }
       if (status) { status.textContent = '⚠️ Update Available'; status.style.color = '#f6bb4e'; }
     }
