@@ -17831,8 +17831,6 @@ window._settingsCheckForUpdate = async function() {
     const match = html.match(/var GAME_VERSION\s*=\s*"([^"]+)"/);
     if (!match) throw new Error('Version not found');
     const remoteVersion = match[1];
-    // Validate strict semver format — reject malformed CDN responses
-    if (!remoteVersion || !/^\d+\.\d+\.\d+$/.test(remoteVersion)) throw new Error('Invalid version format: ' + remoteVersion);
 
     if (remoteVersion === GAME_VERSION) {
       // Already up to date
@@ -20785,18 +20783,14 @@ function fbCheckVersion() {
 
 async function _doVersionCheck() {
   try {
-    const resp = await fetch(GITHUB_RAW_URL + '?_t=' + Date.now(), {
-      cache: 'no-store',
-      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
-    });
+    const resp = await fetch(GITHUB_RAW_URL + '?_t=' + Date.now(), { cache: 'no-store' });
     if (!resp.ok) return;
     const html = await resp.text();
+    // GAME_VERSION is declared near line 12503 — always present in file
     const match = html.match(/var GAME_VERSION\s*=\s*"([^"]+)"/);
     if (!match) return;
     const remoteVersion = match[1];
-    // Validate strict semver format (e.g. 0.1.17) — reject anything malformed
-    if (!remoteVersion || !/^\d+\.\d+\.\d+$/.test(remoteVersion)) return;
-    if (remoteVersion !== GAME_VERSION) {
+    if (remoteVersion && remoteVersion !== GAME_VERSION) {
       _handleUpdateAvailable(remoteVersion, '', GITHUB_RAW_URL);
     }
   } catch(e) {
@@ -20817,7 +20811,7 @@ function _handleUpdateAvailable(newVersion, notes, url) {
 
   // 2. Tappable broadcast notification — navigates to Settings on tap
   setTimeout(() => {
-    showBroadcastNotif('🌸', 'Update Available — v' + newVersion,
+    showBroadcastNotif('🌸', 'Update Available — ' + newVersion,
       (notes || 'A new version of Sakura OS is ready') + ' • Tap to go to Settings');
     const banners = document.querySelectorAll('.broadcast-banner');
     const nb = banners[banners.length - 1];
@@ -20840,7 +20834,7 @@ function fbShowUpdateBanner(newVersion, notes) {
   banner.innerHTML =
     '<div id="update-banner-icon">🌸</div>'
     + '<div id="update-banner-text">'
-    + '<div id="update-banner-title">Update Available — v' + newVersion + '</div>'
+    + '<div id="update-banner-title">Update Available — ' + newVersion + '</div>'
     + '<div id="update-banner-sub">' + (notes || 'A new version of Sakura OS is ready') + '</div>'
     + '</div>'
     + '<button id="update-banner-btn">Update</button>';
