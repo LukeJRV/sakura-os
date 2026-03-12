@@ -2740,10 +2740,12 @@ input[type=number] { -moz-appearance:textfield; }
           </div>
         </div>
         <!-- Stacks -->
-        <div id="quint-stacks" style="flex:1;overflow-y:auto;padding:12px 14px 12px 6px;display:flex;flex-direction:column;gap:8px">
-          <div id="quint-empty" style="display:flex;flex-direction:column;align-items:center;padding:40px 20px;text-align:center">
-            <div style="font-size:48px;margin-bottom:12px;opacity:0.6">💜</div>
-            <div style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.45)">Nothing planned yet</div>
+        <div id="quint-stacks" style="flex:1;overflow-y:auto;padding:12px 14px 12px 6px;position:relative">
+          <div id="quint-stacks-inner" style="position:relative;width:100%">
+            <div id="quint-empty" style="display:flex;flex-direction:column;align-items:center;padding:40px 20px;text-align:center">
+              <div style="font-size:48px;margin-bottom:12px;opacity:0.6">💜</div>
+              <div style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.45)">Nothing planned yet</div>
+            </div>
           </div>
         </div>
       </div>
@@ -6373,7 +6375,7 @@ function _startQuintListener() {
   if (_quintUnsub || !fbDb) return;
   _quintUnsub = fbDb.collection('config').doc('quintStack').onSnapshot(snap => {
     if (document.getElementById('screen-quint')?.classList.contains('active')) {
-      _quintRenderStack(snap.exists ? (snap.data()?.items || []) : []);
+      requestAnimationFrame(() => _quintRenderStack(snap.exists ? (snap.data()?.items || []) : []));
     }
   }, () => {});
 }
@@ -6404,14 +6406,14 @@ function renderQuint() {
   // Build hour labels on bar
   _quintRenderBar(hour, minute);
 
-  // Load from Firestore
+  // Load from Firestore — defer stack render one frame so bar has layout
   _startQuintListener();
   if (fbDb) {
     fbDb.collection('config').doc('quintStack').get().then(snap => {
-      _quintRenderStack(snap.exists ? (snap.data()?.items || []) : []);
-    }).catch(() => _quintRenderStack([]));
+      requestAnimationFrame(() => _quintRenderStack(snap.exists ? (snap.data()?.items || []) : []));
+    }).catch(() => requestAnimationFrame(() => _quintRenderStack([])));
   } else {
-    _quintRenderStack([]);
+    requestAnimationFrame(() => _quintRenderStack([]));
   }
 }
 
@@ -6471,19 +6473,21 @@ function _quintRenderBar(curHour, curMinute) {
 
 function _quintRenderStack(items) {
   const container = document.getElementById('quint-stacks');
+  const inner = document.getElementById('quint-stacks-inner');
   const emptyEl = document.getElementById('quint-empty');
-  if (!container) return;
+  if (!container || !inner) return;
 
   if (!items || items.length === 0) {
     if (emptyEl) emptyEl.style.display = 'flex';
-    // Clear old cards but keep empty
-    Array.from(container.children).forEach(ch => { if (ch !== emptyEl) ch.remove(); });
+    Array.from(inner.children).forEach(ch => { if (ch !== emptyEl) ch.remove(); });
+    inner.style.height = '';
     return;
   }
   if (emptyEl) emptyEl.style.display = 'none';
 
   const { hour, minute } = _quintGetHourLondon();
   const curMins = hour * 60 + minute;
+  const START_H = 6, END_H = 23, SPAN = (END_H - START_H) * 60; // in minutes
 
   // Sort by time
   const sorted = [...items].sort((a, b) => {
@@ -6508,14 +6512,36 @@ function _quintRenderStack(items) {
     note:     { border: 'rgba(255,255,255,0.2)', glow: 'rgba(255,255,255,0.05)', icon: '📝' },
   };
 
-  // Build new HTML
-  const html = sorted.map((item, i) => {
+  // The bar track height matches the parent column. We use the bar track element to
+  // get a stable reference height, then set inner height to match it exactly.
+  const barTrack = document.getElementById('quint-bar-track');
+  const barH = barTrack ? barTrack.getBoundingClientRect().height : 500;
+  const CARD_APPROX_H = 72; // approximate card height for bottom padding
+  const innerH = Math.max(barH, 400) + CARD_APPROX_H;
+  inner.style.height = innerH + 'px';
+
+  // Time → pixel position (same mapping as bar fill)
+  function timeToPx(timeStr) {
+    const mins = _quintTimeToMins(timeStr);
+    const elapsed = Math.max(0, mins - START_H * 60);
+    return (elapsed / SPAN) * barH;
+  }
+
+  // Remove old cards
+  Array.from(inner.children).forEach(ch => { if (ch !== emptyEl) ch.remove(); });
+
+  sorted.forEach((item, i) => {
     const isActive = i === activeIdx;
     const tc = typeColors[item.type] || typeColors.note;
     const emoji = item.emoji || tc.icon;
     const timeLabel = item.time || '';
     const isPast = _quintTimeToMins(item.time) < curMins - 30;
-    return `<div class="quint-stack-piece ${isActive ? 'active-now' : ''}" style="${isActive ? 'border-color:' + tc.border + ';box-shadow:0 4px 24px ' + tc.glow : ''}${isPast ? ';opacity:0.5' : ''}">
+    const topPx = timeToPx(item.time);
+
+    const div = document.createElement('div');
+    div.className = 'quint-stack-piece' + (isActive ? ' active-now' : '');
+    div.style.cssText = `position:absolute;left:0;right:0;top:${topPx}px;${isActive ? 'border-color:' + tc.border + ';box-shadow:0 4px 24px ' + tc.glow + ';' : ''}${isPast ? 'opacity:0.5;' : ''}`;
+    div.innerHTML = `
       ${isActive ? `<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,${tc.border},transparent);border-radius:99px"></div>` : ''}
       <div style="display:flex;align-items:flex-start;gap:10px">
         <div style="font-size:22px;flex-shrink:0;margin-top:1px">${emoji}</div>
@@ -6530,15 +6556,14 @@ function _quintRenderStack(items) {
             ${isActive ? (() => { const diffM = _quintTimeToMins(item.time) - curMins; const label = Math.abs(diffM) <= 5 ? '● Now' : diffM > 0 ? `● In ${diffM}m` : `● ${-diffM}m ago`; return `<span style="font-size:10px;color:${tc.border};font-weight:700;animation:quintGlow 2s ease-in-out infinite">${label}</span>`; })() : ''}
           </div>
         </div>
-      </div>
-    </div>`;
-  }).join('');
+      </div>`;
+    inner.appendChild(div);
+  });
 
-  // Replace content
-  Array.from(container.children).forEach(ch => { if (ch !== emptyEl) ch.remove(); });
-  const wrapper = document.createElement('div');
-  wrapper.innerHTML = html;
-  Array.from(wrapper.children).forEach(ch => container.appendChild(ch));
+  // Auto-scroll so current time is visible (align pointer position in view)
+  const nowPx = ((curMins - START_H * 60) / SPAN) * barH;
+  const scrollTarget = Math.max(0, nowPx - container.clientHeight * 0.3);
+  container.scrollTop = scrollTarget;
 }
 
 function _quintTimeToMins(timeStr) {
@@ -10127,9 +10152,12 @@ function mrGenMap_inner() {
   const rng = () => Math.random();
 
   // ── Dynamic depth: race 3, 6, 9… get extended levels (6–10 screens).
-  // All other races are always exactly 5 screens (default height).
+  // Race 2, 5, 8… (rare) get small levels (3–4 screens).
+  // All other races are exactly 5 screens (default height).
   if (mrRaceCount > 0 && mrRaceCount % 3 === 0) {
-    mrLevelScreens = 6 + Math.floor(rng() * 5); // 6..10
+    mrLevelScreens = 6 + Math.floor(rng() * 5); // 6..10 — deep
+  } else if (mrRaceCount > 1 && mrRaceCount % 5 === 2) {
+    mrLevelScreens = 3 + Math.floor(rng() * 2); // 3..4 — small (rarer: every 5th)
   } else {
     mrLevelScreens = 5; // always reset to default on non-milestone races
   }
@@ -10378,21 +10406,21 @@ function mrGenMap_inner() {
       if (haz1 && !_inGateSafe(oppX1, yBase+zoneH*0.55, z, GATE_W)) _ph(haz1, oppX1, yBase+zoneH*0.55);
 
     } else if (zoneType === 1) {
-      // ── TUNNEL CORRIDOR: two parallel ramps forming a tight channel + hazard inside ──
-      const tunCX = gateIsLeft ? W*0.70+rng()*W*0.16 : W*0.14+rng()*W*0.16;
-      const tunY  = yBase + zoneH * 0.22;
-      if (tunCX > 30 && tunCX < W-30 && !_inGateSafe(tunCX, tunY, z, GATE_W+10)) {
-        const tunW = 38 + rng()*14; // channel width
-        const tunAng = (rng()-0.5)*0.18;
-        // Left wall
-        mrObstacles.push({type:'ramp', x:tunCX-tunW/2-5, y:tunY, w:55+rng()*12, angle:tunAng+Math.PI/2, _theme:mrTheme, _isTunnel:true});
-        // Right wall
-        mrObstacles.push({type:'ramp', x:tunCX+tunW/2+5, y:tunY, w:55+rng()*12, angle:tunAng+Math.PI/2, _theme:mrTheme, _isTunnel:true});
-        // Hazard midway through tunnel
+      // ── V-FUNNEL: two converging ramps pointing toward a hazard at the pinch point ──
+      const funCX = gateIsLeft ? W*0.68+rng()*W*0.16 : W*0.16+rng()*W*0.16;
+      const funY  = yBase + zoneH * 0.18;
+      const funSpread = 34 + rng()*18; // half-width between ramp tips
+      const funAng = 0.32 + rng()*0.14; // inward angle (positive = tilts toward center)
+      if (funCX > 32 && funCX < W-32 && !_inGateSafe(funCX, funY+30, z, GATE_W)) {
+        // Left ramp — angles down-right into funnel
+        mrObstacles.push({type:'ramp', x:funCX-funSpread, y:funY,    w:52+rng()*14, angle: funAng,  _theme:mrTheme});
+        // Right ramp — angles down-left into funnel (mirror)
+        mrObstacles.push({type:'ramp', x:funCX+funSpread, y:funY+14, w:52+rng()*14, angle:-funAng,  _theme:mrTheme});
+        // Hazard at pinch point where marbles converge
         const hTun = _pickN(hazardPool, 1)[0];
-        if (hTun) _ph(hTun, tunCX, tunY + 28);
-        // Short ramp after exit to redirect
-        mrObstacles.push({type:'ramp', x:tunCX+(gateIsLeft?-18:18), y:tunY+62+rng()*10, w:38+rng()*10, angle:gateIsLeft?0.28:-0.28, _theme:mrTheme});
+        if (hTun) _ph(hTun, funCX, funY + 42);
+        // Exit redirect ramp below the funnel
+        mrObstacles.push({type:'ramp', x:funCX+(gateIsLeft?-16:16), y:funY+74+rng()*10, w:40+rng()*10, angle:gateIsLeft?0.24:-0.24, _theme:mrTheme});
       }
 
     } else if (zoneType === 2) {
@@ -15585,12 +15613,13 @@ function mrStartCountdown() {
   const themeEmoji = {space:'🌌',sakura:'🌸',neon:'🌈',sunset:'🌅',ice:'❄️',forest:'🌲',arctic:'🏔️',sewers:'🕳️',sunken:'🌊',fiesta:'🎉',skatepark:'🛹',beach:'🏖️',garden:'🌻',jpnight:'🌙',kitchen:'🍳',midnightup:'🚗',autumn:'🍂',medieval:'⚔️'}[mrTheme]||'🔮';
   const votedMC = MARBLE_COLORS.find(c=>c.id===mrVotedColor);
 
-  const _depthLabel = mrLevelScreens > 5 ? `${mrLevelScreens}× deep` : 'Standard';
-  const _depthEmoji = mrLevelScreens >= 9 ? '🌀' : mrLevelScreens >= 7 ? '⬇️' : mrLevelScreens > 5 ? '↓' : '▸';
+  const _isSmall = mrLevelScreens < 5;
+  const _depthLabel = mrLevelScreens > 5 ? `${mrLevelScreens}× deep` : _isSmall ? `${mrLevelScreens}× short` : 'Standard';
+  const _depthEmoji = mrLevelScreens >= 9 ? '🌀' : mrLevelScreens >= 7 ? '⬇️' : mrLevelScreens > 5 ? '↓' : _isSmall ? '↑' : '▸';
   const _isDeep = mrLevelScreens > 5;
-  const _depthBorder = _isDeep ? 'rgba(199,125,255,0.45)' : 'rgba(255,255,255,0.13)';
-  const _depthBg = _isDeep ? 'linear-gradient(135deg,rgba(199,125,255,0.14),rgba(123,47,247,0.08))' : 'rgba(255,255,255,0.04)';
-  const _depthColor = _isDeep ? '#c77dff' : 'rgba(255,255,255,0.4)';
+  const _depthBorder = _isDeep ? 'rgba(199,125,255,0.45)' : _isSmall ? 'rgba(78,223,208,0.45)' : 'rgba(255,255,255,0.13)';
+  const _depthBg = _isDeep ? 'linear-gradient(135deg,rgba(199,125,255,0.14),rgba(123,47,247,0.08))' : _isSmall ? 'linear-gradient(135deg,rgba(78,223,208,0.14),rgba(47,180,200,0.08))' : 'rgba(255,255,255,0.04)';
+  const _depthColor = _isDeep ? '#c77dff' : _isSmall ? '#4edfd0' : 'rgba(255,255,255,0.4)';
 
   const ui = document.getElementById('mr-ui');
   if(ui) ui.innerHTML = `<div style="text-align:center;padding:14px 12px 10px">
@@ -15621,10 +15650,14 @@ function mrStartCountdown() {
       clearInterval(mrCountTimer); mrCountTimer=null;
       mrState='racing'; mrRaceTime=0; mrCameraY=0; mrCameraTarget=null;
       const ui2=document.getElementById('mr-ui');
-      const _rDepthLabel = mrLevelScreens > 5 ? `${mrLevelScreens}×` : null;
-      const _rDepthEmoji = mrLevelScreens >= 9 ? '🌀' : '⬇️';
+      const _rIsSmall = mrLevelScreens < 5;
+      const _rDepthLabel = mrLevelScreens > 5 ? `${mrLevelScreens}×` : _rIsSmall ? `${mrLevelScreens}× short` : null;
+      const _rDepthEmoji = mrLevelScreens >= 9 ? '🌀' : _rIsSmall ? '↑' : '⬇️';
+      const _rDepthColor = _rIsSmall ? '#4edfd0' : '#c77dff';
+      const _rDepthBorder = _rIsSmall ? 'rgba(78,223,208,0.35)' : 'rgba(199,125,255,0.35)';
+      const _rDepthBg = _rIsSmall ? 'rgba(78,223,208,0.12)' : 'rgba(199,125,255,0.12)';
       const _rDepthPill = _rDepthLabel
-        ? `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:99px;background:rgba(199,125,255,0.12);border:1px solid rgba(199,125,255,0.35);font-size:10px;font-weight:800;color:#c77dff;vertical-align:middle;margin-left:5px">${_rDepthEmoji} ${_rDepthLabel}</span>`
+        ? `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:99px;background:${_rDepthBg};border:1px solid ${_rDepthBorder};font-size:10px;font-weight:800;color:${_rDepthColor};vertical-align:middle;margin-left:5px">${_rDepthEmoji} ${_rDepthLabel}</span>`
         : '';
       if(ui2) ui2.innerHTML=`<div style="padding:8px 16px">
         <div id="mr-commentary" style="font-size:13px;font-weight:800;color:#4edfd0;min-height:20px;text-align:center;letter-spacing:-0.2px">🏁 Race started!${_rDepthPill}</div>
