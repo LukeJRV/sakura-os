@@ -452,9 +452,15 @@ button, a { touch-action: manipulation; }
 .screen.active { display:flex; flex-direction:column; }
 
 /* Scrollbar */
-.screen::-webkit-scrollbar { width:3px; }
+/* Scrollbars – purple game palette, dark mode */
+* { scrollbar-width: thin; scrollbar-color: rgba(160,136,250,0.4) transparent; }
+*::-webkit-scrollbar { width:4px; height:4px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: rgba(160,136,250,0.4); border-radius:99px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(160,136,250,0.65); }
+.screen::-webkit-scrollbar { width:4px; }
 .screen::-webkit-scrollbar-track { background:transparent; }
-.screen::-webkit-scrollbar-thumb { background:var(--border); border-radius:99px; }
+.screen::-webkit-scrollbar-thumb { background:rgba(160,136,250,0.4); border-radius:99px; }
 
 /* Quint: override .screen defaults — must never self-scroll, inner column scrolls */
 #screen-quint {
@@ -1573,6 +1579,14 @@ input[type=number] { -moz-appearance:textfield; }
 @keyframes quintGlow {
   0%,100% { box-shadow:0 0 12px rgba(199,125,255,0.5), 0 0 30px rgba(157,78,221,0.2); }
   50% { box-shadow:0 0 20px rgba(199,125,255,0.9), 0 0 50px rgba(157,78,221,0.4); }
+}
+@keyframes wheelGlowRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes seasonShine {
+  0%, 100% { opacity:0.7; }
+  50%       { opacity:1; }
 }
 @keyframes rainbowBorder {
   0% { background-position: 0% 50%; }
@@ -2727,7 +2741,7 @@ input[type=number] { -moz-appearance:textfield; }
     <div id="screen-themeshop" class="screen">
       <div class="screen-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
-        <span class="screen-title">🎨 Theme Shop</span>
+        <span class="screen-title">🎨 Themes</span>
       </div>
       <div id="themeshop-content" style="padding:16px"></div>
     </div>
@@ -2758,25 +2772,25 @@ input[type=number] { -moz-appearance:textfield; }
           <div style="width:34px"></div>
         </div>
       </div>
-      <!-- Main content -->
-      <div style="position:relative;z-index:2;flex:1;overflow:hidden;display:flex;min-height:0;">
-        <!-- Left: Purple bar -->
-        <div style="width:72px;flex-shrink:0;padding:12px 0 12px 10px;display:flex;flex-direction:column;min-height:0;">
-          <div style="flex:1;position:relative;display:flex;gap:5px;min-height:0;">
-            <div id="quint-hour-labels" style="display:flex;flex-direction:column;justify-content:space-between;font-size:9px;color:rgba(255,255,255,0.4);min-width:28px;font-weight:600"></div>
-            <div style="position:relative;flex:1">
+      <!-- Main content: single scrollable row so bar and cards stay aligned on scroll -->
+      <div id="quint-scroll-area" style="position:relative;z-index:2;flex:1;overflow-y:auto;overflow-x:hidden;display:flex;min-height:0;align-items:flex-start;">
+        <!-- Left: Purple bar – uses position:sticky so it stays visible while content scrolls -->
+        <div style="width:70px;flex-shrink:0;position:sticky;top:0;align-self:stretch;padding:12px 0 12px 10px;display:flex;flex-direction:column;z-index:3;pointer-events:none;">
+          <div style="flex:1;position:relative;display:flex;gap:5px;">
+            <div id="quint-hour-labels" style="display:flex;flex-direction:column;justify-content:space-between;font-size:9px;color:rgba(255,255,255,0.4);min-width:28px;font-weight:600;height:100%"></div>
+            <div style="position:relative;flex:1;height:100%">
               <div id="quint-bar-track" style="position:absolute;inset:0;background:rgba(255,255,255,0.06);border-radius:99px;border:1px solid rgba(255,255,255,0.1);overflow:hidden">
                 <div id="quint-bar-fill" style="position:absolute;top:0;left:0;right:0;border-radius:99px;transition:height 1.5s cubic-bezier(.4,0,.2,1);background:linear-gradient(180deg,#5a189a,#9d4edd,#c77dff);box-shadow:inset 0 2px 6px rgba(255,255,255,0.25),0 0 20px rgba(157,78,221,0.5)">
                   <div style="position:absolute;bottom:0;left:0;right:0;height:5px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent);animation:liquidShimmer 2s ease-in-out infinite"></div>
                 </div>
               </div>
-              <div id="quint-bar-pointer" style="position:absolute;right:-9px;width:16px;height:16px;border-radius:50%;background:#c77dff;border:3px solid #fff;box-shadow:0 0 12px rgba(199,125,255,0.9);transition:top 1.5s cubic-bezier(.4,0,.2,1);transform:translateY(-50%);z-index:2"></div>
+              <div id="quint-bar-pointer" style="position:absolute;right:-9px;width:16px;height:16px;border-radius:50%;background:#c77dff;border:3px solid #fff;box-shadow:0 0 12px rgba(199,125,255,0.9);transition:top 1.5s cubic-bezier(.4,0,.2,1);transform:translateY(-50%);z-index:2;pointer-events:none"></div>
             </div>
           </div>
         </div>
-        <!-- Stacks -->
-        <div id="quint-stacks" style="flex:1;overflow-y:auto;padding:12px 14px 12px 6px;position:relative">
-          <div id="quint-stacks-inner" style="position:relative;width:100%">
+        <!-- Stacks area – not independently scrollable, scrolls with parent -->
+        <div id="quint-stacks" style="flex:1;padding:12px 14px 12px 6px;position:relative;min-height:520px;">
+          <div id="quint-stacks-inner" style="position:relative;width:100%;min-height:520px;">
             <div id="quint-empty" style="display:flex;flex-direction:column;align-items:center;padding:40px 20px;text-align:center">
               <div style="font-size:48px;margin-bottom:12px;opacity:0.6">💜</div>
               <div style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.45)">Nothing planned yet</div>
@@ -3461,11 +3475,6 @@ function selectEmoji(e) {
   }
   if (_emojiPickerCallback) _emojiPickerCallback(e);
   closeEmojiPicker();
-}
-
-function closeEmojiPicker() {
-  const ov = document.getElementById('emoji-picker-overlay');
-  if (ov) ov.style.display = 'none';
 }
 
 function loadState() {
@@ -6598,13 +6607,11 @@ function _quintRenderStack(items) {
     note:     { border: 'rgba(255,255,255,0.2)', glow: 'rgba(255,255,255,0.05)', icon: '📝' },
   };
 
-  // The bar track height matches the parent column. We use the bar track element to
-  // get a stable reference height, then set inner height to match it exactly.
+  // Bar track fills its sticky parent – measure it for pixel mapping
   const barTrack = document.getElementById('quint-bar-track');
-  const barH = barTrack ? barTrack.getBoundingClientRect().height : 500;
-  const CARD_APPROX_H = 72; // approximate card height for bottom padding
-  const innerH = Math.max(barH, 400) + CARD_APPROX_H;
-  inner.style.height = innerH + 'px';
+  const barH = barTrack ? Math.max(barTrack.getBoundingClientRect().height, 440) : 520;
+  inner.style.height = (barH + 80) + 'px';
+  inner.style.minHeight = (barH + 80) + 'px';
 
   // Time → pixel position (same mapping as bar fill)
   function timeToPx(timeStr) {
@@ -6646,22 +6653,11 @@ function _quintRenderStack(items) {
     inner.appendChild(div);
   });
 
-  // Auto-scroll so current time is visible (align pointer position in view)
-  const nowPx = ((curMins - START_H * 60) / SPAN) * barH;
-  const scrollTarget = Math.max(0, nowPx - container.clientHeight * 0.3);
-  container.scrollTop = scrollTarget;
-
-  // Also ensure active piece stays visible via scrollIntoView
-  const activeEl = inner.querySelector('.active-now');
-  if (activeEl) {
-    setTimeout(() => {
-      const elTop = parseFloat(activeEl.style.top) || 0;
-      const visibleTop = container.scrollTop;
-      const visibleBottom = container.scrollTop + container.clientHeight;
-      if (elTop < visibleTop || elTop + 80 > visibleBottom) {
-        container.scrollTop = Math.max(0, elTop - container.clientHeight * 0.3);
-      }
-    }, 100);
+  // Scroll the unified outer area so current time is centred in view
+  const scrollArea = document.getElementById('quint-scroll-area');
+  if (scrollArea) {
+    const nowPx = ((curMins - START_H * 60) / SPAN) * barH;
+    scrollArea.scrollTop = Math.max(0, nowPx - scrollArea.clientHeight * 0.35);
   }
 }
 
@@ -8460,7 +8456,7 @@ function dropPlinkoFree() {
 }
 
 // ============================================================
-// SPIN WHEEL — IMPROVED
+// SPIN WHEEL — iOS 26 INSPIRED
 // ============================================================
 let isSpinning = false;
 let wheelAngle = 0;
@@ -8469,79 +8465,100 @@ function renderSpinWheel() {
   const c = document.getElementById('spinwheel-content');
   if (!c) return;
   const wCols = ['#a088fa','#fc7790','#f6bb4e','#4caf6e','#4edfd0','#6f96ff','#ca7ced','#fbabd8'];
+  const hasItems = S.wheelItems.length > 0;
+
   c.innerHTML = `
-    <!-- Glow bg -->
-    <div style="position:relative;width:300px;margin:0 auto 18px">
-      <div style="position:absolute;inset:-20px;border-radius:50%;background:conic-gradient(from 0deg,rgba(160,136,250,0.2),rgba(252,119,144,0.2),rgba(246,187,78,0.2),rgba(78,223,208,0.2),rgba(160,136,250,0.2));filter:blur(12px);z-index:0;pointer-events:none"></div>
-      <div style="position:absolute;inset:-6px;border-radius:50%;border:1px solid rgba(255,255,255,0.07);z-index:0"></div>
-      <!-- Gold pointer -->
-      <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);z-index:10;filter:drop-shadow(0 0 10px #f6bb4e)">
-        <div style="width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:30px solid #f6bb4e;margin:0 auto"></div>
+    <div style="padding:14px 16px 0">
+      <!-- Wheel stage -->
+      <div style="position:relative;margin:0 auto 20px;width:290px">
+        <!-- Ambient glow ring -->
+        <div style="position:absolute;inset:-28px;border-radius:50%;background:conic-gradient(from 0deg,rgba(160,136,250,0.18),rgba(252,119,144,0.14),rgba(246,187,78,0.14),rgba(78,223,208,0.14),rgba(160,136,250,0.18));filter:blur(18px);pointer-events:none;animation:wheelGlowRotate 8s linear infinite"></div>
+        <!-- Outer ring -->
+        <div style="position:absolute;inset:-5px;border-radius:50%;background:linear-gradient(135deg,rgba(160,136,250,0.3),rgba(252,119,144,0.2),rgba(199,125,255,0.3));padding:2px;border-radius:50%">
+          <div style="width:100%;height:100%;border-radius:50%;background:var(--bg,#0a0015)"></div>
+        </div>
+        <!-- Pointer -->
+        <div id="wheel-pointer" style="position:absolute;top:-18px;left:50%;transform:translateX(-50%);z-index:10">
+          <div style="width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:26px solid #c77dff;filter:drop-shadow(0 0 8px rgba(199,125,255,0.9)) drop-shadow(0 2px 6px rgba(0,0,0,0.6));margin:0 auto"></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:#fff;margin:-3px auto 0;box-shadow:0 0 8px rgba(199,125,255,0.9)"></div>
+        </div>
+        <canvas id="wheel-canvas" width="290" height="290" style="display:block;border-radius:50%;position:relative;z-index:1"></canvas>
       </div>
-      <canvas id="wheel-canvas" width="300" height="300" style="display:block;border-radius:50%;box-shadow:0 0 60px rgba(160,136,250,0.2),inset 0 0 0 3px rgba(255,255,255,0.04);position:relative;z-index:1"></canvas>
-    </div>
 
-    <!-- Result -->
-    <div id="wheel-result" style="min-height:50px;text-align:center;margin-bottom:14px"></div>
+      <!-- Result display -->
+      <div id="wheel-result" style="min-height:54px;text-align:center;margin-bottom:18px"></div>
 
-    <!-- SPIN button -->
-    <button id="wheel-spin-btn" onclick="spinWheel()" style="width:100%;padding:16px;border-radius:22px;border:none;background:linear-gradient(135deg,#a088fa 0%,#fc7790 50%,#f6bb4e 100%);background-size:200%;color:#fff;font-size:18px;font-weight:900;cursor:pointer;letter-spacing:1px;box-shadow:0 8px 32px rgba(160,136,250,0.45);transition:all 0.2s;margin-bottom:10px" onmouseenter="this.style.transform='scale(1.03)';this.style.boxShadow='0 12px 40px rgba(160,136,250,0.65)'" onmouseleave="this.style.transform='';this.style.boxShadow='0 8px 32px rgba(160,136,250,0.45)'">
-      🎡 &nbsp;SPIN
-    </button>
+      <!-- SPIN button -->
+      <button id="wheel-spin-btn" onclick="spinWheel()" style="width:100%;padding:18px;border-radius:20px;border:none;background:linear-gradient(135deg,#5a189a 0%,#9d4edd 45%,#c77dff 100%);color:#fff;font-size:17px;font-weight:900;cursor:pointer;letter-spacing:0.5px;box-shadow:0 8px 28px rgba(157,78,221,0.5),inset 0 1px 0 rgba(255,255,255,0.15);transition:all 0.25s;margin-bottom:10px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent);animation:ticketShimmer 2.5s infinite linear"></div>
+        <span style="position:relative;z-index:1">🎡 &nbsp;SPIN</span>
+      </button>
 
-    <!-- Add item -->
-    <button onclick="openModal('add-wheel-item-modal')" style="width:100%;padding:10px;border-radius:14px;background:rgba(255,255,255,0.05);border:1px dashed rgba(255,255,255,0.15);color:rgba(255,255,255,0.45);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:16px">
-      ＋ Add Item
-    </button>
+      <!-- Add item -->
+      <button onclick="openModal('add-wheel-item-modal')" style="width:100%;padding:11px;border-radius:14px;background:rgba(160,136,250,0.06);border:1px dashed rgba(160,136,250,0.25);color:rgba(160,136,250,0.6);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:20px;transition:all 0.2s" onmouseenter="this.style.background='rgba(160,136,250,0.12)'" onmouseleave="this.style.background='rgba(160,136,250,0.06)'">
+        ＋ Add Item
+      </button>
 
-    <!-- Items list -->
-    <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,0.25);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">Wheel Items (${S.wheelItems.length})</div>
-    ${S.wheelItems.length===0 ? '<div style="text-align:center;color:rgba(255,255,255,0.2);padding:20px;font-size:13px">Add items to get started!</div>' : ''}
-    <div style="display:flex;flex-direction:column;gap:6px">
-    ${S.wheelItems.map((item,i) => {
-      const col = wCols[i%wCols.length];
-      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:${col}14;border:1px solid ${col}30">
-        <div style="width:10px;height:10px;border-radius:50%;background:${col};box-shadow:0 0 6px ${col};flex-shrink:0"></div>
-        <span style="font-size:18px">${item.emoji||'🎁'}</span>
-        <span style="flex:1;font-size:13px;font-weight:600;color:#fff">${item.label}</span>
-        <span style="font-size:11px;color:#f6bb4e;font-weight:700">${item.tickets?'🎟️'+item.tickets:''}</span>
-        ${isAdmin() ? '<button onclick="removeWheelItem('+i+')" style="width:26px;height:26px;border-radius:50%;background:rgba(252,119,144,0.15);border:1px solid rgba(252,119,144,0.2);color:#fc7790;cursor:pointer;font-size:11px">✕</button>' : ''}
-      </div>`;
-    }).join('')}
+      <!-- Items section -->
+      ${hasItems ? `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px">On the Wheel</div>
+        <div style="font-size:11px;color:rgba(160,136,250,0.5);font-weight:600">${S.wheelItems.length} items</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:16px">
+        ${S.wheelItems.map((item, i) => {
+          const col = wCols[i % wCols.length];
+          return `<div style="display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:15px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);transition:all 0.2s" onmouseenter="this.style.background='rgba(255,255,255,0.055)';this.style.borderColor='rgba(255,255,255,0.12)'" onmouseleave="this.style.background='rgba(255,255,255,0.03)';this.style.borderColor='rgba(255,255,255,0.07)'">
+            <div style="width:9px;height:9px;border-radius:50%;background:${col};box-shadow:0 0 8px ${col};flex-shrink:0"></div>
+            <span style="font-size:20px;line-height:1;flex-shrink:0">${item.emoji || '🎁'}</span>
+            <span style="flex:1;font-size:13px;font-weight:600;color:rgba(255,255,255,0.85)">${item.label}</span>
+            ${item.tickets ? `<span style="font-size:11px;color:#f6bb4e;font-weight:700;flex-shrink:0">🎟️ ${item.tickets}</span>` : ''}
+            ${isAdmin() ? `<button onclick="removeWheelItem(${i})" style="width:26px;height:26px;border-radius:8px;background:rgba(252,119,144,0.1);border:1px solid rgba(252,119,144,0.18);color:#fc7790;cursor:pointer;font-size:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s" onmouseenter="this.style.background='rgba(252,119,144,0.22)'" onmouseleave="this.style.background='rgba(252,119,144,0.1)'">✕</button>` : ''}
+          </div>`;
+        }).join('')}
+      </div>
+      ` : '<div style="text-align:center;padding:20px;color:rgba(255,255,255,0.25);font-size:13px">Add items above to start spinning!</div>'}
     </div>
   `;
   drawWheel(wheelAngle);
 }
 
-function drawWheel(angle=0) {
+function drawWheel(angle = 0) {
   const canvas = document.getElementById('wheel-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const items = S.wheelItems.length > 0 ? S.wheelItems : [{label:'Add items!',emoji:'🎁',tickets:0},{label:'Spin me!',emoji:'🌟',tickets:0}];
-  const cx = 150, cy = 150, r = 140;
-  const slice = (Math.PI*2) / items.length;
+  const cx = 145, cy = 145, r = 138;
+  const slice = (Math.PI * 2) / items.length;
   const colors = ['#a088fa','#fc7790','#f6bb4e','#4caf6e','#4edfd0','#6f96ff','#ca7ced','#fbabd8','#566ee3','#e78161','#2cb1b1','#dc8383'];
 
-  ctx.clearRect(0,0,300,300);
+  ctx.clearRect(0, 0, 290, 290);
 
-  // Outer shadow ring
+  // Outer glow ring
   ctx.save();
-  ctx.beginPath(); ctx.arc(cx,cy,r+4,0,Math.PI*2);
-  ctx.strokeStyle = 'rgba(160,136,250,0.3)'; ctx.lineWidth = 8; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, r + 6, 0, Math.PI * 2);
+  const ringGrad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+  ringGrad.addColorStop(0, 'rgba(160,136,250,0.5)');
+  ringGrad.addColorStop(0.5, 'rgba(199,125,255,0.4)');
+  ringGrad.addColorStop(1, 'rgba(160,136,250,0.5)');
+  ctx.strokeStyle = ringGrad;
+  ctx.lineWidth = 5;
+  ctx.stroke();
   ctx.restore();
 
-  items.forEach((item,i) => {
-    const start = angle - Math.PI/2 + i * slice;
-    const end = start + slice;
+  items.forEach((item, i) => {
+    const start = angle - Math.PI / 2 + i * slice;
+    const end   = start + slice;
     const color = colors[i % colors.length];
+    const midAngle = start + slice / 2;
 
-    // Slice fill with gradient
-    const midAngle = start + slice/2;
-    const gx = cx + Math.cos(midAngle) * r * 0.5;
-    const gy = cy + Math.sin(midAngle) * r * 0.5;
+    // Slice – radial gradient center-bright
+    const gx = cx + Math.cos(midAngle) * r * 0.4;
+    const gy = cy + Math.sin(midAngle) * r * 0.4;
     const grad = ctx.createRadialGradient(gx, gy, 0, cx, cy, r);
-    grad.addColorStop(0, color + 'dd');
-    grad.addColorStop(1, color + '99');
+    grad.addColorStop(0, color + 'ee');
+    grad.addColorStop(0.6, color + 'cc');
+    grad.addColorStop(1, color + '88');
 
     ctx.beginPath();
     ctx.moveTo(cx, cy);
@@ -8549,94 +8566,130 @@ function drawWheel(angle=0) {
     ctx.closePath();
     ctx.fillStyle = grad;
     ctx.fill();
-    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+
+    // Divider line
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0,0,0,0.4)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
+    ctx.restore();
+
+    // Inner arc highlight
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 0.18, start, end);
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
 
     // Text
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(start + slice / 2);
-    const textR = r * 0.62;
+    const textR = r * 0.60;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    // Emoji
-    ctx.font = `${Math.min(18, 200/items.length)}px serif`;
-    ctx.fillText(item.emoji||'🎁', textR, -8);
-    // Label
+    const emojiSize = Math.min(20, 220 / items.length);
+    ctx.font = `${emojiSize}px serif`;
+    ctx.fillText(item.emoji || '🎁', textR, -10);
     ctx.fillStyle = '#fff';
-    ctx.font = `bold ${Math.min(11, 140/items.length)}px Inter`;
-    ctx.shadowBlur = 3; ctx.shadowColor = 'rgba(0,0,0,0.8)';
-    const label = item.label.length > 8 ? item.label.slice(0,7)+'…' : item.label;
-    ctx.fillText(label, textR, 8);
+    ctx.font = `bold ${Math.min(12, 150 / items.length)}px Inter, sans-serif`;
+    ctx.shadowBlur = 4; ctx.shadowColor = 'rgba(0,0,0,0.9)';
+    const label = item.label.length > 9 ? item.label.slice(0, 8) + '…' : item.label;
+    ctx.fillText(label, textR, 9);
     ctx.shadowBlur = 0;
     ctx.restore();
   });
 
-  // Center cap
-  const capGrad = ctx.createRadialGradient(cx-4, cy-4, 2, cx, cy, 24);
-  capGrad.addColorStop(0, '#e2e4ff');
-  capGrad.addColorStop(1, '#4f5180');
-  ctx.beginPath(); ctx.arc(cx, cy, 24, 0, Math.PI*2);
+  // Centre cap – glossy purple
+  const capGrad = ctx.createRadialGradient(cx - 6, cy - 6, 2, cx, cy, 26);
+  capGrad.addColorStop(0, '#e0aaff');
+  capGrad.addColorStop(0.4, '#9d4edd');
+  capGrad.addColorStop(1, '#3c096c');
+  ctx.beginPath(); ctx.arc(cx, cy, 26, 0, Math.PI * 2);
   ctx.fillStyle = capGrad; ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 2; ctx.stroke();
 
-  // Center bolt
-  ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI*2);
-  ctx.fillStyle = '#fff'; ctx.fill();
+  ctx.beginPath(); ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.fill();
 }
 
 function spinWheel() {
   if (isSpinning) return;
   const items = S.wheelItems.length > 0 ? S.wheelItems : null;
-  if (!items) { showNotif('🎡','Add items first!',''); return; }
+  if (!items) { showNotif('🎡', 'Add items first!', ''); return; }
   isSpinning = true;
   playSound('whoosh');
 
-  const extraSpins = (5 + Math.random() * 5) * Math.PI * 2;
+  const sBtn = document.getElementById('wheel-spin-btn');
+  if (sBtn) { sBtn.disabled = true; sBtn.style.opacity = '0.55'; sBtn.style.cursor = 'not-allowed'; }
+
+  const extraSpins = (6 + Math.random() * 6) * Math.PI * 2;
   const startAngle = wheelAngle;
   const targetAngle = startAngle + extraSpins;
-  const duration = 4000 + Math.random() * 1500;
+  const duration = 4500 + Math.random() * 1500;
   const startTime = Date.now();
+
+  function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
 
   function animate() {
     const elapsed = Date.now() - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    // Cubic ease out
-    const ease = 1 - Math.pow(1 - progress, 4);
-    wheelAngle = startAngle + (targetAngle - startAngle) * ease;
+    wheelAngle = startAngle + (targetAngle - startAngle) * easeOut(progress);
     drawWheel(wheelAngle);
+
+    // Pointer wobble near end
+    const ptr = document.getElementById('wheel-pointer');
+    if (ptr && progress > 0.85) {
+      const speed = (1 - progress) * 8;
+      ptr.style.transform = `translateX(-50%) rotate(${Math.sin(elapsed / 40) * speed}deg)`;
+    }
 
     if (progress < 1) {
       requestAnimationFrame(animate);
     } else {
       isSpinning = false;
+      if (ptr) ptr.style.transform = 'translateX(-50%)';
       wheelAngle = wheelAngle % (Math.PI * 2);
-      // Determine winner: pointer at top (-PI/2)
-      const slice = (Math.PI * 2) / items.length;
-      const normalized = ((-(wheelAngle - Math.PI/2)) % (Math.PI*2) + Math.PI*2) % (Math.PI*2);
-      const winIndex = Math.floor(normalized / slice) % items.length;
+
+      // Determine winner
+      const sliceA = (Math.PI * 2) / items.length;
+      const normalized = ((-(wheelAngle - Math.PI / 2)) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+      const winIndex = Math.floor(normalized / sliceA) % items.length;
       const winner = items[winIndex];
-      const resultEl = document.getElementById('wheel-result');
-      if (resultEl) resultEl.innerHTML = `<span style="font-size:22px">${winner.emoji}</span> <span>${winner.label}!</span>${winner.tickets?`<span style="color:var(--gold)"> +${winner.tickets}🎟️</span>`:''}`;
-      if (winner.tickets) { addTickets(winner.tickets); }
-      playSound('success'); launchConfetti();
-      // Landing flash animation
+
+      // Show result with pop animation
+      const resEl = document.getElementById('wheel-result');
+      if (resEl) resEl.innerHTML = `
+        <div style="animation:popIn 0.45s cubic-bezier(.34,1.56,.64,1);display:inline-block">
+          <div style="background:linear-gradient(135deg,rgba(90,24,154,0.4),rgba(157,78,221,0.25));border:1px solid rgba(199,125,255,0.4);border-radius:18px;padding:12px 20px;display:inline-flex;align-items:center;gap:10px;box-shadow:0 8px 28px rgba(157,78,221,0.3)">
+            <span style="font-size:30px">${winner.emoji || '🎁'}</span>
+            <div style="text-align:left">
+              <div style="font-size:16px;font-weight:800;color:#fff">${winner.label}!</div>
+              ${winner.tickets ? `<div style="font-size:12px;color:#f6bb4e;font-weight:700;margin-top:2px">+${winner.tickets} 🎟️</div>` : ''}
+            </div>
+          </div>
+        </div>`;
+
+      if (winner.tickets) addTickets(winner.tickets);
+      playSound('success');
+      // Purple confetti for wins
+      if (typeof confetti !== 'undefined') {
+        confetti({ particleCount:60, spread:65, origin:{y:0.55}, colors:['#a088fa','#c77dff','#9d4edd','#e0aaff','#fc7790'] });
+      } else { launchConfetti(); }
+
+      // Canvas pulse glow
       const wCanvas = document.getElementById('wheel-canvas');
       if (wCanvas) {
-        wCanvas.style.boxShadow = '0 0 80px rgba(246,187,78,1),0 0 160px rgba(246,187,78,0.5)';
         wCanvas.style.transition = 'box-shadow 0.1s';
-        setTimeout(() => { wCanvas.style.boxShadow = '0 0 60px rgba(160,136,250,0.2)'; wCanvas.style.transition = 'box-shadow 1s'; }, 600);
+        wCanvas.style.boxShadow = '0 0 70px rgba(199,125,255,0.8), 0 0 140px rgba(157,78,221,0.4)';
+        setTimeout(() => { wCanvas.style.transition = 'box-shadow 1.2s'; wCanvas.style.boxShadow = ''; }, 700);
       }
-      const winBtn = document.getElementById('wheel-spin-btn');
-      if (winBtn) { winBtn.disabled = false; winBtn.style.opacity = '1'; winBtn.style.cursor = 'pointer'; }
-      const resEl = document.getElementById('wheel-result');
-      if (resEl) resEl.innerHTML = `<div style="animation:popIn 0.4s cubic-bezier(.34,1.56,.64,1)"><div style="font-size:36px;margin-bottom:3px">${winner.emoji||'🎁'}</div><div style="font-size:17px;font-weight:800;color:#fff">${winner.label}!</div>${winner.tickets?`<div style="font-size:13px;color:#f6bb4e;font-weight:700;margin-top:3px">+${winner.tickets} 🎟️</div>`:''}</div>`;
+
+      if (sBtn) { sBtn.disabled = false; sBtn.style.opacity = '1'; sBtn.style.cursor = 'pointer'; }
     }
   }
-  // Disable spin button while spinning
-  const sBtn = document.getElementById('wheel-spin-btn');
-  if (sBtn) { sBtn.disabled = true; sBtn.style.opacity = '0.5'; sBtn.style.cursor = 'not-allowed'; }
   requestAnimationFrame(animate);
 }
 
@@ -18124,85 +18177,104 @@ function tpBuy(id,ctx) { buyTheme(id); const c=document.getElementById(ctx==='sh
 function tpApply(id,ctx) { activateTheme(id); const c=document.getElementById(ctx==='shop'?'shop-content':'themeshop-content'); if(c) _renderThemes(c,ctx); }
 
 function _renderThemes(c, ctx) {
-  const isShop = ctx==='shop';
-  const allT = isShop ? THEMES.filter(t=>!S.purchasedThemes.includes(t.id))
-                       : THEMES.filter(t=>S.purchasedThemes.includes(t.id));
+  const isShop = ctx === 'shop';
+  const allT = isShop ? THEMES.filter(t => !S.purchasedThemes.includes(t.id))
+                       : THEMES.filter(t => S.purchasedThemes.includes(t.id));
   let page = isShop ? themeShopPage : themeMyPage;
   const totalThemes = allT.length;
-  const totalPages = Math.max(1,Math.ceil(totalThemes/THEMES_PER_PAGE));
-  page = Math.max(0,Math.min(page,totalPages-1));
-  if (isShop) themeShopPage=page; else themeMyPage=page;
-  const startIdx = page*THEMES_PER_PAGE;
-  const pageThemes = allT.slice(startIdx,startIdx+THEMES_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(totalThemes / THEMES_PER_PAGE));
+  page = Math.max(0, Math.min(page, totalPages - 1));
+  if (isShop) themeShopPage = page; else themeMyPage = page;
+  const startIdx = page * THEMES_PER_PAGE;
+  const pageThemes = allT.slice(startIdx, startIdx + THEMES_PER_PAGE);
   const ownedCount = S.purchasedThemes.length;
 
   const emptyMsg = isShop
-    ? '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.4)"><div style="font-size:32px;margin-bottom:8px">🎉</div>You own all themes!</div>'
-    : '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.4)"><div style="font-size:32px;margin-bottom:8px">🎨</div>No themes owned yet.<br><small style="font-size:11px">Buy themes from Shop → Themes tab.</small></div>';
+    ? `<div style="display:flex;flex-direction:column;align-items:center;padding:48px 20px;gap:10px"><div style="font-size:44px">✨</div><div style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.5)">You own every theme!</div><div style="font-size:12px;color:rgba(255,255,255,0.28)">Check back for new drops</div></div>`
+    : `<div style="display:flex;flex-direction:column;align-items:center;padding:48px 20px;gap:10px"><div style="font-size:44px">🎨</div><div style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.5)">No themes unlocked yet</div><div style="font-size:12px;color:rgba(255,255,255,0.28)">Browse the Shop tab to find themes</div></div>`;
 
   c.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <div>
-        <div style="font-size:16px;font-weight:700;color:var(--fg)">${isShop ? '🛍️ Buy Themes' : '🎨 My Themes'}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px">${isShop ? (THEMES.length-ownedCount)+' available to buy' : ownedCount+'/'+THEMES.length+' owned'}</div>
+    <div style="padding:14px 16px 0">
+      <!-- Header row -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:18px;font-weight:800;color:#fff;letter-spacing:-0.3px">${isShop ? 'Discover' : 'My Themes'}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:2px">${isShop ? (THEMES.length - ownedCount) + ' available' : ownedCount + ' / ' + THEMES.length + ' unlocked'}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="background:rgba(160,136,250,0.1);border:1px solid rgba(160,136,250,0.2);border-radius:10px;padding:6px 10px;display:flex;align-items:center;gap:5px">
+            <span style="font-size:13px">🎟️</span>
+            <span style="font-size:14px;font-weight:800;color:#a088fa">${S.tickets}</span>
+          </div>
+        </div>
       </div>
-      <div style="text-align:right">
-        <div style="font-size:13px;font-weight:700;color:var(--gold)">🎟️ ${S.tickets}</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:1px">${totalPages>1 ? 'Page '+(page+1)+' of '+totalPages : ''}</div>
-      </div>
-    </div>
 
-    ${totalThemes === 0 ? emptyMsg : ''}
+      ${totalThemes === 0 ? emptyMsg : `
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          ${pageThemes.map(t => {
+            const owned = S.purchasedThemes.includes(t.id);
+            const active = S.activeTheme === t.id;
+            const canAfford = t.cost <= S.tickets;
+            const tier = t.mythic ? 'mythic' : t.legendary ? 'legendary' : '';
+            const tierColor = tier === 'mythic' ? '#00c8ff' : tier === 'legendary' ? '#ffd700' : null;
+            const accentColor = active ? 'var(--accent1)' : tierColor || (owned ? '#a088fa' : 'rgba(255,255,255,0.5)');
 
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
-      ${pageThemes.map(t => {
-        const owned = S.purchasedThemes.includes(t.id);
-        const active = S.activeTheme === t.id;
-        const canAfford = t.cost <= S.tickets;
-        return `
-          <div class="card" style="display:flex;align-items:center;gap:10px;padding:10px 12px;position:relative;overflow:hidden;${active?'border-color:var(--accent1);background:rgba(160,136,250,0.08)':''}${t.mythic?';border-color:rgba(0,200,255,0.5);box-shadow:0 0 24px rgba(0,200,255,0.2),0 0 8px rgba(180,0,255,0.15)':t.legendary?';border-color:rgba(255,215,0,0.4);box-shadow:0 0 16px rgba(255,215,0,0.12)':''}">
-            ${active ? '<div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--accent1);border-radius:3px 0 0 3px"></div>' : ''}
-            ${t.mythic ? '<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#00c8ff,#8800ff,#ff0088,#8800ff,#00c8ff);animation:ticketShimmer 1.2s linear infinite"></div>' : t.mythic ? '<div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#00c8ff,#8800ff,#ff0088,#8800ff,#00c8ff);animation:ticketShimmer 1s linear infinite"></div>' : t.legendary ? '<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#b8860b,#ffd700,#ff8c00,#ffd700,#b8860b);animation:ticketShimmer 2s linear infinite"></div>' : ''}
-            <div style="display:flex;gap:2px;flex-shrink:0;${t.legendary?'filter:drop-shadow(0 0 6px rgba(255,215,0,0.5))':''}">
-              ${t.preview.map(col => `<div style="width:12px;height:40px;background:${col};border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>`).join('')}
-            </div>
-            <div style="flex:1;min-width:0">
-              <div style="display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden">
-                <div style="font-size:13px;font-weight:700;color:${t.legendary?'#ffd700':'var(--fg)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex-shrink:1">${t.name}</div>
-                ${t.mythic ? '<span style="font-size:8px;font-weight:900;background:linear-gradient(135deg,#00c8ff,#8800ff,#ff0088);color:#fff;padding:2px 6px;border-radius:4px;letter-spacing:0.5px;animation:ticketShimmer 1.5s linear infinite;background-size:200%">✦ MYTHIC ✦</span>' : t.mythic ? '<span style="font-size:8px;font-weight:900;background:linear-gradient(135deg,#00c8ff,#8800ff,#ff0088);color:#fff;padding:2px 6px;border-radius:4px;letter-spacing:0.5px">✦ MYTHIC ✦</span>' : t.legendary ? '<span style="font-size:8px;font-weight:900;background:linear-gradient(135deg,#b8860b,#ffd700);color:#000;padding:2px 5px;border-radius:4px;letter-spacing:0.5px">LEGENDARY</span>' : ''}
+            return `<div style="
+              background: ${active ? 'rgba(160,136,250,0.1)' : tier === 'mythic' ? 'rgba(0,200,255,0.04)' : tier === 'legendary' ? 'rgba(255,215,0,0.05)' : 'rgba(255,255,255,0.03)'};
+              border: 1px solid ${active ? 'rgba(160,136,250,0.45)' : tier === 'mythic' ? 'rgba(0,200,255,0.35)' : tier === 'legendary' ? 'rgba(255,215,0,0.3)' : 'rgba(255,255,255,0.08)'};
+              border-radius: 18px;
+              padding: 14px;
+              display: flex;
+              align-items: center;
+              gap: 13px;
+              position: relative;
+              overflow: hidden;
+              transition: all 0.2s;
+              ${active ? 'box-shadow: 0 0 20px rgba(160,136,250,0.15);' : tier === 'mythic' ? 'box-shadow: 0 0 24px rgba(0,200,255,0.1);' : tier === 'legendary' ? 'box-shadow: 0 0 20px rgba(255,215,0,0.08);' : ''}
+            ">
+              ${active ? '<div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#a088fa,#c77dff);border-radius:2px 0 0 2px"></div>' : ''}
+              ${tier === 'mythic' ? '<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#00c8ff,#8800ff,#ff0088,#8800ff,#00c8ff);background-size:200%;animation:ticketShimmer 1.5s linear infinite"></div>' : tier === 'legendary' ? '<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#b8860b,#ffd700,#ff8c00,#ffd700,#b8860b);background-size:200%;animation:ticketShimmer 2s linear infinite"></div>' : ''}
+              <!-- Colour swatch preview -->
+              <div style="display:flex;gap:3px;flex-shrink:0;border-radius:10px;overflow:hidden;${tier === 'legendary' ? 'filter:drop-shadow(0 0 5px rgba(255,215,0,0.4))' : tier === 'mythic' ? 'filter:drop-shadow(0 0 5px rgba(0,200,255,0.35))' : active ? 'filter:drop-shadow(0 0 5px rgba(160,136,250,0.35))' : ''}">
+                ${t.preview.map(col => `<div style="width:14px;height:46px;background:${col}"></div>`).join('')}
               </div>
-              <div style="font-size:10px;margin-top:2px;color:${active?'var(--accent1)':owned?'#4caf6e':t.legendary?'#ffd700':'var(--gold)'}">
-                ${active ? '✓ Active' : owned ? '✓ Owned' : '🎟️ '+t.cost+' tickets'}
+              <!-- Info -->
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;overflow:hidden">
+                  <span style="font-size:14px;font-weight:700;color:${tier === 'legendary' ? '#ffd700' : '#fff'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1">${t.name}</span>
+                  ${tier === 'mythic' ? '<span style="font-size:8px;font-weight:900;background:linear-gradient(135deg,#00c8ff,#8800ff,#ff0088);color:#fff;padding:2px 6px;border-radius:5px;letter-spacing:0.5px;flex-shrink:0">✦ MYTHIC</span>' : tier === 'legendary' ? '<span style="font-size:8px;font-weight:900;background:linear-gradient(135deg,#b8860b,#ffd700);color:#000;padding:2px 6px;border-radius:5px;letter-spacing:0.5px;flex-shrink:0">LEGENDARY</span>' : ''}
+                </div>
+                <div style="font-size:11px;font-weight:600;color:${active ? '#a088fa' : owned ? 'rgba(160,136,250,0.6)' : canAfford ? 'rgba(246,187,78,0.8)' : 'rgba(255,255,255,0.3)'}">
+                  ${active ? '● Active' : owned ? '✓ Owned' : '🎟️ ' + t.cost + ' tickets'}
+                </div>
               </div>
-            </div>
-            <div style="flex-shrink:0">
-              ${active
-                ? '<div style="width:28px;height:28px;border-radius:50%;background:var(--accent1);display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff">✓</div>'
-                : owned
-                  ? '<button class="btn btn-ghost btn-sm" onclick="tpApply(\''+t.id+'\',\''+ctx+'\')" style="font-size:11px;padding:4px 10px">Apply</button>'
-                  : '<button class="btn btn-sm" onclick="tpBuy(\''+t.id+'\',\''+ctx+'\')" style="font-size:11px;padding:4px 10px;background:'+(canAfford?'linear-gradient(135deg,var(--accent1),var(--gold))':'rgba(255,255,255,0.06)')+';border:none;color:'+(canAfford?'#fff':'rgba(255,255,255,0.3)')+';border-radius:8px;cursor:'+(canAfford?'pointer':'not-allowed')+';font-weight:700" '+(canAfford?'':'disabled')+'>Buy</button>'
-              }
-            </div>
-          </div>`;
-      }).join('')}
-    </div>
+              <!-- Action button -->
+              <div style="flex-shrink:0">
+                ${active
+                  ? `<div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#a088fa,#c77dff);display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;box-shadow:0 4px 12px rgba(160,136,250,0.4)">✓</div>`
+                  : owned
+                    ? `<button onclick="tpApply('${t.id}','${ctx}')" style="padding:8px 14px;border-radius:99px;background:rgba(160,136,250,0.12);border:1px solid rgba(160,136,250,0.3);color:#a088fa;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.1px" onmouseenter="this.style.background='rgba(160,136,250,0.22)'" onmouseleave="this.style.background='rgba(160,136,250,0.12)'">Apply</button>`
+                    : `<button onclick="tpBuy('${t.id}','${ctx}')" ${canAfford ? '' : 'disabled'} style="padding:8px 14px;border-radius:99px;background:${canAfford ? 'linear-gradient(135deg,#5a189a,#9d4edd)' : 'rgba(255,255,255,0.05)'};border:${canAfford ? 'none' : '1px solid rgba(255,255,255,0.08)'};color:${canAfford ? '#fff' : 'rgba(255,255,255,0.25)'};font-size:11px;font-weight:700;cursor:${canAfford ? 'pointer' : 'not-allowed'};transition:all 0.2s;letter-spacing:0.1px;box-shadow:${canAfford ? '0 4px 14px rgba(157,78,221,0.35)' : 'none'}" ${canAfford ? `onmouseenter="this.style.background='linear-gradient(135deg,#7b2ff7,#c77dff)'" onmouseleave="this.style.background='linear-gradient(135deg,#5a189a,#9d4edd)'"` : ''}>Get</button>`
+                }
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
 
-    ${totalPages > 1 ? `
-    <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 0">
-      <button onclick="tpNav('${ctx}',-1)"
-        style="width:40px;height:40px;border-radius:50%;background:${page>0?'rgba(160,136,250,0.2)':'rgba(255,255,255,0.04)'};border:1px solid ${page>0?'rgba(160,136,250,0.4)':'rgba(255,255,255,0.08)'};color:${page>0?'var(--accent1)':'rgba(255,255,255,0.2)'};font-size:16px;cursor:${page>0?'pointer':'default'};display:flex;align-items:center;justify-content:center;transition:all 0.2s" ${page===0?'disabled':''}>‹</button>
-      <div style="display:flex;gap:5px;align-items:center">
-        ${Array.from({length:totalPages},(_,p)=>
-          '<div onclick="tpGoto(\''+ctx+'\','+p+')" style="width:'+(p===page?20:7)+'px;height:7px;border-radius:99px;background:'+(p===page?'var(--accent1)':'rgba(255,255,255,0.2)')+';transition:all 0.3s;cursor:pointer"></div>'
-        ).join('')}
-      </div>
-      <button onclick="tpNav('${ctx}',1)"
-        style="width:40px;height:40px;border-radius:50%;background:${page<totalPages-1?'rgba(160,136,250,0.2)':'rgba(255,255,255,0.04)'};border:1px solid ${page<totalPages-1?'rgba(160,136,250,0.4)':'rgba(255,255,255,0.08)'};color:${page<totalPages-1?'var(--accent1)':'rgba(255,255,255,0.2)'};font-size:16px;cursor:${page<totalPages-1?'pointer':'default'};display:flex;align-items:center;justify-content:center;transition:all 0.2s" ${page===totalPages-1?'disabled':''}>›</button>
+        ${totalPages > 1 ? `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0 14px">
+          <button onclick="tpNav('${ctx}',-1)" ${page === 0 ? 'disabled' : ''} style="width:38px;height:38px;border-radius:12px;background:${page > 0 ? 'rgba(160,136,250,0.14)' : 'rgba(255,255,255,0.03)'};border:1px solid ${page > 0 ? 'rgba(160,136,250,0.3)' : 'rgba(255,255,255,0.06)'};color:${page > 0 ? '#a088fa' : 'rgba(255,255,255,0.15)'};font-size:18px;cursor:${page > 0 ? 'pointer' : 'default'};display:flex;align-items:center;justify-content:center;transition:all 0.2s">‹</button>
+          <div style="display:flex;gap:5px;align-items:center">
+            ${Array.from({length: totalPages}, (_, p) =>
+              `<div onclick="tpGoto('${ctx}',${p})" style="width:${p === page ? 22 : 7}px;height:7px;border-radius:99px;background:${p === page ? 'linear-gradient(90deg,#a088fa,#c77dff)' : 'rgba(255,255,255,0.18)'};transition:all 0.3s;cursor:pointer;box-shadow:${p === page ? '0 0 8px rgba(160,136,250,0.5)' : 'none'}"></div>`
+            ).join('')}
+          </div>
+          <button onclick="tpNav('${ctx}',1)" ${page === totalPages - 1 ? 'disabled' : ''} style="width:38px;height:38px;border-radius:12px;background:${page < totalPages - 1 ? 'rgba(160,136,250,0.14)' : 'rgba(255,255,255,0.03)'};border:1px solid ${page < totalPages - 1 ? 'rgba(160,136,250,0.3)' : 'rgba(255,255,255,0.06)'};color:${page < totalPages - 1 ? '#a088fa' : 'rgba(255,255,255,0.15)'};font-size:18px;cursor:${page < totalPages - 1 ? 'pointer' : 'default'};display:flex;align-items:center;justify-content:center;transition:all 0.2s">›</button>
+        </div>
+        <div style="text-align:center;font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:14px">${startIdx + 1}–${Math.min(startIdx + THEMES_PER_PAGE, totalThemes)} of ${totalThemes}</div>
+        ` : '<div style="height:14px"></div>'}
+      `}
     </div>
-    <div style="text-align:center;font-size:10px;color:rgba(255,255,255,0.3);margin-top:4px">
-      ${startIdx+1}–${Math.min(startIdx+THEMES_PER_PAGE,totalThemes)} of ${totalThemes}
-    </div>
-    ` : ''}
   `;
 }
 
@@ -19818,69 +19890,122 @@ function renderBattlepass() {
   const earned = _getBPProgress();
   const milestones = rot.milestones || [];
   const maxAt = milestones.length ? milestones[milestones.length-1].at : 1000;
-  const pct = Math.min(100, (earned/maxAt)*100);
-  
-  // Check for claimable
-  milestones.forEach(m => {
-    if (!m.claimed && earned >= m.at) {
-      // Auto-highlight but don't claim
+  const pct = Math.min(100, (earned / maxAt) * 100);
+  const isComplete = pct >= 100 && milestones.every(m => m.claimed);
+
+  // ── Completion celebration (fires once per session per completion) ──
+  if (isComplete && !window._bpCelebrated) {
+    window._bpCelebrated = true;
+    setTimeout(() => {
+      playSound('bell');
+      _launchPurpleConfetti();
+    }, 300);
+  } else if (!isComplete) {
+    window._bpCelebrated = false;
+  }
+
+  // ── Countdown ──
+  const endDate = S.bpPass.endDate || null;
+  let countdownHTML = '';
+  if (endDate) {
+    const diff = new Date(endDate) - new Date();
+    if (diff > 0) {
+      const days = Math.floor(diff / 86400000);
+      const hrs  = Math.floor((diff % 86400000) / 3600000);
+      const mins = Math.floor((diff % 3600000) / 60000);
+      const urgent = days <= 3;
+      countdownHTML = `<div style="margin-bottom:16px;background:${urgent ? 'rgba(252,119,144,0.07)' : 'rgba(160,136,250,0.06)'};border:1px solid ${urgent ? 'rgba(252,119,144,0.28)' : 'rgba(160,136,250,0.2)'};border-radius:20px;padding:14px 16px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${urgent ? '#fc7790' : '#a088fa'},transparent);opacity:0.5"></div>
+        <div style="font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:${urgent ? 'rgba(252,119,144,0.7)' : 'rgba(160,136,250,0.6)'};margin-bottom:11px">${urgent ? '🔥' : '⏳'} Season Ends In</div>
+        <div style="display:flex;gap:10px">
+          ${[['DAYS', days], ['HRS', hrs], ['MIN', mins]].map(([lbl, val]) => `<div style="flex:1;background:rgba(0,0,0,0.35);border-radius:14px;padding:11px 6px 9px;border:1px solid ${urgent ? 'rgba(252,119,144,0.18)' : 'rgba(160,136,250,0.14)'};text-align:center">
+            <div style="font-size:26px;font-weight:900;color:${urgent ? '#fc7790' : '#c0b9f5'};letter-spacing:-1.5px;line-height:1;font-variant-numeric:tabular-nums">${String(val).padStart(2,'0')}</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:0.8px;margin-top:5px;font-weight:700">${lbl}</div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    } else {
+      countdownHTML = `<div style="margin-bottom:16px;padding:10px 14px;background:rgba(160,136,250,0.06);border:1px solid rgba(160,136,250,0.18);border-radius:14px;font-size:12px;color:rgba(160,136,250,0.6);font-weight:700;text-align:center">🏁 Season has ended</div>`;
     }
-  });
+  }
 
-  c.innerHTML = `
-    <div style="padding:16px 16px 0">
-      <!-- Season header -->
-      <div style="background:linear-gradient(135deg,rgba(255,215,0,0.12),rgba(255,140,0,0.08));border:1px solid rgba(255,215,0,0.2);border-radius:20px;padding:16px;margin-bottom:16px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div>
-            <div style="font-size:10px;color:rgba(255,215,0,0.6);text-transform:uppercase;letter-spacing:1px;font-weight:800">Current Pass</div>
-            <div style="font-size:20px;font-weight:900;color:#ffd700">${rot.name}</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-size:10px;color:rgba(255,255,255,0.4)">Tickets Earned</div>
-            <div style="font-size:24px;font-weight:900;color:#f6bb4e">${earned}</div>
-          </div>
-        </div>
-        <!-- Progress bar -->
-        <div style="height:12px;background:rgba(0,0,0,0.4);border-radius:99px;overflow:hidden;position:relative;border:1px solid rgba(255,215,0,0.15);margin-bottom:6px">
-          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#b8860b,#ffd700,#ff8c00);border-radius:99px;transition:width 0.8s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden">
-            <div style="position:absolute;top:0;left:-100%;right:0;bottom:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);animation:ticketShimmer 1.5s infinite linear"></div>
-          </div>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,0.35)"><span>0</span><span>${maxAt} tickets</span></div>
-      </div>
-      
-      <!-- Milestones -->
-      <div style="font-size:10px;font-weight:800;color:rgba(255,215,0,0.5);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">🏅 Milestones</div>
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
-        ${milestones.map((m,mi) => {
-          const unlocked = earned >= m.at;
-          const canClaim = unlocked && !m.claimed;
-          return `<div style="background:${m.claimed?'rgba(76,175,110,0.08)':unlocked?'rgba(255,215,0,0.08)':'rgba(255,255,255,0.03)'};border:1px solid ${m.claimed?'rgba(76,175,110,0.25)':unlocked?'rgba(255,215,0,0.3)':'rgba(255,255,255,0.06)'};border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:12px;transition:all 0.3s;position:relative;overflow:hidden">
-            ${unlocked && !m.claimed ? '<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#ffd700,#ff8c00,#ffd700);animation:ticketShimmer 2s infinite linear"></div>' : ''}
-            <div style="width:48px;height:48px;border-radius:14px;background:${m.claimed?'rgba(76,175,110,0.2)':unlocked?'rgba(255,215,0,0.15)':'rgba(255,255,255,0.05)'};border:2px solid ${m.claimed?'rgba(76,175,110,0.4)':unlocked?'rgba(255,215,0,0.4)':'rgba(255,255,255,0.08)'};display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;filter:${unlocked?'none':'grayscale(0.8)'}">
-              ${m.claimed?'✓':m.emoji}
-            </div>
-            <div style="flex:1">
-              <div style="font-size:14px;font-weight:700;color:${m.claimed?'rgba(76,175,110,0.8)':unlocked?'#ffd700':'rgba(255,255,255,0.5)'}">${m.reward}</div>
-              <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:2px">At ${m.at} tickets earned</div>
-            </div>
-            ${m.claimed ? '<div style="font-size:11px;font-weight:700;color:#4caf6e">✓ Claimed</div>' :
-              canClaim ? `<button onclick="claimBPMilestone(${mi})" style="padding:8px 14px;border-radius:99px;background:linear-gradient(135deg,#b8860b,#ffd700);border:none;color:#000;font-size:11px;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(255,215,0,0.4)">CLAIM!</button>` :
-              `<div style="font-size:11px;color:rgba(255,255,255,0.2);text-align:right">${m.at - earned > 0 ? (m.at-earned)+' more' : ''}</div>`}
-          </div>`;
-        }).join('')}
-      </div>
+  // ── Header visuals – purple glow when complete ──
+  const hdrBg     = isComplete ? 'background:linear-gradient(135deg,rgba(90,24,154,0.5),rgba(157,78,221,0.32),rgba(199,125,255,0.12))' : 'background:linear-gradient(135deg,rgba(90,24,154,0.15),rgba(157,78,221,0.1))';
+  const hdrBorder = isComplete ? 'border:1.5px solid rgba(199,125,255,0.6)' : 'border:1px solid rgba(160,136,250,0.22)';
+  const hdrShadow = isComplete ? 'box-shadow:0 0 50px rgba(157,78,221,0.28),0 0 100px rgba(157,78,221,0.08),inset 0 1px 0 rgba(255,255,255,0.07)' : '';
 
-      <!-- Actions -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-        <button onclick="openBPRotationGallery()" style="padding:12px;border-radius:14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-size:12px;font-weight:700;cursor:pointer">📚 Gallery</button>
-        <button onclick="openBPSettings()" style="padding:12px;border-radius:14px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);color:#ffd700;font-size:12px;font-weight:700;cursor:pointer">⚙️ Settings</button>
+  c.innerHTML = `<div style="padding:16px 16px 0">
+    ${countdownHTML}
+    <div style="${hdrBg};${hdrBorder};${hdrShadow};border-radius:22px;padding:18px;margin-bottom:16px;position:relative;overflow:hidden">
+      ${isComplete ? '<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(199,125,255,0.2),transparent 65%);pointer-events:none"></div><div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#c77dff,#e0aaff,#c77dff,transparent);animation:ticketShimmer 2.5s linear infinite"></div>' : ''}
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;position:relative">
+        <div>
+          <div style="font-size:9px;color:${isComplete ? 'rgba(199,125,255,0.8)' : 'rgba(160,136,250,0.6)'};text-transform:uppercase;letter-spacing:1.2px;font-weight:800;margin-bottom:3px">${isComplete ? '✨ Completed' : 'Current Pass'}</div>
+          <div style="font-size:21px;font-weight:900;color:${isComplete ? '#e0aaff' : '#c0b9f5'};letter-spacing:-0.3px">${rot.name}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:9px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px">Tickets</div>
+          <div style="font-size:32px;font-weight:900;color:${isComplete ? '#c77dff' : '#a088fa'};line-height:1;letter-spacing:-1px">${earned}</div>
+        </div>
       </div>
+      <div style="height:12px;background:rgba(0,0,0,0.45);border-radius:99px;overflow:hidden;border:1px solid rgba(160,136,250,0.12);margin-bottom:7px;position:relative">
+        <div style="height:100%;width:${pct}%;background:${isComplete ? 'linear-gradient(90deg,#5a189a,#9d4edd,#c77dff,#e0aaff)' : 'linear-gradient(90deg,#5a189a,#9d4edd,#c77dff)'};border-radius:99px;transition:width 0.9s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden">
+          <div style="position:absolute;top:0;left:-100%;right:0;bottom:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent);animation:ticketShimmer 1.8s infinite linear"></div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:9px"><span style="color:rgba(255,255,255,0.25)">0</span><span style="color:rgba(160,136,250,0.4);font-weight:600">${maxAt} tickets</span></div>
     </div>
-  `;
+    <div style="font-size:10px;font-weight:800;color:rgba(160,136,250,0.55);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">🏅 Milestones</div>
+    <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:16px">
+      ${milestones.map((m, mi) => {
+        const unlocked = earned >= m.at;
+        const canClaim = unlocked && !m.claimed;
+        return `<div style="background:${m.claimed ? 'rgba(160,136,250,0.08)' : unlocked ? 'rgba(160,136,250,0.05)' : 'rgba(255,255,255,0.022)'};border:1px solid ${m.claimed ? 'rgba(160,136,250,0.38)' : unlocked ? 'rgba(160,136,250,0.22)' : 'rgba(255,255,255,0.06)'};border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden">
+          ${canClaim ? '<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#5a189a,#9d4edd,#c77dff,#9d4edd,#5a189a);background-size:200%;animation:ticketShimmer 2s linear infinite"></div>' : ''}
+          <div style="width:46px;height:46px;border-radius:13px;background:${m.claimed ? 'rgba(160,136,250,0.18)' : unlocked ? 'rgba(160,136,250,0.1)' : 'rgba(255,255,255,0.04)'};border:${m.claimed ? '2px solid rgba(160,136,250,0.55)' : unlocked ? '2px solid rgba(160,136,250,0.28)' : '2px solid rgba(255,255,255,0.07)'};display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;filter:${unlocked ? 'none' : 'grayscale(0.75)'};box-shadow:${m.claimed ? '0 0 16px rgba(160,136,250,0.28)' : 'none'}">${m.claimed ? '✓' : m.emoji}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:${m.claimed ? '#a088fa' : unlocked ? '#c0b9f5' : 'rgba(255,255,255,0.4)'};">${m.reward}</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.28);margin-top:2px">At ${m.at} tickets</div>
+          </div>
+          <div style="flex-shrink:0">
+            ${m.claimed ? '<span style="font-size:11px;font-weight:700;color:#a088fa">✓</span>' :
+              canClaim ? `<button onclick="claimBPMilestone(${mi})" style="padding:8px 15px;border-radius:99px;background:linear-gradient(135deg,#5a189a,#9d4edd,#c77dff);border:none;color:#fff;font-size:11px;font-weight:900;cursor:pointer;box-shadow:0 4px 20px rgba(157,78,221,0.5);letter-spacing:0.2px">CLAIM</button>` :
+              `<span style="font-size:11px;color:rgba(255,255,255,0.18)">${m.at - earned > 0 ? '+' + (m.at - earned) : ''}</span>`}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+      <button onclick="openBPRotationGallery()" style="padding:12px;border-radius:14px;background:rgba(160,136,250,0.07);border:1px solid rgba(160,136,250,0.15);color:rgba(160,136,250,0.7);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s" onmouseenter="this.style.background='rgba(160,136,250,0.13)'" onmouseleave="this.style.background='rgba(160,136,250,0.07)'">📚 Gallery</button>
+      <button onclick="openBPSettings()" style="padding:12px;border-radius:14px;background:rgba(160,136,250,0.1);border:1px solid rgba(160,136,250,0.25);color:#c0b9f5;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s" onmouseenter="this.style.background='rgba(160,136,250,0.18)'" onmouseleave="this.style.background='rgba(160,136,250,0.1)'">⚙️ Settings</button>
+    </div>
+  </div>`;
+  _bpStartCountdown();
 }
 
+function _launchPurpleConfetti() {
+  if (typeof confetti !== 'undefined') {
+    confetti({ particleCount:80, spread:70, origin:{y:0.6}, colors:['#a088fa','#c77dff','#9d4edd','#e0aaff','#5a189a','#fc7790'], startVelocity:35, gravity:0.9, ticks:200 });
+    setTimeout(() => confetti({ particleCount:50, spread:100, origin:{y:0.5}, colors:['#c77dff','#a088fa','#e0aaff','#7b2ff7'], startVelocity:25, gravity:1, ticks:180 }), 400);
+  } else {
+    launchConfetti();
+  }
+}
+
+let _bpCountdownInterval = null;
+function _bpStartCountdown() {
+  if (_bpCountdownInterval) return;
+  _bpCountdownInterval = setInterval(() => {
+    const screen = document.getElementById('screen-battlepass');
+    if (screen && screen.classList.contains('active')) {
+      // Only re-render the countdown portion to avoid full re-render flicker
+      renderBattlepass();
+    } else {
+      clearInterval(_bpCountdownInterval);
+      _bpCountdownInterval = null;
+    }
+  }, 60000);
+}
 function claimBPMilestone(mi) {
   const rot = S.bpPass.rotations[S.bpPass.rotation];
   if (!rot) return;
@@ -19905,24 +20030,32 @@ function openBPSettings() {
     document.getElementById('phone').appendChild(ov);
   }
   const rot = S.bpPass.rotations[S.bpPass.rotation]||{name:'Season 1',milestones:[]};
-  ov.innerHTML = `<div class="modal" style="max-height:84vh;display:flex;flex-direction:column;padding:0;overflow:hidden;background:linear-gradient(160deg,rgba(22,14,2,0.99),rgba(10,8,2,0.99));border:1px solid rgba(255,215,0,0.18);box-shadow:0 24px 64px rgba(0,0,0,0.95),0 0 0 1px rgba(255,215,0,0.06)">
-    <div style="padding:16px 16px 14px;border-bottom:1px solid rgba(255,215,0,0.1);flex-shrink:0;background:linear-gradient(135deg,rgba(255,215,0,0.06),transparent)">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <span style="font-size:18px">🏆</span>
-        <span style="font-size:14px;font-weight:900;background:linear-gradient(90deg,#ffd700,#ffaa00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:0.2px">Season Pass Settings</span>
+  // Default end date: last day of current month
+  const _defEnd = (() => { const n=new Date(); return new Date(n.getFullYear(),n.getMonth()+1,0).toISOString().slice(0,10); })();
+  const _curEnd = S.bpPass.endDate ? S.bpPass.endDate.slice(0,10) : _defEnd;
+  ov.innerHTML = `<div class="modal" style="max-height:84vh;display:flex;flex-direction:column;padding:0;overflow:hidden;background:linear-gradient(160deg,rgba(10,4,28,0.99),rgba(6,2,18,0.99));border:1px solid rgba(160,136,250,0.2);box-shadow:0 24px 64px rgba(0,0,0,0.95),0 0 0 1px rgba(160,136,250,0.06)">
+    <div style="padding:16px 16px 14px;border-bottom:1px solid rgba(160,136,250,0.1);flex-shrink:0;background:linear-gradient(135deg,rgba(160,136,250,0.07),transparent)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <span style="font-size:18px">💜</span>
+        <span style="font-size:14px;font-weight:900;background:linear-gradient(90deg,#a088fa,#c77dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:0.2px">Season Pass Settings</span>
         <button onclick="closeModal('bp-settings-modal')" style="margin-left:auto;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
       </div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:10px;color:rgba(160,136,250,0.55);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px">Season Name</div>
+        <input class="input" id="bp-season-name" value="${rot.name}" placeholder="e.g. Season 1" style="background:rgba(160,136,250,0.07);border:1px solid rgba(160,136,250,0.22);color:#c0b9f5;font-weight:700;font-size:13px">
+      </div>
       <div>
-        <div style="font-size:10px;color:rgba(255,215,0,0.5);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px">Season Name</div>
-        <input class="input" id="bp-season-name" value="${rot.name}" placeholder="e.g. Season 1" style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);color:#ffd700;font-weight:700;font-size:13px">
+        <div style="font-size:10px;color:rgba(160,136,250,0.55);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:5px">⏳ Season End Date <span style="color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;letter-spacing:0">(live countdown)</span></div>
+        <input type="date" id="bp-end-date" value="${_curEnd}" style="width:100%;background:rgba(160,136,250,0.07);border:1px solid rgba(160,136,250,0.22);border-radius:10px;color:#c0b9f5;font-weight:700;font-size:13px;padding:9px 12px;outline:none;box-sizing:border-box;-webkit-appearance:none;color-scheme:dark">
+        <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:5px">Default: last day of current month. Updates live for all users.</div>
       </div>
     </div>
     <div id="bp-milestones-edit" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-height:60px"></div>
-    <div style="padding:10px 14px 14px;border-top:1px solid rgba(255,215,0,0.08);flex-shrink:0;background:rgba(0,0,0,0.35)">
-      <button onclick="addBPMilestoneEdit()" style="width:100%;padding:10px;border-radius:12px;background:rgba(255,215,0,0.07);border:1px dashed rgba(255,215,0,0.3);color:#ffd700;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:10px;transition:background .15s" onmouseenter="this.style.background='rgba(255,215,0,0.14)'" onmouseleave="this.style.background='rgba(255,215,0,0.07)'">＋ Add Milestone</button>
+    <div style="padding:10px 14px 14px;border-top:1px solid rgba(160,136,250,0.08);flex-shrink:0;background:rgba(0,0,0,0.35)">
+      <button onclick="addBPMilestoneEdit()" style="width:100%;padding:10px;border-radius:12px;background:rgba(160,136,250,0.07);border:1px dashed rgba(160,136,250,0.3);color:#a088fa;font-size:12px;font-weight:700;cursor:pointer;margin-bottom:10px;transition:background .15s" onmouseenter="this.style.background='rgba(160,136,250,0.14)'" onmouseleave="this.style.background='rgba(160,136,250,0.07)'">＋ Add Milestone</button>
       <div style="display:flex;gap:8px">
         <button class="btn btn-ghost btn-sm" style="flex:1;border-color:rgba(255,255,255,0.1)" onclick="closeModal('bp-settings-modal')">Cancel</button>
-        <button onclick="saveBPSettings()" style="flex:1;padding:9px;border-radius:10px;background:linear-gradient(135deg,#f6bb4e,#e07a30);border:none;color:#1a0800;font-size:12px;font-weight:900;cursor:pointer">💾 Save Pass</button>
+        <button onclick="saveBPSettings()" style="flex:1;padding:9px;border-radius:10px;background:linear-gradient(135deg,#5a189a,#9d4edd,#c77dff);border:none;color:#fff;font-size:12px;font-weight:900;cursor:pointer">💾 Save Pass</button>
       </div>
     </div>
   </div>`;
@@ -19972,10 +20105,19 @@ function addBPMilestoneEdit() {
 }
 function saveBPSettings() {
   const name = document.getElementById('bp-season-name').value || 'Season';
+  const endDateVal = document.getElementById('bp-end-date')?.value || null;
   const rot = S.bpPass.rotations[S.bpPass.rotation];
   if (rot) { rot.name=name; rot.milestones=_bpMilestonesEdit.sort((a,b)=>a.at-b.at); }
+  if (endDateVal) S.bpPass.endDate = endDateVal + 'T23:59:59';
   saveState(); closeModal('bp-settings-modal'); renderBattlepass();
-  showNotif('🏆','Pass Updated!','');
+  // Push end date live to Firestore so all users update in real-time
+  if (typeof fbDb !== 'undefined' && fbDb) {
+    fbDb.collection('config').doc('battlepass').get().then(doc => {
+      const cur = doc.exists ? doc.data() : { seasons:[], activeSeason:0 };
+      fbDb.collection('config').doc('battlepass').set({ ...cur, endDate: endDateVal ? endDateVal + 'T23:59:59' : null }, { merge:true });
+    }).catch(()=>{});
+  }
+  showNotif('💜','Pass Updated!','Countdown updated live for all players');
 }
 function openBPRotationGallery() {
   if (!fbCurrentUser || fbCurrentUser.email?.toLowerCase() !== (typeof ADMIN_EMAIL !== 'undefined' ? ADMIN_EMAIL.toLowerCase() : '')) {
@@ -20029,6 +20171,22 @@ loadState = function() {
 // UPDATE LOGS
 // ============================================================
 const UPDATE_LOGS = [
+  {
+    version: '0.1.17',
+    date: 'March 2026',
+    emoji: '✨',
+    title: 'Season Pass Overhaul, Spin Wheel Redesign, Themes Refresh & Quint Fix',
+    items: [
+      { tag:'new',     text:'Season Pass — Countdown timer on the Season Pass screen. Admin can set a live end-date from the Pass Settings panel; it updates in real-time for all connected users.' },
+      { tag:'upgrade', text:'Season Pass — When all milestones are claimed the header transforms into a glowing purple completion state with shimmer, glow, and purple-themed confetti celebration.' },
+      { tag:'upgrade', text:'Season Pass — Full visual overhaul: deep purple glassmorphism header, gradient progress bar, purple milestone cards, and polished claim buttons inspired by iPhone 15.' },
+      { tag:'fix',     text:'Quint — Timeline bar and stack cards now scroll together as one unit. Scrolling up or down no longer shifts the cards away from their assigned time positions.' },
+      { tag:'upgrade', text:'Spin Wheel — Full iOS 26 visual redesign: glowing ambient ring, gradient slices, glossy purple centre cap, pointer wobble animation, and purple confetti on win.' },
+      { tag:'upgrade', text:'Themes App — Complete overhaul inspired by iPhone 15 / iOS 26: larger colour swatches, tier badges, purple Buy/Apply buttons, improved layout and pagination.' },
+      { tag:'fix',     text:'Theme Shop header now correctly reads "Themes" instead of "Theme Shop".' },
+      { tag:'upgrade', text:'Scrollbars — All scrollable areas now use the game purple palette (rgba(160,136,250,0.4)) with a smooth hover state, globally consistent across the app.' },
+    ]
+  },
   {
     version: '0.1.16',
     date: 'March 2026',
@@ -20577,7 +20735,7 @@ document.getElementById('princess-theme-modal').addEventListener('click', e => {
 
 // ── True globals: var avoids temporal dead zone for code above fbInit ──
 var ADMIN_EMAIL      = "Djrocky2021@gmail.com";
-var GAME_VERSION     = "0.1.16";
+var GAME_VERSION     = "0.1.17";
 var fbCurrentUser    = null;
 var fbDb             = null;
 // Raw GitHub URL — fetched periodically to detect new versions automatically
@@ -20878,6 +21036,8 @@ window._fbListenBattlePass = function() {
       const newName = S.bpPass.rotations[newActive]?.name || 'New Season';
       showBroadcastNotif('🏆', 'New Season Pass Season!', newName);
     }
+    // Sync endDate live so countdown updates for all users immediately
+    if (data.endDate !== undefined) S.bpPass.endDate = data.endDate;
     saveState();
     if (typeof renderBattlepass === 'function' && document.getElementById('screen-battlepass')?.classList.contains('active')) {
       renderBattlepass();
