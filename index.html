@@ -388,11 +388,11 @@ button, a { touch-action: manipulation; }
   box-shadow:0 4px 16px rgba(0,0,0,0.5);
 }
 #ticket-progress-wrap:hover #ticket-tooltip { display:block; }
-@keyframes ticketBarTip {
-  0%   { opacity:0; transform:translateX(-50%) translateY(4px) scale(0.85); }
-  15%  { opacity:1; transform:translateX(-50%) translateY(0) scale(1); }
-  70%  { opacity:1; transform:translateX(-50%) translateY(-6px) scale(1); }
-  100% { opacity:0; transform:translateX(-50%) translateY(-18px) scale(0.9); }
+@keyframes ticketPip {
+  0%   { opacity:0; transform:translateX(-50%) translateY(0px) scale(0.7); }
+  15%  { opacity:1; transform:translateX(-50%) translateY(-4px) scale(1.05); }
+  70%  { opacity:1; transform:translateX(-50%) translateY(-12px) scale(1); }
+  100% { opacity:0; transform:translateX(-50%) translateY(-22px) scale(0.85); }
 }
 
 /* ===== SCREENS ===== */
@@ -418,6 +418,15 @@ button, a { touch-action: manipulation; }
 .screen::-webkit-scrollbar { width:3px; }
 .screen::-webkit-scrollbar-track { background:transparent; }
 .screen::-webkit-scrollbar-thumb { background:var(--border); border-radius:99px; }
+
+/* Quint: override .screen defaults — must never self-scroll, inner column scrolls */
+#screen-quint {
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+#screen-quint > div[style*="flex:1"] {
+  min-height: 0;
+}
 
 /* ===== HOME SCREEN ===== */
 #screen-home {
@@ -612,9 +621,9 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:
 input[type=number] { -moz-appearance:textfield; }
 /* Emoji picker */
 #emoji-picker-overlay {
-  position:fixed;top:0;left:0;right:0;bottom:0;
+  position:absolute;top:0;left:0;right:0;bottom:0;
   background:rgba(0,0,0,0);
-  z-index:99999;
+  z-index:9999;
   display:flex;align-items:center;justify-content:center;
   transition:background 0.22s ease;
   pointer-events:none;
@@ -627,12 +636,12 @@ input[type=number] { -moz-appearance:textfield; }
   background:rgba(18,14,34,0.97);
   border:1.5px solid rgba(160,136,250,0.3);
   border-radius:22px;
-  width:min(340px, calc(100vw - 24px));
-  max-width:340px;
-  /* Use dvh to fill correctly on mobile/desktop without clipping */
-  height:min(480px, calc(100dvh - 120px));
-  max-height:min(480px, calc(100dvh - 120px));
-  min-height:260px;
+  width:calc(100% - 24px);
+  max-width:296px;
+  /* Height: search bar ~50px + grid fills remaining space */
+  height:72%;
+  max-height:420px;
+  min-height:280px;
   display:flex;flex-direction:column;overflow:hidden;
   box-shadow:0 24px 64px rgba(0,0,0,0.85), 0 0 0 0.5px rgba(255,255,255,0.06) inset;
   /* Spring entrance animation */
@@ -678,11 +687,11 @@ input[type=number] { -moz-appearance:textfield; }
   flex:1;
   /* Custom scrollbar */
   scrollbar-width:thin;
-  scrollbar-color:#a088fa rgba(160,136,250,0.08);
+  scrollbar-color:rgba(160,136,250,0.3) transparent;
 }
-.emoji-picker-grid::-webkit-scrollbar { width:5px; }
-.emoji-picker-grid::-webkit-scrollbar-track { background:rgba(160,136,250,0.06);border-radius:99px; }
-.emoji-picker-grid::-webkit-scrollbar-thumb { background:linear-gradient(180deg,#a088fa,#7b2ff7);border-radius:99px;box-shadow:0 0 6px rgba(160,136,250,0.4); }
+.emoji-picker-grid::-webkit-scrollbar { width:3px; }
+.emoji-picker-grid::-webkit-scrollbar-track { background:transparent; }
+.emoji-picker-grid::-webkit-scrollbar-thumb { background:rgba(160,136,250,0.3);border-radius:99px; }
 .emoji-picker-cell {
   font-size:21px;text-align:center;padding:5px 2px;border-radius:10px;
   cursor:pointer;transition:background 0.1s, transform 0.12s;
@@ -1426,23 +1435,20 @@ input[type=number] { -moz-appearance:textfield; }
   to   { opacity:1; transform:scale(1) translateY(0); }
 }
 .chat-bubble.sent {
-  background:var(--chat-sent-bg, linear-gradient(135deg,#0a84ff,#0066cc));
-  color:var(--chat-sent-color, #fff);
+  background:linear-gradient(135deg,#0a84ff,#0066cc);
+  color:#fff;
   margin-left:auto;
   border-bottom-right-radius:5px;
-  box-shadow:0 3px 12px var(--chat-sent-shadow, rgba(10,132,255,0.35));
+  box-shadow:0 3px 12px rgba(10,132,255,0.35);
 }
 .chat-bubble.recv {
-  background:var(--chat-recv-bg, rgba(44,44,46,0.92));
-  color:var(--chat-recv-color, #f5f5f7);
+  background:rgba(44,44,46,0.92);
+  color:#f5f5f7;
   margin-right:auto;
   border-bottom-left-radius:5px;
   backdrop-filter:blur(12px);
-  border:1px solid var(--chat-recv-border, rgba(255,255,255,0.08));
+  border:1px solid rgba(255,255,255,0.08);
   box-shadow:0 3px 10px rgba(0,0,0,0.25);
-}
-#screen-chat-convo {
-  background:var(--chat-bg, linear-gradient(180deg,#0a0a12 0%,#0d0d1a 100%));
 }
 .chat-bubble-time {
   font-size:10px; color:rgba(255,255,255,0.35);
@@ -2454,7 +2460,6 @@ input[type=number] { -moz-appearance:textfield; }
           <div style="font-size:10px;color:#30d158;display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#30d158;display:inline-block"></span>Active now</div>
         </div>
         <div style="display:flex;gap:8px;flex-shrink:0">
-          <button class="imsg-action-btn" onclick="openChatThemePicker()" title="Chat theme">🎨</button>
           <button class="imsg-action-btn" onclick="playSound('click')">📞</button>
           <button class="imsg-action-btn" onclick="playSound('click')">📹</button>
         </div>
@@ -2678,13 +2683,13 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== QUINT SCREEN ===== -->
-    <div id="screen-quint" class="screen" style="padding:0;flex-direction:column;overflow:hidden;position:relative;display:none;height:100%;min-height:0">
+    <div id="screen-quint" class="screen" style="padding:0;flex-direction:column;overflow:hidden;position:relative;display:none">
       <!-- Dynamic background (changes by time of day) -->
       <div id="quint-bg" style="position:absolute;inset:0;z-index:0;transition:all 2s ease"></div>
       <!-- Gentle confetti canvas -->
       <canvas id="quint-confetti" style="position:absolute;inset:0;z-index:1;pointer-events:none;width:100%;height:100%"></canvas>
       <!-- Header -->
-      <div style="position:relative;z-index:3;padding:20px 20px 14px;backdrop-filter:blur(20px);background:rgba(0,0,0,0.15);border-bottom:1px solid rgba(255,255,255,0.08)">
+      <div style="position:relative;z-index:3;flex-shrink:0;padding:20px 20px 14px;backdrop-filter:blur(20px);background:rgba(0,0,0,0.15);border-bottom:1px solid rgba(255,255,255,0.08)">
         <div style="display:flex;align-items:center;justify-content:space-between">
           <button onclick="openScreen('home')" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:12px;width:34px;height:34px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">←</button>
           <div style="text-align:center">
@@ -2695,10 +2700,10 @@ input[type=number] { -moz-appearance:textfield; }
         </div>
       </div>
       <!-- Main content -->
-      <div style="position:relative;z-index:2;flex:1;overflow:hidden;display:flex;min-height:0">
+      <div style="position:relative;z-index:2;flex:1;overflow:hidden;display:flex;min-height:0;">
         <!-- Left: Purple bar -->
-        <div style="width:72px;flex-shrink:0;padding:12px 0 12px 10px;display:flex;flex-direction:column">
-          <div style="flex:1;position:relative;display:flex;gap:5px">
+        <div style="width:72px;flex-shrink:0;padding:12px 0 12px 10px;display:flex;flex-direction:column;min-height:0;">
+          <div style="flex:1;position:relative;display:flex;gap:5px;min-height:0;">
             <div id="quint-hour-labels" style="display:flex;flex-direction:column;justify-content:space-between;font-size:9px;color:rgba(255,255,255,0.4);min-width:28px;font-weight:600"></div>
             <div style="position:relative;flex:1">
               <div id="quint-bar-track" style="position:absolute;inset:0;background:rgba(255,255,255,0.06);border-radius:99px;border:1px solid rgba(255,255,255,0.1);overflow:hidden">
@@ -3569,34 +3574,17 @@ function updateTicketDisplay(delta) {
     anim.textContent = delta > 0 ? `+${delta} 🎟️` : `${delta} 🎟️`;
     anim.className = delta > 0 ? 'show-up' : 'show-down';
     setTimeout(() => anim.className = '', 1600);
-
-    // Show floating purple +N tooltip on the progress bar
+    // Floating pip on the progress bar
     if (delta > 0) {
       const wrap = document.getElementById('ticket-progress-wrap');
       if (wrap) {
-        const tip = document.createElement('div');
-        tip.textContent = `+${delta} 🎟️`;
-        tip.style.cssText = [
-          'position:absolute',
-          'top:-32px',
-          'left:50%',
-          'transform:translateX(-50%)',
-          'background:linear-gradient(135deg,rgba(123,47,247,0.95),rgba(160,136,250,0.95))',
-          'color:#fff',
-          'font-size:11px',
-          'font-weight:800',
-          'padding:4px 10px',
-          'border-radius:20px',
-          'white-space:nowrap',
-          'pointer-events:none',
-          'z-index:10000',
-          'box-shadow:0 3px 12px rgba(123,47,247,0.5),0 0 0 1px rgba(255,255,255,0.15) inset',
-          'animation:ticketBarTip 1.8s cubic-bezier(.4,0,.2,1) forwards',
-          'letter-spacing:0.3px',
-        ].join(';');
-        wrap.style.position = 'relative';
-        wrap.appendChild(tip);
-        setTimeout(() => tip.remove(), 1800);
+        const old = wrap.querySelector('.tbpip'); if (old) old.remove();
+        const pip = document.createElement('div');
+        pip.className = 'tbpip';
+        pip.textContent = '+' + delta + ' 🎟️';
+        pip.style.cssText = 'position:absolute;bottom:calc(100% + 6px);left:50%;white-space:nowrap;pointer-events:none;z-index:10000;background:linear-gradient(135deg,#7b2ff7,#a259ff);color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;box-shadow:0 2px 12px rgba(123,47,247,0.5);animation:ticketPip 1.8s ease forwards;letter-spacing:0.3px;';
+        wrap.appendChild(pip);
+        setTimeout(() => pip.remove(), 1900);
       }
     }
   }
@@ -3721,23 +3709,16 @@ function openScreen(id) {
   if (id !== 'plinko') _plinkoStopLiveBroadcast();
   // Stop live ticket chat listener when navigating away from support
   if (id !== 'support' && typeof _stopTicketChatListener === 'function') _stopTicketChatListener();
-
-  // Hide all screens efficiently (avoid triggering multiple reflows)
-  const allScreens = document.querySelectorAll('.screen');
-  allScreens.forEach(s => {
-    if (s.classList.contains('active') || s.style.display !== 'none') {
-      s.classList.remove('active');
-      s.style.display = 'none';
-    }
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
   });
-
   const el = document.getElementById(`screen-${id}`);
   if (!el) return;
   el.style.display = 'flex';
   el.classList.add('active');
   currentScreen = id;
-  // Defer heavy render to next animation frame to allow the screen transition to paint first
-  requestAnimationFrame(() => renderScreen(id));
+  renderScreen(id);
 }
 
 function renderScreen(id) {
@@ -3856,7 +3837,6 @@ function renderHome() {
   const pageApps = gridApps.slice(homePageIdx * APPS_PER_PAGE, (homePageIdx + 1) * APPS_PER_PAGE);
 
   grid.innerHTML = '';
-  grid._swipeBound = false; // reset so swipe/mouse listeners re-register on fresh DOM
 
   // Edit mode banner
   if (appEditMode) {
@@ -3913,53 +3893,51 @@ function renderHome() {
   grid._wheelFn=_wheelFn;
   grid.addEventListener('wheel',_wheelFn,{passive:false});
 
-  // Swipe to change page on home grid — only attach once per grid element
-  if (!grid._swipeBound) {
-    grid._swipeBound = true;
-    let _swipeStartX = null;
-    let _swipeStartY = null;
-    let _swipeLocked = false;
-    grid.addEventListener('touchstart', e => {
-      _swipeStartX = e.touches[0].clientX;
-      _swipeStartY = e.touches[0].clientY;
-      _swipeLocked = false;
-    }, { passive: true });
-    grid.addEventListener('touchmove', e => {
-      if (_swipeStartX === null) return;
-      const dx = e.touches[0].clientX - _swipeStartX;
-      const dy = e.touches[0].clientY - _swipeStartY;
-      // Lock to horizontal if dx > dy (prevents accidental swipes while scrolling)
-      if (!_swipeLocked && Math.abs(dy) > Math.abs(dx) + 5) { _swipeStartX = null; return; }
-      if (Math.abs(dx) > 12) { _swipeLocked = true; e.preventDefault(); }
-    }, { passive: false });
-    grid.addEventListener('touchend', e => {
-      if (_swipeStartX === null) return;
-      const dx = e.changedTouches[0].clientX - _swipeStartX;
-      _swipeStartX = null; _swipeStartY = null; _swipeLocked = false;
-      if (Math.abs(dx) < 35) return;
-      const _tp = Math.ceil((S.appPositions || []).length / APPS_PER_PAGE) || 1;
-      playSound('click');
-      if (dx < 0 && homePageIdx < _tp - 1) { homePageIdx++; renderHome(); }
-      if (dx > 0 && homePageIdx > 0) { homePageIdx--; renderHome(); }
-    });
+  // Swipe to change page on home grid
+  let _swipeStartX = null;
+  let _swipeStartY = null;
+  let _swipeLocked = false;
+  grid.addEventListener('touchstart', e => {
+    _swipeStartX = e.touches[0].clientX;
+    _swipeStartY = e.touches[0].clientY;
+    _swipeLocked = false;
+  }, { passive: true });
+  grid.addEventListener('touchmove', e => {
+    if (_swipeStartX === null) return;
+    const dx = e.touches[0].clientX - _swipeStartX;
+    const dy = e.touches[0].clientY - _swipeStartY;
+    // Lock to horizontal if dx > dy (prevents accidental swipes while scrolling)
+    if (!_swipeLocked && Math.abs(dy) > Math.abs(dx) + 5) { _swipeStartX = null; return; }
+    if (Math.abs(dx) > 12) { _swipeLocked = true; e.preventDefault(); }
+  }, { passive: false });
+  grid.addEventListener('touchend', e => {
+    if (_swipeStartX === null) return;
+    const dx = e.changedTouches[0].clientX - _swipeStartX;
+    _swipeStartX = null; _swipeStartY = null; _swipeLocked = false;
+    if (Math.abs(dx) < 35) return;
+    playSound('click');
+    if (dx < 0 && homePageIdx < totalPages - 1) { homePageIdx++; renderHome(); }
+    if (dx > 0 && homePageIdx > 0) { homePageIdx--; renderHome(); }
+  });
 
-    // Mouse drag swipe too
-    let _msStartX = null;
-    grid.addEventListener('mousedown', e => {
-      if (e.target.closest('.app-icon, .btn')) return;
-      _msStartX = e.clientX;
-    });
-    const _msEnd = (e) => {
-      if (_msStartX === null) return;
-      const dx = e.clientX - _msStartX;
-      _msStartX = null;
-      if (Math.abs(dx) < 50) return;
-      const _tp = Math.ceil((S.appPositions || []).length / APPS_PER_PAGE) || 1;
-      if (dx < 0 && homePageIdx < _tp - 1) { homePageIdx++; renderHome(); }
-      if (dx > 0 && homePageIdx > 0) { homePageIdx--; renderHome(); }
-    };
-    grid.addEventListener('mouseup', _msEnd);
-  }
+  // Update calendar badge
+  setTimeout(_updateCalBadge, 50);
+
+  // Mouse drag swipe too
+  let _msStartX = null;
+  grid.addEventListener('mousedown', e => {
+    if (e.target.closest('.app-icon, .btn')) return;
+    _msStartX = e.clientX;
+  });
+  const _msEnd = (e) => {
+    if (_msStartX === null) return;
+    const dx = e.clientX - _msStartX;
+    _msStartX = null;
+    if (Math.abs(dx) < 50) return;
+    if (dx < 0 && homePageIdx < totalPages - 1) { homePageIdx++; renderHome(); }
+    if (dx > 0 && homePageIdx > 0) { homePageIdx--; renderHome(); }
+  };
+  grid.addEventListener('mouseup', _msEnd);
 
   // Long press for edit mode on wallpaper
   let _lpTimer = null;
@@ -6112,13 +6090,8 @@ function formatMsgTime(ts) {
 function renderChatList() {
   const c = document.getElementById('chat-list');
   if (!c) return;
-
-  // Update conversation count subtitle
-  const subtitle = document.getElementById('chat-list-subtitle');
-  if (subtitle) {
-    const n = (S.contacts || []).length;
-    subtitle.textContent = n + ' conversation' + (n !== 1 ? 's' : '');
-  }
+  const sub = document.getElementById('chat-list-subtitle');
+  if (sub) { const n=(S.contacts||[]).length; sub.textContent=n+' conversation'+(n!==1?'s':''); }
 
   if (!S.contacts || S.contacts.length === 0) {
     c.innerHTML = `
@@ -6171,13 +6144,6 @@ function openChat(i) {
   activeChatContact = S.contacts[i];
   if (!S.messages[activeChatContact.id]) S.messages[activeChatContact.id] = [];
 
-  // Mark all messages as read and clear unread badge
-  let changed = false;
-  (S.messages[activeChatContact.id] || []).forEach(m => {
-    if (m.sender !== 'user' && !m.read) { m.read = true; changed = true; }
-  });
-  if (changed) { saveState(); updateBadges(); renderChatList(); }
-
   const nameEl = document.getElementById('chat-convo-name');
   const avatarEl = document.getElementById('chat-convo-avatar');
   if (nameEl) nameEl.textContent = activeChatContact.name;
@@ -6189,8 +6155,6 @@ function openChat(i) {
   document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
   const cv = document.getElementById('screen-chat-convo');
   if (cv) { cv.style.display = 'flex'; cv.classList.add('active'); currentScreen = 'chat-convo'; }
-  // Apply saved chat theme
-  requestAnimationFrame(() => _applyChatTheme(S.chatTheme || 'default'));
   renderChatMessages();
 }
 
@@ -6254,16 +6218,15 @@ async function sendChatMsg() {
   setTimeout(async () => {
     const response = await getAIChat(activeChatContact, text);
     window._chatTyping = false;
-    const newMsg = { sender:'ai', text: response, ts: Date.now(), read: true };
-    S.messages[activeChatContact.id].push(newMsg);
-    renderChatMessages(); saveState(); updateBadges();
+    S.messages[activeChatContact.id].push({ sender:'ai', text: response, ts: Date.now() });
+    renderChatMessages(); saveState();
     playSound('tick');
   }, 800 + Math.random() * 1200);
 }
 
 async function getAIChat(contact, userMsg) {
   try {
-    const history = (S.messages[contact.id] || []).slice(-20).map(m => ({
+    const history = (S.messages[contact.id] || []).slice(-10).map(m => ({
       role: m.sender === 'user' ? 'user' : 'assistant',
       content: m.text
     }));
@@ -6273,22 +6236,14 @@ async function getAIChat(contact, userMsg) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
-        system: `You are ${contact.name}, texting a close friend. Personality: ${contact.personality || 'friendly, warm and casual'}. 
-Rules: 
-- Respond naturally like a real person texting — casual, warm, human. 
-- Vary your reply length: sometimes short (1 sentence), sometimes longer (3-5 sentences) when excited or telling a story.
-- Use occasional emoji naturally (not every message).
-- Ask follow-up questions to keep the conversation flowing.
-- Reference things mentioned earlier in the conversation to feel like you're paying attention.
-- Never use asterisks, roleplay markers, or AI-style formatting.
-- Never say you're an AI. Stay in character always.`,
+        system: `You are ${contact.name}, a real person texting a friend. Personality: ${contact.personality || 'friendly and casual'}. Keep replies short (1-3 sentences), casual, realistic like actual text messages. No asterisks or roleplay markers.`,
         messages: history
       })
     });
     const data = await response.json();
     return data.content?.[0]?.text || '👋';
   } catch(e) {
-    const replies = ["Hey! 😊","omg tell me more!","lol fr 💀","sounds good to me","haha yeah I get that","that's actually wild 😂","no way!!","fr tho","omg yes same","ngl that's kinda wholesome","wait really??","I was literally just thinking about this","ok but also—","hahaha honestly same though"];
+    const replies = ["Hey! 😊","Cool!","lol fr","Sounds good!","Haha yeah","That's wild 😂","No way!","For real tho 💀","omg yes","ngl that's kinda cute"];
     return replies[Math.floor(Math.random() * replies.length)];
   }
 }
@@ -6307,79 +6262,6 @@ function addContact() {
   document.getElementById('contact-emoji').value = '';
   document.getElementById('contact-personality').value = '';
   renderChatList();
-}
-// ============================================================
-// CHAT THEMES
-// ============================================================
-const CHAT_THEMES = [
-  { id:'default',    name:'Default',     bg:'linear-gradient(180deg,#0a0a12 0%,#0d0d1a 100%)', sent:'linear-gradient(135deg,#0a84ff,#0066cc)', sentC:'#fff', recv:'rgba(44,44,46,0.92)', recvC:'#f5f5f7', recvB:'rgba(255,255,255,0.08)', sentS:'rgba(10,132,255,0.35)' },
-  { id:'sakura',     name:'🌸 Sakura',   bg:'linear-gradient(180deg,#1a0a15 0%,#0d0510 100%)', sent:'linear-gradient(135deg,#ff6b9d,#c44dff)', sentC:'#fff', recv:'rgba(80,30,55,0.92)', recvC:'#ffdcf0', recvB:'rgba(255,107,157,0.18)', sentS:'rgba(255,107,157,0.4)' },
-  { id:'midnight',   name:'🌙 Midnight', bg:'linear-gradient(180deg,#020110 0%,#05021a 100%)', sent:'linear-gradient(135deg,#7b2ff7,#c77dff)', sentC:'#fff', recv:'rgba(30,20,60,0.92)', recvC:'#e8d8ff', recvB:'rgba(123,47,247,0.2)', sentS:'rgba(123,47,247,0.45)' },
-  { id:'forest',     name:'🌿 Forest',   bg:'linear-gradient(180deg,#030e05 0%,#071508 100%)', sent:'linear-gradient(135deg,#22c55e,#16a34a)', sentC:'#fff', recv:'rgba(15,40,20,0.92)', recvC:'#d4fce8', recvB:'rgba(34,197,94,0.18)', sentS:'rgba(34,197,94,0.4)' },
-  { id:'sunset',     name:'🌅 Sunset',   bg:'linear-gradient(180deg,#1a0800 0%,#250d00 100%)', sent:'linear-gradient(135deg,#ff6b00,#ff9f0a)', sentC:'#fff', recv:'rgba(60,25,5,0.92)', recvC:'#fff0d8', recvB:'rgba(255,107,0,0.18)', sentS:'rgba(255,107,0,0.4)' },
-  { id:'ocean',      name:'🌊 Ocean',    bg:'linear-gradient(180deg,#000d1a 0%,#001428 100%)', sent:'linear-gradient(135deg,#0088cc,#00ccff)', sentC:'#fff', recv:'rgba(0,30,55,0.92)', recvC:'#d0f0ff', recvB:'rgba(0,136,204,0.2)', sentS:'rgba(0,136,204,0.4)' },
-  { id:'rose',       name:'🌹 Rose',     bg:'linear-gradient(180deg,#12020a 0%,#1a030f 100%)', sent:'linear-gradient(135deg,#e11d48,#fb7185)', sentC:'#fff', recv:'rgba(55,10,25,0.92)', recvC:'#ffe4ec', recvB:'rgba(225,29,72,0.2)', sentS:'rgba(225,29,72,0.4)' },
-  { id:'gold',       name:'✨ Gold',     bg:'linear-gradient(180deg,#0d0900 0%,#150e00 100%)', sent:'linear-gradient(135deg,#d97706,#fbbf24)', sentC:'#000', recv:'rgba(45,30,0,0.92)', recvC:'#fffbd0', recvB:'rgba(217,119,6,0.2)', sentS:'rgba(217,119,6,0.4)' },
-];
-
-function _applyChatTheme(themeId) {
-  const t = CHAT_THEMES.find(x => x.id === themeId) || CHAT_THEMES[0];
-  const cv = document.getElementById('screen-chat-convo');
-  if (!cv) return;
-  cv.style.background = t.bg;
-  const root = cv;
-  root.style.setProperty('--chat-bg', t.bg);
-  root.style.setProperty('--chat-sent-bg', t.sent);
-  root.style.setProperty('--chat-sent-color', t.sentC);
-  root.style.setProperty('--chat-sent-shadow', t.sentS);
-  root.style.setProperty('--chat-recv-bg', t.recv);
-  root.style.setProperty('--chat-recv-color', t.recvC);
-  root.style.setProperty('--chat-recv-border', t.recvB);
-}
-
-function openChatThemePicker() {
-  playSound('click');
-  const current = S.chatTheme || 'default';
-  const html = `<div style="padding:16px">
-    <div style="font-size:14px;font-weight:700;color:#f5f5f7;margin-bottom:14px;text-align:center">💬 Chat Theme</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      ${CHAT_THEMES.map(t => `
-        <div onclick="setChatTheme('${t.id}')" style="padding:10px 12px;border-radius:14px;background:${t.bg};border:2px solid ${t.id===current?'#a088fa':'rgba(255,255,255,0.1)'};cursor:pointer;transition:all 0.2s;position:relative">
-          <div style="font-size:12px;font-weight:700;color:${t.recvC || '#fff'};margin-bottom:6px">${t.name}</div>
-          <div style="display:flex;gap:4px">
-            <div style="height:16px;flex:1;border-radius:6px;background:${t.sent}"></div>
-            <div style="height:16px;flex:1;border-radius:6px;background:${t.recv}"></div>
-          </div>
-          ${t.id===current?'<div style="position:absolute;top:6px;right:8px;font-size:10px;color:#a088fa;font-weight:900">✓</div>':''}
-        </div>`).join('')}
-    </div>
-  </div>`;
-  const overlay = document.createElement('div');
-  overlay.id = 'chat-theme-overlay';
-  overlay.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px)';
-  overlay.innerHTML = `<div style="width:100%;background:rgba(18,14,34,0.98);border-radius:22px 22px 0 0;border:1px solid rgba(160,136,250,0.2);max-height:70%;overflow-y:auto">${html}<button onclick="document.getElementById('chat-theme-overlay').remove()" style="width:calc(100% - 32px);margin:0 16px 16px;padding:12px;border-radius:14px;background:rgba(160,136,250,0.15);border:1px solid rgba(160,136,250,0.3);color:#a088fa;font-size:14px;font-weight:700;cursor:pointer">Done</button></div>`;
-  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
-  const cv = document.getElementById('screen-chat-convo');
-  if (cv) cv.appendChild(overlay);
-}
-
-function setChatTheme(id) {
-  S.chatTheme = id; saveState();
-  _applyChatTheme(id);
-  // Update checkmarks
-  document.querySelectorAll('#chat-theme-overlay [onclick^="setChatTheme"]').forEach(el => {
-    const tid = el.getAttribute('onclick').match(/'(\w+)'/)?.[1];
-    el.style.borderColor = tid === id ? '#a088fa' : 'rgba(255,255,255,0.1)';
-    const check = el.querySelector('[style*="position:absolute"]');
-    if (check) check.remove();
-    if (tid === id) {
-      const ck = document.createElement('div');
-      ck.style.cssText = 'position:absolute;top:6px;right:8px;font-size:10px;color:#a088fa;font-weight:900';
-      ck.textContent = '✓';
-      el.appendChild(ck);
-    }
-  });
-  playSound('click');
 }
 // ============================================================
 // QUINT — Relationship Day Planner
@@ -8643,7 +8525,6 @@ let mClawAnimFrame = null;
 let mClawBridgeX   = 170;   // horizontal position of bridge
 let mClawDropY     = 72;    // current cable-end Y (animated)
 let mClawState     = 'moving'; // moving | dropping | closing | rising | delivering | resetting
-let mClawRiggedResult = undefined; // undefined = not yet decided for this drop
 let mClawDir       = 1;
 let mClawSpeed     = 1.3;
 // clawBoxItems is now S.clawBoxItems (persisted to Firestore)
@@ -8953,7 +8834,6 @@ function renderClaw() {
 function mClawDrop() {
   if (mClawState !== 'moving') return;
   if (S.clawCredits <= 0) { showNotif('❌','No credits!','Buy in Shop'); playSound('error'); return; }
-  mClawRiggedResult = undefined; // reset rig decision for this drop
   S.clawCredits--; saveState(); playSound('whoosh');
   const cc = document.querySelector('#claw-content .claw-credit-count');
   if (cc) cc.textContent = S.clawCredits;
@@ -9054,18 +8934,8 @@ function mClawTick(canvas) {
       mClawDropY -= 3.5;
       mFingerTarget = 1;  // keep closed during rise
 
-      // Rigged claw logic — real claw machines only grip ~30% of the time.
-      // Determine success on first frame of rising state (once per drop).
-      if (mClawRiggedResult === undefined) {
-        // ~28% base win rate, slightly better with more credits spent (but still rigged)
-        const baseWinRate = (S.clawSettings?.winRate ?? 28) / 100;
-        mClawRiggedResult = Math.random() < baseWinRate;
-        // If rigged to fail, relax finger grip slightly so prizes slip out
-        if (!mClawRiggedResult) mFingerTarget = 0.35; // partially open = grip too weak
-      }
-
-      // Only drag prize upward if the rig allows a win
-      if (mClawRiggedResult && mClawWorld && window.Matter) {
+      // Actively drag any prize that's inside the grip radius upward with the claw
+      if (mClawWorld && window.Matter) {
         const clawTipY = mClawDropY + 50; // approximate tip of closed fingers
         Matter.Composite.allBodies(mClawWorld).forEach(b => {
           if (b.label !== 'prize') return;
@@ -9174,7 +9044,7 @@ function mClawTick(canvas) {
     case 'resetting':
       mFingerTarget = 0;
       mClawBridgeX += (170 - mClawBridgeX) * 0.06;
-      if (Math.abs(mClawBridgeX - 170) < 2) { mClawBridgeX = 170; mClawState = 'moving'; mClawRiggedResult = undefined; }
+      if (Math.abs(mClawBridgeX - 170) < 2) { mClawBridgeX = 170; mClawState = 'moving'; }
       break;
   }
 
@@ -10217,14 +10087,12 @@ function mrGenMap_inner() {
   const W = mrWorldW;
   const rng = () => Math.random();
 
-  // ── Dynamic depth: every 3 races, randomise between 6–10 screens tall ──
-  // Default is 5 screens (MR_H * 5). We DON'T change MR_H itself (physics uses it
-  // as the viewport height). Instead we give the generator a taller canvas to fill.
+  // ── Dynamic depth: race 3, 6, 9… get extended levels (6–10 screens).
+  // All other races are always exactly 5 screens (default height).
   if (mrRaceCount > 0 && mrRaceCount % 3 === 0) {
     mrLevelScreens = 6 + Math.floor(rng() * 5); // 6..10
-  } else if (mrRaceCount % 3 !== 0 || mrRaceCount === 0) {
-    // Between milestone races keep the same depth; on the first race always reset
-    if (mrRaceCount === 0) mrLevelScreens = 5;
+  } else {
+    mrLevelScreens = 5; // always reset to default on non-milestone races
   }
   mrLevelH = MR_H * mrLevelScreens;
   const H = mrLevelH;
@@ -10247,11 +10115,18 @@ function mrGenMap_inner() {
   const zoneH = (H - 100) / ZONES;
 
 
-  // Alternate gate X positions zigzag across track
-  const gates = [];
-  // ── Theme-specific hazard pools (hoisted for use in special sections) ──
-  // ── One interactive hazard per zone — placed near gate but not IN it ──
-  // Theme-specific hazard pools
+  // ── STRUCTURED LEVEL GENERATOR ──────────────────────────────────
+  // Design philosophy:
+  //  1. Plan gate corridors first  (strict left/right zigzag, small random nudge)
+  //  2. Guide ramps hug the walls and angle toward the NEXT gate
+  //  3. One themed feature on the OPPOSITE side from each gate
+  //  4. Boundary pegs near walls only — never cluttering the centre path
+  //  5. Every 2 zones: a wide crossing element (seesaw/conveyor) for variety
+  //  6. Every 3 zones: a bumper accent flanking the gate for deflection interest
+  //  7. Extended levels: one structured arena section per extra screen
+  // ────────────────────────────────────────────────────────────────
+
+  // ── Theme hazard pools ──
   const themeHazards = {
   forest:    ['buzzsaw','fallenTree','string'],
   ice:       ['icePatch','icicle','icyBoulder','snowMachine'],
@@ -10269,414 +10144,225 @@ function mrGenMap_inner() {
   medieval:  ['swingingMace','arrowTrap','firePit','spikedGate','catapult','shieldBumper','castleGear','barrelRoller','knightStatue'],
   };
   const basePool = ['springboard','fan','gear','stickyzone','bridge','conveyor','seesaw','bouncywall','slide','rollerchain'];
+  const alwaysThemed = ['arctic','sewers','sunken','skatepark','beach','garden','jpnight','kitchen','midnightup','forest','autumn','medieval'].includes(mrTheme);
+  const themePool = themeHazards[mrTheme] || [];
+  const hazardPool = themePool.length && (alwaysThemed || rng() < 0.75) ? themePool : basePool;
 
+  // Helper: pick N distinct items from pool
+  function _pickN(pool, n) {
+    const c=pool.slice(),o=[];
+    for(let i=0;i<n&&c.length;i++){const x=Math.floor(rng()*c.length);o.push(c.splice(x,1)[0]);}
+    return o;
+  }
+
+  // Helper: place a named hazard at world position (hx,hy)
+  function _ph(pick,hx,hy) {
+    switch(pick){
+      case 'springboard': mrObstacles.push({type:'springboard',x:hx,y:hy,w:38,hits:0,armed:false,springT:0}); break;
+      case 'fan':         mrObstacles.push({type:'fan',x:hx,y:hy,r:18,dir:rng()>0.5?1:-1,active:false,activeT:0,spin:0}); break;
+      case 'gear':        mrObstacles.push({type:'gear',x:hx,y:hy,r:14,teeth:8,angle:0,speed:rng()>0.5?0.02:-0.02}); break;
+      case 'stickyzone':  mrObstacles.push({type:'stickyzone',x:hx,y:hy,r:18+rng()*10}); break;
+      case 'bridge':      mrObstacles.push({type:'bridge',x:hx,y:hy,w:55+rng()*18,broken:false,load:0,breakAt:2+(rng()>0.5?1:0),breakT:0}); break;
+      case 'conveyor':    mrObstacles.push({type:'conveyor',x:hx,y:hy,w:50+rng()*18,dir:rng()>0.5?1:-1,beltPhase:0}); break;
+      case 'seesaw':      mrObstacles.push({type:'seesaw',cx:hx,y:hy,w:58+rng()*18,angle:0,angV:0}); break;
+      case 'bouncywall':  mrObstacles.push({type:'bouncywall',side:hx<W/2?'left':'right',y:hy,h:35+rng()*20,flash:0}); break;
+      case 'slide':       mrObstacles.push({type:'slide',x:hx,y:hy,w:52,angle:hx<W/2?0.4:-0.4}); break;
+      case 'rollerchain': mrObstacles.push({type:'rollerchain',x:hx,y:hy,w:44,phase:0}); break;
+      case 'buzzsaw':     mrObstacles.push({type:'buzzsaw',x:hx,y:hy,r:16,angle:0,speed:rng()>0.5?0.06:-0.06,_theme:'forest'}); break;
+      case 'fallenTree':  mrObstacles.push({type:'fallenTree',cx:hx,y:hy,w:64+rng()*20,angle:0,angV:0,split:false,splitT:0,_theme:'forest'}); break;
+      case 'string':      mrObstacles.push({type:'string',x:hx,y:hy,len:40+rng()*20,angle:(rng()-0.5)*0.3,tension:1,_theme:'forest'}); break;
+      case 'icePatch':    mrObstacles.push({type:'icePatch',x:hx,y:hy,w:55+rng()*20,_theme:'ice'}); break;
+      case 'icicle':      mrObstacles.push({type:'icicle',x:hx,y:hy,len:25+rng()*15,_theme:'ice'}); break;
+      case 'icyBoulder':  mrObstacles.push({type:'icyBoulder',x:hx,y:hy,r:14+rng()*6,vx:(rng()-0.5)*0.4,vy:0,_theme:'ice'}); break;
+      case 'snowMachine': mrObstacles.push({type:'snowMachine',x:hx,y:hy,dir:rng()>0.5?1:-1,particles:[],_theme:'ice'}); break;
+      case 'sakuraPetal': mrObstacles.push({type:'sakuraPetal',x:hx,y:hy,r:8+rng()*4,vx:(rng()-0.5)*0.5,vy:0.4+rng()*0.3,rot:rng()*Math.PI*2,_theme:'sakura'}); break;
+      case 'leafPile':    mrObstacles.push({type:'leafPile',x:hx,y:hy,w:55+rng()*20,_theme:'sakura'}); break;
+      case 'snowAvalanche':    mrObstacles.push({type:'snowAvalanche',x:hx,y:hy,w:70+rng()*30,balls:[],triggered:false,triggerT:0,_theme:'arctic'}); break;
+      case 'crackingIceBridge':mrObstacles.push({type:'crackingIceBridge',x:hx,y:hy,w:65+rng()*20,cracks:0,broken:false,breakT:0,_theme:'arctic'}); break;
+      case 'iceSpike':     mrObstacles.push({type:'iceSpike',x:hx,y:hy,h:22+rng()*12,_theme:'arctic'}); break;
+      case 'iceSlide':     mrObstacles.push({type:'iceSlide',x:hx,y:hy,w:60+rng()*20,angle:hx<W/2?0.35:-0.35,_theme:'arctic'}); break;
+      case 'penguinBumper':mrObstacles.push({type:'penguinBumper',x:hx,y:hy,r:14+rng()*4,wobble:0,wobbleV:0,_theme:'arctic'}); break;
+      case 'frozenGear':   mrObstacles.push({type:'frozenGear',x:hx,y:hy,r:16+rng()*6,teeth:8,angle:0,speed:(rng()>0.5?1:-1)*0.018,frozen:false,frozenT:0,_theme:'arctic'}); break;
+      case 'toxicSludge':  mrObstacles.push({type:'toxicSludge',x:hx,y:hy,w:60+rng()*25,phase:0,_theme:'sewers'}); break;
+      case 'pipeBlade':    mrObstacles.push({type:'pipeBlade',x:hx,y:hy,r:13+rng()*4,angle:0,speed:(rng()>0.5?1:-1)*(0.05+rng()*0.03),_theme:'sewers'}); break;
+      case 'steamBurst':   mrObstacles.push({type:'steamBurst',x:hx,y:hy,dir:rng()>0.5?1:-1,timer:0,interval:90+Math.floor(rng()*60),active:false,particles:[],_theme:'sewers'}); break;
+      case 'drippingWater':mrObstacles.push({type:'drippingWater',x:hx,y:hy,drops:[],dropT:0,_theme:'sewers'}); break;
+      case 'ratStampede':  mrObstacles.push({type:'ratStampede',x:hx,y:hy,rats:[],triggered:false,_theme:'sewers'}); break;
+      case 'drainTunnel':  mrObstacles.push({type:'drainTunnel',x:hx,y:hy,r:18+rng()*6,pull:0.4+rng()*0.2,spin:0,_theme:'sewers'}); break;
+      case 'directionalPipe':{const dA=rng()>0.5?0:(rng()-0.5)*0.5,dD=rng()>0.5?1:-1;
+        mrObstacles.push({type:'directionalPipe',x:hx,y:hy,len:110+rng()*60,angle:dA,dir:dD,w:24,phase:0,_theme:'sewers'});break;}
+      case 'waterCurrent': mrObstacles.push({type:'waterCurrent',x:hx,y:hy,w:65+rng()*20,h:22+rng()*10,dir:rng()>0.5?1:-1,phase:0,bubbles:[],_theme:'sunken'}); break;
+      case 'pressureZone': mrObstacles.push({type:'pressureZone',x:hx,y:hy,r:22+rng()*10,phase:0,_theme:'sunken'}); break;
+      case 'clamTrap':     mrObstacles.push({type:'clamTrap',x:hx,y:hy,w:40+rng()*15,open:true,timer:0,openT:120+Math.floor(rng()*80),closeT:100+Math.floor(rng()*60),_theme:'sunken'}); break;
+      case 'bubbleElevator':mrObstacles.push({type:'bubbleElevator',x:hx,y:hy,h:60+rng()*30,phase:0,_theme:'sunken'}); break;
+      case 'rollingBoard': mrObstacles.push({type:'rollingBoard',x:hx,y:hy,w:44+rng()*16,vx:(rng()>0.5?1:-1)*1.0,angle:0,_theme:'skatepark'}); break;
+      case 'grindRail':    mrObstacles.push({type:'grindRail',x:hx,y:hy,w:60+rng()*20,angle:(rng()-0.5)*0.2,_theme:'skatepark'}); break;
+      case 'spinRamp':     mrObstacles.push({type:'spinRamp',cx:hx,y:hy,w:55+rng()*20,angle:0,speed:(rng()>0.5?1:-1)*0.015,_theme:'skatepark'}); break;
+      case 'halfPipe':     mrObstacles.push({type:'halfPipe',x:hx,y:hy,w:60+rng()*20,_theme:'skatepark'}); break;
+      case 'boostRail':    mrObstacles.push({type:'boostRail',x:hx,y:hy,w:55+rng()*18,dir:rng()>0.5?1:-1,_theme:'skatepark'}); break;
+      case 'grafittiBumper':mrObstacles.push({type:'grafittiBumper',x:hx,y:hy,r:14+rng()*5,angle:0,speed:0.025,_theme:'skatepark'}); break;
+      case 'rotatingObstacle':mrObstacles.push({type:'rotatingObstacle',x:hx,y:hy,r:18+rng()*6,angle:0,speed:(rng()>0.5?1:-1)*0.02,_theme:'skatepark'}); break;
+      case 'beachBall':    mrObstacles.push({type:'beachBall',x:hx,y:hy,r:16+rng()*6,vx:(rng()-0.5)*0.6,vy:0,spin:0,_theme:'beach'}); break;
+      case 'crabTrap':     mrObstacles.push({type:'crabTrap',x:hx,y:hy,w:36+rng()*14,open:true,snapT:0,cooldown:0,_theme:'beach'}); break;
+      case 'wavePush':     mrObstacles.push({type:'wavePush',x:hx,y:hy,w:70+rng()*30,phase:0,dir:rng()>0.5?1:-1,_theme:'beach'}); break;
+      case 'sandRamp':     mrObstacles.push({type:'sandRamp',x:hx,y:hy,w:55+rng()*20,angle:hx<W/2?0.3:-0.3,_theme:'beach'}); break;
+      case 'umbrellaBumper':mrObstacles.push({type:'umbrellaBumper',x:hx,y:hy,r:16+rng()*5,open:true,_theme:'beach'}); break;
+      case 'waterPuddle':  mrObstacles.push({type:'waterPuddle',x:hx,y:hy,r:18+rng()*8,ripple:0,_theme:'garden'}); break;
+      case 'thornBush':    mrObstacles.push({type:'thornBush',x:hx,y:hy,w:45+rng()*20,_theme:'garden'}); break;
+      case 'grassPatch':   mrObstacles.push({type:'grassPatch',x:hx,y:hy,w:55+rng()*20,_theme:'garden'}); break;
+      case 'beeSting':     mrObstacles.push({type:'beeSting',x:hx+rng()*30-15,y:hy,vx:rng()>0.5?1.5:-1.5,vy:(rng()-0.5)*0.8,buzz:0,_theme:'garden'}); break;
+      case 'swingingBamboo':mrObstacles.push({type:'swingingBamboo',x:hx,y:hy,len:55+rng()*25,angle:(rng()-0.5)*0.4,angV:0,restitution:0.82+rng()*0.12,_theme:'jpnight'}); break;
+      case 'paperLantern': mrObstacles.push({type:'paperLantern',x:hx,y:hy,r:13+rng()*5,phase:rng()*Math.PI*2,colorIdx:Math.floor(rng()*4),lit:true,flickerT:0,_theme:'jpnight'}); break;
+      case 'shurikenWheel':mrObstacles.push({type:'shurikenWheel',x:hx,y:hy,r:15+rng()*6,angle:0,speed:(rng()>0.5?1:-1)*(0.04+rng()*0.03),_theme:'jpnight'}); break;
+      case 'sakuraWindTunnel':{const tD=rng()>0.5?1:-1,tL=90+rng()*50,tA=tD*(0.3+rng()*0.35);
+        mrObstacles.push({type:'sakuraWindTunnel',x:hx,y:hy,len:tL,angle:tA,w:28+rng()*10,phase:0,petals:[],_theme:'jpnight'});
+        const eX=hx+Math.sin(tA)*tL,eY=hy+Math.cos(tA)*tL;
+        if(eX>20&&eX<W-20&&eY<mrLevelH-40)mrObstacles.push({type:'moonlitSection',x:eX,y:eY,r:24+rng()*10,phase:rng()*Math.PI*2,_theme:'jpnight'});
+        break;}
+      case 'waterGardenCurrent':mrObstacles.push({type:'waterGardenCurrent',x:hx,y:hy,w:65+rng()*20,h:22+rng()*10,dir:rng()>0.5?1:-1,phase:0,ripples:[],_theme:'jpnight'}); break;
+      case 'moonlitSection':mrObstacles.push({type:'moonlitSection',x:hx,y:hy,r:28+rng()*12,phase:rng()*Math.PI*2,_theme:'jpnight'}); break;
+      case 'grillPlatform': mrObstacles.push({type:'grillPlatform',x:hx,y:hy,w:60+rng()*20,heat:0,heatT:0,flipT:0,flipped:false,marbleCount:0,_theme:'kitchen'}); break;
+      case 'kitchenKnife':  mrObstacles.push({type:'kitchenKnife',x:hx,y:hy,len:35+rng()*15,angle:rng()*Math.PI*2,speed:(rng()>0.5?1:-1)*(0.04+rng()*0.03),pivotR:18+rng()*10,_theme:'kitchen'}); break;
+      case 'mixingBowl':    mrObstacles.push({type:'mixingBowl',x:hx,y:hy,r:22+rng()*8,marbles:[],rockAngle:0,rockV:0,pourT:0,pouring:false,_theme:'kitchen'}); break;
+      case 'toiletPaper':   mrObstacles.push({type:'toiletPaper',x:hx,y:hy,r:14,rolling:false,rollV:0,trail:[],trailAge:0,_theme:'kitchen'}); break;
+      case 'trafficCar':{const cD=rng()>0.5?1:-1,cC=['#3a50c8','#c83a3a','#3ac860','#c8a03a','#8a3ac8','#3aa8c8','#c8603a'];
+        mrObstacles.push({type:'trafficCar',x:hx,y:hy,w:72,h:28,dir:cD,speed:1.2+rng()*0.8,_carCol:cC[Math.floor(rng()*cC.length)],
+          stopped:false,trunkOpen:false,trunkT:0,roofBroken:false,roofShards:[],marbleInside:null,passedEdge:false,_theme:'midnightup'});break;}
+      case 'trafficLight':  mrObstacles.push({type:'trafficLight',x:hx,y:hy,state:'green',timer:0,greenT:180+Math.floor(rng()*120),yellowT:60,redT:150+Math.floor(rng()*90),_theme:'midnightup'}); break;
+      case 'trafficCone':   mrObstacles.push({type:'trafficCone',x:hx,y:hy,angle:0,angV:0,_theme:'midnightup'}); break;
+      case 'oilSpillage':   mrObstacles.push({type:'oilSpillage',x:hx,y:hy,w:55+rng()*30,phase:0,_theme:'midnightup'}); break;
+      case 'fallingAcorn':  mrObstacles.push({type:'fallingAcorn',x:hx,y:hy,r:8,vx:0,vy:0,fallen:false,bounces:0,_theme:'autumn'}); break;
+      case 'windGust':      mrObstacles.push({type:'windGust',x:hx,y:hy,w:70+rng()*40,h:30+rng()*20,dir:rng()>0.5?1:-1,phase:0,strength:0.18+rng()*0.12,active:true,_theme:'autumn'}); break;
+      case 'slippyLeaves':  mrObstacles.push({type:'slippyLeaves',x:hx,y:hy,w:60+rng()*30,phase:0,_theme:'autumn'}); break;
+      case 'mushroomPad':   mrObstacles.push({type:'mushroomPad',x:hx,y:hy,r:20+rng()*8,bounce:0,_theme:'autumn'}); break;
+      case 'pumpkinTrampoline':mrObstacles.push({type:'pumpkinTrampoline',x:hx,y:hy,w:50+rng()*20,squish:0,_theme:'autumn'}); break;
+      case 'hollowLog':     mrObstacles.push({type:'hollowLog',x:hx,y:hy,w:70+rng()*20,r:14,dir:rng()>0.5?1:-1,marbleInside:null,_theme:'autumn'}); break;
+      case 'windmill':      mrObstacles.push({type:'windmill',x:hx,y:hy,angle:0,speed:(rng()>0.5?1:-1)*(0.018+rng()*0.012),bladeLen:28+rng()*10,_theme:'autumn'}); break;
+      case 'scarecrow':     mrObstacles.push({type:'scarecrow',x:hx,y:hy,wobble:0,wobbleV:0,_theme:'autumn'}); break;
+      case 'cornStalk':     mrObstacles.push({type:'cornStalk',x:hx,y:hy,w:50+rng()*30,sway:0,swayV:0,_theme:'autumn'}); break;
+      case 'swingingMace':  mrObstacles.push({type:'swingingMace',x:hx,y:hy,len:40+rng()*15,angle:-0.5+rng()*1,angV:0,r:12,_theme:'medieval'}); break;
+      case 'arrowTrap':     mrObstacles.push({type:'arrowTrap',x:hx,y:hy,dir:rng()>0.5?1:-1,cooldown:0,arrows:[],_theme:'medieval'}); break;
+      case 'firePit':       mrObstacles.push({type:'firePit',x:hx,y:hy,w:50+rng()*20,phase:0,particles:[],_theme:'medieval'}); break;
+      case 'spikedGate':    mrObstacles.push({type:'spikedGate',x:hx,y:hy,w:60+rng()*20,open:false,timer:0,openT:90+Math.floor(rng()*60),closeT:120+Math.floor(rng()*60),_theme:'medieval'}); break;
+      case 'catapult':      mrObstacles.push({type:'catapult',x:hx,y:hy,angle:0.3,fired:false,cooldown:0,projectiles:[],_theme:'medieval'}); break;
+      case 'shieldBumper':  mrObstacles.push({type:'shieldBumper',x:hx,y:hy,r:18+rng()*6,angle:rng()*Math.PI*2,_theme:'medieval'}); break;
+      case 'castleGear':    mrObstacles.push({type:'castleGear',x:hx,y:hy,r:20+rng()*8,angle:0,speed:(rng()>0.5?1:-1)*0.022,teeth:8,_theme:'medieval'}); break;
+      case 'barrelRoller':  mrObstacles.push({type:'barrelRoller',x:hx,y:hy,r:14+rng()*5,vx:(rng()>0.5?1:-1)*1.2,angle:0,_theme:'medieval'}); break;
+      case 'knightStatue':  mrObstacles.push({type:'knightStatue',x:hx,y:hy,r:16,glow:0,_theme:'medieval'}); break;
+    }
+  }
+
+  // ── 1. Plan gate corridors — strict zigzag, small controlled nudge ──
+  const gates = [];
   for (let z = 0; z < ZONES; z++) {
-    const side = z % 2;
-    const gx = side === 0
-      ? 30  + rng() * (W * 0.35)
-      : W * 0.65 + rng() * (W * 0.3 - 30);
+    const isLeft = z % 2 === 0;
+    const gx = isLeft
+      ? W * 0.16 + rng() * (W * 0.22)   // left zone: 16–38% of width
+      : W * 0.62 + rng() * (W * 0.22);  // right zone: 62–84% of width
     gates.push({ x: gx, y: 60 + z * zoneH + zoneH * 0.5 });
   }
 
+  // ── 2. Zone loop: place structured elements per zone ──
   for (let z = 0; z < ZONES; z++) {
     const yBase = 60 + z * zoneH;
-    const yMid  = yBase + zoneH * 0.5;
     const gate  = gates[z];
+    const nextG = gates[Math.min(z + 1, ZONES - 1)];
     const gLeft  = gate.x - GATE_W / 2;
     const gRight = gate.x + GATE_W / 2;
+    const gateIsLeft = gate.x < W / 2;
 
-    // ── Guide ramp pointing TOWARD the gate below ──
-    const nextGate = gates[Math.min(z + 1, ZONES - 1)];
-    const slope = nextGate.x > gate.x ? 0.28 + rng() * 0.12 : -(0.28 + rng() * 0.12);
-
-    // Left-side ramp (only if it doesn't block the gate corridor)
-    if (gLeft > 40) {
-      mrObstacles.push({ type:'ramp', x: gLeft * 0.5, y: yBase + 18 + rng() * 20, w: 50 + rng() * 15, angle: 0.28 + rng() * 0.1, _theme: mrTheme });
+    // ── Guide ramps: hug walls, angle toward next gate ──
+    const rAL = nextG.x > W * 0.5 ? 0.30 + rng() * 0.12 :  0.20 + rng() * 0.08;
+    const rAR = nextG.x < W * 0.5 ? -(0.30 + rng() * 0.12) : -(0.20 + rng() * 0.08);
+    if (gLeft > 42) {
+      mrObstacles.push({type:'ramp', x:Math.max(20,gLeft*0.42), y:yBase+12+rng()*18,
+        w:44+rng()*18, angle:rAL, _theme:mrTheme});
     }
-    // Right-side ramp
-    if (gRight < W - 40) {
-      mrObstacles.push({ type:'ramp', x: (gRight + W) * 0.5, y: yBase + 18 + rng() * 20, w: 50 + rng() * 15, angle: -(0.28 + rng() * 0.1), _theme: mrTheme });
-    }
-
-    // ── Pegs — only outside gate corridor — more dense on extended levels ──
-    const pegCount = isDeepLevel ? 5 : 3;
-    for (let p = 0; p < pegCount; p++) {
-      let px;
-      if (rng() > 0.5 && gLeft > 50) {
-        px = 15 + rng() * (gLeft - 20);
-      } else if (gRight < W - 50) {
-        px = gRight + rng() * (W - gRight - 20);
-      } else {
-        continue;
-      }
-      mrObstacles.push({ type:'peg', x: px, y: yBase + 10 + rng() * (zoneH - 20), r: 5 + rng() * 3, _theme: mrTheme });
+    if (gRight < W - 42) {
+      mrObstacles.push({type:'ramp', x:Math.min(W-20,gRight+(W-gRight)*0.52), y:yBase+12+rng()*18,
+        w:44+rng()*18, angle:rAR, _theme:mrTheme});
     }
 
-    // ── Bumper — outside gate — every zone on extended levels ──
-    if (z % 3 === 0 || (isDeepLevel && z % 2 === 0)) {
-      const bx = rng() > 0.5
-        ? Math.min(gLeft - 20, 60 + rng() * 40)
-        : Math.max(gRight + 20, W - 60 - rng() * 40);
-      if (bx > 20 && bx < W - 20) {
-        mrObstacles.push({ type:'bumper', x: bx, y: yMid + rng() * 15, r: 9 + rng() * 4, angle: 0, speed: 0.025 + rng() * 0.02, _theme: mrTheme });
-      }
-    }
-
-    const themePool = themeHazards[mrTheme] || [];
-    // For themed levels always use the theme pool; for generic themes mix in base pool occasionally
-    const alwaysThemed = ['arctic','sewers','sunken','skatepark','beach','garden','jpnight','kitchen','midnightup','forest','autumn','medieval'].includes(mrTheme);
-    const hazardPool = themePool.length && (alwaysThemed || rng() < 0.75) ? themePool : basePool;
-
-    // Pick 2-3 distinct hazards per zone; extended levels get 3 for density
-    const picks = [];
-    const poolCopy = hazardPool.slice();
-    const hazardPicks = isDeepLevel ? 3 : 2;
-    for (let pi = 0; pi < hazardPicks && poolCopy.length; pi++) {
-      const idx = Math.floor(rng() * poolCopy.length);
-      picks.push(poolCopy.splice(idx, 1)[0]);
-    }
-
-    for (const pick of picks) {
-    // Place hazard on the opposite side of the track from the gate
-    const hx = gate.x > W / 2
-      ? 30 + rng() * (W * 0.35)
-      : W * 0.65 + rng() * (W * 0.3);
-    const hy = yBase + 15 + rng() * (zoneH - 30);
-
-    switch (pick) {
-      case 'springboard':
-        mrObstacles.push({ type:'springboard', x: hx, y: hy, w: 38, hits:0, armed:false, springT:0 });
-        break;
-      case 'fan':
-        mrObstacles.push({ type:'fan', x: hx, y: hy, r: 18, dir: rng()>0.5?1:-1, active:false, activeT:0, spin:0 });
-        break;
-      case 'gear':
-        mrObstacles.push({ type:'gear', x: hx, y: hy, r: 14, teeth:8, angle:0, speed: rng()>0.5?0.02:-0.02 });
-        break;
-      case 'stickyzone':
-        mrObstacles.push({ type:'stickyzone', x: hx, y: hy, r: 18 + rng() * 10 });
-        break;
-      case 'bridge':
-        mrObstacles.push({ type:'bridge', x: hx, y: hy, w: 55 + rng() * 18, broken:false, load:0, breakAt: 2 + (rng()>0.5?1:0), breakT:0 });
-        break;
-      case 'conveyor':
-        mrObstacles.push({ type:'conveyor', x: hx, y: hy, w: 50 + rng() * 18, dir: rng()>0.5?1:-1, beltPhase:0 });
-        break;
-      case 'seesaw':
-        mrObstacles.push({ type:'seesaw', cx: hx, y: hy, w: 58 + rng() * 18, angle:0, angV:0 });
-        break;
-      case 'bouncywall':
-        mrObstacles.push({ type:'bouncywall', side: gate.x > W/2 ? 'left' : 'right', y: hy, h: 35 + rng() * 20, flash:0 });
-        break;
-      case 'slide':
-        mrObstacles.push({ type:'slide', x: hx, y: hy, w: 52, angle: gate.x > W/2 ? 0.4 : -0.4 });
-        break;
-      case 'rollerchain':
-        mrObstacles.push({ type:'rollerchain', x: hx, y: hy, w: 44, phase:0 });
-        break;
-      // ── Forest ──
-      case 'buzzsaw':
-        mrObstacles.push({ type:'buzzsaw', x:hx, y:hy, r:16, angle:0, speed:rng()>0.5?0.06:-0.06, _theme:'forest' });
-        break;
-      case 'fallenTree':
-        mrObstacles.push({ type:'fallenTree', cx:hx, y:hy, w:64+rng()*20, angle:0, angV:0, split:false, splitT:0, _theme:'forest' });
-        break;
-      case 'string':
-        mrObstacles.push({ type:'string', x:hx, y:hy, len:45+rng()*20, swing:0, swingV:0, _theme:'forest' });
-        break;
-      // ── Ice ──
-      case 'icePatch':
-        mrObstacles.push({ type:'icePatch', x:hx, y:hy, w:50+rng()*30, h:6, _theme:'ice' });
-        break;
-      case 'icicle':
-        mrObstacles.push({ type:'icicle', x:hx, y:hy, h:18+rng()*12, fallen:false, fallY:hy, patchX:null, patchY:null, _theme:'ice' });
-        break;
-      case 'icyBoulder':
-        mrObstacles.push({ type:'icyBoulder', x:hx, y:hy, r:16+rng()*6, vx:0, vy:0, rolling:false, breakT:0, broken:false, _theme:'ice' });
-        break;
-      case 'snowMachine':
-        mrObstacles.push({ type:'snowMachine', x:hx, y:hy, balls:[], lastSpawn:0, _theme:'ice' });
-        break;
-      // ── Sakura ──
-      case 'sakuraPetal':
-        mrObstacles.push({ type:'sakuraPetal', cx:hx, y:hy, w:40+rng()*20, angle:0, angV:0, flopped:false, _theme:'sakura' });
-        break;
-      case 'leafPile':
-        mrObstacles.push({ type:'leafPile', x:hx, y:hy, w:50+rng()*20, particles:[], _theme:'sakura' });
-        break;
-      // ── Arctic Mountain ──
-      case 'snowAvalanche':
-        mrObstacles.push({ type:'snowAvalanche', x: hx, y: hy, r:14+rng()*8, triggered:false, despawnT:0, balls:[], _theme:'arctic' });
-        break;
-      case 'crackingIceBridge':
-        mrObstacles.push({ type:'crackingIceBridge', x: hx, y: hy, w:65+rng()*20, cracks:0, broken:false, breakT:0, _theme:'arctic' });
-        break;
-      case 'iceSpike':
-        mrObstacles.push({ type:'iceSpike', x: hx, y: hy, h:22+rng()*10, _theme:'arctic' });
-        break;
-      case 'iceSlide':
-        mrObstacles.push({ type:'iceSlide', x: hx, y: hy, w:70+rng()*20, angle: gate.x > W/2 ? 0.42 : -0.42, _theme:'arctic' });
-        break;
-      case 'penguinBumper':
-        mrObstacles.push({ type:'penguinBumper', x: hx, y: hy, r:14, wobble:0, _theme:'arctic' });
-        break;
-      case 'frozenGear':
-        mrObstacles.push({ type:'frozenGear', x: hx, y: hy, r:16, teeth:8, angle:0, speed: rng()>0.5?0.02:-0.02, _theme:'arctic' });
-        break;
-      // ── Sewers ──
-      case 'toxicSludge':
-        mrObstacles.push({ type:'toxicSludge', x: hx, y: hy, r:24+rng()*10, attached:[], phase:0, _theme:'sewers' });
-        break;
-      case 'pipeBlade':
-        mrObstacles.push({ type:'pipeBlade', x: hx, y: hy, r:16, angle:0, speed: rng()>0.5?0.05:-0.05, _theme:'sewers' });
-        break;
-      case 'steamBurst':
-        mrObstacles.push({ type:'steamBurst', x: hx, y: hy, active:false, timer:0, cooldown:90+Math.floor(rng()*60), particles:[], _theme:'sewers' });
-        break;
-      case 'waterCurrentPipe':
-        mrObstacles.push({ type:'waterCurrentPipe', x: hx, y: hy, w:60+rng()*20, dir: rng()>0.5?1:-1, flow:0, _theme:'sewers' });
-        break;
-      case 'drippingWater':
-        mrObstacles.push({ type:'drippingWater', x: hx, y: hy, drops:[], timer:0, _theme:'sewers' });
-        break;
-      case 'ratStampede':
-        mrObstacles.push({ type:'ratStampede', x: W/2, y: hy, rats:[], timer:0, cooldown:180+Math.floor(rng()*120), dir: rng()>0.5?1:-1, _theme:'sewers' });
-        break;
-      case 'drainTunnel':
-        mrObstacles.push({ type:'drainTunnel', x: hx, y: hy, r:18, active:false, _theme:'sewers' });
-        break;
-      // ── Sunken Depths ──
-      case 'waterCurrent':
-        mrObstacles.push({ type:'waterCurrent', x: hx, y: hy, w:65+rng()*20, h:32+rng()*14, dir: rng()>0.5?1:-1, phase:0, _theme:'sunken' });
-        break;
-      case 'pressureZone':
-        mrObstacles.push({ type:'pressureZone', x: hx, y: hy, r:22+rng()*10, pulse:0, _theme:'sunken' });
-        break;
-      case 'clamTrap':
-        mrObstacles.push({ type:'clamTrap', x: hx, y: hy, w:38, open:true, phase:Math.floor(rng()*120), _theme:'sunken' });
-        break;
-      case 'bubbleElevator':
-        mrObstacles.push({ type:'bubbleElevator', x: hx, y: hy, h:55+rng()*30, bubbles:[], phase:0, _theme:'sunken' });
-        break;
-      // ── Skate Park ──
-      case 'rollingBoard':
-        mrObstacles.push({ type:'rollingBoard', x: hx, y: hy, w:32+rng()*12, vx: rng()>0.5?1.2:-1.2, phase:0, _theme:'skatepark' });
-        break;
-      case 'grindRail':
-        mrObstacles.push({ type:'grindRail', x: hx, y: hy, w:60+rng()*20, dir: rng()>0.5?1:-1, offset:0, _theme:'skatepark' });
-        break;
-      case 'spinRamp':
-        mrObstacles.push({ type:'spinRamp', x: hx, y: hy, w:50+rng()*15, angle:0, speed: rng()>0.5?0.018:-0.018, _theme:'skatepark' });
-        break;
-      case 'halfPipe':
-        mrObstacles.push({ type:'halfPipe', x: hx, y: hy, w:55+rng()*20, side: gate.x > W/2 ? 'left' : 'right', _theme:'skatepark' });
-        break;
-      case 'boostRail':
-        mrObstacles.push({ type:'boostRail', x: hx, y: hy, w:55+rng()*20, dir: rng()>0.5?1:-1, glow:0, _theme:'skatepark' });
-        break;
-      case 'grafittiBumper':
-        mrObstacles.push({ type:'grafittiBumper', x: hx, y: hy, r:13+rng()*5, colorIdx:Math.floor(rng()*5), wobble:0, _theme:'skatepark' });
-        break;
-      case 'rotatingObstacle':
-        mrObstacles.push({ type:'rotatingObstacle', x: hx, y: hy, r:18+rng()*8, angle:0, speed:(rng()>0.5?1:-1)*(0.025+rng()*0.02), armLen:22+rng()*10, _theme:'skatepark' });
-        break;
-      // ── Beach ──
-      case 'beachBall':
-        mrObstacles.push({ type:'beachBall', x: hx, y: hy, r:14+rng()*6, vx: rng()>0.5?0.8:-0.8, vy:0, _theme:'beach' });
-        break;
-      case 'crabTrap':
-        mrObstacles.push({ type:'crabTrap', x: hx, y: hy, w:28+rng()*10, open:true, phase:Math.floor(rng()*90), _theme:'beach' });
-        break;
-      case 'wavePush':
-        mrObstacles.push({ type:'wavePush', x: W/2, y: hy, w: W*0.85, h:18+rng()*8, phase:0, cooldown:150+Math.floor(rng()*100), timer:Math.floor(rng()*150), _theme:'beach' });
-        break;
-      case 'sandRamp':
-        mrObstacles.push({ type:'sandRamp', x: hx, y: hy, w:55+rng()*18, angle: gate.x > W/2 ? 0.32 : -0.32, _theme:'beach' });
-        break;
-      case 'umbrellaBumper':
-        mrObstacles.push({ type:'umbrellaBumper', x: hx, y: hy, r:16+rng()*5, colorIdx:Math.floor(rng()*4), _theme:'beach' });
-        break;
-      // ── Garden ──
-      case 'waterPuddle':
-        mrObstacles.push({ type:'waterPuddle', x: hx, y: hy, r:20+rng()*12, phase:0, _theme:'garden' });
-        break;
-      case 'thornBush':
-        mrObstacles.push({ type:'thornBush', x: hx, y: hy, w:45+rng()*20, _theme:'garden' });
-        break;
-      case 'grassPatch':
-        mrObstacles.push({ type:'grassPatch', x: hx, y: hy, w:55+rng()*20, _theme:'garden' });
-        break;
-      case 'beeSting':
-        mrObstacles.push({ type:'beeSting', x: hx+rng()*30-15, y: hy, vx: rng()>0.5?1.5:-1.5, vy:(rng()-0.5)*0.8, buzz:0, _theme:'garden' });
-        break;
-      // ── Japanese Night ──
-      case 'swingingBamboo':
-        mrObstacles.push({ type:'swingingBamboo', x: hx, y: hy, len:55+rng()*25, angle:(rng()-0.5)*0.4, angV:0, restitution:0.82+rng()*0.12, _theme:'jpnight' });
-        break;
-      case 'paperLantern':
-        mrObstacles.push({ type:'paperLantern', x: hx, y: hy, r:13+rng()*5, phase:rng()*Math.PI*2, colorIdx:Math.floor(rng()*4), lit:true, flickerT:0, _theme:'jpnight' });
-        break;
-      case 'shurikenWheel':
-        mrObstacles.push({ type:'shurikenWheel', x: hx, y: hy, r:15+rng()*6, angle:0, speed:(rng()>0.5?1:-1)*(0.04+rng()*0.03), _theme:'jpnight' });
-        break;
-      case 'sakuraWindTunnel': {
-        // Tunnel direction: mostly downward but angled; pick a direction that goes across the track
-        const tDir = rng() > 0.5 ? 1 : -1;
-        const tLen = 90 + rng()*50;
-        const tAngle = tDir * (0.3 + rng()*0.35); // angle from vertical
-        const tunnel = { type:'sakuraWindTunnel', x: hx, y: hy, len: tLen, angle: tAngle, w: 28+rng()*10, phase:0, petals:[], _theme:'jpnight' };
-        mrObstacles.push(tunnel);
-        // Spawn a moonlit section at the tunnel exit — they are always connected
-        const exitX = hx + Math.sin(tAngle)*tLen;
-        const exitY = hy + Math.cos(tAngle)*tLen;
-        if (exitX > 20 && exitX < W-20 && exitY < mrLevelH - 40) {
-          mrObstacles.push({ type:'moonlitSection', x: exitX, y: exitY, r:24+rng()*10, phase:rng()*Math.PI*2, _theme:'jpnight' });
+    // ── Wall pegs: near outer edges only, never centre ──
+    const pegC = isDeepLevel ? 2 : 1;
+    for (let side = 0; side < 2; side++) {
+      for (let pi = 0; pi < pegC; pi++) {
+        const px = side === 0
+          ? 10 + rng() * Math.max(1, gLeft * 0.5)
+          : Math.min(W-10, gRight + (W-gRight)*(0.5+pi*0.3));
+        if (px > 10 && px < W - 10) {
+          mrObstacles.push({type:'peg', x:px, y:yBase+18+rng()*(zoneH-32),
+            r:4.5+rng()*2.5, _theme:mrTheme});
         }
-        break;
       }
-      case 'waterGardenCurrent':
-        mrObstacles.push({ type:'waterGardenCurrent', x: hx, y: hy, w:65+rng()*20, h:22+rng()*10, dir:rng()>0.5?1:-1, phase:0, ripples:[], _theme:'jpnight' });
-        break;
-      case 'moonlitSection':
-        mrObstacles.push({ type:'moonlitSection', x: hx, y: hy, r:28+rng()*12, phase:rng()*Math.PI*2, _theme:'jpnight' });
-        break;
-      // ── Directional Pipe (Sewers upgrade) ──
-      case 'directionalPipe': {
-        const dpAngle = rng()>0.5 ? 0 : (rng()-0.5)*0.5; // mostly horizontal, slight angle
-        const dpDir   = rng()>0.5 ? 1 : -1;
-        const dpLen   = 110 + rng()*60; // long enough to feel substantial
-        mrObstacles.push({ type:'directionalPipe', x: hx, y: hy, len: dpLen, angle: dpAngle, dir: dpDir, w: 24, phase:0, _theme:'sewers' });
-        break;
+    }
+
+    // ── Themed feature: OPPOSITE side from gate, one per zone ──
+    const fX = gateIsLeft
+      ? W * 0.60 + rng() * (W * 0.30)
+      : W * 0.10 + rng() * (W * 0.30);
+    const fY = yBase + zoneH * 0.42 + (rng()-0.5) * zoneH * 0.22;
+    const fp = _pickN(hazardPool, 1);
+    if (fp[0]) _ph(fp[0], Math.max(16,Math.min(W-16,fX)), Math.max(yBase+12,Math.min(yBase+zoneH-12,fY)));
+
+    // ── Bumper accent every 3 zones: flanking the gate ──
+    if (z % 3 === 0) {
+      const bS = rng() > 0.5 ? 1 : -1;
+      const bx = gate.x + bS * (GATE_W * 0.75 + rng() * 18);
+      if (bx > 14 && bx < W - 14) {
+        mrObstacles.push({type:'bumper', x:bx, y:yBase+zoneH*0.65+rng()*zoneH*0.15,
+          r:9+rng()*4, angle:0, speed:0.022+rng()*0.018, _theme:mrTheme});
       }
-      // ── Kitchen ──
-      case 'grillPlatform':
-        mrObstacles.push({ type:'grillPlatform', x: hx, y: hy, w: 60+rng()*20, heat:0, heatT:0, flipT:0, flipped:false, marbleCount:0, _theme:'kitchen' });
-        break;
-      case 'kitchenKnife':
-        mrObstacles.push({ type:'kitchenKnife', x: hx, y: hy, len:35+rng()*15, angle:rng()*Math.PI*2, speed:(rng()>0.5?1:-1)*(0.04+rng()*0.03), pivotR:18+rng()*10, _theme:'kitchen' });
-        break;
-      case 'mixingBowl':
-        mrObstacles.push({ type:'mixingBowl', x: hx, y: hy, r:22+rng()*8, marbles:[], rockAngle:0, rockV:0, pourT:0, pouring:false, _theme:'kitchen' });
-        break;
-      case 'toiletPaper':
-        mrObstacles.push({ type:'toiletPaper', x: hx, y: hy, r:14, rolling:false, rollV:0, trail:[], trailAge:0, _theme:'kitchen' });
-        break;
-      // ── Midnight Uprise ──
-      case 'trafficCar': {
-        const carDir = rng()>0.5 ? 1 : -1;
-        const carCols = ['#3a50c8','#c83a3a','#3ac860','#c8a03a','#8a3ac8','#3aa8c8','#c8603a'];
-        mrObstacles.push({ type:'trafficCar', x: hx, y: hy, w:72, h:28, dir:carDir, speed:1.2+rng()*0.8,
-          _carCol: carCols[Math.floor(rng()*carCols.length)],
-          stopped:false, trunkOpen:false, trunkT:0, roofBroken:false, roofShards:[],
-          marbleInside:null, passedEdge:false, _theme:'midnightup' });
-        break;
+    }
+
+    // ── Crossing element every 2 zones: seesaw or conveyor spanning the track ──
+    if (z % 2 === 1) {
+      const cX = W * 0.5 + (rng()-0.5) * W * 0.12;
+      const cY = yBase + zoneH * 0.78;
+      if (Math.abs(cX - gate.x) > GATE_W * 0.6) {
+        if (rng() > 0.55) {
+          mrObstacles.push({type:'seesaw', cx:cX, y:cY, w:58+rng()*22, angle:0, angV:0});
+        } else {
+          mrObstacles.push({type:'conveyor', x:cX, y:cY, w:52+rng()*20, dir:rng()>0.5?1:-1, beltPhase:0});
+        }
       }
-      case 'trafficLight':
-        mrObstacles.push({ type:'trafficLight', x: hx, y: hy, state:'green', timer:0, greenT:180+Math.floor(rng()*120), yellowT:60, redT:150+Math.floor(rng()*90), _theme:'midnightup' });
-        break;
-      case 'trafficCone':
-        mrObstacles.push({ type:'trafficCone', x: hx, y: hy, angle:0, angV:0, _theme:'midnightup' });
-        break;
-      case 'oilSpillage':
-        mrObstacles.push({ type:'oilSpillage', x: hx, y: hy, w:55+rng()*30, phase:0, _theme:'midnightup' });
-        break;
-      // ── Autumn Harvest ──
-      case 'fallingAcorn':
-        mrObstacles.push({ type:'fallingAcorn', x:hx, y:hy, r:8, vx:0, vy:0, fallen:false, bounces:0, _theme:'autumn' });
-        break;
-      case 'windGust':
-        mrObstacles.push({ type:'windGust', x:hx, y:hy, w:70+rng()*40, h:30+rng()*20, dir:rng()>0.5?1:-1, phase:0, strength:0.18+rng()*0.12, active:true, _theme:'autumn' });
-        break;
-      case 'slippyLeaves':
-        mrObstacles.push({ type:'slippyLeaves', x:hx, y:hy, w:60+rng()*30, phase:0, _theme:'autumn' });
-        break;
-      case 'mushroomPad':
-        mrObstacles.push({ type:'mushroomPad', x:hx, y:hy, r:20+rng()*8, bounce:0, _theme:'autumn' });
-        break;
-      case 'pumpkinTrampoline':
-        mrObstacles.push({ type:'pumpkinTrampoline', x:hx, y:hy, w:50+rng()*20, squish:0, _theme:'autumn' });
-        break;
-      case 'hollowLog': {
-        const logDir = rng()>0.5?1:-1;
-        mrObstacles.push({ type:'hollowLog', x:hx, y:hy, w:70+rng()*20, r:14, dir:logDir, marbleInside:null, _theme:'autumn' });
-        break;
-      }
-      case 'windmill':
-        mrObstacles.push({ type:'windmill', x:hx, y:hy, angle:0, speed:(rng()>0.5?1:-1)*(0.018+rng()*0.012), bladeLen:28+rng()*10, _theme:'autumn' });
-        break;
-      case 'scarecrow':
-        mrObstacles.push({ type:'scarecrow', x:hx, y:hy, wobble:0, wobbleV:0, _theme:'autumn' });
-        break;
-      case 'cornStalk':
-        mrObstacles.push({ type:'cornStalk', x:hx, y:hy, w:50+rng()*30, sway:0, swayV:0, _theme:'autumn' });
-        break;
-      // ── Medieval Keep ──
-      case 'swingingMace':
-        mrObstacles.push({ type:'swingingMace', x:hx, y:hy, len:40+rng()*15, angle:-0.5+rng()*1, angV:0, r:12, _theme:'medieval' });
-        break;
-      case 'arrowTrap':
-        mrObstacles.push({ type:'arrowTrap', x:hx, y:hy, dir:rng()>0.5?1:-1, cooldown:0, arrows:[], _theme:'medieval' });
-        break;
-      case 'firePit':
-        mrObstacles.push({ type:'firePit', x:hx, y:hy, w:50+rng()*20, phase:0, particles:[], _theme:'medieval' });
-        break;
-      case 'spikedGate':
-        mrObstacles.push({ type:'spikedGate', x:hx, y:hy, w:60+rng()*20, open:false, timer:0, openT:90+Math.floor(rng()*60), closeT:120+Math.floor(rng()*60), _theme:'medieval' });
-        break;
-      case 'catapult':
-        mrObstacles.push({ type:'catapult', x:hx, y:hy, angle:0.3, fired:false, cooldown:0, projectiles:[], _theme:'medieval' });
-        break;
-      case 'shieldBumper':
-        mrObstacles.push({ type:'shieldBumper', x:hx, y:hy, r:18+rng()*6, angle:rng()*Math.PI*2, _theme:'medieval' });
-        break;
-      case 'castleGear':
-        mrObstacles.push({ type:'castleGear', x:hx, y:hy, r:20+rng()*8, angle:0, speed:(rng()>0.5?1:-1)*0.022, teeth:8, _theme:'medieval' });
-        break;
-      case 'barrelRoller':
-        mrObstacles.push({ type:'barrelRoller', x:hx, y:hy, r:14+rng()*5, vx:(rng()>0.5?1:-1)*1.2, angle:0, _theme:'medieval' });
-        break;
-      case 'knightStatue':
-        mrObstacles.push({ type:'knightStatue', x:hx, y:hy, r:16, glow:0, _theme:'medieval' });
-        break;
-    } // end switch(pick)
-  } // end for(pick of picks)
+    }
   } // end zone loop
 
-  // ── Special section for deep levels ──────────────────────────
+  // ── 3. Extended level: one structured arena per extra screen ──
   if (isDeepLevel) {
-    // Place one special section in the lower third of the extra depth
-    const specialY = MR_H * 5 + rng() * (H - MR_H * 5 - 200);
-    const specialType = Math.floor(rng() * 3);
-    const cx = W * 0.2 + rng() * W * 0.6;
+    const extraScreens = mrLevelScreens - 5;
+    for (let sec = 0; sec < extraScreens; sec++) {
+      const aTop = MR_H * 5 + sec * MR_H + MR_H * 0.15;
+      const aType = Math.floor(rng() * 4);
+      const cx2 = W * 0.5;
 
-    if (specialType === 0) {
-      // Hazard gauntlet: a dense row of themed hazards
-      const themePool = (themeHazards[mrTheme] || []);
-      const pool = themePool.length ? themePool : ['springboard','fan','gear','bumper','conveyor'];
-      for (let gi = 0; gi < 5; gi++) {
-        const gx = W * 0.1 + gi * (W * 0.18);
-        const pick = pool[Math.floor(rng() * pool.length)];
-        const hx2 = gx, hy2 = specialY + (gi % 2) * 30;
-        // Spawn via simplified inline push (shared types only)
-        mrObstacles.push({ type: 'bumper', x: hx2, y: hy2, r: 11 + rng() * 5, angle: 0, speed: 0.025 + rng() * 0.02, _theme: mrTheme, _special: 'gauntlet' });
+      if (aType === 0) {
+        // Gauntlet row: 4 themed features evenly spaced + entry ramps
+        _pickN(hazardPool, 4).forEach((p,i) => _ph(p, W*(0.12+i*0.25), aTop+(i%2)*40));
+        mrObstacles.push({type:'ramp',x:W*0.22,y:aTop-22,w:60,angle:0.40,_theme:mrTheme});
+        mrObstacles.push({type:'ramp',x:W*0.78,y:aTop-22,w:60,angle:-0.40,_theme:mrTheme});
+      } else if (aType === 1) {
+        // Speed corridor: alternating slalom ramps for fast descent
+        for (let ri=0;ri<5;ri++){
+          const rS=ri%2,rx=rS===0?22+rng()*W*0.28:W*0.72+rng()*W*0.22-18;
+          mrObstacles.push({type:'ramp',x:rx,y:aTop+ri*60,w:64+rng()*18,
+            angle:rS===0?0.42+rng()*0.1:-(0.42+rng()*0.1),_theme:mrTheme});
+        }
+      } else if (aType === 2) {
+        // Bumper arena: diamond pattern + themed feature in centre
+        [[cx2,aTop],[cx2-50,aTop+45],[cx2+50,aTop+45],[cx2,aTop+90],[cx2-50,aTop+135],[cx2+50,aTop+135]]
+          .forEach(([bx,by])=>mrObstacles.push({type:'bumper',x:bx,y:by,r:11+rng()*4,angle:0,speed:0.022+rng()*0.016,_theme:mrTheme}));
+        const ap=_pickN(hazardPool,1)[0]; if(ap)_ph(ap,cx2,aTop+180);
+      } else {
+        // Bounce cascade: ramps → springboards → themed reward at bottom
+        mrObstacles.push({type:'ramp',x:W*0.24,y:aTop,w:70,angle:0.48,_theme:mrTheme});
+        mrObstacles.push({type:'ramp',x:W*0.76,y:aTop+55,w:70,angle:-0.48,_theme:mrTheme});
+        mrObstacles.push({type:'springboard',x:cx2,y:aTop+118,w:50,hits:0,armed:false,springT:0});
+        mrObstacles.push({type:'springboard',x:cx2-55,y:aTop+158,w:46,hits:0,armed:false,springT:0});
+        mrObstacles.push({type:'springboard',x:cx2+55,y:aTop+158,w:46,hits:0,armed:false,springT:0});
+        const bp=_pickN(hazardPool,1)[0]; if(bp)_ph(bp,cx2,aTop+210);
       }
-      mrObstacles.push({ type: 'ramp', x: W * 0.25, y: specialY - 20, w: 60, angle: 0.35, _theme: mrTheme, _special: 'gauntlet' });
-      mrObstacles.push({ type: 'ramp', x: W * 0.75, y: specialY - 20, w: 60, angle: -0.35, _theme: mrTheme, _special: 'gauntlet' });
-    } else if (specialType === 1) {
-      // Speed ramp gauntlet: interlocked ramps for fast descent
-      for (let ri = 0; ri < 4; ri++) {
-        const side = ri % 2;
-        const rx = side === 0 ? 30 + rng() * (W * 0.35) : W * 0.65 + rng() * (W * 0.3 - 30);
-        const angle = side === 0 ? 0.45 + rng() * 0.1 : -(0.45 + rng() * 0.1);
-        mrObstacles.push({ type: 'ramp', x: rx, y: specialY + ri * 80, w: 70 + rng() * 20, angle, _theme: mrTheme, _special: 'speedramp' });
-      }
-      mrObstacles.push({ type: 'conveyor', x: cx, y: specialY + 200, w: 80 + rng() * 30, dir: rng() > 0.5 ? 1 : -1, speed: 2, _theme: mrTheme, _special: 'speedramp' });
-    } else {
-      // Bonus zone: springboards and low-friction slides for big air
-      mrObstacles.push({ type: 'springboard', x: W * 0.3, y: specialY, w: 45, power: 14, compressed: 0, _theme: mrTheme, _special: 'bonus' });
-      mrObstacles.push({ type: 'springboard', x: W * 0.7, y: specialY + 60, w: 45, power: 14, compressed: 0, _theme: mrTheme, _special: 'bonus' });
-      mrObstacles.push({ type: 'bouncywall', x: cx, y: specialY + 130, w: 80, angle: 0, _theme: mrTheme, _special: 'bonus' });
-      mrObstacles.push({ type: 'slide', x: W * 0.5, y: specialY + 210, w: 90, angle: rng() > 0.5 ? 0.3 : -0.3, _theme: mrTheme, _special: 'bonus' });
     }
   }
 
@@ -12404,7 +12090,7 @@ function mrDrawFrame() {
   ctx.save();
   ctx.translate(0, -camY);
 
-  // Background — fill the FULL level height so extended levels have complete coverage
+  // Background — fills full level depth (mrLevelH), not just one viewport
   const th = MR_THEMES[mrTheme] || MR_THEMES.space;
   const bg = ctx.createLinearGradient(0, 0, 0, mrLevelH);
   bg.addColorStop(0, th.bgA); bg.addColorStop(0.5, th.bgA); bg.addColorStop(1, th.bgB);
@@ -12440,7 +12126,7 @@ function mrDrawFrame() {
     window._mrBlizzard.forEach(p => {
       p.x += p.vx; p.y += p.vy + Math.sin(Date.now()*0.002+p.y*0.02)*0.3;
       if (p.x > cssW+10) p.x = -10;
-      if (p.y > mrLevelH+10) { p.y = -10; p.x = Math.random()*cssW; }
+      if (p.y > MR_H+10) { p.y = -10; p.x = Math.random()*cssW; }
       ctx.globalAlpha = p.alpha * 0.7;
       ctx.fillStyle = '#e8f4ff';
       ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
@@ -12459,10 +12145,10 @@ function mrDrawFrame() {
 
   // ── Sunken Depths water vignette ──
   if (mrTheme === 'sunken') {
-    const uvG = ctx.createRadialGradient(cssW/2, mrLevelH/2, mrLevelH*0.3, cssW/2, mrLevelH/2, mrLevelH*0.8);
+    const uvG = ctx.createRadialGradient(cssW/2, MR_H/2, MR_H*0.3, cssW/2, MR_H/2, MR_H*0.8);
     uvG.addColorStop(0,'rgba(0,0,0,0)');
     uvG.addColorStop(1,'rgba(0,20,60,0.35)');
-    ctx.fillStyle=uvG; ctx.fillRect(0,0,cssW,mrLevelH);
+    ctx.fillStyle=uvG; ctx.fillRect(0,0,cssW,MR_H);
   }
 
   // ── Skate Park — sunset sky with warm horizon glow ──
@@ -12630,89 +12316,74 @@ function mrDrawFrame() {
     ctx.globalAlpha=1;
   }
 
-  // ── Japanese Night — moonlit sky, stars, sakura petal storm ──
+  // ── Japanese Night — world-space atmosphere across full level depth ──
   if (mrTheme === 'jpnight') {
-    // Deep indigo sky gradient covering full level
+    // Full-level sky wash — rich indigo fading to deep blue at bottom
     const jnSky = ctx.createLinearGradient(0, 0, 0, mrLevelH);
-    jnSky.addColorStop(0, 'rgba(40,20,100,0.35)');
-    jnSky.addColorStop(0.3, 'rgba(20,8,60,0.18)');
-    jnSky.addColorStop(1, 'rgba(0,0,0,0)');
+    jnSky.addColorStop(0,   'rgba(35,15,90,0.50)');
+    jnSky.addColorStop(0.3, 'rgba(20,8,70,0.32)');
+    jnSky.addColorStop(0.7, 'rgba(10,5,40,0.20)');
+    jnSky.addColorStop(1,   'rgba(5,2,20,0.12)');
     ctx.fillStyle = jnSky; ctx.fillRect(0, 0, cssW, mrLevelH);
 
-    // Moon — top right (fixed in world space)
-    const moonX = cssW * 0.82, moonY = 28;
-    ctx.shadowBlur = 30; ctx.shadowColor = 'rgba(220,210,255,0.6)';
-    const moonG = ctx.createRadialGradient(moonX-4, moonY-4, 1, moonX, moonY, 18);
-    moonG.addColorStop(0, 'rgba(255,255,240,0.98)');
-    moonG.addColorStop(0.5, 'rgba(230,220,255,0.6)');
-    moonG.addColorStop(1, 'rgba(180,160,255,0)');
-    ctx.fillStyle = moonG; ctx.beginPath(); ctx.arc(moonX, moonY, 18, 0, Math.PI*2); ctx.fill();
-    ctx.shadowBlur = 0;
-    // Moon halo
-    ctx.strokeStyle = 'rgba(200,190,255,0.12)'; ctx.lineWidth = 8;
-    ctx.beginPath(); ctx.arc(moonX, moonY, 26, 0, Math.PI*2); ctx.stroke();
-
-    // Stars — distributed across full level height
+    // Stars — tiled across full level height, seeded so they don't jump each frame
     const starT2 = Date.now() * 0.0005;
-    const starRows = Math.max(1, Math.ceil(mrLevelH / MR_H));
-    for (let sr = 0; sr < starRows; sr++) {
-      for(let si=0; si<22; si++){
-        const sx = (si*131+17) % cssW;
-        const sy = sr * MR_H + (si*79+11) % 90;
-        const salpha = 0.3 + Math.sin(starT2+si*1.3+sr*0.7)*0.2;
-        ctx.globalAlpha = salpha;
-        ctx.fillStyle = 'rgba(220,210,255,0.9)';
-        ctx.beginPath(); ctx.arc(sx, sy, 0.9+Math.sin(si)*0.4, 0, Math.PI*2); ctx.fill();
+    const numScreens = mrLevelScreens;
+    for (let sr = 0; sr < numScreens; sr++) {
+      for (let si = 0; si < 16; si++) {
+        const sx = ((si * 137 + sr * 53) % Math.max(cssW - 10, 1)) + 5;
+        const sy = sr * MR_H + ((si * 83 + sr * 29) % (MR_H - 10));
+        const sa = 0.25 + Math.sin(starT2 + si * 1.4 + sr * 0.7) * 0.2;
+        ctx.globalAlpha = Math.max(0, sa);
+        ctx.fillStyle = 'rgba(220,210,255,0.95)';
+        ctx.beginPath(); ctx.arc(sx, sy, 0.8 + (si % 3) * 0.3, 0, Math.PI * 2); ctx.fill();
       }
     }
     ctx.globalAlpha = 1;
 
-    // Sakura petal storm — 10s on / 10s off cycle
-    if (!window._mrJPPetals) {
-      window._mrJPPetals = Array.from({length:55}, () => ({
-        x: Math.random()*cssW, y: Math.random()*mrLevelH,
-        vx: -0.4-Math.random()*0.7, vy: 0.5+Math.random()*0.9,
-        rot: Math.random()*Math.PI*2, rotV: (Math.random()-0.5)*0.08,
-        r: 2+Math.random()*2.5, alpha: 0.3+Math.random()*0.4,
-        phase: Math.random()*Math.PI*2
+    // Sakura petal storm — petals cover full mrLevelH, reset pool when level size changes
+    if (!window._mrJPPetals || window._mrJPPetals._h !== mrLevelH) {
+      window._mrJPPetals = Array.from({length: 60}, () => ({
+        x: Math.random() * cssW,
+        y: Math.random() * mrLevelH,
+        vx: -0.35 - Math.random() * 0.65,
+        vy: 0.45 + Math.random() * 0.85,
+        rot: Math.random() * Math.PI * 2,
+        rotV: (Math.random() - 0.5) * 0.07,
+        r: 2 + Math.random() * 2.5,
+        alpha: 0.28 + Math.random() * 0.38,
+        phase: Math.random() * Math.PI * 2
       }));
+      window._mrJPPetals._h = mrLevelH;
     }
-    // 20s cycle: 0-10s active, 10-20s dormant
     const cyclePos = (Date.now() / 1000) % 20;
-    const stormActive = cyclePos < 10;
-    const stormFade = stormActive
-      ? Math.min(1, cyclePos / 1.5)                   // fade in over 1.5s
-      : Math.max(0, 1 - (cyclePos - 10) / 1.5);       // fade out over 1.5s
-
+    const stormFade = cyclePos < 10
+      ? Math.min(1, cyclePos / 1.5)
+      : Math.max(0, 1 - (cyclePos - 10) / 1.5);
     if (stormFade > 0.01) {
       window._mrJPPetals.forEach(p => {
-        p.x += p.vx * stormFade;
-        p.y += p.vy;
-        p.rot += p.rotV;
-        p.phase += 0.03;
-        // Gentle horizontal sway
-        p.x += Math.sin(p.phase) * 0.3;
+        p.x += p.vx * stormFade; p.y += p.vy; p.rot += p.rotV; p.phase += 0.025;
+        p.x += Math.sin(p.phase) * 0.28;
         if (p.x < -10) p.x = cssW + 10;
-        if (p.y > mrLevelH + 10) { p.y = -10; p.x = Math.random()*cssW; }
+        if (p.y > mrLevelH + 10) { p.y = -10; p.x = Math.random() * cssW; }
         ctx.save();
         ctx.globalAlpha = p.alpha * stormFade;
         ctx.translate(p.x, p.y); ctx.rotate(p.rot);
-        ctx.fillStyle = 'rgba(255,160,200,0.9)';
-        ctx.beginPath(); ctx.ellipse(0, 0, p.r, p.r*0.55, 0, 0, Math.PI*2); ctx.fill();
-        // Petal vein
-        ctx.strokeStyle = 'rgba(255,200,220,0.5)'; ctx.lineWidth = 0.6;
-        ctx.beginPath(); ctx.moveTo(-p.r*0.8,0); ctx.lineTo(p.r*0.8,0); ctx.stroke();
+        ctx.fillStyle = 'rgba(255,158,198,0.92)';
+        ctx.beginPath(); ctx.ellipse(0, 0, p.r, p.r * 0.52, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,200,222,0.45)'; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.moveTo(-p.r * 0.78, 0); ctx.lineTo(p.r * 0.78, 0); ctx.stroke();
         ctx.globalAlpha = 1; ctx.restore();
       });
     }
 
-    // Soft purple vignette on sides for depth across full level
-    const jnVL = ctx.createLinearGradient(0, 0, 20, 0);
-    jnVL.addColorStop(0, 'rgba(60,20,120,0.2)'); jnVL.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = jnVL; ctx.fillRect(0, 0, 20, mrLevelH);
-    const jnVR = ctx.createLinearGradient(cssW-20, 0, cssW, 0);
-    jnVR.addColorStop(0, 'rgba(0,0,0,0)'); jnVR.addColorStop(1, 'rgba(60,20,120,0.2)');
-    ctx.fillStyle = jnVR; ctx.fillRect(cssW-20, 0, 20, mrLevelH);
+    // Side vignettes — full level height
+    const jnVL = ctx.createLinearGradient(0, 0, 24, 0);
+    jnVL.addColorStop(0, 'rgba(50,15,110,0.28)'); jnVL.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = jnVL; ctx.fillRect(0, 0, 24, mrLevelH);
+    const jnVR = ctx.createLinearGradient(cssW - 24, 0, cssW, 0);
+    jnVR.addColorStop(0, 'rgba(0,0,0,0)'); jnVR.addColorStop(1, 'rgba(50,15,110,0.28)');
+    ctx.fillStyle = jnVR; ctx.fillRect(cssW - 24, 0, 24, mrLevelH);
   }
 
   // ── Midnight Fiesta confetti ──
@@ -15293,6 +14964,20 @@ function mrDrawFrame() {
 
   ctx.restore(); // end camera / world transform
 
+  // ── Japanese Night: screen-space moon (always visible at top-right regardless of scroll) ──
+  if (mrTheme === 'jpnight' && (mrState === 'racing' || mrState === 'results' || mrState === 'countdown')) {
+    const moonX = cssW * 0.82, moonY = 30;
+    ctx.shadowBlur = 28; ctx.shadowColor = 'rgba(200,185,255,0.65)';
+    const moonG = ctx.createRadialGradient(moonX-3, moonY-3, 1, moonX, moonY, 17);
+    moonG.addColorStop(0, 'rgba(255,255,242,0.97)');
+    moonG.addColorStop(0.5, 'rgba(232,222,255,0.65)');
+    moonG.addColorStop(1, 'rgba(180,155,255,0)');
+    ctx.fillStyle = moonG; ctx.beginPath(); ctx.arc(moonX, moonY, 17, 0, Math.PI * 2); ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(200,188,255,0.13)'; ctx.lineWidth = 8;
+    ctx.beginPath(); ctx.arc(moonX, moonY, 25, 0, Math.PI * 2); ctx.stroke();
+  }
+
   // ════════════════════════════════════════════════════════
   //  HUD — screen-space (no camera offset)
   // ════════════════════════════════════════════════════════
@@ -16015,8 +15700,6 @@ function renderCoinPusher() {
       // Engine already running — just swap in the new canvas and resume
       try {
         Matter.Render.stop(cpRender);
-        // Remove old overlay listener before re-adding to prevent duplicates
-        Matter.Events.off(cpRender, 'afterRender', cpDrawOverlay);
         cpRender.canvas = canvas;
         cpRender.context = canvas.getContext('2d');
         cpRender.options.width = CP_W;
@@ -16208,10 +15891,8 @@ function cpMakePrize(def, x, y) {
   let b;
   if (def.r) b = Bodies.circle(x, y, def.r, opts);
   else b = Bodies.rectangle(x, y, def.w, def.h, { ...opts, chamfer: { radius: 5 } });
-  if (!def.mass || isNaN(def.mass)) def.mass = 0.002; // guard against missing mass
   Body.setMass(b, def.mass);
   b._prizeData = def;
-  b.label = 'cpPrize';
   return b;
 }
 
@@ -17997,9 +17678,9 @@ function _renderThemes(c, ctx) {
               ${t.preview.map(col => `<div style="width:12px;height:40px;background:${col};border-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.3)"></div>`).join('')}
             </div>
             <div style="flex:1;min-width:0">
-              <div style="display:flex;align-items:center;gap:4px;min-width:0;overflow:hidden;flex-wrap:nowrap">
-                <div style="font-size:13px;font-weight:700;color:${t.legendary?'#ffd700':'var(--fg)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 0">${t.name}</div>
-                ${t.mythic ? '<span style="font-size:7px;font-weight:900;background:linear-gradient(135deg,#00c8ff,#8800ff,#ff0088);color:#fff;padding:2px 5px;border-radius:4px;letter-spacing:0.3px;white-space:nowrap;flex-shrink:0;animation:ticketShimmer 1.5s linear infinite;background-size:200%">✦ MYTHIC ✦</span>' : t.legendary ? '<span style="font-size:7px;font-weight:900;background:linear-gradient(135deg,#b8860b,#ffd700);color:#000;padding:2px 4px;border-radius:4px;letter-spacing:0.3px;white-space:nowrap;flex-shrink:0">LEGEND</span>' : ''}
+              <div style="display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden">
+                <div style="font-size:13px;font-weight:700;color:${t.legendary?'#ffd700':'var(--fg)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex-shrink:1">${t.name}</div>
+                ${t.mythic ? '<span style="font-size:8px;font-weight:900;background:linear-gradient(135deg,#00c8ff,#8800ff,#ff0088);color:#fff;padding:2px 6px;border-radius:4px;letter-spacing:0.5px;animation:ticketShimmer 1.5s linear infinite;background-size:200%">✦ MYTHIC ✦</span>' : t.mythic ? '<span style="font-size:8px;font-weight:900;background:linear-gradient(135deg,#00c8ff,#8800ff,#ff0088);color:#fff;padding:2px 6px;border-radius:4px;letter-spacing:0.5px">✦ MYTHIC ✦</span>' : t.legendary ? '<span style="font-size:8px;font-weight:900;background:linear-gradient(135deg,#b8860b,#ffd700);color:#000;padding:2px 5px;border-radius:4px;letter-spacing:0.5px">LEGENDARY</span>' : ''}
               </div>
               <div style="font-size:10px;margin-top:2px;color:${active?'var(--accent1)':owned?'#4caf6e':t.legendary?'#ffd700':'var(--gold)'}">
                 ${active ? '✓ Active' : owned ? '✓ Owned' : '🎟️ '+t.cost+' tickets'}
