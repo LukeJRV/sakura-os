@@ -1774,6 +1774,40 @@ input[type=number] { -moz-appearance:textfield; }
   animation: logShimmer 3s linear infinite;
 }
 @keyframes logShimmer { 0%{background-position:0%} 100%{background-position:200%} }
+
+/* ── Neon Stats Boxes ── */
+.ul-neon-box {
+  position: relative; flex: 1; min-width: 0;
+  background: rgba(10,6,22,0.85); border-radius: 14px;
+  border: 1.5px solid var(--neon-clr); padding: 14px 10px 12px;
+  text-align: center; overflow: hidden; cursor: default;
+  box-shadow: 0 0 8px var(--neon-glow), 0 0 24px color-mix(in srgb,var(--neon-clr) 30%,transparent), inset 0 0 18px color-mix(in srgb,var(--neon-clr) 8%,transparent);
+  animation: ulNeonBorderPulse 2.8s ease-in-out infinite;
+}
+.ul-neon-box::before {
+  content:''; position:absolute; inset:0; border-radius:13px;
+  background: radial-gradient(ellipse at 50% 0%, var(--neon-soft) 0%, transparent 65%);
+  pointer-events:none;
+}
+@keyframes ulNeonBorderPulse {
+  0%,100% { box-shadow: 0 0 8px var(--neon-glow), 0 0 22px color-mix(in srgb,var(--neon-clr) 28%,transparent), inset 0 0 14px color-mix(in srgb,var(--neon-clr) 8%,transparent); }
+  50%     { box-shadow: 0 0 14px var(--neon-glow), 0 0 42px color-mix(in srgb,var(--neon-clr) 45%,transparent), inset 0 0 26px color-mix(in srgb,var(--neon-clr) 14%,transparent); }
+}
+.ul-neon-scanner {
+  position:absolute; top:0; left:-100%; width:60%; height:100%;
+  background: linear-gradient(90deg, transparent 0%, color-mix(in srgb,var(--neon-clr) 18%,transparent) 50%, transparent 100%);
+  animation: ulNeonScan 3.2s ease-in-out infinite; pointer-events:none;
+}
+@keyframes ulNeonScan { 0%{left:-60%;opacity:0} 15%{opacity:1} 85%{opacity:1} 100%{left:140%;opacity:0} }
+.ul-neon-num {
+  font-size:28px; font-weight:900; color:var(--neon-clr); letter-spacing:-1px; line-height:1; margin-bottom:6px;
+  text-shadow: 0 0 10px var(--neon-glow), 0 0 28px var(--neon-glow);
+  animation: ulNeonNumFlicker 5s ease-in-out infinite;
+}
+@keyframes ulNeonNumFlicker { 0%,94%,96%,100%{opacity:1} 95%{opacity:0.82} }
+.ul-neon-lbl { font-size:9px; font-weight:800; color:rgba(255,255,255,0.45); letter-spacing:1.2px; text-transform:uppercase; line-height:1.4; }
+@keyframes ulStatsReveal { from{opacity:0;transform:translateY(-8px) scale(0.93)} to{opacity:1;transform:translateY(0) scale(1)} }
+.ul-neon-box.anim-in { animation: ulNeonBorderPulse 2.8s ease-in-out infinite, ulStatsReveal 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
 .update-version-badge {
   display: inline-flex; align-items: center; gap: 6px;
   background: linear-gradient(135deg,#a088fa,#7d65d6);
@@ -1810,6 +1844,59 @@ input[type=number] { -moz-appearance:textfield; }
 .tag-new    { background: rgba(160,136,250,0.15); color:#a088fa; border:1px solid rgba(160,136,250,0.3); }
 .tag-upgrade{ background: rgba(246,187,78,0.15); color:#f6bb4e; border:1px solid rgba(246,187,78,0.3); }
 .tag-system { background: rgba(252,119,144,0.15); color:#fc7790; border:1px solid rgba(252,119,144,0.3); }
+
+/* ── New tags ── */
+.tag-change { background:rgba(231,76,60,0.14); color:#e74c3c; border:1px solid rgba(231,76,60,0.38); text-shadow:0 0 6px rgba(231,76,60,0.45); }
+.tag-remove { background:rgba(100,15,22,0.35); color:#c0394a; border:1px solid rgba(140,28,38,0.55); text-shadow:0 0 6px rgba(160,30,44,0.5); box-shadow:inset 0 0 8px rgba(120,10,20,0.3); }
+.tag-edit   { background:rgba(180,150,255,0.1); color:#c8aaff; position:relative; border:1px solid transparent; background-clip:padding-box; isolation:isolate; }
+.tag-edit::before {
+  content:''; position:absolute; inset:-1px; border-radius:99px; padding:1px;
+  background:linear-gradient(90deg,#e74c3c,#e78161,#f6bb4e,#c8aaff,#a088fa,#e74c3c);
+  background-size:300% 100%;
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  animation:tagEditBorder 3s linear infinite; pointer-events:none;
+}
+@keyframes tagEditBorder { 0%{background-position:0% 50%} 100%{background-position:300% 50%} }
+/* ── Theme Name Tooltip ── */
+#theme-tooltip {
+  position: absolute; z-index: 9500; pointer-events: none;
+  opacity: 0; transform: translateY(6px) scale(0.96);
+  transition: opacity 0.22s cubic-bezier(0.4,0,0.2,1), transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+  will-change: opacity, transform;
+}
+#theme-tooltip.visible { opacity: 1; transform: translateY(0) scale(1); pointer-events: none; }
+.theme-tooltip-inner {
+  background: linear-gradient(145deg, #13082a, #1e1040);
+  border: 1px solid rgba(160,136,250,0.4); border-radius: 16px; padding: 12px 14px; width: 190px;
+  box-shadow: 0 0 0 1px rgba(160,136,250,0.1), 0 8px 32px rgba(0,0,0,0.7), 0 0 24px rgba(100,70,200,0.2), inset 0 1px 0 rgba(255,255,255,0.07);
+}
+.theme-tooltip-inner::before {
+  content:''; position:absolute; bottom:100%; left:50%; transform:translateX(-50%);
+  border:6px solid transparent; border-bottom-color:rgba(160,136,250,0.35);
+}
+.theme-tooltip-inner::after {
+  content:''; position:absolute; bottom:calc(100% - 1px); left:50%; transform:translateX(-50%);
+  border:6px solid transparent; border-bottom-color:#13082a;
+}
+.theme-tt-swatch { display:flex; border-radius:8px; overflow:hidden; height:36px; margin-bottom:10px; gap:2px; }
+.theme-tt-swatch div { flex:1; }
+.theme-tt-name { font-size:13px; font-weight:800; color:#e8e0ff; letter-spacing:-0.2px; margin-bottom:5px; line-height:1.3; }
+.theme-tt-meta { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+.theme-tt-rarity { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.8px; padding:2px 8px; border-radius:99px; }
+.theme-tt-cost { font-size:10px; font-weight:700; color:rgba(246,187,78,0.9); display:flex; align-items:center; gap:3px; }
+.theme-preview-btn {
+  position:absolute; top:7px; right:62px;
+  width:22px; height:22px; border-radius:50%;
+  background:rgba(160,136,250,0.15); border:1px solid rgba(160,136,250,0.3);
+  color:rgba(160,136,250,0.8); font-size:10px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.18s ease; z-index:2;
+}
+.theme-preview-btn:hover, .theme-preview-btn:active {
+  background:rgba(160,136,250,0.3); border-color:rgba(160,136,250,0.6); color:#fff;
+}
+
 /* ===== SHOP ANIMATIONS ===== */
 @keyframes shopBubblePop {
   0%   { transform:scale(1); opacity:1; }
@@ -2290,6 +2377,18 @@ input[type=number] { -moz-appearance:textfield; }
 
   <!-- Notch -->
   <div id="notch"></div>
+
+  <!-- Theme name tooltip -->
+  <div id="theme-tooltip">
+    <div class="theme-tooltip-inner">
+      <div class="theme-tt-swatch" id="tt-swatch"></div>
+      <div class="theme-tt-name" id="tt-name"></div>
+      <div class="theme-tt-meta">
+        <span class="theme-tt-rarity" id="tt-rarity"></span>
+        <span class="theme-tt-cost" id="tt-cost"></span>
+      </div>
+    </div>
+  </div>
   
   <!-- Notification Panel Drag Zone (top-left corner) -->
   <div id="notif-drag-zone" style="position:absolute;top:0;left:0;width:48px;height:36px;z-index:9000;cursor:pointer" ontouchstart="notifPanelDragStart(event)" onmousedown="notifPanelDragStart(event)"></div>
@@ -2750,7 +2849,7 @@ input[type=number] { -moz-appearance:textfield; }
       <div class="screen-header" style="background:linear-gradient(135deg,rgba(160,136,250,0.15),rgba(125,101,214,0.08));border-bottom:1px solid rgba(160,136,250,0.2)">
         <button class="back-btn" onclick="openScreen('home')" style="color:#a088fa">←</button>
         <span class="screen-title" style="background:linear-gradient(90deg,#c0b9f5,#a088fa,#fbabd8);-webkit-background-clip:text;-webkit-text-fill-color:transparent">📋 Update Logs</span>
-        <div style="font-size:10px;color:rgba(160,136,250,0.7);font-weight:700;letter-spacing:1px">v0.1.16</div>
+        <div id="updatelogs-version-badge" style="font-size:10px;color:rgba(160,136,250,0.7);font-weight:700;letter-spacing:1px"></div>
       </div>
       <div id="updatelogs-content" style="padding:16px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch"></div>
     </div>
@@ -18219,6 +18318,15 @@ function _renderThemes(c, ctx) {
             const tierColor = tier === 'mythic' ? '#00c8ff' : tier === 'legendary' ? '#ffd700' : null;
             const accentColor = active ? 'var(--accent1)' : tierColor || (owned ? '#a088fa' : 'rgba(255,255,255,0.5)');
 
+            const ttData = JSON.stringify({
+              name: t.name,
+              preview: t.preview,
+              tier,
+              cost: t.cost,
+              owned,
+              active
+            }).replace(/"/g,'&quot;');
+
             return `<div style="
               background: ${active ? 'rgba(160,136,250,0.1)' : tier === 'mythic' ? 'rgba(0,200,255,0.04)' : tier === 'legendary' ? 'rgba(255,215,0,0.05)' : 'rgba(255,255,255,0.03)'};
               border: 1px solid ${active ? 'rgba(160,136,250,0.45)' : tier === 'mythic' ? 'rgba(0,200,255,0.35)' : tier === 'legendary' ? 'rgba(255,215,0,0.3)' : 'rgba(255,255,255,0.08)'};
@@ -18228,10 +18336,13 @@ function _renderThemes(c, ctx) {
               align-items: center;
               gap: 13px;
               position: relative;
-              overflow: hidden;
+              overflow: visible;
               transition: all 0.2s;
               ${active ? 'box-shadow: 0 0 20px rgba(160,136,250,0.15);' : tier === 'mythic' ? 'box-shadow: 0 0 24px rgba(0,200,255,0.1);' : tier === 'legendary' ? 'box-shadow: 0 0 20px rgba(255,215,0,0.08);' : ''}
-            ">
+            "
+            onmouseenter="themeRowHover(this, '${ttData}')"
+            onmouseleave="themeTooltipHide()"
+            >
               ${active ? '<div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#a088fa,#c77dff);border-radius:2px 0 0 2px"></div>' : ''}
               ${tier === 'mythic' ? '<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#00c8ff,#8800ff,#ff0088,#8800ff,#00c8ff);background-size:200%;animation:ticketShimmer 1.5s linear infinite"></div>' : tier === 'legendary' ? '<div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#b8860b,#ffd700,#ff8c00,#ffd700,#b8860b);background-size:200%;animation:ticketShimmer 2s linear infinite"></div>' : ''}
               <!-- Colour swatch preview -->
@@ -18249,7 +18360,9 @@ function _renderThemes(c, ctx) {
                 </div>
               </div>
               <!-- Action button -->
-              <div style="flex-shrink:0">
+              <div style="flex-shrink:0;display:flex;align-items:center;gap:6px">
+                <!-- Mobile preview button (hidden on desktop via JS detection) -->
+                <button class="theme-preview-btn" onclick="event.stopPropagation();themeTooltipShowMobile(this,'${ttData}')" title="Preview">👁</button>
                 ${active
                   ? `<div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#a088fa,#c77dff);display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;box-shadow:0 4px 12px rgba(160,136,250,0.4)">✓</div>`
                   : owned
@@ -18277,6 +18390,108 @@ function _renderThemes(c, ctx) {
     </div>
   `;
 }
+
+// ── Theme Name Tooltip System ───────────────────────────────────────────────
+const _isTouchDevice = () => window.matchMedia('(hover: none)').matches;
+let _ttHideTimer = null;
+const _RARITY_STYLE = {
+  mythic:    { bg:'linear-gradient(135deg,#00c8ff,#8800ff,#ff0088)', color:'#fff',    label:'✦ MYTHIC'  },
+  legendary: { bg:'linear-gradient(135deg,#b8860b,#ffd700)',          color:'#000',    label:'LEGENDARY' },
+  '':        { bg:'rgba(160,136,250,0.18)',                            color:'#c0b9f5', label:'Theme'     },
+};
+
+function _themeTooltipPopulate(data) {
+  const swatch = document.getElementById('tt-swatch');
+  const nameEl = document.getElementById('tt-name');
+  const rarEl  = document.getElementById('tt-rarity');
+  const costEl = document.getElementById('tt-cost');
+  if (!swatch) return;
+  swatch.innerHTML = (data.preview || []).map(c => `<div style="background:${c};flex:1"></div>`).join('');
+  nameEl.textContent = data.name || '';
+  const rs = _RARITY_STYLE[data.tier || ''] || _RARITY_STYLE[''];
+  rarEl.textContent = rs.label;
+  rarEl.style.cssText = `background:${rs.bg};color:${rs.color};font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.8px;padding:2px 8px;border-radius:99px;flex-shrink:0`;
+  if (data.active) {
+    costEl.innerHTML = `<span style="color:#a088fa;font-weight:700">● Active</span>`;
+  } else if (data.owned) {
+    costEl.innerHTML = `<span style="color:rgba(160,136,250,0.7);font-weight:700">✓ Owned</span>`;
+  } else {
+    costEl.innerHTML = `🎟️&nbsp;<span style="font-weight:800">${data.cost}</span>`;
+  }
+}
+
+function _themeTooltipPosition(anchorEl) {
+  const tt    = document.getElementById('theme-tooltip');
+  const phone = document.getElementById('phone');
+  if (!tt || !phone || !anchorEl) return;
+  const phoneRect  = phone.getBoundingClientRect();
+  const anchorRect = anchorEl.getBoundingClientRect();
+  const TT_W = 190, TT_H = 108;
+  const leftRaw  = anchorRect.left - phoneRect.left + anchorRect.width / 2 - TT_W / 2;
+  const topAbove = anchorRect.top  - phoneRect.top  - TT_H - 10;
+  const topBelow = anchorRect.bottom - phoneRect.top + 10;
+  const clampedLeft = Math.max(8, Math.min(leftRaw, phoneRect.width - TT_W - 8));
+  tt.style.left = clampedLeft + 'px';
+  tt.style.top  = (topAbove < 8 ? topBelow : topAbove) + 'px';
+}
+
+function themeRowHover(rowEl, dataStr) {
+  if (_isTouchDevice()) return;
+  if (_ttHideTimer) { clearTimeout(_ttHideTimer); _ttHideTimer = null; }
+  try {
+    const data = JSON.parse(dataStr.replace(/&quot;/g, '"'));
+    _themeTooltipPopulate(data);
+    _themeTooltipPosition(rowEl);
+    const tt = document.getElementById('theme-tooltip');
+    if (tt) tt.classList.add('visible');
+  } catch(e) {}
+}
+
+function themeTooltipHide() {
+  if (_isTouchDevice()) return;
+  _ttHideTimer = setTimeout(() => {
+    const tt = document.getElementById('theme-tooltip');
+    if (tt) tt.classList.remove('visible');
+  }, 80);
+}
+
+function themeTooltipShowMobile(btnEl, dataStr) {
+  const tt = document.getElementById('theme-tooltip');
+  if (!tt) return;
+  if (tt.classList.contains('visible')) { tt.classList.remove('visible'); return; }
+  try {
+    const data = JSON.parse(dataStr.replace(/&quot;/g, '"'));
+    _themeTooltipPopulate(data);
+    const rowEl = btnEl.closest('div[style*="border-radius: 18px"]') || btnEl.parentElement?.parentElement;
+    _themeTooltipPosition(rowEl || btnEl);
+    tt.classList.add('visible');
+    if (_ttHideTimer) clearTimeout(_ttHideTimer);
+    _ttHideTimer = setTimeout(() => tt.classList.remove('visible'), 3200);
+  } catch(e) {}
+}
+
+document.addEventListener('scroll', () => {
+  const tt = document.getElementById('theme-tooltip');
+  if (tt) tt.classList.remove('visible');
+}, true);
+
+document.addEventListener('touchstart', (e) => {
+  const tt = document.getElementById('theme-tooltip');
+  if (!tt?.classList.contains('visible')) return;
+  if (!tt.contains(e.target) && !e.target.classList.contains('theme-preview-btn')) {
+    tt.classList.remove('visible');
+  }
+}, { passive: true });
+
+(function _syncPreviewBtns() {
+  function run() {
+    const touch = _isTouchDevice();
+    document.querySelectorAll('.theme-preview-btn').forEach(b => b.style.display = touch ? 'flex' : 'none');
+  }
+  run();
+  window.addEventListener('resize', run);
+  setInterval(run, 1500);
+})();
 
 const THEME_VARS = {
   default: {},
@@ -20533,6 +20748,10 @@ function renderUpdateLogs() {
   const c = document.getElementById('updatelogs-content');
   if (!c) return;
 
+  // Keep version badge in header always current
+  const vBadge = document.getElementById('updatelogs-version-badge');
+  if (vBadge) vBadge.textContent = 'v' + GAME_VERSION;
+
   const LOGS_PER_PAGE = 4;
   if (typeof window._updateLogsPage === 'undefined') window._updateLogsPage = 0;
   const totalPages = Math.ceil(UPDATE_LOGS.length / LOGS_PER_PAGE);
@@ -20546,18 +20765,31 @@ function renderUpdateLogs() {
       <div style="font-size:48px;margin-bottom:8px;filter:drop-shadow(0 0 20px rgba(160,136,250,0.6))">📋</div>
       <div style="font-size:22px;font-weight:900;background:linear-gradient(90deg,#c0b9f5,#a088fa,#fbabd8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px">Update Logs</div>
       <div style="font-size:12px;color:rgba(255,255,255,0.4)">Sakura OS · Build History</div>
-      <div style="display:flex;justify-content:center;gap:10px;margin-top:14px">
-        <div style="background:rgba(160,136,250,0.1);border:1px solid rgba(160,136,250,0.3);border-radius:10px;padding:8px 16px;text-align:center">
-          <div style="font-size:20px;font-weight:800;color:#a088fa">${UPDATE_LOGS.reduce((a,v)=>a+v.items.length,0)}</div>
-          <div style="font-size:9px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px">Changes</div>
-        </div>
-        <div style="background:rgba(78,223,208,0.08);border:1px solid rgba(78,223,208,0.2);border-radius:10px;padding:8px 16px;text-align:center">
-          <div style="font-size:20px;font-weight:800;color:#4edfd0">${UPDATE_LOGS.reduce((a,v)=>a+v.items.filter(i=>i.tag==='fix').length,0)}</div>
-          <div style="font-size:9px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px">Bug Fixes</div>
-        </div>
-        <div style="background:rgba(246,187,78,0.08);border:1px solid rgba(246,187,78,0.2);border-radius:10px;padding:8px 16px;text-align:center">
-          <div style="font-size:20px;font-weight:800;color:#f6bb4e">${UPDATE_LOGS.reduce((a,v)=>a+v.items.filter(i=>i.tag==='upgrade'||i.tag==='new').length,0)}</div>
-          <div style="font-size:9px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px">New/Upgrades</div>
+
+      <!-- Neon Stats Toggle Button -->
+      <button id="ul-stats-toggle" onclick="window._ulToggleStats()" style="margin-top:14px;display:inline-flex;align-items:center;gap:6px;background:rgba(160,136,250,0.08);border:1px solid rgba(160,136,250,0.22);border-radius:20px;padding:5px 14px 5px 10px;cursor:pointer;color:rgba(160,136,250,0.8);font-size:11px;font-weight:700;letter-spacing:0.3px;transition:all 0.25s ease">
+        <span id="ul-stats-chevron" style="display:inline-block;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1);font-size:9px">▼</span>
+        <span>Stats Overview</span>
+      </button>
+
+      <!-- Neon Stats Panel -->
+      <div id="ul-stats-panel" style="overflow:hidden;max-height:0;opacity:0;transition:max-height 0.45s cubic-bezier(0.4,0,0.2,1),opacity 0.35s ease;will-change:max-height,opacity">
+        <div style="display:flex;justify-content:center;gap:10px;margin-top:14px;padding:0 4px">
+          <div class="ul-neon-box" id="ul-box-changes" style="--neon-clr:#a088fa;--neon-glow:rgba(160,136,250,0.7);--neon-soft:rgba(160,136,250,0.18)">
+            <div class="ul-neon-scanner"></div>
+            <div class="ul-neon-num">${UPDATE_LOGS.reduce((a,v)=>a+v.items.length,0)}</div>
+            <div class="ul-neon-lbl">CHANGES</div>
+          </div>
+          <div class="ul-neon-box" id="ul-box-fixes" style="--neon-clr:#4edfd0;--neon-glow:rgba(78,223,208,0.7);--neon-soft:rgba(78,223,208,0.14)">
+            <div class="ul-neon-scanner"></div>
+            <div class="ul-neon-num">${UPDATE_LOGS.reduce((a,v)=>a+v.items.filter(i=>i.tag==='fix').length,0)}</div>
+            <div class="ul-neon-lbl">BUG<br>FIXES</div>
+          </div>
+          <div class="ul-neon-box" id="ul-box-new" style="--neon-clr:#f6bb4e;--neon-glow:rgba(246,187,78,0.7);--neon-soft:rgba(246,187,78,0.14)">
+            <div class="ul-neon-scanner"></div>
+            <div class="ul-neon-num">${UPDATE_LOGS.reduce((a,v)=>a+v.items.filter(i=>i.tag==='upgrade'||i.tag==='new').length,0)}</div>
+            <div class="ul-neon-lbl">NEW/<br>UPGRADES</div>
+          </div>
         </div>
       </div>
     </div>
@@ -20579,16 +20811,16 @@ function renderUpdateLogs() {
         <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">
           ${[...new Set(log.items.map(i=>i.tag))].map(tag => {
             const counts = log.items.filter(i=>i.tag===tag).length;
-            const tagNames = {fix:'🔧 Fix',new:'✨ New',upgrade:'⬆️ Upgrade',system:'⚙️ System'};
+            const tagNames = {fix:'🔧 Fix',new:'✨ New',upgrade:'⬆️ Upgrade',system:'⚙️ System',change:'🔴 Change',remove:'💀 Remove',edit:'✏️ Edit'};
             return `<span class="update-tag tag-${tag}">${tagNames[tag]||tag} ×${counts}</span>`;
           }).join('')}
         </div>
         <div>
           ${log.items.map((item, ii) => `
             <div class="update-item" style="animation-delay:${ii*0.05}s">
-              <div class="update-item-dot" style="background:${{fix:'#4edfd0',new:'#a088fa',upgrade:'#f6bb4e',system:'#fc7790'}[item.tag]||'#a088fa'};box-shadow:0 0 6px ${{fix:'rgba(78,223,208,0.5)',new:'rgba(160,136,250,0.5)',upgrade:'rgba(246,187,78,0.5)',system:'rgba(252,119,144,0.5)'}[item.tag]||'rgba(160,136,250,0.5)'}"></div>
+              <div class="update-item-dot" style="background:${{fix:'#4edfd0',new:'#a088fa',upgrade:'#f6bb4e',system:'#fc7790',change:'#e74c3c',remove:'#c0394a',edit:'#c8aaff'}[item.tag]||'#a088fa'};box-shadow:0 0 6px ${{fix:'rgba(78,223,208,0.5)',new:'rgba(160,136,250,0.5)',upgrade:'rgba(246,187,78,0.5)',system:'rgba(252,119,144,0.5)',change:'rgba(231,76,60,0.5)',remove:'rgba(160,30,44,0.5)',edit:'rgba(200,170,255,0.5)'}[item.tag]||'rgba(160,136,250,0.5)'}"></div>
               <div class="update-item-text">
-                <span class="update-tag tag-${item.tag}" style="vertical-align:middle;margin-right:6px">${{fix:'Fix',new:'New',upgrade:'⬆',system:'Sys'}[item.tag]||item.tag}</span>
+                <span class="update-tag tag-${item.tag}" style="vertical-align:middle;margin-right:6px">${{fix:'Fix',new:'New',upgrade:'⬆',system:'Sys',change:'Change',remove:'Remove',edit:'Edit'}[item.tag]||item.tag}</span>
                 ${item.text}
               </div>
             </div>`).join('')}
@@ -20620,9 +20852,47 @@ function renderUpdateLogs() {
       playSound('tick');
     }
   }, { passive: true });
+
+  // Restore stats open state if it was open before re-render (e.g. pagination)
+  if (window._ulStatsOpen) {
+    const panel = document.getElementById('ul-stats-panel');
+    const chevron = document.getElementById('ul-stats-chevron');
+    if (panel) { panel.style.maxHeight = '160px'; panel.style.opacity = '1'; }
+    if (chevron) chevron.style.transform = 'rotate(180deg)';
+    ['ul-box-changes','ul-box-fixes','ul-box-new'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el) { el.style.animationDelay = `${i * 0.08}s`; el.classList.add('anim-in'); }
+    });
+  }
 }
 
-function applySettings() {
+// ── Neon Stats Toggle ──────────────────────────────────────────
+window._ulStatsOpen = false;
+window._ulToggleStats = function() {
+  const panel   = document.getElementById('ul-stats-panel');
+  const chevron = document.getElementById('ul-stats-chevron');
+  const btn     = document.getElementById('ul-stats-toggle');
+  if (!panel) return;
+  window._ulStatsOpen = !window._ulStatsOpen;
+  if (window._ulStatsOpen) {
+    panel.style.maxHeight = '160px'; panel.style.opacity = '1';
+    if (chevron) chevron.style.transform = 'rotate(180deg)';
+    if (btn) { btn.style.background = 'rgba(160,136,250,0.15)'; btn.style.borderColor = 'rgba(160,136,250,0.45)'; }
+    ['ul-box-changes','ul-box-fixes','ul-box-new'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('anim-in'); void el.offsetWidth;
+      el.style.animationDelay = `${i * 0.09}s`;
+      el.classList.add('anim-in');
+    });
+    if (typeof playSound === 'function') playSound('tick');
+  } else {
+    panel.style.maxHeight = '0'; panel.style.opacity = '0';
+    if (chevron) chevron.style.transform = 'rotate(0deg)';
+    if (btn) { btn.style.background = 'rgba(160,136,250,0.08)'; btn.style.borderColor = 'rgba(160,136,250,0.22)'; }
+    if (typeof playSound === 'function') playSound('tick');
+  }
+};
   if (S.settings.uiScale !== 1) document.documentElement.style.setProperty('--ui-scale', S.settings.uiScale);
   if (S.settings.fontRainbow) document.documentElement.style.setProperty('--font-rainbow', 'rainbow 3s linear infinite');
   if (S.settings.fontGlow) document.documentElement.style.setProperty('--font-glow', '0 0 8px rgba(160,136,250,0.8)');
@@ -20811,7 +21081,7 @@ function _handleUpdateAvailable(newVersion, notes, url) {
 
   // 2. Tappable broadcast notification — navigates to Settings on tap
   setTimeout(() => {
-    showBroadcastNotif('🌸', 'Update Available — ' + newVersion,
+    showBroadcastNotif('🌸', 'Update Available — v' + newVersion,
       (notes || 'A new version of Sakura OS is ready') + ' • Tap to go to Settings');
     const banners = document.querySelectorAll('.broadcast-banner');
     const nb = banners[banners.length - 1];
@@ -20834,7 +21104,7 @@ function fbShowUpdateBanner(newVersion, notes) {
   banner.innerHTML =
     '<div id="update-banner-icon">🌸</div>'
     + '<div id="update-banner-text">'
-    + '<div id="update-banner-title">Update Available — ' + newVersion + '</div>'
+    + '<div id="update-banner-title">Update Available — v' + newVersion + '</div>'
     + '<div id="update-banner-sub">' + (notes || 'A new version of Sakura OS is ready') + '</div>'
     + '</div>'
     + '<button id="update-banner-btn">Update</button>';
