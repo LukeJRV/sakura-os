@@ -1557,6 +1557,11 @@ input[type=number] { -moz-appearance:textfield; }
   0%,100% { box-shadow:0 0 12px rgba(199,125,255,0.5), 0 0 30px rgba(157,78,221,0.2); }
   50% { box-shadow:0 0 20px rgba(199,125,255,0.9), 0 0 50px rgba(157,78,221,0.4); }
 }
+@keyframes rainbowBorder {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 @keyframes stackHighlight {
   0% { box-shadow:0 4px 20px rgba(199,125,255,0); transform:scale(1); }
   40% { box-shadow:0 4px 30px rgba(199,125,255,0.6); transform:scale(1.015); }
@@ -2255,6 +2260,19 @@ input[type=number] { -moz-appearance:textfield; }
   <!-- Notch -->
   <div id="notch"></div>
   
+  <!-- Notification Panel Drag Zone (top-left corner) -->
+  <div id="notif-drag-zone" style="position:absolute;top:0;left:0;width:48px;height:36px;z-index:9000;cursor:pointer" ontouchstart="notifPanelDragStart(event)" onmousedown="notifPanelDragStart(event)"></div>
+
+  <!-- Notification Panel -->
+  <div id="notif-panel" style="position:absolute;top:0;left:0;right:0;z-index:8900;transform:translateY(-100%);transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);background:rgba(18,10,40,0.96);backdrop-filter:blur(28px) saturate(180%);border-bottom:1px solid rgba(160,136,250,0.25);border-radius:0 0 24px 24px;padding:48px 16px 16px;box-shadow:0 16px 48px rgba(0,0,0,0.6)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px">Notifications</div>
+      <button onclick="notifPanelClearAll()" style="font-size:11px;color:#a088fa;background:rgba(160,136,250,0.12);border:1px solid rgba(160,136,250,0.25);border-radius:8px;padding:4px 10px;cursor:pointer;font-weight:700">Clear All</button>
+    </div>
+    <div id="notif-panel-list" style="display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto"></div>
+    <div style="width:40px;height:4px;border-radius:2px;background:rgba(255,255,255,0.2);margin:14px auto 0"></div>
+  </div>
+
   <!-- Status Bar -->
   <div id="statusbar">
     <div style="display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden">
@@ -2262,7 +2280,7 @@ input[type=number] { -moz-appearance:textfield; }
       <span id="time-display">12:00</span>
     </div>
     <div id="status-right">
-      <span style="font-size:11px;color:rgba(255,255,255,0.6)" id="battery-icon">🔋</span>
+      <span style="font-size:11px;color:rgba(255,255,255,0.6)" id="battery-icon"><svg width="25" height="12" viewBox="0 0 25 12" style="vertical-align:middle;display:inline-block"><rect x="0.75" y="0.75" width="21.5" height="10.5" rx="2.5" stroke="rgba(255,255,255,0.85)" stroke-width="1.5" fill="none"/><rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="rgba(255,255,255,0.85)"/><rect id="battery-fill-rect" x="2.25" y="2.25" width="17" height="7.5" rx="1.5" fill="#a088fa"/></svg></span>
       <div id="profile-icon" onclick="openScreen('settings')" title="Settings">👤</div>
     </div>
   </div>
@@ -2701,7 +2719,7 @@ input[type=number] { -moz-appearance:textfield; }
       <div class="screen-header" style="background:linear-gradient(135deg,rgba(160,136,250,0.15),rgba(125,101,214,0.08));border-bottom:1px solid rgba(160,136,250,0.2)">
         <button class="back-btn" onclick="openScreen('home')" style="color:#a088fa">←</button>
         <span class="screen-title" style="background:linear-gradient(90deg,#c0b9f5,#a088fa,#fbabd8);-webkit-background-clip:text;-webkit-text-fill-color:transparent">📋 Update Logs</span>
-        <div style="font-size:10px;color:rgba(160,136,250,0.7);font-weight:700;letter-spacing:1px">v0.0.1</div>
+        <div style="font-size:10px;color:rgba(160,136,250,0.7);font-weight:700;letter-spacing:1px">v0.1.16</div>
       </div>
       <div id="updatelogs-content" style="padding:16px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch"></div>
     </div>
@@ -3576,7 +3594,12 @@ function updateTicketDisplay(delta) {
   const prevPct = fill ? parseFloat(fill.style.width||'0') : 0;
   if (fill) fill.style.width = pct + '%';
   if (count) count.textContent = S.tickets;
-  if (tooltip) tooltip.textContent = `${S.tickets} / ${S.maxTickets} tickets`;
+  if (tooltip) {
+    tooltip.textContent = `${S.tickets} / ${S.maxTickets} tickets`;
+    tooltip.style.left = Math.min(pct, 96) + '%';
+    tooltip.style.right = 'auto';
+    tooltip.style.transform = 'translateX(-50%)';
+  }
   // Touch: show tooltip on tap-hold (mobile doesn't have hover)
   const wrap = document.getElementById('ticket-progress-wrap');
   if (wrap && !wrap._tooltipTouchBound) {
@@ -3623,7 +3646,7 @@ function updateTicketDisplay(delta) {
         const pip = document.createElement('div');
         pip.className = 'tbpip';
         pip.textContent = '+' + delta + ' 🎟️';
-        pip.style.cssText = 'position:absolute;bottom:calc(100% + 6px);left:50%;white-space:nowrap;pointer-events:none;z-index:10000;background:linear-gradient(135deg,#7b2ff7,#a259ff);color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;box-shadow:0 2px 12px rgba(123,47,247,0.5);animation:ticketPip 1.8s ease forwards;letter-spacing:0.3px;';
+        pip.style.cssText = 'position:absolute;bottom:calc(100% + 6px);left:' + Math.min(pct, 92) + '%;white-space:nowrap;pointer-events:none;z-index:10000;background:linear-gradient(135deg,#7b2ff7,#a259ff);color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;box-shadow:0 2px 12px rgba(123,47,247,0.5);animation:ticketPip 1.8s ease forwards;letter-spacing:0.3px;transform:translateX(-50%);';
         wrap.appendChild(pip);
         setTimeout(() => pip.remove(), 1900);
       }
@@ -3739,6 +3762,9 @@ function _updateCalBadge() {
 // ============================================================
 let currentScreen = 'home';
 function openScreen(id) {
+  // Suppress scroll sounds briefly during screen transition
+  window._suppressScrollSounds = true;
+  setTimeout(() => { window._suppressScrollSounds = false; }, 600);
   // Stop CP auto-save when navigating away from coin pusher
   if (id !== 'coinpusher') {
     const prevScreen = document.querySelector('.screen.active');
@@ -5832,7 +5858,15 @@ function bpCloseMobileSheet() {
   const sheet = document.getElementById('bp-mobile-sheet');
   if (sheet) sheet.classList.remove('open');
   const bd = document.getElementById('bp-sheet-backdrop');
-  if (bd) bd.style.opacity = '0';
+  if (bd) {
+    bd.style.opacity = '0';
+    bd.style.pointerEvents = 'none';
+    setTimeout(() => { if (bd && bd.parentNode) bd.parentNode.removeChild(bd); }, 350);
+  }
+  // Ensure sheet is also cleaned up after transition
+  if (sheet) {
+    setTimeout(() => { if (sheet && !sheet.classList.contains('open')) sheet.style.pointerEvents = ''; }, 350);
+  }
 }
 
 function bpShowHoverTooltip(slot, i) {
@@ -6185,6 +6219,11 @@ function openChat(i) {
   activeChatContact = S.contacts[i];
   if (!S.messages[activeChatContact.id]) S.messages[activeChatContact.id] = [];
 
+  // Mark all messages from this contact as read
+  S.messages[activeChatContact.id].forEach(m => { if (m.sender !== 'user') m.read = true; });
+  saveState();
+  renderChatList();
+
   const nameEl = document.getElementById('chat-convo-name');
   const avatarEl = document.getElementById('chat-convo-avatar');
   if (nameEl) nameEl.textContent = activeChatContact.name;
@@ -6277,7 +6316,15 @@ async function getAIChat(contact, userMsg) {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
-        system: `You are ${contact.name}, a real person texting a friend. Personality: ${contact.personality || 'friendly and casual'}. Keep replies short (1-3 sentences), casual, realistic like actual text messages. No asterisks or roleplay markers.`,
+        system: `You are ${contact.name}, a real person texting your close friend. Personality: ${contact.personality || 'friendly and casual'}.
+
+Rules for realistic texting:
+- Analyse the message type before replying: questions get actual answers, emotional messages get empathy first, jokes get a funny response, statements get a natural reaction.
+- Vary length naturally: very short messages (1-5 words) warrant a quick reply (1 sentence). Longer or emotional messages can get 2-3 sentences. Never give bullet points or lists.
+- Use casual spelling and grammar like a real texter: abbreviations (lol, omg, ngl, fr, nah, yeah, tbh), occasional typos are fine, lowercase is normal.
+- React with personality — show excitement, curiosity, or humour based on context. Don't be bland or generic.
+- No asterisks, no roleplay markers, no quotation marks around what you're saying.
+- Never say "I'm an AI" or break character in any way.`,
         messages: history
       })
     });
@@ -6564,6 +6611,19 @@ function _quintRenderStack(items) {
   const nowPx = ((curMins - START_H * 60) / SPAN) * barH;
   const scrollTarget = Math.max(0, nowPx - container.clientHeight * 0.3);
   container.scrollTop = scrollTarget;
+
+  // Also ensure active piece stays visible via scrollIntoView
+  const activeEl = inner.querySelector('.active-now');
+  if (activeEl) {
+    setTimeout(() => {
+      const elTop = parseFloat(activeEl.style.top) || 0;
+      const visibleTop = container.scrollTop;
+      const visibleBottom = container.scrollTop + container.clientHeight;
+      if (elTop < visibleTop || elTop + 80 > visibleBottom) {
+        container.scrollTop = Math.max(0, elTop - container.clientHeight * 0.3);
+      }
+    }, 100);
+  }
 }
 
 function _quintTimeToMins(timeStr) {
@@ -17633,7 +17693,7 @@ function renderSettings() {
           <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#a088fa,#fb99d5);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;box-shadow:0 4px 12px rgba(160,136,250,0.35)">🌸</div>
           <div>
             <div style="font-size:14px;font-weight:800;color:#fff;letter-spacing:0.1px">Sakura OS</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px">by LukeJRV</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;display:none">by LukeJRV</div>
           </div>
         </div>
       </div>
@@ -18343,7 +18403,111 @@ function showNotif(icon, title, msg) {
   toast.className = 'notif-toast';
   toast.innerHTML = `<div class="notif-icon">${icon}</div><div class="notif-body" style="flex:1;overflow:hidden"><div class="notif-title">${title}</div>${msg?`<div class="notif-msg">${msg}</div>`:''}</div><button onclick="this.parentElement.remove()" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:11px;cursor:pointer;flex-shrink:0;padding:0 2px">✕</button>`;
   container.appendChild(toast);
+  // Also log to notification panel
+  notifPanelAdd(icon, title, msg);
   setTimeout(() => { if (toast.parentElement) { toast.classList.add('hiding'); setTimeout(() => toast.remove(), 300); } }, 2500);
+}
+
+// ── Notification Panel ──────────────────────────────────────────
+if (!window._notifPanelItems) window._notifPanelItems = [];
+let _notifPanelOpen = false;
+let _notifPanelDragStartY = 0;
+let _notifPanelDragging = false;
+
+function notifPanelAdd(icon, title, msg) {
+  window._notifPanelItems.unshift({ id: Date.now(), icon, title, msg, ts: new Date() });
+  if (window._notifPanelItems.length > 20) window._notifPanelItems.pop();
+  if (_notifPanelOpen) notifPanelRender();
+}
+
+function notifPanelRender() {
+  const list = document.getElementById('notif-panel-list');
+  if (!list) return;
+  const items = window._notifPanelItems;
+  if (!items.length) {
+    list.innerHTML = `<div style="text-align:center;padding:20px 0;color:rgba(255,255,255,0.25);font-size:13px">No notifications</div>`;
+    return;
+  }
+  list.innerHTML = items.map(n => `
+    <div data-notif-id="${n.id}" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:10px 12px;position:relative;overflow:hidden;touch-action:pan-y">
+      <div style="font-size:22px;flex-shrink:0">${n.icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:2px">${n.title}</div>
+        ${n.msg ? `<div style="font-size:11px;color:rgba(255,255,255,0.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n.msg}</div>` : ''}
+        <div style="font-size:9px;color:rgba(255,255,255,0.25);margin-top:3px">${n.ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+      <button onclick="notifPanelDismiss(${n.id})" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:rgba(255,255,255,0.4);font-size:11px;cursor:pointer;padding:3px 7px;flex-shrink:0">✕</button>
+    </div>
+  `).join('');
+}
+
+function notifPanelDismiss(id) {
+  window._notifPanelItems = window._notifPanelItems.filter(n => n.id !== id);
+  notifPanelRender();
+}
+
+function notifPanelClearAll() {
+  window._notifPanelItems = [];
+  notifPanelRender();
+}
+
+function notifPanelShow() {
+  const panel = document.getElementById('notif-panel');
+  if (!panel) return;
+  _notifPanelOpen = true;
+  notifPanelRender();
+  panel.style.transition = 'transform 0.38s cubic-bezier(0.4,0,0.2,1)';
+  panel.style.transform = 'translateY(0)';
+  // Backdrop
+  let bd = document.getElementById('notif-panel-backdrop');
+  if (!bd) {
+    bd = document.createElement('div');
+    bd.id = 'notif-panel-backdrop';
+    bd.style.cssText = 'position:absolute;inset:0;z-index:8850;background:rgba(0,0,0,0.4)';
+    bd.addEventListener('click', notifPanelHide);
+    bd.addEventListener('touchstart', notifPanelHide, { passive: true });
+    document.getElementById('phone').appendChild(bd);
+  }
+}
+
+function notifPanelHide() {
+  const panel = document.getElementById('notif-panel');
+  if (!panel) return;
+  _notifPanelOpen = false;
+  panel.style.transition = 'transform 0.32s cubic-bezier(0.4,0,0.2,1)';
+  panel.style.transform = 'translateY(-100%)';
+  const bd = document.getElementById('notif-panel-backdrop');
+  if (bd) bd.remove();
+}
+
+function notifPanelDragStart(e) {
+  _notifPanelDragging = true;
+  _notifPanelDragStartY = (e.touches ? e.touches[0].clientY : e.clientY);
+  const panel = document.getElementById('notif-panel');
+  if (panel) panel.style.transition = 'none';
+  const onMove = (e2) => {
+    if (!_notifPanelDragging) return;
+    const y = (e2.touches ? e2.touches[0].clientY : e2.clientY);
+    const dy = y - _notifPanelDragStartY;
+    if (!_notifPanelOpen && dy > 0) {
+      if (panel) panel.style.transform = `translateY(calc(-100% + ${Math.min(dy, 280)}px))`;
+    }
+  };
+  const onEnd = (e2) => {
+    if (!_notifPanelDragging) return;
+    _notifPanelDragging = false;
+    const y = (e2.changedTouches ? e2.changedTouches[0].clientY : e2.clientY);
+    const dy = y - _notifPanelDragStartY;
+    if (dy > 60) notifPanelShow(); else notifPanelHide();
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onEnd);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onEnd);
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+  document.addEventListener('touchmove', onMove, { passive: true });
+  document.addEventListener('touchend', onEnd);
 }
 
 function showBroadcastNotif(icon, title, msg) {
@@ -19427,62 +19591,76 @@ function renderAppStore() {
             <circle id="dl-circle-${app.id}" cx="18" cy="18" r="14" fill="none" stroke="#0d84ff" stroke-width="2.5"
               stroke-dasharray="88" stroke-dashoffset="${dashOffset}" style="transition:stroke-dashoffset 0.5s linear"/>
           </svg>
-          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:rgba(255,255,255,0.7)">✕</div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:font-size:11px;color:rgba(255,255,255,0.7)">✕</div>
         </div>
         <div id="dl-time-${app.id}" style="font-size:9px;color:rgba(255,255,255,0.4);white-space:nowrap">${timeStr}</div>
       </div>`;
     }
-    return `<button onclick="startAppDownload('${app.id}')" style="padding:9px 18px;border-radius:99px;background:linear-gradient(135deg,#0d84ff,#00d4ff);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(13,132,255,0.45)">GET</button>`;
+    return `<button onclick="startAppDownload('${app.id}')" style="padding:7px 16px;border-radius:99px;background:rgba(13,132,255,0.15);border:none;color:#0d84ff;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.2px">GET</button>`;
   };
 
   c.innerHTML = `
-    <div style="text-align:center;padding:20px 0 24px">
-      <div style="width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#0d84ff,#00d4ff);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 8px 32px rgba(13,132,255,0.5)">🅰️</div>
-      <div style="font-size:22px;font-weight:900;color:#fff;margin-bottom:4px">App Store</div>
-      <div style="font-size:13px;color:rgba(255,255,255,0.4)">Manage & reinstall your apps</div>
+    <!-- Featured Banner -->
+    <div style="margin:-12px -12px 0;background:linear-gradient(135deg,#1a0533,#0d0226);border-radius:0 0 28px 28px;padding:20px 16px 24px;position:relative;overflow:hidden;margin-bottom:20px">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%,rgba(13,132,255,0.25),transparent 60%),radial-gradient(ellipse at 20% 80%,rgba(160,136,250,0.2),transparent 60%);pointer-events:none"></div>
+      <div style="font-size:10px;font-weight:800;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">App Store</div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#a088fa,#0d84ff);display:flex;align-items:center;justify-content:center;font-size:30px;flex-shrink:0;box-shadow:0 8px 28px rgba(13,132,255,0.45)">🌸</div>
+        <div style="flex:1">
+          <div style="font-size:9px;font-weight:700;color:rgba(160,136,250,0.9);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Featured</div>
+          <div style="font-size:17px;font-weight:800;color:#fff;letter-spacing:-0.3px;line-height:1.2">Sakura OS</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:3px">Your personal pocket universe</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Pills -->
+    <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px;scrollbar-width:none">
+      ${['All','Games','Utilities','Social','Finance'].map((cat, i) => `
+        <div style="flex-shrink:0;padding:7px 16px;border-radius:99px;background:${i===0?'#a088fa':'rgba(255,255,255,0.07)'};border:1px solid ${i===0?'transparent':'rgba(255,255,255,0.1)'};color:${i===0?'#fff':'rgba(255,255,255,0.55)'};font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">${cat}</div>
+      `).join('')}
     </div>
 
     ${removedList.length > 0 ? `
-    <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">Available to Install (${removedList.length})</div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px">
+    <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px">Available to Install (${removedList.length})</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
       ${removedList.map(app => `
-        <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:20px">
-          <div style="width:54px;height:54px;border-radius:14px;background:${app.color||'#a088fa'};display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;box-shadow:0 4px 18px rgba(0,0,0,0.35)">${app.emoji}</div>
+        <div style="display:flex;align-items:center;gap:14px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:20px">
+          <div style="width:52px;height:52px;border-radius:14px;background:${app.color||'#a088fa'};display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;box-shadow:0 4px 16px rgba(0,0,0,0.3)">${app.emoji}</div>
           <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:3px">${app.label}</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.32);margin-bottom:${downloads[app.id] ? '6px' : '0'}">
+            <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:2px">${app.label}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.32)">
               ${downloads[app.id] ? 'Downloading…' : 'Removed from Home Screen'}
             </div>
-            ${downloads[app.id] ? `<div style="height:3px;border-radius:99px;background:rgba(255,255,255,0.08);overflow:hidden">
+            ${downloads[app.id] ? `<div style="height:3px;border-radius:99px;background:rgba(255,255,255,0.08);overflow:hidden;margin-top:6px">
               <div id="dl-progress-${app.id}" style="height:100%;border-radius:99px;background:linear-gradient(90deg,#0d84ff,#00d4ff);width:${Math.min((Date.now()-downloads[app.id].startedAt)/downloads[app.id].duration*100,100)}%;transition:width 0.5s linear"></div>
             </div>` : ''}
           </div>
           ${renderDownloadBtn(app)}
         </div>`).join('')}
     </div>` : `
-    <div style="text-align:center;padding:24px 20px;background:rgba(13,132,255,0.06);border:1px solid rgba(13,132,255,0.14);border-radius:20px;margin-bottom:20px">
-      <div style="font-size:32px;margin-bottom:10px">✅</div>
-      <div style="font-size:15px;font-weight:700;color:rgba(255,255,255,0.6);margin-bottom:4px">All apps installed</div>
-      <div style="font-size:12px;color:rgba(255,255,255,0.28)">Enter edit mode on Home Screen<br>to remove apps</div>
+    <div style="text-align:center;padding:20px;background:rgba(13,132,255,0.06);border:1px solid rgba(13,132,255,0.14);border-radius:20px;margin-bottom:20px">
+      <div style="font-size:28px;margin-bottom:8px">✅</div>
+      <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.55);margin-bottom:3px">All apps installed</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.25)">Enter edit mode on Home Screen to remove apps</div>
     </div>`}
 
-    <div style="font-size:11px;font-weight:800;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px">All Apps (${allApps.length})</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
-      ${allApps.map(app => {
+    <!-- All Apps Section -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:15px;font-weight:800;color:#fff">All Apps</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.3)">${allApps.length} apps</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0">
+      ${allApps.map((app, i) => {
         const isRemoved = hidden.includes(app.id);
         const isDownloading = downloads[app.id]?.status === 'downloading';
-        return `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;opacity:${isRemoved&&!isDownloading?'0.4':'1'}">
-          <div style="position:relative;width:56px;height:56px">
-            <div style="width:56px;height:56px;border-radius:16px;background:${app.color||'#a088fa'};display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 14px rgba(0,0,0,0.3)">${app.emoji}</div>
-            ${isDownloading ? `<div style="position:absolute;inset:0;border-radius:16px;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center">
-              <svg width="28" height="28" viewBox="0 0 28 28" style="transform:rotate(-90deg)">
-                <circle cx="14" cy="14" r="10" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
-                <circle id="dl-grid-circle-${app.id}" cx="14" cy="14" r="10" fill="none" stroke="#0d84ff" stroke-width="2"
-                  stroke-dasharray="63" stroke-dashoffset="${63-(Math.min((Date.now()-downloads[app.id].startedAt)/downloads[app.id].duration,1)*63)}"/>
-              </svg>
-            </div>` : ''}
+        return `<div style="display:flex;align-items:center;gap:14px;padding:12px 0;${i < allApps.length-1 ? 'border-bottom:1px solid rgba(255,255,255,0.05)' : ''}">
+          <div style="width:48px;height:48px;border-radius:12px;background:${app.color||'#a088fa'};display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:0 3px 10px rgba(0,0,0,0.25);opacity:${isRemoved&&!isDownloading?'0.4':'1'}">${app.emoji}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:700;color:${isRemoved&&!isDownloading?'rgba(255,255,255,0.35)':'#fff'};margin-bottom:1px">${app.label}</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.28)">${isRemoved&&!isDownloading ? 'Hidden' : isDownloading ? 'Downloading…' : 'Installed'}</div>
           </div>
-          <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,${isRemoved&&!isDownloading?'0.25':'0.65'});text-align:center;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${app.label}</div>
+          ${isDownloading ? `<div style="font-size:11px;color:#0d84ff;font-weight:700">↓</div>` : `<div style="width:8px;height:8px;border-radius:50%;background:${isRemoved ? 'rgba(252,119,144,0.4)' : 'rgba(78,223,208,0.5)'}"></div>`}
         </div>`;
       }).join('')}
     </div>
@@ -19813,6 +19991,26 @@ loadState = function() {
 // ============================================================
 const UPDATE_LOGS = [
   {
+    version: '0.1.16',
+    date: 'March 2026',
+    emoji: '🛠️',
+    title: 'Bug Fix Sweep, AI Messages Upgrade & UI Polish',
+    items: [
+      { tag:'fix',     text:'Marble Racer — Japanese Night camera now correctly follows marbles using the same smooth tracking logic as all other themes.' },
+      { tag:'fix',     text:'Admin Panel — Claw tab item modals now render above the admin panel overlay (z-index fix) so they are always fully interactive.' },
+      { tag:'fix',     text:'Messages — Unread message badges now correctly clear when opening a chat. All received messages are marked read on chat open.' },
+      { tag:'fix',     text:'Progress Bar — Ticket tooltip now follows the exact end of the progress fill instead of always anchoring to the right edge.' },
+      { tag:'fix',     text:'Quint — Stack bubble is now sticky so it stays visible while scrolling on mobile.' },
+      { tag:'fix',     text:'Quint — Scroll sound no longer fires when closing the Quint app or navigating away from the screen.' },
+      { tag:'fix',     text:'Backpack — Mobile: tapping off an item popup no longer leaves the screen unresponsive. Backdrop and sheet are now fully cleaned up on close.' },
+      { tag:'upgrade', text:'Messages — AI chat responses are now more context-aware: the model analyses message type (question, emotion, statement) and varies reply length and personality accordingly.' },
+      { tag:'upgrade', text:'Update Logs — Paginated display (4 updates per page) with prev/next navigation. Latest update card has a beautiful purple–rainbow outline.' },
+      { tag:'upgrade', text:'Status Bar — Battery icon replaced with a custom SVG (rounded rect, terminal cap, purple fill) matching the iPhone 15 palette.' },
+      { tag:'new',     text:'Home Screen — iPhone 15-style notification panel: drag from top-left to reveal notifications, swipe-to-dismiss, tap to open.' },
+      { tag:'upgrade', text:'App Store — Full visual overhaul inspired by iPhone 15 App Store design: featured banner, category pills, and improved app cards.' },
+    ]
+  },
+  {
     version: '0.1.15',
     date: 'March 2026',
     emoji: '🌸',
@@ -20138,6 +20336,12 @@ function renderUpdateLogs() {
   const c = document.getElementById('updatelogs-content');
   if (!c) return;
 
+  const LOGS_PER_PAGE = 4;
+  if (typeof window._updateLogsPage === 'undefined') window._updateLogsPage = 0;
+  const totalPages = Math.ceil(UPDATE_LOGS.length / LOGS_PER_PAGE);
+  const page = window._updateLogsPage;
+  const pageLogs = UPDATE_LOGS.slice(page * LOGS_PER_PAGE, (page + 1) * LOGS_PER_PAGE);
+
   // Header hero
   c.innerHTML = `
     <div style="text-align:center;padding:20px 0 24px;position:relative">
@@ -20151,7 +20355,7 @@ function renderUpdateLogs() {
           <div style="font-size:9px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px">Changes</div>
         </div>
         <div style="background:rgba(78,223,208,0.08);border:1px solid rgba(78,223,208,0.2);border-radius:10px;padding:8px 16px;text-align:center">
-          <div style="font-size:20px;font-weight:800;color:#4edfd0">${UPDATE_LOGS.filter(l=>l.items.some(i=>i.tag==='fix')).length > 0 ? UPDATE_LOGS.reduce((a,v)=>a+v.items.filter(i=>i.tag==='fix').length,0) : 0}</div>
+          <div style="font-size:20px;font-weight:800;color:#4edfd0">${UPDATE_LOGS.reduce((a,v)=>a+v.items.filter(i=>i.tag==='fix').length,0)}</div>
           <div style="font-size:9px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px">Bug Fixes</div>
         </div>
         <div style="background:rgba(246,187,78,0.08);border:1px solid rgba(246,187,78,0.2);border-radius:10px;padding:8px 16px;text-align:center">
@@ -20161,8 +20365,15 @@ function renderUpdateLogs() {
       </div>
     </div>
 
-    ${UPDATE_LOGS.map((log, li) => `
-      <div class="update-log-card" style="animation-delay:${li*0.1}s">
+    ${pageLogs.map((log, li) => {
+      const globalIdx = page * LOGS_PER_PAGE + li;
+      const isLatest = globalIdx === 0;
+      const latestBorder = isLatest ? `border:2px solid transparent;background-clip:padding-box;position:relative;` : '';
+      const latestWrap = isLatest ? `
+        <div style="position:absolute;inset:-2px;border-radius:22px;z-index:-1;background:linear-gradient(135deg,#a088fa,#c77dff,#fb99d5,#a088fa,#7b61ff);background-size:300% 300%;animation:rainbowBorder 4s ease infinite;padding:2px;border-radius:22px"></div>` : '';
+      return `
+      <div class="update-log-card" style="animation-delay:${li*0.1}s;${isLatest ? 'position:relative;z-index:0;border:1.5px solid rgba(160,136,250,0.7);box-shadow:0 0 28px rgba(160,136,250,0.25),0 0 6px rgba(199,125,255,0.2);' : ''}">
+        ${isLatest ? `<div style="position:absolute;inset:-2px;border-radius:22px;z-index:-1;background:linear-gradient(135deg,#a088fa,#c77dff,#fb99d5,#7b61ff,#a088fa);background-size:300% 300%;animation:rainbowBorder 4s ease infinite;border-radius:22px;opacity:0.7;filter:blur(3px)"></div>` : ''}
         <div class="update-date">${log.date}</div>
         <div class="update-version-badge">
           <span style="font-size:14px">${log.emoji}</span>
@@ -20185,7 +20396,17 @@ function renderUpdateLogs() {
               </div>
             </div>`).join('')}
         </div>
-      </div>`).join('')}
+      </div>`;
+    }).join('')}
+
+    ${totalPages > 1 ? `
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:16px 0 8px">
+      <button onclick="window._updateLogsPage=Math.max(0,window._updateLogsPage-1);renderUpdateLogs();document.getElementById('updatelogs-content').scrollTop=0"
+        style="padding:8px 18px;border-radius:12px;background:rgba(160,136,250,0.12);border:1px solid rgba(160,136,250,0.3);color:#c0b9f5;font-size:13px;font-weight:700;cursor:pointer;opacity:${page===0?'0.3':'1'};pointer-events:${page===0?'none':'auto'}">← Newer</button>
+      <span style="font-size:11px;color:rgba(255,255,255,0.35);font-weight:600">${page+1} / ${totalPages}</span>
+      <button onclick="window._updateLogsPage=Math.min(${totalPages-1},window._updateLogsPage+1);renderUpdateLogs();document.getElementById('updatelogs-content').scrollTop=0"
+        style="padding:8px 18px;border-radius:12px;background:rgba(160,136,250,0.12);border:1px solid rgba(160,136,250,0.3);color:#c0b9f5;font-size:13px;font-weight:700;cursor:pointer;opacity:${page===totalPages-1?'0.3':'1'};pointer-events:${page===totalPages-1?'none':'auto'}">Older →</button>
+    </div>` : ''}
 
     <div style="text-align:center;padding:24px 0;color:rgba(160,136,250,0.3);font-size:11px">
       <div style="font-size:24px;margin-bottom:6px">✨</div>
@@ -20250,6 +20471,7 @@ document.addEventListener('scroll', () => {}, { passive: true });
 (function attachScrollSounds() {
   const sel = '.screen > div, #updatelogs-content, #wallet-content, #shop-content, #backpack-content, #notes-sidebar, #achievements-content, #wishlist-content';
   function onScroll() {
+    if (window._suppressScrollSounds) return;
     const now = Date.now();
     if (!this._lastScrollSound || now - this._lastScrollSound > 250) {
       this._lastScrollSound = now;
@@ -20316,7 +20538,7 @@ document.getElementById('princess-theme-modal').addEventListener('click', e => {
 
 // ── True globals: var avoids temporal dead zone for code above fbInit ──
 var ADMIN_EMAIL      = "Djrocky2021@gmail.com";
-var GAME_VERSION     = "0.1.15";
+var GAME_VERSION     = "0.1.16";
 var fbCurrentUser    = null;
 var fbDb             = null;
 // Raw GitHub URL — fetched periodically to detect new versions automatically
@@ -22410,7 +22632,7 @@ window._admClawAddPreset = function() {
   if (ov) { ov.remove(); return; }
   ov = document.createElement('div');
   ov.id = 'claw-preset-picker';
-  ov.style.cssText = 'position:absolute;inset:0;z-index:8000;background:rgba(0,0,0,0.75);display:flex;align-items:flex-end;padding-bottom:0;overflow:hidden';
+  ov.style.cssText = 'position:absolute;inset:0;z-index:9900;background:rgba(0,0,0,0.75);display:flex;align-items:flex-end;padding-bottom:0;overflow:hidden';
   const presets = [
     ...CLAW_PRIZE_DEFS,
     { emoji:'🌸', r:15, mass:2.5, color:'#fbabd8', isPlush:true,  name:'Sakura', pts:10 },
@@ -22454,7 +22676,7 @@ window._admClawAddCustom = function() {
   if (ov) { ov.remove(); return; }
   ov = document.createElement('div');
   ov.id = 'claw-custom-prize-form';
-  ov.style.cssText = 'position:absolute;inset:0;z-index:8000;background:rgba(0,0,0,0.75);display:flex;align-items:flex-end';
+  ov.style.cssText = 'position:absolute;inset:0;z-index:9900;background:rgba(0,0,0,0.75);display:flex;align-items:flex-end';
   ov.innerHTML = `
     <div style="background:#1a0e2e;border-radius:20px 20px 0 0;width:100%;padding:16px">
       <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:12px">🎨 Custom Prize</div>
@@ -22504,7 +22726,7 @@ window._admClawAddTheme = function() {
   if (ov) { ov.remove(); return; }
   ov = document.createElement('div');
   ov.id = 'claw-theme-picker';
-  ov.style.cssText = 'position:absolute;inset:0;z-index:8000;background:rgba(0,0,0,0.75);display:flex;align-items:flex-end';
+  ov.style.cssText = 'position:absolute;inset:0;z-index:9900;background:rgba(0,0,0,0.75);display:flex;align-items:flex-end';
   ov.innerHTML = `
     <div style="background:#1a0e2e;border-radius:20px 20px 0 0;width:100%;padding:16px;max-height:70%;overflow-y:auto">
       <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:12px">🎨 Add Theme as Prize</div>
