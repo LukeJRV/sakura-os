@@ -279,6 +279,176 @@ html, body {
 @keyframes starTwinkle { 0%,100%{opacity:0.1} 50%{opacity:0.7} }
 button, a { touch-action: manipulation; }
 
+/* ===== PHONE SHELL WRAPPER + PHYSICAL BUTTONS ===== */
+#phone-shell-wrap {
+  position: relative;
+  z-index: 1;
+  /* Extra space so buttons can protrude outside phone */
+  padding: 0 14px;
+}
+
+/* ── Side Button Base ── */
+.side-btn {
+  position: absolute;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: filter 0.12s, transform 0.08s;
+  z-index: 10;
+}
+.side-btn:active { filter: brightness(1.35); transform: scaleX(0.82); }
+
+/* ── Power / Sleep button — RIGHT side ── */
+#btn-power {
+  right: 0px;
+  top: 168px;
+  width: 5px; height: 72px;
+  background: linear-gradient(180deg,
+    rgba(220,200,255,0.55) 0%,
+    rgba(140,80,240,0.4) 50%,
+    rgba(100,40,200,0.35) 100%
+  );
+  border-radius: 0 3px 3px 0;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.5), inset -1px 0 0 rgba(255,255,255,0.12);
+}
+
+/* ── Mute toggle — LEFT side, top ── */
+#btn-mute {
+  left: 0px;
+  top: 110px;
+  width: 4px; height: 30px;
+  background: linear-gradient(180deg,
+    rgba(200,180,255,0.4) 0%,
+    rgba(120,60,220,0.3) 100%
+  );
+  border-radius: 3px 0 0 3px;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.4);
+  pointer-events: none; /* visual only, real mute in app settings */
+}
+
+/* ── Volume Up — LEFT side ── */
+#btn-vol-up {
+  left: 0px;
+  top: 158px;
+  width: 4px; height: 54px;
+  background: linear-gradient(180deg,
+    rgba(220,200,255,0.5) 0%,
+    rgba(150,90,255,0.38) 100%
+  );
+  border-radius: 3px 0 0 3px;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.4), inset 1px 0 0 rgba(255,255,255,0.1);
+}
+
+/* ── Volume Down — LEFT side ── */
+#btn-vol-down {
+  left: 0px;
+  top: 222px;
+  width: 4px; height: 54px;
+  background: linear-gradient(180deg,
+    rgba(220,200,255,0.5) 0%,
+    rgba(150,90,255,0.38) 100%
+  );
+  border-radius: 3px 0 0 3px;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.4), inset 1px 0 0 rgba(255,255,255,0.1);
+}
+
+/* ── USB-C Port — BOTTOM ── */
+#usbc-port {
+  position: absolute;
+  bottom: -8px; left: 50%;
+  transform: translateX(-50%);
+  width: 52px; height: 8px;
+  background: linear-gradient(180deg, rgba(20,8,44,0.95), rgba(8,2,20,0.98));
+  border-radius: 0 0 6px 6px;
+  border: 1px solid rgba(160,120,255,0.25);
+  border-top: none;
+  z-index: 5;
+  overflow: hidden;
+  cursor: default;
+}
+/* Port hole detail */
+#usbc-port::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 26px; height: 4px;
+  background: rgba(0,0,0,0.9);
+  border-radius: 3px;
+  border: 0.5px solid rgba(140,100,220,0.3);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+}
+/* Port pin dots */
+#usbc-port::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px; height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(160,120,255,0.4) 0px,
+    rgba(160,120,255,0.4) 1.5px,
+    transparent 1.5px,
+    transparent 3px
+  );
+  border-radius: 1px;
+}
+
+/* ── Tooltip for buttons ── */
+.btn-tooltip {
+  position: absolute;
+  background: rgba(20,8,44,0.96);
+  border: 1px solid rgba(196,168,245,0.3);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(220,200,255,0.9);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+.side-btn:hover .btn-tooltip { opacity: 1; }
+
+/* ── Volume HUD (shown on volume press) ── */
+#vol-hud {
+  position: absolute;
+  top: 120px; right: 14px;
+  z-index: 9900;
+  background: rgba(16,6,36,0.92);
+  border: 1px solid rgba(196,168,245,0.25);
+  border-radius: 16px;
+  padding: 12px 10px;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 40px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(196,168,245,0.08);
+}
+#vol-hud.show { display: flex; }
+.vol-hud-icon { font-size: 16px; }
+.vol-hud-bar {
+  width: 4px; height: 80px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+.vol-hud-fill {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(0deg, #5a20c0, #c4a8f5);
+  border-radius: 2px;
+  transition: height 0.2s ease;
+}
+.vol-hud-pct { font-size: 9px; font-weight: 800; color: rgba(196,168,245,0.8); }
+
 /* ===== PHONE SHELL ===== */
 #phone {
   width: 390px;
@@ -381,25 +551,102 @@ button, a { touch-action: manipulation; }
 /* Signal bars */
 .sig-bars { display:flex; align-items:flex-end; gap:1.5px; }
 .sig-bar { width:3px; background:rgba(255,255,255,0.9); border-radius:1px; }
-/* Wave battery */
-.wave-battery {
-  width:28px; height:14px;
-  border-radius:6px;
-  position:relative; overflow:hidden;
-  background:rgba(255,255,255,0.08);
-  border:1.5px solid rgba(196,168,245,0.4);
+/* ── Crystal iPhone 19 Battery ── */
+.crystal-battery {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  cursor: default;
 }
-.wave-battery::after {
-  content:'';
-  position:absolute; right:-4.5px; top:3px;
-  width:3px; height:8px;
-  background:rgba(196,168,245,0.5);
-  border-radius:0 2px 2px 0;
+/* The main battery body */
+.cbatt-body {
+  width: 34px; height: 17px;
+  border-radius: 5px;
+  border: 1.5px solid rgba(196,168,245,0.55);
+  position: relative;
+  overflow: hidden;
+  background: rgba(12,4,28,0.6);
+  box-shadow:
+    0 0 0 0.5px rgba(100,40,200,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 0 8px rgba(160,100,255,0.15);
 }
-.wave-batt-liq { position:absolute; inset:0; overflow:hidden; border-radius:4px; }
-.wave-batt-fill { position:absolute; bottom:0; left:-100%; width:300%; }
-.wave-batt-svg { width:100%; display:block; animation:battWave 2s linear infinite; }
-@keyframes battWave { 0%{transform:translateX(0)} 100%{transform:translateX(33.33%)} }
+/* Battery nub/tip */
+.cbatt-body::after {
+  content: '';
+  position: absolute;
+  right: -5px; top: 50%;
+  transform: translateY(-50%);
+  width: 3.5px; height: 8px;
+  background: linear-gradient(180deg, rgba(196,168,245,0.7), rgba(130,80,220,0.5));
+  border-radius: 0 2px 2px 0;
+}
+/* Inner fill — crystal purple gradient */
+.cbatt-fill {
+  position: absolute;
+  inset: 0;
+  width: var(--batt-pct, 75%);
+  background: linear-gradient(90deg,
+    rgba(90,32,192,0.9) 0%,
+    rgba(140,80,255,0.95) 40%,
+    rgba(196,168,245,0.9) 80%,
+    rgba(220,200,255,0.95) 100%
+  );
+  border-radius: 3px;
+  transition: width 1s ease;
+  overflow: hidden;
+}
+/* Animated shimmer sweep */
+.cbatt-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -60%;
+  width: 40%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: cbattShimmer 2.4s ease-in-out infinite;
+}
+@keyframes cbattShimmer {
+  0%   { left: -60%; opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { left: 130%; opacity: 0; }
+}
+/* Top gloss strip */
+.cbatt-gloss {
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 40%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.18), transparent);
+  border-radius: 3px 3px 0 0;
+  pointer-events: none; z-index: 2;
+}
+/* Percentage label */
+.cbatt-pct {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(220,200,255,0.9);
+  letter-spacing: -0.3px;
+  text-shadow: 0 0 6px rgba(160,100,255,0.6);
+  min-width: 22px;
+  text-align: left;
+}
+/* Low battery turns red */
+.crystal-battery.low .cbatt-body { border-color: rgba(255,80,80,0.6); }
+.crystal-battery.low .cbatt-fill {
+  background: linear-gradient(90deg, rgba(180,20,20,0.9), rgba(255,80,60,0.95), rgba(255,140,120,0.9));
+}
+.crystal-battery.low .cbatt-pct { color: rgba(255,140,120,0.9); text-shadow: 0 0 6px rgba(255,60,60,0.5); }
+/* Charging state — green pulse */
+.crystal-battery.charging .cbatt-fill {
+  background: linear-gradient(90deg, rgba(20,140,60,0.9), rgba(60,220,120,0.95), rgba(160,255,200,0.9));
+  animation: cbattChargePulse 1.5s ease-in-out infinite;
+}
+.crystal-battery.charging .cbatt-body { border-color: rgba(60,220,120,0.6); }
+.crystal-battery.charging .cbatt-pct { color: rgba(120,255,180,0.9); text-shadow: 0 0 6px rgba(40,200,80,0.5); }
+@keyframes cbattChargePulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
 #day-night-icon {
   font-size:14px;
 }
@@ -2647,8 +2894,38 @@ input[type=number] { -moz-appearance:textfield; }
   </div>
 </div>
 
+<!-- Phone Shell Wrapper (holds phone + physical buttons) -->
+<div id="phone-shell-wrap">
+
+  <!-- Physical Side Buttons -->
+  <!-- LEFT: Mute toggle (visual) -->
+  <div class="side-btn" id="btn-mute">
+    <div class="btn-tooltip" style="right:14px;top:2px">Mute</div>
+  </div>
+  <!-- LEFT: Volume Up -->
+  <div class="side-btn" id="btn-vol-up" onclick="sideVolume(1)">
+    <div class="btn-tooltip" style="right:14px;top:8px">Vol +</div>
+  </div>
+  <!-- LEFT: Volume Down -->
+  <div class="side-btn" id="btn-vol-down" onclick="sideVolume(-1)">
+    <div class="btn-tooltip" style="right:14px;top:8px">Vol −</div>
+  </div>
+  <!-- RIGHT: Power button -->
+  <div class="side-btn" id="btn-power" onmousedown="sidePowerDown()" onmouseup="sidePowerUp()" ontouchstart="sidePowerDown()" ontouchend="sidePowerUp()">
+    <div class="btn-tooltip" style="left:14px;top:8px">Power</div>
+  </div>
+
 <!-- Main Phone -->
 <div id="phone">
+
+  <!-- Volume HUD -->
+  <div id="vol-hud">
+    <div class="vol-hud-icon" id="vol-hud-icon">🔊</div>
+    <div class="vol-hud-bar">
+      <div class="vol-hud-fill" id="vol-hud-fill" style="height:70%"></div>
+    </div>
+    <div class="vol-hud-pct" id="vol-hud-pct">70%</div>
+  </div>
   <!-- Sync indicator -->
   <div class="fb-sync-indicator" id="fb-sync-dot">☁️ Saved</div>
   <!-- View-as-player banner -->
@@ -2829,22 +3106,20 @@ input[type=number] { -moz-appearance:textfield; }
     <div id="status-right">
       <!-- Signal bars -->
       <div class="sig-bars">
-        <div class="sig-bar" style="height:4px"></div>
-        <div class="sig-bar" style="height:6px"></div>
-        <div class="sig-bar" style="height:9px"></div>
+        <div class="sig-bar" style="height:4px;opacity:0.4"></div>
+        <div class="sig-bar" style="height:6px;opacity:0.6"></div>
+        <div class="sig-bar" style="height:9px;opacity:0.8"></div>
         <div class="sig-bar" style="height:12px"></div>
       </div>
       <!-- Day/night icon -->
       <span id="day-night-icon" style="font-size:13px">☀️</span>
-      <!-- Wave battery -->
-      <div class="wave-battery" id="battery-icon">
-        <div class="wave-batt-liq">
-          <div class="wave-batt-fill" style="height:75%">
-            <svg class="wave-batt-svg" viewBox="0 0 300 20" preserveAspectRatio="none">
-              <path d="M0 10 Q25 0 50 10 Q75 20 100 10 Q125 0 150 10 Q175 20 200 10 Q225 0 250 10 Q275 20 300 10 L300 20 L0 20Z" fill="rgba(155,109,224,0.85)"/>
-            </svg>
-          </div>
+      <!-- Crystal Battery -->
+      <div class="crystal-battery" id="crystal-battery-wrap">
+        <div class="cbatt-body" id="cbatt-body">
+          <div class="cbatt-fill" id="cbatt-fill" style="--batt-pct:75%"></div>
+          <div class="cbatt-gloss"></div>
         </div>
+        <span class="cbatt-pct" id="cbatt-pct">75%</span>
       </div>
       <div id="profile-icon" onclick="openScreen('settings')" title="Settings">👤</div>
     </div>
@@ -3801,6 +4076,11 @@ input[type=number] { -moz-appearance:textfield; }
   </div>
 
 </div><!-- /phone -->
+
+  <!-- USB-C Charging Port -->
+  <div id="usbc-port"></div>
+
+</div><!-- /phone-shell-wrap -->
 
 <script>
 // ============================================================
@@ -26417,7 +26697,387 @@ function admSwitchTab(t,el) { if(_fbReady) window.admSwitchTab(t,el); }
 </script>
 
 <script>
-// ── AURORA BACKGROUND: Star field init ──────────────────────────────────────
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  CRYSTAL BATTERY SYSTEM                                         ║
+// ╚══════════════════════════════════════════════════════════════════╝
+var _battLevel   = 78;   // 0–100
+var _battCharging = false;
+var _battDrainIv = null;
+
+function _battUpdate(level, charging) {
+  _battLevel   = Math.max(0, Math.min(100, level));
+  _battCharging = !!charging;
+
+  var fill = document.getElementById('cbatt-fill');
+  var pct  = document.getElementById('cbatt-pct');
+  var wrap = document.getElementById('crystal-battery-wrap');
+  if (!fill || !pct || !wrap) return;
+
+  fill.style.setProperty('--batt-pct', _battLevel + '%');
+  fill.style.width = _battLevel + '%';
+  pct.textContent  = (_battCharging ? '⚡ ' : '') + _battLevel + '%';
+
+  wrap.classList.remove('low', 'charging');
+  if (_battCharging)    wrap.classList.add('charging');
+  else if (_battLevel <= 20) wrap.classList.add('low');
+
+  // Sync charging screen if visible
+  _chargingScreenUpdate();
+}
+
+// Simulate slow natural drain when not charging
+function _battStartDrain() {
+  if (_battDrainIv) return;
+  _battDrainIv = setInterval(function() {
+    if (_battCharging) return;
+    _battUpdate(_battLevel - 0.05);
+  }, 60000); // 0.05% per minute — cosmetic
+}
+_battStartDrain();
+
+// Initialize display
+_battUpdate(78, false);
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  SIDE BUTTON LOGIC                                              ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+// ── Volume ───────────────────────────────────────────────────────
+var _volLevel = 70; // 0–100
+var _volHudTimer = null;
+
+function sideVolume(dir) {
+  _volLevel = Math.max(0, Math.min(100, _volLevel + dir * 10));
+  playSound(dir > 0 ? 'tick' : 'click');
+
+  var hud     = document.getElementById('vol-hud');
+  var hudFill = document.getElementById('vol-hud-fill');
+  var hudPct  = document.getElementById('vol-hud-pct');
+  var hudIcon = document.getElementById('vol-hud-icon');
+
+  if (!hud) return;
+
+  if (hudFill) hudFill.style.height = _volLevel + '%';
+  if (hudPct)  hudPct.textContent   = _volLevel + '%';
+  if (hudIcon) hudIcon.textContent  = _volLevel === 0 ? '🔇' : _volLevel < 40 ? '🔉' : '🔊';
+
+  hud.classList.add('show');
+  clearTimeout(_volHudTimer);
+  _volHudTimer = setTimeout(function() {
+    hud.classList.remove('show');
+  }, 2000);
+}
+
+// ── Power button ─────────────────────────────────────────────────
+var _powerHoldTimer = null;
+
+function sidePowerDown() {
+  _powerHoldTimer = setTimeout(function() {
+    // Long press → power-off / charging menu
+    _powerHoldTimer = null;
+    _showPowerMenu();
+  }, 700);
+}
+
+function sidePowerUp() {
+  if (_powerHoldTimer) {
+    clearTimeout(_powerHoldTimer);
+    _powerHoldTimer = null;
+    // Short tap → quick flash (like waking screen)
+    playSound('click');
+    var phone = document.getElementById('phone');
+    if (phone) {
+      phone.style.transition = 'filter 0.08s';
+      phone.style.filter = 'brightness(1.18)';
+      setTimeout(function() { phone.style.filter = ''; }, 120);
+    }
+  }
+}
+
+function _showPowerMenu() {
+  // Reuse the existing powerOffApp() but add charging option
+  var existing = document.getElementById('ios-pow-ov');
+  if (existing) { existing.remove(); return; }
+
+  playSound('power');
+  var ov = document.createElement('div');
+  ov.id = 'ios-pow-ov';
+  ov.style.cssText = [
+    'position:absolute;inset:0;z-index:99999',
+    'background:rgba(4,1,16,0.88)',
+    'backdrop-filter:blur(28px)',
+    '-webkit-backdrop-filter:blur(28px)',
+    'display:flex;flex-direction:column;align-items:center;justify-content:space-between',
+    'padding:52px 24px 44px',
+    'border-radius:inherit',
+  ].join(';');
+
+  ov.innerHTML = [
+    // Top: date/time
+    '<div style="text-align:center">',
+      '<div style="font-size:12px;letter-spacing:1.5px;color:rgba(196,168,245,0.45);text-transform:uppercase;margin-bottom:8px">Friday 13 March</div>',
+      '<div style="font-size:52px;font-weight:200;color:#fff;letter-spacing:-4px;line-height:1;text-shadow:0 0 30px rgba(196,168,245,0.3)" id="pow-clock">--:--</div>',
+      '<div style="font-size:12px;color:rgba(196,168,245,0.4);margin-top:8px">Battery · ' + _battLevel + '%</div>',
+    '</div>',
+
+    // Middle: sliders
+    '<div style="width:100%;display:flex;flex-direction:column;gap:12px">',
+
+      // Power off slider
+      _powSlider('pow-slider-off',
+        'linear-gradient(135deg,rgba(220,180,255,0.7),rgba(160,100,255,0.5))',
+        '⏻', 'slide to power off',
+        'rgba(255,255,255,0.08)', 'rgba(196,168,245,0.2)'
+      ),
+
+      // Charge slider  
+      _powSlider('pow-slider-chg',
+        'linear-gradient(135deg,rgba(40,200,100,0.8),rgba(20,160,70,0.6))',
+        '⚡', 'slide to charge',
+        'rgba(40,180,90,0.08)', 'rgba(60,220,120,0.2)'
+      ),
+
+    '</div>',
+
+    // Cancel
+    '<button onclick="document.getElementById(\'ios-pow-ov\').remove()" style="background:rgba(196,168,245,0.1);border:1px solid rgba(196,168,245,0.22);color:rgba(255,255,255,0.85);font-size:17px;font-weight:600;padding:14px 40px;border-radius:99px;cursor:pointer;min-width:160px;letter-spacing:-0.3px;transition:background 0.2s" onmouseover="this.style.background=\'rgba(196,168,245,0.2)\'" onmouseout="this.style.background=\'rgba(196,168,245,0.1)\'">Cancel</button>',
+  ].join('');
+
+  document.getElementById('phone').appendChild(ov);
+
+  // Set clock
+  var clk = ov.querySelector('#pow-clock');
+  if (clk) {
+    var n = new Date();
+    var h = n.getHours() % 12 || 12;
+    var m = ('0' + n.getMinutes()).slice(-2);
+    clk.textContent = h + ':' + m;
+  }
+
+  // Wire sliders
+  _wirePowSlider(ov, 'pow-slider-off', function() {
+    ov.remove();
+    playSound('power');
+    var ph = document.getElementById('phone');
+    ph.classList.add('power-off');
+    setTimeout(function() {
+      ph.classList.remove('power-off');
+      document.getElementById('power-screen').classList.add('on');
+    }, 800);
+  });
+
+  _wirePowSlider(ov, 'pow-slider-chg', function() {
+    ov.remove();
+    _startCharging();
+  });
+}
+
+function _powSlider(id, thumbBg, icon, label, trackBg, trackBorder) {
+  return [
+    '<div id="' + id + '" style="width:100%;height:58px;',
+      'background:' + trackBg + ';',
+      'border:1px solid ' + trackBorder + ';',
+      'border-radius:99px;position:relative;overflow:hidden;',
+      'display:flex;align-items:center;padding-left:5px">',
+      '<div class="_pow-thumb" style="width:48px;height:48px;border-radius:50%;',
+        'background:' + thumbBg + ';',
+        'display:flex;align-items:center;justify-content:center;',
+        'font-size:20px;cursor:grab;position:relative;z-index:2;',
+        'box-shadow:0 4px 20px rgba(0,0,0,0.4),0 0 16px rgba(160,100,255,0.3);',
+        'user-select:none;flex-shrink:0;transition:box-shadow 0.15s">',
+        icon,
+      '</div>',
+      '<div style="flex:1;text-align:center;font-size:11px;font-weight:600;',
+        'color:rgba(255,255,255,0.35);letter-spacing:2px;',
+        'padding-right:48px;text-transform:uppercase">',
+        label,
+      '</div>',
+    '</div>',
+  ].join('');
+}
+
+function _wirePowSlider(ov, id, onConfirm) {
+  var track = ov.querySelector('#' + id);
+  if (!track) return;
+  var thumb = track.querySelector('._pow-thumb');
+  var dragging = false, startX = 0, curX = 0;
+  var getMax = function() { return track.offsetWidth - 48 - 10; };
+  var moveTo = function(x) {
+    curX = Math.max(0, Math.min(x, getMax()));
+    thumb.style.transform = 'translateX(' + curX + 'px)';
+    var progress = curX / getMax();
+    thumb.style.boxShadow = '0 4px 20px rgba(0,0,0,0.4), 0 0 ' + (16 + progress * 24) + 'px rgba(160,100,255,' + (0.3 + progress * 0.5) + ')';
+    if (curX >= getMax() * 0.82) onConfirm();
+  };
+  thumb.addEventListener('mousedown',  function(e) { dragging=true; startX=e.clientX-curX; thumb.style.cursor='grabbing'; });
+  document.addEventListener('mousemove', function(e) { if (dragging) moveTo(e.clientX-startX); });
+  document.addEventListener('mouseup',   function()  { if (dragging) { dragging=false; thumb.style.cursor='grab'; if (curX < getMax()*0.7) { curX=0; thumb.style.transform=''; } } });
+  thumb.addEventListener('touchstart', function(e) { dragging=true; startX=e.touches[0].clientX-curX; }, {passive:true});
+  document.addEventListener('touchmove', function(e) { if (dragging) moveTo(e.touches[0].clientX-startX); }, {passive:true});
+  document.addEventListener('touchend',  function()  { if (dragging) { dragging=false; if (curX < getMax()*0.7) { curX=0; thumb.style.transform=''; } } }, {passive:true});
+}
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  CHARGING SCREEN                                                ║
+// ╚══════════════════════════════════════════════════════════════════╝
+var _chargingIv = null;
+var _chargingEl = null;
+
+function _startCharging() {
+  if (_battCharging) { _stopCharging(); return; }
+  _battCharging = true;
+  playSound('bell');
+
+  // Show charging overlay
+  var phone = document.getElementById('phone');
+  if (_chargingEl) _chargingEl.remove();
+
+  _chargingEl = document.createElement('div');
+  _chargingEl.id = 'charging-overlay';
+  _chargingEl.style.cssText = [
+    'position:absolute;inset:0;z-index:99998',
+    'background:#000',
+    'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0',
+    'overflow:hidden',
+    'cursor:pointer',
+  ].join(';');
+
+  _chargingEl.innerHTML = _buildChargingHTML();
+  phone.appendChild(_chargingEl);
+
+  // Tap to dismiss
+  _chargingEl.addEventListener('click', function(e) {
+    if (e.target.id === 'chg-stop-btn' || e.target.closest('#chg-stop-btn')) {
+      _stopCharging();
+    }
+  });
+
+  // Animate charge incrementing
+  _chargingIv = setInterval(function() {
+    if (_battLevel >= 100) { _stopCharging(); return; }
+    _battUpdate(_battLevel + 0.5, true);
+  }, 800);
+
+  _battUpdate(_battLevel, true);
+}
+
+function _stopCharging() {
+  _battCharging = false;
+  if (_chargingIv) { clearInterval(_chargingIv); _chargingIv = null; }
+  if (_chargingEl) { _chargingEl.remove(); _chargingEl = null; }
+  _battUpdate(_battLevel, false);
+  playSound('click');
+}
+
+function _chargingScreenUpdate() {
+  if (!_chargingEl) return;
+  var pctEl  = _chargingEl.querySelector('#chg-big-pct');
+  var fillEl = _chargingEl.querySelector('#chg-batt-fill');
+  var etaEl  = _chargingEl.querySelector('#chg-eta');
+  var segsEl = _chargingEl.querySelectorAll('.chg-seg');
+  if (pctEl)  pctEl.textContent  = _battLevel + '%';
+  if (fillEl) fillEl.style.height = _battLevel + '%';
+  if (etaEl) {
+    var minsLeft = Math.round((100 - _battLevel) * 1.2);
+    etaEl.textContent = _battLevel >= 100 ? 'Fully charged' : 'About ' + minsLeft + ' min remaining';
+  }
+  // Segment indicators (5 bars)
+  segsEl.forEach(function(seg, i) {
+    var threshold = (i + 1) * 20;
+    seg.classList.toggle('lit', _battLevel >= threshold);
+  });
+}
+
+function _buildChargingHTML() {
+  var minsLeft = Math.round((100 - _battLevel) * 1.2);
+  var segs = '';
+  for (var i = 0; i < 5; i++) {
+    var lit = _battLevel >= (i + 1) * 20;
+    segs += '<div class="chg-seg' + (lit ? ' lit' : '') + '"></div>';
+  }
+  var fillH = _battLevel + '%';
+
+  return [
+    // ── Ambient green glow ──
+    '<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 65%,rgba(30,180,80,0.14),transparent 65%);pointer-events:none"></div>',
+    // ── Top shimmer line ──
+    '<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(60,220,120,0.35),transparent);pointer-events:none"></div>',
+
+    // CHARGING LABEL
+    '<div style="font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:rgba(60,220,120,0.65);margin-bottom:8px">Charging</div>',
+
+    // BIG PERCENTAGE
+    '<div id="chg-big-pct" style="font-size:96px;font-weight:100;color:#fff;letter-spacing:-6px;line-height:1;text-shadow:0 0 60px rgba(60,220,120,0.35);margin-bottom:4px">' + _battLevel + '%</div>',
+
+    // ETA
+    '<div id="chg-eta" style="font-size:14px;color:rgba(60,220,120,0.55);margin-bottom:36px">About ' + minsLeft + ' min remaining</div>',
+
+    // CRYSTAL BATTERY GRAPHIC
+    '<div style="position:relative;width:140px">',
+      // Nub / tip
+      '<div style="width:44px;height:13px;border-radius:4px 4px 0 0;border:1.5px solid rgba(60,220,120,0.38);border-bottom:none;background:rgba(0,0,0,0.6);margin:0 auto;position:relative;z-index:2"></div>',
+      // Body
+      '<div style="width:140px;height:228px;border-radius:0 0 18px 18px;border:1.5px solid rgba(60,220,120,0.38);border-top:none;position:relative;overflow:hidden;background:rgba(0,0,0,0.55)">',
+        // Fill
+        '<div id="chg-batt-fill" style="position:absolute;bottom:0;left:0;right:0;height:' + fillH + ';background:linear-gradient(180deg,rgba(40,220,100,0.5),rgba(20,180,70,0.75));transition:height 0.8s ease">',
+          // Wave ripple on top of fill
+          '<div style="position:absolute;top:0;left:0;right:0;height:20px;overflow:hidden">',
+            '<svg style="width:300%;display:block;animation:cbattWave 1.8s linear infinite" viewBox="0 0 300 20" preserveAspectRatio="none">',
+              '<path d="M0 10 Q25 0 50 10 Q75 20 100 10 Q125 0 150 10 Q175 20 200 10 Q225 0 250 10 Q275 20 300 10 L300 20 L0 20Z" fill="rgba(60,220,100,0.35)"/>',
+            '</svg>',
+          '</div>',
+        '</div>',
+        // Crystal refraction lines
+        '<div style="position:absolute;inset:0;background:repeating-linear-gradient(160deg,transparent 0px,transparent 18px,rgba(140,255,180,0.03) 18px,rgba(140,255,180,0.03) 19px);pointer-events:none"></div>',
+        // Top gloss
+        '<div style="position:absolute;top:0;left:0;right:0;height:35%;background:linear-gradient(180deg,rgba(255,255,255,0.06),transparent);pointer-events:none"></div>',
+        // Lightning bolt
+        '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:4">',
+          '<svg width="38" height="60" viewBox="0 0 38 60" fill="none">',
+            '<path d="M22 2L4 34h14L12 58l22-32H20L22 2z" fill="rgba(255,255,255,0.75)" filter="url(#bolt-glow)"/>',
+            '<defs><filter id="bolt-glow" x="-50%" y="-50%" width="200%" height="200%">',
+              '<feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>',
+              '<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>',
+            '</filter></defs>',
+          '</svg>',
+        '</div>',
+      '</div>',
+    '</div>',
+
+    // SEGMENT DOTS
+    '<div style="display:flex;gap:5px;margin-top:14px">' + segs + '</div>',
+
+    // USB-C CONNECTED
+    '<div style="display:flex;align-items:center;gap:7px;margin-top:12px;color:rgba(60,220,120,0.5);font-size:12px">',
+      '<svg width="16" height="10" viewBox="0 0 16 10" fill="none"><rect x="0.5" y="0.5" width="13" height="9" rx="2.5" stroke="rgba(60,220,120,0.6)" stroke-width="1"/><rect x="13.5" y="3" width="2" height="4" rx="1" fill="rgba(60,220,120,0.6)"/><rect x="2" y="3" width="9" height="4" rx="1" fill="rgba(60,220,120,0.3)"/></svg>',
+      'USB-C · Crystal Charger',
+    '</div>',
+
+    // DISMISS BUTTON
+    '<div id="chg-stop-btn" style="margin-top:32px;font-size:13px;color:rgba(255,255,255,0.25);cursor:pointer;letter-spacing:0.3px">Tap to dismiss</div>',
+
+    // Keyframes scoped here
+    '<style>',
+      '.chg-seg{width:22px;height:7px;border-radius:3px;background:rgba(60,220,120,0.12);border:1px solid rgba(60,220,120,0.2);transition:all 0.4s}',
+      '.chg-seg.lit{background:rgba(60,220,120,0.55);border-color:rgba(60,220,120,0.7);box-shadow:0 0 8px rgba(60,220,120,0.4)}',
+      '@keyframes cbattWave{0%{transform:translateX(0)}100%{transform:translateX(-33.33%)}}',
+    '</style>',
+  ].join('');
+}
+
+// Expose so volume button also starts charging (fun easter egg — Vol+ when at 0%)
+window._startCharging = _startCharging;
+window._stopCharging  = _stopCharging;
+window._battUpdate    = _battUpdate;
+
+// ── Patch existing powerOffApp to use new power menu ──────────────
+var _origPowerOffApp = window.powerOffApp;
+window.powerOffApp = function() {
+  _showPowerMenu();
+};
+</script>
+</body>
+</html>
 (function() {
   var container = document.getElementById('bg-stars');
   if (!container) return;
