@@ -1447,41 +1447,45 @@ input[type=number] { -moz-appearance:textfield; }
 }
 #admin-panel-overlay.open { display:flex; }
 .adm-header {
-  background:rgba(26,10,46,0.92);
+  background:rgba(20,8,40,0.96);
   backdrop-filter:blur(40px);
   -webkit-backdrop-filter:blur(40px);
   padding:14px 16px 0;
-  border-bottom:1px solid rgba(196,168,245,0.17);
+  border-bottom:1px solid rgba(196,168,245,0.22);
   flex-shrink:0;
   position:relative;
   overflow:hidden;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
 }
-/* Rotating conic gradient shimmer — same as dock */
+/* Rotating conic gradient — same as dock, boosted for visibility */
 .adm-header::before {
   content:'';
   position:absolute;
-  width:200%; height:200%;
-  top:-50%; left:-50%;
-  background:conic-gradient(from 0deg,rgba(120,60,230,0.07) 0deg,rgba(196,120,255,0.06) 90deg,rgba(75,15,195,0.07) 180deg,rgba(196,120,255,0.05) 270deg,rgba(120,60,230,0.07) 360deg);
+  width:220%; height:220%;
+  top:-60%; left:-60%;
+  background:conic-gradient(from 0deg,
+    rgba(100,40,200,0.18) 0deg,
+    rgba(196,120,255,0.14) 90deg,
+    rgba(75,15,195,0.18) 180deg,
+    rgba(196,120,255,0.12) 270deg,
+    rgba(100,40,200,0.18) 360deg);
   animation:dockSpin 20s linear infinite;
   pointer-events:none;
   z-index:0;
 }
-/* Shimmer sweep line across the top */
+/* Travelling shimmer line across the top edge */
 .adm-header::after {
   content:'';
   position:absolute;
-  top:0; left:0; right:0; height:1px;
-  background:linear-gradient(90deg,transparent,rgba(196,168,245,0.5),rgba(251,171,216,0.4),rgba(196,168,245,0.5),transparent);
-  background-size:200% auto;
-  animation:admHeaderShimmer 3s linear infinite;
+  top:0; left:-100%; width:60%; height:1.5px;
+  background:linear-gradient(90deg,transparent,rgba(196,168,245,0.7),rgba(251,171,216,0.6),rgba(196,168,245,0.7),transparent);
+  animation:admShimmerTravel 3s ease-in-out infinite;
   pointer-events:none;
-  z-index:1;
+  z-index:3;
 }
-@keyframes admHeaderShimmer {
-  0%   { background-position: 200% center; }
-  100% { background-position: -200% center; }
+@keyframes admShimmerTravel {
+  0%   { left:-60%; }
+  100% { left:110%; }
 }
 .adm-header-top, .adm-tabs {
   position:relative; z-index:2;
@@ -1977,15 +1981,31 @@ input[type=number] { -moz-appearance:textfield; }
   width: calc(32px * var(--ui-scale));
   height: calc(32px * var(--ui-scale));
   border-radius:50%;
-  background:linear-gradient(135deg, var(--accent1), var(--pink));
+  background:linear-gradient(145deg, #2a1a4e, #1a0a3a);
   display:flex; align-items:center; justify-content:center;
-  font-size:14px;
   cursor:pointer;
-  border:2px solid rgba(255,255,255,0.2);
+  border:1.5px solid rgba(196,168,245,0.45);
   overflow:hidden;
-  transition:transform 0.15s;
+  transition:transform 0.18s cubic-bezier(.34,1.56,.64,1), box-shadow 0.18s;
+  box-shadow: 0 0 0 0 rgba(160,136,250,0);
+  position:relative;
 }
-#profile-icon:hover { transform:scale(1.1); }
+#profile-icon::after {
+  content:'';
+  position:absolute;inset:-2px;
+  border-radius:50%;
+  background:conic-gradient(from 0deg,rgba(160,136,250,0.7),rgba(251,171,216,0.6),rgba(78,223,208,0.5),rgba(160,136,250,0.7));
+  animation:profileRingSpin 4s linear infinite;
+  z-index:-1;
+  opacity:0;
+  transition:opacity 0.2s;
+}
+#profile-icon:hover {
+  transform:scale(1.12) translateY(-1px);
+  box-shadow: 0 4px 16px rgba(160,136,250,0.45);
+}
+#profile-icon:hover::after { opacity:1; }
+@keyframes profileRingSpin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
 #profile-icon img { width:100%; height:100%; object-fit:cover; }
 
 /* ===== EXPAND BTN ===== */
@@ -2982,19 +3002,42 @@ input[type=number] { -moz-appearance:textfield; }
   background:var(--bg);
 }
 .profile-header {
-  background:linear-gradient(180deg, #2a1a4e, #1a0a2e);
-  padding:40px 20px 30px;
-  display:flex; flex-direction:column; align-items:center; gap:12px;
+  background:linear-gradient(180deg, #2a1a4e 0%, #1a0a2e 60%, rgba(10,5,30,0) 100%);
+  padding:48px 20px 32px;
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  position:relative; overflow:hidden;
+}
+/* Top shimmer line */
+.profile-header::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(196,168,245,0.55),rgba(251,171,216,0.4),rgba(196,168,245,0.55),transparent);
+  background-size:200% auto;
+  animation:admHeaderShimmer 3.5s linear infinite;
+}
+/* Soft radial glow behind avatar */
+.profile-header::after {
+  content:'';
+  position:absolute; top:20px; left:50%; transform:translateX(-50%);
+  width:180px; height:180px; border-radius:50%;
+  background:radial-gradient(circle,rgba(160,136,250,0.18) 0%,transparent 70%);
+  pointer-events:none;
 }
 .profile-avatar {
   width:90px; height:90px;
   border-radius:50%;
-  background:linear-gradient(135deg, var(--accent1), var(--pink));
+  background:linear-gradient(145deg, #2a1a4e, #1a0a3a);
   display:flex; align-items:center; justify-content:center;
-  font-size:36px;
-  border:3px solid rgba(255,255,255,0.2);
+  border:2px solid rgba(196,168,245,0.45);
   overflow:hidden;
   cursor:pointer;
+  position:relative;
+  box-shadow: 0 0 0 4px rgba(160,136,250,0.12), 0 8px 32px rgba(0,0,0,0.5);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.profile-avatar:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 0 4px rgba(160,136,250,0.3), 0 8px 40px rgba(160,136,250,0.25);
 }
 
 /* Home screen info widgets */
@@ -3032,31 +3075,9 @@ input[type=number] { -moz-appearance:textfield; }
 </div>
 <div id="bg-stars"></div>
 
-<!-- Power / Boot Screen -->
-<div id="power-screen">
-  <!-- Boot ambient blobs -->
-  <div class="boot-blob boot-blob-1"></div>
-  <div class="boot-blob boot-blob-2"></div>
-  <!-- Particles injected by JS -->
-  <div id="boot-parts"></div>
-  <!-- Gem logo -->
-  <div class="boot-gem-wrap">
-    <div class="boot-gem-halo2"></div>
-    <div class="boot-gem-halo"></div>
-    <div class="boot-gem-face">
-      <div class="boot-gem-shine"></div>
-    </div>
-  </div>
-  <!-- Title -->
-  <div style="color:#fff;font-size:32px;font-weight:200;letter-spacing:10px;text-shadow:0 0 30px rgba(196,168,245,0.5);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',sans-serif">Sakura</div>
-  <div style="color:rgba(196,168,245,0.55);font-size:12px;letter-spacing:4px;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',sans-serif">OS · crystal</div>
-  <!-- Boot bar -->
-  <div class="boot-bar-wrap">
-    <div class="boot-bar-fill" id="boot-bar-fill"></div>
-  </div>
-  <!-- Power on button (shown when off) -->
-  <button id="power-btn-on" onclick="powerOn()">⏻</button>
-</div>
+
+<!-- Power / Boot Screen is now inside #phone — see below -->
+
 
 <!-- Expand Button -->
 <button id="expand-btn" onclick="toggleExpand()" title="Expand/Collapse">⛶</button>
@@ -3124,6 +3145,26 @@ input[type=number] { -moz-appearance:textfield; }
 <!-- Main Phone -->
 <div id="phone">
 
+  <!-- Power / Boot Screen — inside #phone so it's clipped by phone's rounded corners -->
+  <div id="power-screen">
+    <div class="boot-blob boot-blob-1"></div>
+    <div class="boot-blob boot-blob-2"></div>
+    <div id="boot-parts"></div>
+    <div class="boot-gem-wrap">
+      <div class="boot-gem-halo2"></div>
+      <div class="boot-gem-halo"></div>
+      <div class="boot-gem-face">
+        <div class="boot-gem-shine"></div>
+      </div>
+    </div>
+    <div style="color:#fff;font-size:32px;font-weight:200;letter-spacing:10px;text-shadow:0 0 30px rgba(196,168,245,0.5);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',sans-serif">Sakura</div>
+    <div style="color:rgba(196,168,245,0.55);font-size:12px;letter-spacing:4px;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',sans-serif">OS · crystal</div>
+    <div class="boot-bar-wrap">
+      <div class="boot-bar-fill" id="boot-bar-fill"></div>
+    </div>
+    <button id="power-btn-on" onclick="powerOn()">⏻</button>
+  </div>
+
   <!-- Volume HUD -->
   <div id="vol-hud">
     <div class="vol-hud-icon" id="vol-hud-icon">🔊</div>
@@ -3145,7 +3186,7 @@ input[type=number] { -moz-appearance:textfield; }
   </div>
 
   <div class="fb-user-chip" id="fb-user-chip" onclick="fbShowUserMenu()" style="display:none">
-    <div class="fb-user-avatar" id="fb-user-avatar">👤</div>
+    <div class="fb-user-avatar" id="fb-user-avatar"><svg viewBox="0 0 20 20" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="fbAvBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2a1a4e"/><stop offset="100%" stop-color="#1a0a3a"/></linearGradient><clipPath id="fbAvClip"><circle cx="10" cy="10" r="10"/></clipPath></defs><circle cx="10" cy="10" r="10" fill="url(#fbAvBg)"/><g clip-path="url(#fbAvClip)"><ellipse cx="10" cy="18.5" rx="7" ry="5" fill="#a088fa" opacity="0.95"/><circle cx="10" cy="8.5" r="3.8" fill="#c4a0f0"/><path d="M6.2 7.8 Q6.3 4.3 10 4.3 Q13.7 4.3 13.8 7.8 Q12.4 6.5 10 6.5 Q7.6 6.5 6.2 7.8Z" fill="#7b5fd4"/></g></svg></div>
     <span id="fb-user-name">User</span>
   </div>
 
@@ -3328,7 +3369,47 @@ input[type=number] { -moz-appearance:textfield; }
           <div class="cbatt-bolt" id="cbatt-bolt"></div>
         </div>
       </div>
-      <div id="profile-icon" onclick="openScreen('settings')" title="Settings">👤</div>
+      <div id="profile-icon" onclick="openScreen('settings')" title="Go to Settings">
+        <svg id="profile-default-svg" viewBox="0 0 32 32" width="32" height="32" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0">
+          <defs>
+            <linearGradient id="pgBg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#2a1a4e"/>
+              <stop offset="100%" stop-color="#1a0a3a"/>
+            </linearGradient>
+            <linearGradient id="pgBody" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#a088fa"/>
+              <stop offset="100%" stop-color="#7b5fd4"/>
+            </linearGradient>
+            <linearGradient id="pgSkin" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#e8d0ff"/>
+              <stop offset="100%" stop-color="#c4a0f0"/>
+            </linearGradient>
+            <clipPath id="pgClip">
+              <circle cx="16" cy="16" r="16"/>
+            </clipPath>
+          </defs>
+          <!-- Background circle -->
+          <circle cx="16" cy="16" r="16" fill="url(#pgBg)"/>
+          <!-- Subtle inner glow -->
+          <circle cx="16" cy="16" r="16" fill="none" stroke="rgba(160,136,250,0.2)" stroke-width="0.5"/>
+          <g clip-path="url(#pgClip)">
+            <!-- Body / shoulders -->
+            <ellipse cx="16" cy="30" rx="11" ry="8" fill="url(#pgBody)" opacity="0.95"/>
+            <!-- Shirt collar highlight -->
+            <ellipse cx="16" cy="28.5" rx="5.5" ry="3.5" fill="rgba(196,168,245,0.25)"/>
+            <!-- Head -->
+            <circle cx="16" cy="13.5" r="6.2" fill="url(#pgSkin)"/>
+            <!-- Hair -->
+            <path d="M9.8 12.5 Q10 7 16 7 Q22 7 22.2 12.5 Q20 10.5 16 10.5 Q12 10.5 9.8 12.5Z" fill="#7b5fd4"/>
+            <!-- Hair highlight -->
+            <path d="M11 11 Q13 8.5 16 8.5 Q13.5 9.5 11 11Z" fill="rgba(255,255,255,0.2)"/>
+            <!-- Subtle face shadow -->
+            <ellipse cx="16" cy="14.5" rx="4.5" ry="3.5" fill="rgba(180,140,240,0.15)"/>
+          </g>
+          <!-- Rim highlight -->
+          <circle cx="16" cy="16" r="15.25" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+        </svg>
+      </div>
     </div>
   </div>
   
@@ -3754,7 +3835,9 @@ input[type=number] { -moz-appearance:textfield; }
     <!-- ===== PROFILE SCREEN ===== -->
     <div id="screen-profile" class="screen">
       <div class="profile-header">
-        <div class="profile-avatar" id="profile-avatar-big" onclick="changeProfilePhoto()">👤</div>
+        <div class="profile-avatar" id="profile-avatar-big" onclick="changeProfilePhoto()">
+          <svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg" style="display:block"><defs><linearGradient id="pgBgL2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2a1a4e"/><stop offset="100%" stop-color="#1a0a3a"/></linearGradient><linearGradient id="pgBodyL2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a088fa"/><stop offset="100%" stop-color="#7b5fd4"/></linearGradient><linearGradient id="pgSkinL2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8d0ff"/><stop offset="100%" stop-color="#c4a0f0"/></linearGradient><clipPath id="pgClipL2"><circle cx="40" cy="40" r="40"/></clipPath></defs><circle cx="40" cy="40" r="40" fill="url(#pgBgL2)"/><g clip-path="url(#pgClipL2)"><ellipse cx="40" cy="74" rx="27" ry="20" fill="url(#pgBodyL2)" opacity="0.95"/><ellipse cx="40" cy="70" rx="14" ry="9" fill="rgba(196,168,245,0.25)"/><circle cx="40" cy="33.5" r="15.5" fill="url(#pgSkinL2)"/><path d="M24.5 31 Q25 17 40 17 Q55 17 55.5 31 Q50 26 40 26 Q30 26 24.5 31Z" fill="#7b5fd4"/><path d="M27 28 Q32 21 40 21 Q33 24 27 28Z" fill="rgba(255,255,255,0.2)"/><ellipse cx="40" cy="36" rx="11" ry="8.5" fill="rgba(180,140,240,0.15)"/></g><circle cx="40" cy="40" r="38.5" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></svg>
+        </div>
         <div id="profile-name" style="font-size:20px;font-weight:700;color:#fff">User</div>
         <div style="font-size:12px;color:rgba(255,255,255,0.5)">Tap avatar to change photo</div>
         <button class="back-btn" style="margin-top:8px" onclick="openScreen('home')">← Back</button>
@@ -19608,13 +19691,29 @@ function renderSettings() {
       </div>
     </div>` : ''}
 
-    <div class="card" style="margin-bottom:12px">
-      <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:10px">👤 Profile</div>
-      <div style="display:flex;gap:6px;margin-bottom:8px">
+    <div class="card" style="margin-bottom:12px;padding:0;overflow:hidden;border:1px solid rgba(160,136,250,0.2)">
+      <!-- Profile header banner -->
+      <div style="background:linear-gradient(135deg,rgba(160,136,250,0.15),rgba(251,171,216,0.08));padding:18px 16px 14px;border-bottom:1px solid rgba(160,136,250,0.12);position:relative;overflow:hidden">
+        <!-- Subtle conic shimmer -->
+        <div style="position:absolute;width:200%;height:200%;top:-50%;left:-50%;background:conic-gradient(from 0deg,rgba(120,60,230,0.04) 0deg,rgba(196,120,255,0.03) 90deg,rgba(75,15,195,0.04) 180deg,rgba(196,120,255,0.03) 270deg,rgba(120,60,230,0.04) 360deg);animation:dockSpin 20s linear infinite;pointer-events:none"></div>
+        <div style="position:relative;z-index:1;display:flex;align-items:center;gap:14px">
+          <!-- Live avatar preview -->
+          <div id="settings-avatar-preview" onclick="changeProfilePhoto()" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(145deg,#2a1a4e,#1a0a3a);border:2px solid rgba(196,168,245,0.45);overflow:hidden;cursor:pointer;flex-shrink:0;box-shadow:0 0 0 3px rgba(160,136,250,0.12),0 4px 20px rgba(0,0,0,0.4);transition:transform 0.18s,box-shadow 0.18s" onmouseover="this.style.transform='scale(1.06)';this.style.boxShadow='0 0 0 3px rgba(160,136,250,0.35),0 6px 24px rgba(160,136,250,0.25)'" onmouseout="this.style.transform='';this.style.boxShadow='0 0 0 3px rgba(160,136,250,0.12),0 4px 20px rgba(0,0,0,0.4)'">${S.profilePhoto ? `<img src="${S.profilePhoto}" style="width:100%;height:100%;object-fit:cover">` : `<svg viewBox="0 0 56 56" width="56" height="56" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="stAvBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2a1a4e"/><stop offset="100%" stop-color="#1a0a3a"/></linearGradient><linearGradient id="stAvBody" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a088fa"/><stop offset="100%" stop-color="#7b5fd4"/></linearGradient><linearGradient id="stAvSkin" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8d0ff"/><stop offset="100%" stop-color="#c4a0f0"/></linearGradient><clipPath id="stAvClip"><circle cx="28" cy="28" r="28"/></clipPath></defs><circle cx="28" cy="28" r="28" fill="url(#stAvBg)"/><g clip-path="url(#stAvClip)"><ellipse cx="28" cy="52" rx="19" ry="14" fill="url(#stAvBody)" opacity="0.95"/><ellipse cx="28" cy="49" rx="10" ry="6" fill="rgba(196,168,245,0.25)"/><circle cx="28" cy="23.5" r="10.8" fill="url(#stAvSkin)"/><path d="M17.4 21.5 Q17.5 12 28 12 Q38.5 12 38.6 21.5 Q35 18.5 28 18.5 Q21 18.5 17.4 21.5Z" fill="#7b5fd4"/><path d="M19 20 Q22.5 14.5 28 14.5 Q23 16.5 19 20Z" fill="rgba(255,255,255,0.2)"/></g><circle cx="28" cy="28" r="27" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></svg>`}</div>
+          <!-- Name and subtitle -->
+          <div style="flex:1;min-width:0">
+            <div style="font-size:17px;font-weight:800;color:#fff;letter-spacing:-0.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${S.profileName || 'User'}</div>
+            <div style="font-size:11px;color:rgba(196,168,245,0.6);margin-top:2px;font-weight:500">Tap avatar to change photo</div>
+          </div>
+          <!-- Edit chevron -->
+          <div style="color:rgba(196,168,245,0.4);font-size:16px;flex-shrink:0">›</div>
+        </div>
+      </div>
+      <!-- Name input row -->
+      <div style="padding:12px 16px;display:flex;gap:8px;align-items:center">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.5px;flex-shrink:0">Name</div>
         <input class="input" id="profile-name-input" value="${S.profileName||'User'}" style="flex:1;font-size:13px">
         <button class="btn btn-primary btn-sm" onclick="setProfileName()">Save</button>
       </div>
-      <button class="btn btn-ghost btn-sm" style="width:100%" onclick="changeProfilePhoto()">📷 Change Profile Photo</button>
     </div>
 
     <div class="card" style="margin-bottom:12px">
@@ -19954,12 +20053,14 @@ function renderProfile() {
   // Update profile icon
   const pi = document.getElementById('profile-icon');
   const pa = document.getElementById('profile-avatar-big');
+  const _defaultSvg = `<svg id="profile-default-svg" viewBox="0 0 32 32" width="32" height="32" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0"><defs><linearGradient id="pgBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2a1a4e"/><stop offset="100%" stop-color="#1a0a3a"/></linearGradient><linearGradient id="pgBody" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a088fa"/><stop offset="100%" stop-color="#7b5fd4"/></linearGradient><linearGradient id="pgSkin" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8d0ff"/><stop offset="100%" stop-color="#c4a0f0"/></linearGradient><clipPath id="pgClip"><circle cx="16" cy="16" r="16"/></clipPath></defs><circle cx="16" cy="16" r="16" fill="url(#pgBg)"/><circle cx="16" cy="16" r="16" fill="none" stroke="rgba(160,136,250,0.2)" stroke-width="0.5"/><g clip-path="url(#pgClip)"><ellipse cx="16" cy="30" rx="11" ry="8" fill="url(#pgBody)" opacity="0.95"/><ellipse cx="16" cy="28.5" rx="5.5" ry="3.5" fill="rgba(196,168,245,0.25)"/><circle cx="16" cy="13.5" r="6.2" fill="url(#pgSkin)"/><path d="M9.8 12.5 Q10 7 16 7 Q22 7 22.2 12.5 Q20 10.5 16 10.5 Q12 10.5 9.8 12.5Z" fill="#7b5fd4"/><path d="M11 11 Q13 8.5 16 8.5 Q13.5 9.5 11 11Z" fill="rgba(255,255,255,0.2)"/><ellipse cx="16" cy="14.5" rx="4.5" ry="3.5" fill="rgba(180,140,240,0.15)"/></g><circle cx="16" cy="16" r="15.25" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></svg>`;
+  const _defaultSvgLarge = `<svg viewBox="0 0 80 80" width="80" height="80" xmlns="http://www.w3.org/2000/svg" style="display:block"><defs><linearGradient id="pgBgL" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2a1a4e"/><stop offset="100%" stop-color="#1a0a3a"/></linearGradient><linearGradient id="pgBodyL" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a088fa"/><stop offset="100%" stop-color="#7b5fd4"/></linearGradient><linearGradient id="pgSkinL" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#e8d0ff"/><stop offset="100%" stop-color="#c4a0f0"/></linearGradient><clipPath id="pgClipL"><circle cx="40" cy="40" r="40"/></clipPath></defs><circle cx="40" cy="40" r="40" fill="url(#pgBgL)"/><g clip-path="url(#pgClipL)"><ellipse cx="40" cy="74" rx="27" ry="20" fill="url(#pgBodyL)" opacity="0.95"/><ellipse cx="40" cy="70" rx="14" ry="9" fill="rgba(196,168,245,0.25)"/><circle cx="40" cy="33.5" r="15.5" fill="url(#pgSkinL)"/><path d="M24.5 31 Q25 17 40 17 Q55 17 55.5 31 Q50 26 40 26 Q30 26 24.5 31Z" fill="#7b5fd4"/><path d="M27 28 Q32 21 40 21 Q33 24 27 28Z" fill="rgba(255,255,255,0.2)"/><ellipse cx="40" cy="36" rx="11" ry="8.5" fill="rgba(180,140,240,0.15)"/></g><circle cx="40" cy="40" r="38.5" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></svg>`;
   if (S.profilePhoto) {
     pi.innerHTML = `<img src="${S.profilePhoto}" style="width:100%;height:100%;object-fit:cover">`;
     if (pa) pa.innerHTML = `<img src="${S.profilePhoto}" style="width:100%;height:100%;object-fit:cover">`;
   } else {
-    pi.textContent = '👤';
-    if (pa) pa.textContent = '👤';
+    pi.innerHTML = _defaultSvg;
+    if (pa) pa.innerHTML = _defaultSvgLarge;
   }
 }
 
