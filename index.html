@@ -780,6 +780,24 @@ button, a { touch-action: manipulation; }
   pointer-events: none;
   font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
 }
+/* Charging bolt overlay — sits on top of label, only visible when charging */
+.cbatt-bolt {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: none;
+}
+.crystal-battery.charging .cbatt-bolt { display: flex; }
+.cbatt-bolt::after {
+  content: '⚡';
+  font-size: 8px;
+  line-height: 1;
+  opacity: 0.92;
+  text-shadow: 0 0 4px rgba(0,0,0,0.9);
+}
 /* Low battery turns red */
 .crystal-battery.low .cbatt-body { border-color: rgba(255,80,80,0.6); box-shadow: 0 0 0 0.5px rgba(200,0,0,0.3), 0 0 8px rgba(255,60,60,0.2); }
 .crystal-battery.low .cbatt-fill {
@@ -1429,10 +1447,44 @@ input[type=number] { -moz-appearance:textfield; }
 }
 #admin-panel-overlay.open { display:flex; }
 .adm-header {
-  background:linear-gradient(135deg,#1a0a2e 0%,#0f0820 100%);
+  background:rgba(26,10,46,0.92);
+  backdrop-filter:blur(40px);
+  -webkit-backdrop-filter:blur(40px);
   padding:14px 16px 0;
-  border-bottom:1px solid rgba(160,136,250,0.15);
+  border-bottom:1px solid rgba(196,168,245,0.17);
   flex-shrink:0;
+  position:relative;
+  overflow:hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+/* Rotating conic gradient shimmer — same as dock */
+.adm-header::before {
+  content:'';
+  position:absolute;
+  width:200%; height:200%;
+  top:-50%; left:-50%;
+  background:conic-gradient(from 0deg,rgba(120,60,230,0.07) 0deg,rgba(196,120,255,0.06) 90deg,rgba(75,15,195,0.07) 180deg,rgba(196,120,255,0.05) 270deg,rgba(120,60,230,0.07) 360deg);
+  animation:dockSpin 20s linear infinite;
+  pointer-events:none;
+  z-index:0;
+}
+/* Shimmer sweep line across the top */
+.adm-header::after {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(196,168,245,0.5),rgba(251,171,216,0.4),rgba(196,168,245,0.5),transparent);
+  background-size:200% auto;
+  animation:admHeaderShimmer 3s linear infinite;
+  pointer-events:none;
+  z-index:1;
+}
+@keyframes admHeaderShimmer {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+.adm-header-top, .adm-tabs {
+  position:relative; z-index:2;
 }
 .adm-header-top {
   display:flex; align-items:center; gap:10px; margin-bottom:14px;
@@ -1821,7 +1873,7 @@ input[type=number] { -moz-appearance:textfield; }
 
 /* ===== POWER OFF ===== */
 #power-screen {
-  position:fixed; inset:0;
+  position:absolute; inset:0;
   background:linear-gradient(160deg,#080218,#130932,#0e0625);
   z-index:99999;
   display:none;
@@ -1829,6 +1881,7 @@ input[type=number] { -moz-appearance:textfield; }
   flex-direction:column;
   gap:22px;
   overflow:hidden;
+  border-radius:inherit;
 }
 #power-screen.on { display:flex; }
 
@@ -3272,6 +3325,7 @@ input[type=number] { -moz-appearance:textfield; }
           <div class="cbatt-fill" id="cbatt-fill" style="--batt-pct:78%"></div>
           <div class="cbatt-gloss"></div>
           <div class="cbatt-label" id="cbatt-label">78%</div>
+          <div class="cbatt-bolt" id="cbatt-bolt"></div>
         </div>
       </div>
       <div id="profile-icon" onclick="openScreen('settings')" title="Settings">👤</div>
@@ -26878,8 +26932,8 @@ function _battUpdate(level, charging) {
   fill.style.setProperty('--batt-pct', _battLevel + '%');
   fill.style.width = _battLevel + '%';
 
-  /* % text inside the body — show ⚡ icon when charging */
-  if (label) label.textContent = (_battCharging ? '⚡' : '') + _battLevel + '%';
+  /* Show only the number — ⚡ bolt is handled by the .cbatt-bolt CSS overlay */
+  if (label) label.textContent = _battLevel + '%';
 
   wrap.classList.remove('low', 'charging');
   if (_battCharging)         wrap.classList.add('charging');
@@ -26977,8 +27031,6 @@ function _showPowerMenu() {
     '-webkit-backdrop-filter:blur(28px)',
     'display:flex;flex-direction:column;align-items:center;justify-content:space-between',
     'padding:52px 24px 44px',
-    'border-radius:48px',          /* match #phone exactly */
-    'overflow:hidden',              /* clip to rounded corners */
   ].join(';');
 
   ov.innerHTML = [
@@ -27095,7 +27147,7 @@ var _chargingBusy = false;   /* guard against re-entrant calls */
 
 function _startCharging() {
   if (_chargingBusy) return;
-  if (_battCharging) { _stopCharging(); return; }
+  if (_battCharging) return;  /* already charging — do nothing, don't toggle off */
   _chargingBusy = true;
   _battCharging = true;
   playSound('bell');
@@ -27108,8 +27160,6 @@ function _startCharging() {
   _chargingEl.style.cssText = [
     'position:absolute;inset:0;z-index:99998',
     'background:#000',
-    'border-radius:48px',          /* must match #phone exactly */
-    'overflow:hidden',
     'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0',
   ].join(';');
 
@@ -27125,10 +27175,10 @@ function _startCharging() {
     });
   }
 
-  /* Charge by exactly 1% per tick (integer) */
+  /* Charge by exactly 1% per tick — _battLevel is always an integer so just add 1 */
   _chargingIv = setInterval(function() {
     if (_battLevel >= 100) { _stopCharging(); return; }
-    _battUpdate(Math.min(100, Math.floor(_battLevel) + 1), true);
+    _battUpdate(_battLevel + 1, true);
   }, 1000);
 
   _battUpdate(_battLevel, true);
@@ -27147,32 +27197,36 @@ function _stopCharging() {
 
 function _chargingScreenUpdate() {
   if (!_chargingEl) return;
+  var lvl    = Math.round(_battLevel); /* always integer */
   var pctEl  = _chargingEl.querySelector('#chg-big-pct');
   var fillEl = _chargingEl.querySelector('#chg-batt-fill');
   var etaEl  = _chargingEl.querySelector('#chg-eta');
   var segsEl = _chargingEl.querySelectorAll('.chg-seg');
-  if (pctEl)  pctEl.textContent  = _battLevel + '%';
-  if (fillEl) fillEl.style.height = _battLevel + '%';
+  if (pctEl)  pctEl.textContent   = lvl + '%';
+  if (fillEl) fillEl.style.height = lvl + '%';
   if (etaEl) {
-    var minsLeft = Math.round((100 - _battLevel) * 1.2);
-    etaEl.textContent = _battLevel >= 100 ? 'Fully charged' : 'About ' + minsLeft + ' min remaining';
+    var minsLeft = Math.round((100 - lvl) * 1.2);
+    etaEl.textContent = lvl >= 100 ? 'Fully charged ✦' : 'About ' + minsLeft + ' min remaining';
   }
-  // Segment indicators (5 bars)
+  /* Segment indicators (5 bars) */
   segsEl.forEach(function(seg, i) {
-    var threshold = (i + 1) * 20;
-    seg.classList.toggle('lit', _battLevel >= threshold);
+    seg.classList.toggle('lit', lvl >= (i + 1) * 20);
   });
+  /* Also sync the small top-right % label if present */
+  var topPct = _chargingEl.querySelector('#chg-top-pct');
+  if (topPct) topPct.textContent = lvl + '%';
 }
 
 function _buildChargingHTML() {
-  var minsLeft = Math.round((100 - _battLevel) * 1.2);
-  var fillH    = _battLevel + '%';
-  var isFullyCharged = _battLevel >= 100;
+  var lvl  = Math.round(_battLevel);  /* always integer */
+  var minsLeft = Math.round((100 - lvl) * 1.2);
+  var fillH    = lvl + '%';
+  var isFullyCharged = lvl >= 100;
 
   // 5 segment indicators
   var segs = '';
   for (var i = 0; i < 5; i++) {
-    var lit = _battLevel >= (i + 1) * 20;
+    var lit = lvl >= (i + 1) * 20;
     segs += '<div class="chg-seg' + (lit ? ' lit' : '') + '"></div>';
   }
 
@@ -27184,7 +27238,7 @@ function _buildChargingHTML() {
 
   return [
     /* ── Full-screen background ── */
-    '<div style="position:absolute;inset:0;background:#000;z-index:0"></div>',
+    '<div style="position:absolute;inset:0;background:#000;z-index:0;pointer-events:none"></div>',
 
     /* ── Radial ambient glow at bottom ── */
     '<div style="position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:500px;height:340px;border-radius:50%;background:radial-gradient(ellipse,rgba(20,200,80,0.18) 0%,transparent 70%);filter:blur(30px);pointer-events:none;z-index:1"></div>',
@@ -27204,7 +27258,7 @@ function _buildChargingHTML() {
         '<div style="font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:rgba(60,220,120,0.7)">',
           isFullyCharged ? '✦ CHARGED' : '⚡ CHARGING',
         '</div>',
-        '<div style="font-size:11px;color:rgba(255,255,255,0.2)">' + _battLevel + '%</div>',
+        '<div id="chg-top-pct" style="font-size:11px;color:rgba(255,255,255,0.2)">' + lvl + '%</div>',
       '</div>',
 
       /* Giant percentage */
@@ -27217,7 +27271,7 @@ function _buildChargingHTML() {
         'text-shadow:0 0 80px rgba(60,220,120,0.4),0 0 160px rgba(60,220,120,0.1);',
         'margin-bottom:6px;',
         'font-family:-apple-system,BlinkMacSystemFont,sans-serif;',
-      '">' + _battLevel + '%</div>',
+      '">' + lvl + '%</div>',
 
       /* ETA */
       '<div id="chg-eta" style="font-size:13px;color:rgba(60,220,120,0.55);margin-bottom:44px;font-weight:400;letter-spacing:-0.1px">',
@@ -27276,7 +27330,7 @@ function _buildChargingHTML() {
           '<div style="position:absolute;inset:0;border-radius:0 0 19px 19px;box-shadow:inset 0 0 12px rgba(40,200,90,0.06);pointer-events:none;z-index:4"></div>',
 
           /* Lightning bolt */
-          '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5">',
+          '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5;pointer-events:none">',
             '<svg width="34" height="56" viewBox="0 0 34 56" fill="none">',
               '<defs>',
                 '<filter id="boltBlur" x="-60%" y="-60%" width="220%" height="220%">',
@@ -27296,7 +27350,6 @@ function _buildChargingHTML() {
 
       /* ── USB-C status ── */
       '<div style="display:flex;align-items:center;gap:8px;margin-bottom:28px;background:rgba(40,200,90,0.06);border:1px solid rgba(40,200,90,0.14);border-radius:99px;padding:6px 14px">',
-        /* USB-C icon */
         '<svg width="18" height="11" viewBox="0 0 18 11" fill="none">',
           '<rect x="0.5" y="0.5" width="15" height="10" rx="3" stroke="rgba(50,220,110,0.65)" stroke-width="1"/>',
           '<rect x="15.5" y="3.5" width="2" height="4" rx="1" fill="rgba(50,220,110,0.55)"/>',
@@ -27306,8 +27359,8 @@ function _buildChargingHTML() {
         '<span style="font-size:11px;font-weight:600;color:rgba(50,220,110,0.6);letter-spacing:0.2px">USB-C Connected</span>',
       '</div>',
 
-      /* ── Dismiss ── */
-      '<div id="chg-stop-btn" style="font-size:12px;color:rgba(255,255,255,0.2);cursor:pointer;letter-spacing:0.3px;padding:10px 20px">Tap anywhere to dismiss</div>',
+      /* ── Dismiss button — only way to close the screen ── */
+      '<button id="chg-stop-btn" style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.55);cursor:pointer;letter-spacing:0.3px;padding:12px 32px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:99px;transition:background 0.2s" onmouseover="this.style.background=\'rgba(255,255,255,0.12)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.06)\'">Stop Charging</button>',
 
     '</div>',
 
@@ -27317,7 +27370,7 @@ function _buildChargingHTML() {
       '.chg-seg.lit{background:rgba(40,200,90,0.5);border-color:rgba(40,200,90,0.65);box-shadow:0 0 8px rgba(40,200,90,0.45),0 0 16px rgba(40,200,90,0.15)}',
       '@keyframes chgWaveAnim{0%{transform:translateX(0)}100%{transform:translateX(-33.33%)}}',
       '@keyframes chgFillShimmer{0%{opacity:0;transform:translateX(-100%)}40%{opacity:1}60%{opacity:1}100%{opacity:0;transform:translateX(100%)}}',
-      '#charging-overlay{cursor:pointer}',
+      '#charging-overlay{cursor:default}',
     '</style>',
   ].join('');
 }
