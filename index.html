@@ -488,8 +488,8 @@ button, a { touch-action: manipulation; }
 
 /* ── Phone div inside wrapper ── */
 #phone {
-  position: relative;   /* stays in normal flow so wrapper has real height */
-  margin-left: 8px;     /* offset for left side-buttons */
+  position: relative;
+  margin-left: 8px;
   width: 390px;
   height: 844px;
   background: var(--bg);
@@ -497,6 +497,7 @@ button, a { touch-action: manipulation; }
   border: none;
   overflow: hidden;
   clip-path: inset(0 round 48px);
+  isolation: isolate;
   box-shadow:
     0 0 0 2.5px rgba(180,140,255,0.5),
     0 0 0 4px rgba(80,20,160,0.4),
@@ -1449,16 +1450,16 @@ input[type=number] { -moz-appearance:textfield; }
 #admin-panel-overlay.open { display:flex; }
 /* Match expanded phone */
 #phone.expanded #admin-panel-overlay { border-radius: 24px; }
+#phone.expanded .adm-header { border-radius: 24px 24px 0 0; }
 .adm-header {
-  background:rgba(20,8,40,0.96);
-  backdrop-filter:blur(40px);
-  -webkit-backdrop-filter:blur(40px);
+  background:rgba(14,5,30,0.98);
   padding:14px 16px 0;
   border-bottom:1px solid rgba(196,168,245,0.22);
   flex-shrink:0;
   position:relative;
   overflow:hidden;
   box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+  border-radius: 48px 48px 0 0;
 }
 /* Rotating conic gradient — same as dock, boosted for visibility */
 .adm-header::before {
