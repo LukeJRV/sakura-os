@@ -254,29 +254,165 @@
 input, textarea, [contenteditable=true] { -webkit-user-select:text !important; user-select:text !important; }
 html, body {
   width:100%; height:100%;
-  background: #030110;
+  background: #030008;
   display:flex; align-items:center; justify-content:center;
   font-family:'Inter',sans-serif;
   overflow:hidden;
   touch-action: manipulation;
 }
-/* ===== AURORA BACKGROUND ===== */
-.aurora-bg { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+
+/* ╔══════════════════════════════════════════════════╗
+   ║  AURORA / NEBULA BACKGROUND                      ║
+   ╚══════════════════════════════════════════════════╝ */
+.aurora-bg {
+  position: fixed; inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(88,28,200,0.45) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 80% 20%, rgba(160,40,255,0.3) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 40% at 60% 80%, rgba(50,10,140,0.4) 0%, transparent 60%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, rgba(4,0,20,1) 40%, rgba(8,0,30,1) 100%);
+}
+
+/* Large drifting nebula blobs */
 .aurora-blob {
-  position:absolute; border-radius:50%; filter:blur(80px);
-  animation:auroraPulse 14s ease-in-out infinite;
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  will-change: transform;
 }
-.aurora-blob-1 { width:700px; height:400px; background:radial-gradient(ellipse,rgba(110,50,220,0.35),transparent 70%); top:-100px; left:-150px; }
-.aurora-blob-2 { width:600px; height:350px; background:radial-gradient(ellipse,rgba(180,80,255,0.2),transparent 70%); top:30%; right:-150px; animation-delay:-5s; animation-duration:11s; }
-.aurora-blob-3 { width:500px; height:300px; background:radial-gradient(ellipse,rgba(60,15,170,0.22),transparent 70%); bottom:5%; left:5%; animation-delay:-9s; animation-duration:17s; }
-@keyframes auroraPulse {
-  0%,100%{transform:translate(0,0) scale(1)}
-  40%{transform:translate(30px,-20px) scale(1.08)}
-  70%{transform:translate(-12px,15px) scale(0.95)}
+.aurora-blob-1 {
+  width: 900px; height: 600px;
+  background: radial-gradient(ellipse, rgba(120,40,255,0.5) 0%, rgba(80,0,200,0.25) 40%, transparent 70%);
+  top: -180px; left: -200px;
+  animation: nebDrift1 18s ease-in-out infinite;
 }
+.aurora-blob-2 {
+  width: 700px; height: 500px;
+  background: radial-gradient(ellipse, rgba(200,60,255,0.35) 0%, rgba(140,20,220,0.18) 45%, transparent 70%);
+  top: 25%; right: -180px;
+  animation: nebDrift2 14s ease-in-out infinite;
+  animation-delay: -6s;
+}
+.aurora-blob-3 {
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(60,10,180,0.4) 0%, rgba(40,0,130,0.2) 50%, transparent 70%);
+  bottom: -100px; left: -100px;
+  animation: nebDrift3 20s ease-in-out infinite;
+  animation-delay: -10s;
+}
+/* Accent warm rose blob */
+.aurora-blob-4 {
+  width: 500px; height: 350px;
+  background: radial-gradient(ellipse, rgba(220,60,160,0.22) 0%, transparent 65%);
+  bottom: 10%; right: -80px;
+  animation: nebDrift1 16s ease-in-out infinite;
+  animation-delay: -4s;
+}
+/* Central deep blue anchor */
+.aurora-blob-5 {
+  width: 800px; height: 800px;
+  background: radial-gradient(ellipse, rgba(30,0,80,0.6) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  animation: nebPulse 8s ease-in-out infinite;
+}
+
+@keyframes nebDrift1 {
+  0%,100% { transform: translate(0,0)   scale(1);    }
+  33%      { transform: translate(50px,-35px) scale(1.08); }
+  66%      { transform: translate(-25px, 20px) scale(0.94); }
+}
+@keyframes nebDrift2 {
+  0%,100% { transform: translate(0,0)   scale(1);    }
+  40%      { transform: translate(-40px, 30px) scale(1.1);  }
+  70%      { transform: translate(20px,-20px) scale(0.92); }
+}
+@keyframes nebDrift3 {
+  0%,100% { transform: translate(0,0)   scale(1);    }
+  35%      { transform: translate(30px,-40px) scale(1.06); }
+  75%      { transform: translate(-15px, 25px) scale(0.96); }
+}
+@keyframes nebPulse {
+  0%,100% { opacity: 0.7; transform: translate(-50%,-50%) scale(1);    }
+  50%      { opacity: 1;   transform: translate(-50%,-50%) scale(1.12); }
+}
+
+/* Horizontal aurora band — like northern lights */
+.aurora-band {
+  position: absolute;
+  left: 0; right: 0;
+  height: 220px;
+  filter: blur(55px);
+  pointer-events: none;
+}
+.aurora-band-1 {
+  top: 15%;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(100,20,255,0.18) 30%,
+    rgba(160,60,255,0.28) 50%,
+    rgba(100,20,255,0.15) 70%,
+    transparent 100%
+  );
+  animation: bandFloat1 22s ease-in-out infinite;
+}
+.aurora-band-2 {
+  bottom: 20%;
+  height: 160px;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(180,40,220,0.12) 30%,
+    rgba(220,80,255,0.2) 50%,
+    rgba(160,30,200,0.1) 70%,
+    transparent 100%
+  );
+  animation: bandFloat2 26s ease-in-out infinite;
+  animation-delay: -8s;
+}
+@keyframes bandFloat1 {
+  0%,100% { transform: translateY(0)    scaleX(1);    opacity: 0.7; }
+  50%      { transform: translateY(-30px) scaleX(1.04); opacity: 1;   }
+}
+@keyframes bandFloat2 {
+  0%,100% { transform: translateY(0)   scaleX(1);    opacity: 0.5; }
+  50%      { transform: translateY(20px) scaleX(0.97); opacity: 0.9; }
+}
+
 /* Stars */
-.bg-star { position:fixed; border-radius:50%; background:#fff; animation:starTwinkle var(--d,3s) ease-in-out infinite var(--del,0s); pointer-events:none; z-index:0; }
-@keyframes starTwinkle { 0%,100%{opacity:0.1} 50%{opacity:0.7} }
+.bg-star {
+  position: fixed;
+  border-radius: 50%;
+  background: #fff;
+  animation: starTwinkle var(--d,3s) ease-in-out infinite var(--del,0s);
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes starTwinkle { 0%,100%{opacity:0.08} 50%{opacity:0.75} }
+
+/* Phone outer glow ring — makes phone look like it's emanating light */
+#phone-shell-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -40px;
+  border-radius: 88px;
+  background: radial-gradient(ellipse at center,
+    rgba(140,60,255,0.22) 0%,
+    rgba(100,30,220,0.12) 40%,
+    transparent 70%
+  );
+  filter: blur(30px);
+  pointer-events: none;
+  z-index: 0;
+  animation: phoneGlow 6s ease-in-out infinite;
+}
+@keyframes phoneGlow {
+  0%,100% { opacity: 0.8; transform: scale(1);    }
+  50%      { opacity: 1;   transform: scale(1.04); }
+}
+
 button, a { touch-action: manipulation; }
 
 /* ===== PHONE SHELL WRAPPER + PHYSICAL BUTTONS ===== */
@@ -286,11 +422,14 @@ button, a { touch-action: manipulation; }
   Side buttons protrude from left:0 and right:0 of wrapper.
 */
 #phone-shell-wrap {
-  position: relative;
+  position: relative;   /* absolute children (buttons) positioned against this */
   z-index: 1;
   width: 406px;
   height: 844px;
   flex-shrink: 0;
+  /* flex-item centering — parent body is display:flex so these ensure it stays centred */
+  align-self: center;
+  justify-self: center;
 }
 
 /* ── Side Button Base ── */
@@ -2827,6 +2966,10 @@ input[type=number] { -moz-appearance:textfield; }
   <div class="aurora-blob aurora-blob-1"></div>
   <div class="aurora-blob aurora-blob-2"></div>
   <div class="aurora-blob aurora-blob-3"></div>
+  <div class="aurora-blob aurora-blob-4"></div>
+  <div class="aurora-blob aurora-blob-5"></div>
+  <div class="aurora-band aurora-band-1"></div>
+  <div class="aurora-band aurora-band-2"></div>
 </div>
 <div id="bg-stars"></div>
 
@@ -27165,26 +27308,35 @@ var _origPowerOffApp = window.powerOffApp;
 window.powerOffApp = function() {
   _showPowerMenu();
 };
-</script>
-</body>
-</html>
+
 (function() {
   var container = document.getElementById('bg-stars');
   if (!container) return;
-  for (var i = 0; i < 60; i++) {
-    var s = document.createElement('div');
-    s.className = 'bg-star';
-    var size = Math.random() * 1.8 + 0.4;
-    s.style.cssText = [
-      'width:' + size + 'px',
-      'height:' + size + 'px',
-      'left:' + (Math.random() * 100) + '%',
-      'top:' + (Math.random() * 100) + '%',
-      '--d:' + (2 + Math.random() * 4) + 's',
-      '--del:-' + (Math.random() * 4) + 's'
-    ].join(';');
-    container.appendChild(s);
-  }
+  var layers = [
+    { count:70,  minS:0.3, maxS:0.9,  cols:['#fff','#fff','#e8d8ff'] },
+    { count:40,  minS:1.0, maxS:1.7,  cols:['#fff','#fff','#d0e8ff','#ffe8f8'] },
+    { count:18,  minS:1.8, maxS:2.8,  cols:['#fff','#f0e8ff','#e0f0ff'] },
+  ];
+  layers.forEach(function(layer) {
+    for (var i = 0; i < layer.count; i++) {
+      var s = document.createElement('div');
+      s.className = 'bg-star';
+      var size = layer.minS + Math.random() * (layer.maxS - layer.minS);
+      var col  = layer.cols[Math.floor(Math.random() * layer.cols.length)];
+      var glow = size > 1.5 ? ('box-shadow:0 0 ' + (size*2.5).toFixed(1) + 'px ' + col) : '';
+      s.style.cssText = [
+        'width:'  + size + 'px',
+        'height:' + size + 'px',
+        'left:'   + (Math.random()*100) + '%',
+        'top:'    + (Math.random()*100) + '%',
+        'background:' + col,
+        '--d:'    + (1.5 + Math.random()*5) + 's',
+        '--del:-' + (Math.random()*5) + 's',
+        glow
+      ].filter(Boolean).join(';');
+      container.appendChild(s);
+    }
+  });
 })();
 
 // ── BOOT SCREEN: Floating particles + animated boot bar ─────────────────────
@@ -27265,6 +27417,7 @@ window.powerOffApp = function() {
     }, 60);
   };
 })();
+
 </script>
 </body>
 </html>
