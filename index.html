@@ -19720,7 +19720,16 @@ function renderSettings() {
     <div class="card" style="margin-bottom:12px">
       <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:10px">🎨 Appearance</div>
       <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:6px" onclick="openScreen('themeshop')">🛍️ Theme Shop (${S.purchasedThemes.length} owned)</button>
-      <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:6px">Current theme: ${S.activeTheme||'default'}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:12px">Current theme: ${S.activeTheme||'default'}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--fg)">📱 Phone Outline</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.35)">Show the phone frame & glow ring</div>
+        </div>
+        <div onclick="togglePhoneOutline()" style="width:46px;height:26px;border-radius:13px;background:${S.settings.phoneOutline!==false?'var(--accent1)':'rgba(255,255,255,0.12)'};position:relative;cursor:pointer;transition:background 0.25s;flex-shrink:0;box-shadow:inset 0 1px 3px rgba(0,0,0,0.3)">
+          <div style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:3px;left:${S.settings.phoneOutline!==false?'23':'3'}px;transition:left 0.25s;box-shadow:0 2px 6px rgba(0,0,0,0.35)"></div>
+        </div>
+      </div>
     </div>
 
     <div class="card" style="margin-bottom:12px">
@@ -19905,6 +19914,29 @@ function toggleGlow() {
   S.settings.fontGlow = !S.settings.fontGlow;
   document.documentElement.style.setProperty('--font-glow', S.settings.fontGlow ? '0 0 8px rgba(160,136,250,0.8)' : 'none');
   saveState(); renderSettings();
+}
+
+function togglePhoneOutline() {
+  S.settings.phoneOutline = !(S.settings.phoneOutline !== false);
+  applyPhoneOutline();
+  saveState(); renderSettings();
+}
+
+function applyPhoneOutline() {
+  const phone = document.getElementById('phone');
+  const wrap  = document.getElementById('phone-shell-wrap');
+  if (!phone) return;
+  const hidden = S.settings.phoneOutline === false;
+  phone.style.boxShadow = hidden ? 'none' : '';
+  phone.style.borderRadius = hidden ? '0' : '';
+  phone.style.transition = 'box-shadow 0.4s ease, border-radius 0.4s ease';
+  if (wrap) {
+    wrap.style.filter = hidden ? 'none' : '';
+  }
+  // Also hide/show the side buttons and USB port
+  document.querySelectorAll('.side-btn, #usbc-port').forEach(el => {
+    el.style.display = hidden ? 'none' : '';
+  });
 }
 
 function setTotalTickets() {
@@ -23059,6 +23091,7 @@ function applySettings() {
   if (S.settings.fontRainbow) document.documentElement.style.setProperty('--font-rainbow', 'rainbow 3s linear infinite');
   if (S.settings.fontGlow) document.documentElement.style.setProperty('--font-glow', '0 0 8px rgba(160,136,250,0.8)');
   if (S.activeTheme && S.activeTheme !== 'default') activateTheme(S.activeTheme);
+  applyPhoneOutline();
   updateTicketDisplay(0);
   renderProfile();
   initPrincessThemes();
