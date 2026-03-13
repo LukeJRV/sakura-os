@@ -413,6 +413,15 @@ html, body {
   50%      { opacity: 1;   transform: scale(1.04); }
 }
 
+/* Hide phone outline, glow ring and side buttons when toggle is off */
+#phone-shell-wrap.no-outline::before { display: none; }
+#phone-shell-wrap.no-outline .side-btn { display: none !important; }
+#phone-shell-wrap.no-outline #usbc-port { display: none !important; }
+#phone-shell-wrap.no-outline #phone {
+  box-shadow: none !important;
+  /* Keep border-radius — needed for overflow:hidden corner clipping of overlays */
+}
+
 button, a { touch-action: manipulation; }
 
 /* ===== PHONE SHELL WRAPPER + PHYSICAL BUTTONS ===== */
@@ -19923,28 +19932,10 @@ function togglePhoneOutline() {
 }
 
 function applyPhoneOutline() {
-  const phone = document.getElementById('phone');
-  if (!phone) return;
+  const wrap = document.getElementById('phone-shell-wrap');
+  if (!wrap) return;
   const hidden = S.settings.phoneOutline === false;
-
-  // Set transition first so the change animates
-  phone.style.transition = 'box-shadow 0.4s ease, border-radius 0.4s ease';
-
-  if (hidden) {
-    phone.style.boxShadow = 'none';
-    phone.style.borderRadius = '0';
-  } else {
-    // Explicitly restore the full box-shadow — don't rely on '' falling back to CSS
-    phone.style.boxShadow = '0 0 0 2.5px rgba(180,140,255,0.5), 0 0 0 4px rgba(80,20,160,0.4), 0 40px 120px rgba(0,0,0,0.9), 0 0 80px rgba(120,60,220,0.15), inset 0 1px 0 rgba(255,255,255,0.12)';
-    phone.style.borderRadius = '48px';
-  }
-
-  // Side buttons and USB port — only toggle on desktop (media query handles mobile)
-  document.querySelectorAll('.side-btn').forEach(el => {
-    el.style.display = hidden ? 'none' : '';
-  });
-  const usbc = document.getElementById('usbc-port');
-  if (usbc) usbc.style.display = hidden ? 'none' : '';
+  wrap.classList.toggle('no-outline', hidden);
 }
 
 function setTotalTickets() {
