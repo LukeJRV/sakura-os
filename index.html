@@ -19924,19 +19924,27 @@ function togglePhoneOutline() {
 
 function applyPhoneOutline() {
   const phone = document.getElementById('phone');
-  const wrap  = document.getElementById('phone-shell-wrap');
   if (!phone) return;
   const hidden = S.settings.phoneOutline === false;
-  phone.style.boxShadow = hidden ? 'none' : '';
-  phone.style.borderRadius = hidden ? '0' : '';
+
+  // Set transition first so the change animates
   phone.style.transition = 'box-shadow 0.4s ease, border-radius 0.4s ease';
-  if (wrap) {
-    wrap.style.filter = hidden ? 'none' : '';
+
+  if (hidden) {
+    phone.style.boxShadow = 'none';
+    phone.style.borderRadius = '0';
+  } else {
+    // Explicitly restore the full box-shadow — don't rely on '' falling back to CSS
+    phone.style.boxShadow = '0 0 0 2.5px rgba(180,140,255,0.5), 0 0 0 4px rgba(80,20,160,0.4), 0 40px 120px rgba(0,0,0,0.9), 0 0 80px rgba(120,60,220,0.15), inset 0 1px 0 rgba(255,255,255,0.12)';
+    phone.style.borderRadius = '48px';
   }
-  // Also hide/show the side buttons and USB port
-  document.querySelectorAll('.side-btn, #usbc-port').forEach(el => {
+
+  // Side buttons and USB port — only toggle on desktop (media query handles mobile)
+  document.querySelectorAll('.side-btn').forEach(el => {
     el.style.display = hidden ? 'none' : '';
   });
+  const usbc = document.getElementById('usbc-port');
+  if (usbc) usbc.style.display = hidden ? 'none' : '';
 }
 
 function setTotalTickets() {
