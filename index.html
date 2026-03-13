@@ -280,183 +280,82 @@ html, body {
 button, a { touch-action: manipulation; }
 
 /* ===== PHONE SHELL WRAPPER + PHYSICAL BUTTONS ===== */
+/*
+  Wrapper = 390px (phone) + 8px left + 8px right = 406px.
+  Phone is at left:8px inside wrapper.
+  Side buttons protrude from left:0 and right:0 of wrapper.
+*/
 #phone-shell-wrap {
   position: relative;
   z-index: 1;
-  /* Extra space so buttons can protrude outside phone */
-  padding: 0 14px;
+  width: 406px;
+  height: 844px;
+  flex-shrink: 0;
 }
 
 /* ── Side Button Base ── */
 .side-btn {
   position: absolute;
   cursor: pointer;
-  border-radius: 3px;
-  transition: filter 0.12s, transform 0.08s;
-  z-index: 10;
+  transition: filter 0.1s, transform 0.08s;
+  z-index: 20;
 }
-.side-btn:active { filter: brightness(1.35); transform: scaleX(0.82); }
-
-/* ── Power / Sleep button — RIGHT side ── */
-#btn-power {
-  right: 0px;
-  top: 168px;
-  width: 5px; height: 72px;
-  background: linear-gradient(180deg,
-    rgba(220,200,255,0.55) 0%,
-    rgba(140,80,240,0.4) 50%,
-    rgba(100,40,200,0.35) 100%
-  );
-  border-radius: 0 3px 3px 0;
-  box-shadow: 2px 0 6px rgba(0,0,0,0.5), inset -1px 0 0 rgba(255,255,255,0.12);
-}
-
-/* ── Mute toggle — LEFT side, top ── */
-#btn-mute {
-  left: 0px;
-  top: 110px;
-  width: 4px; height: 30px;
-  background: linear-gradient(180deg,
-    rgba(200,180,255,0.4) 0%,
-    rgba(120,60,220,0.3) 100%
-  );
-  border-radius: 3px 0 0 3px;
-  box-shadow: -2px 0 5px rgba(0,0,0,0.4);
-  pointer-events: none; /* visual only, real mute in app settings */
-}
-
-/* ── Volume Up — LEFT side ── */
-#btn-vol-up {
-  left: 0px;
-  top: 158px;
-  width: 4px; height: 54px;
-  background: linear-gradient(180deg,
-    rgba(220,200,255,0.5) 0%,
-    rgba(150,90,255,0.38) 100%
-  );
-  border-radius: 3px 0 0 3px;
-  box-shadow: -2px 0 5px rgba(0,0,0,0.4), inset 1px 0 0 rgba(255,255,255,0.1);
-}
-
-/* ── Volume Down — LEFT side ── */
-#btn-vol-down {
-  left: 0px;
-  top: 222px;
-  width: 4px; height: 54px;
-  background: linear-gradient(180deg,
-    rgba(220,200,255,0.5) 0%,
-    rgba(150,90,255,0.38) 100%
-  );
-  border-radius: 3px 0 0 3px;
-  box-shadow: -2px 0 5px rgba(0,0,0,0.4), inset 1px 0 0 rgba(255,255,255,0.1);
-}
-
-/* ── USB-C Port — BOTTOM ── */
-#usbc-port {
-  position: absolute;
-  bottom: -8px; left: 50%;
-  transform: translateX(-50%);
-  width: 52px; height: 8px;
-  background: linear-gradient(180deg, rgba(20,8,44,0.95), rgba(8,2,20,0.98));
-  border-radius: 0 0 6px 6px;
-  border: 1px solid rgba(160,120,255,0.25);
-  border-top: none;
-  z-index: 5;
-  overflow: hidden;
-  cursor: default;
-}
-/* Port hole detail */
-#usbc-port::before {
+/* Inner highlight gives 3D depth */
+.side-btn::before {
   content: '';
   position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 26px; height: 4px;
-  background: rgba(0,0,0,0.9);
-  border-radius: 3px;
-  border: 0.5px solid rgba(140,100,220,0.3);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
-}
-/* Port pin dots */
-#usbc-port::after {
-  content: '';
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 20px; height: 2px;
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(160,120,255,0.4) 0px,
-    rgba(160,120,255,0.4) 1.5px,
-    transparent 1.5px,
-    transparent 3px
-  );
-  border-radius: 1px;
-}
-
-/* ── Tooltip for buttons ── */
-.btn-tooltip {
-  position: absolute;
-  background: rgba(20,8,44,0.96);
-  border: 1px solid rgba(196,168,245,0.3);
-  border-radius: 8px;
-  padding: 4px 10px;
-  font-size: 10px;
-  font-weight: 700;
-  color: rgba(220,200,255,0.9);
-  white-space: nowrap;
+  inset: 0;
+  border-radius: inherit;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.2s;
-  z-index: 100;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
 }
-.side-btn:hover .btn-tooltip { opacity: 1; }
+.side-btn:active {
+  filter: brightness(1.45);
+  transform: scaleX(0.68);
+}
 
-/* ── Volume HUD (shown on volume press) ── */
-#vol-hud {
-  position: absolute;
-  top: 120px; right: 14px;
-  z-index: 9900;
-  background: rgba(16,6,36,0.92);
-  border: 1px solid rgba(196,168,245,0.25);
-  border-radius: 16px;
-  padding: 12px 10px;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  width: 40px;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(196,168,245,0.08);
+/* ── LEFT buttons (mute, vol+, vol−) ── */
+/* left:0 = outer-left of wrapper, which sits 8px before phone */
+#btn-mute {
+  left: 0; top: 142px;
+  width: 7px; height: 34px;
+  border-radius: 3px 0 0 3px;
+  background: linear-gradient(180deg, rgba(200,175,255,0.48) 0%, rgba(110,55,210,0.38) 100%);
+  box-shadow: -2px 0 7px rgba(0,0,0,0.6), inset 1px 0 0 rgba(255,255,255,0.14);
+  pointer-events: none;
 }
-#vol-hud.show { display: flex; }
-.vol-hud-icon { font-size: 16px; }
-.vol-hud-bar {
-  width: 4px; height: 80px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 2px;
-  position: relative;
-  overflow: hidden;
+#btn-vol-up {
+  left: 0; top: 192px;
+  width: 7px; height: 60px;
+  border-radius: 3px 0 0 3px;
+  background: linear-gradient(180deg, rgba(215,190,255,0.52) 0%, rgba(130,70,235,0.4) 100%);
+  box-shadow: -2px 0 7px rgba(0,0,0,0.6), inset 1px 0 0 rgba(255,255,255,0.16);
 }
-.vol-hud-fill {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  background: linear-gradient(0deg, #5a20c0, #c4a8f5);
-  border-radius: 2px;
-  transition: height 0.2s ease;
+#btn-vol-down {
+  left: 0; top: 264px;
+  width: 7px; height: 60px;
+  border-radius: 3px 0 0 3px;
+  background: linear-gradient(180deg, rgba(215,190,255,0.52) 0%, rgba(130,70,235,0.4) 100%);
+  box-shadow: -2px 0 7px rgba(0,0,0,0.6), inset 1px 0 0 rgba(255,255,255,0.16);
 }
-.vol-hud-pct { font-size: 9px; font-weight: 800; color: rgba(196,168,245,0.8); }
 
-/* ===== PHONE SHELL ===== */
+/* ── RIGHT button (power/sleep) ── */
+#btn-power {
+  right: 0; top: 200px;
+  width: 7px; height: 80px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, rgba(220,200,255,0.54) 0%, rgba(145,85,248,0.42) 50%, rgba(92,32,182,0.38) 100%);
+  box-shadow: 2px 0 7px rgba(0,0,0,0.6), inset -1px 0 0 rgba(255,255,255,0.14);
+}
+
+/* ── Phone div inside wrapper ── */
 #phone {
+  position: absolute;
+  left: 8px; top: 0;
   width: 390px;
   height: 844px;
   background: var(--bg);
   border-radius: 48px;
   border: none;
-  position: relative;
   overflow: hidden;
   clip-path: inset(0 round 48px);
   box-shadow:
@@ -465,10 +364,109 @@ button, a { touch-action: manipulation; }
     0 40px 120px rgba(0,0,0,0.9),
     0 0 80px rgba(120,60,220,0.15),
     inset 0 1px 0 rgba(255,255,255,0.12);
-  transition: width 0.4s ease, height 0.4s ease;
+  transition: left 0.4s ease, width 0.4s ease, height 0.4s ease;
   z-index: 1;
 }
-#phone.expanded { width: 700px; height: 900px; border-radius: 24px; clip-path: inset(0 round 24px); }
+#phone.expanded { left: 0; width: 700px; height: 900px; border-radius: 24px; clip-path: inset(0 round 24px); }
+
+/* ── USB-C Port (bottom of phone) ── */
+#usbc-port {
+  position: absolute;
+  left: calc(8px + 195px - 28px); /* phone left + center - half width */
+  bottom: 0;
+  width: 56px; height: 10px;
+  background: linear-gradient(180deg, rgba(14,4,32,0.98), rgba(4,1,12,1));
+  border-radius: 0 0 8px 8px;
+  border: 1px solid rgba(150,110,240,0.2);
+  border-top: none;
+  z-index: 5;
+  overflow: hidden;
+}
+#usbc-port::before {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px; height: 5px;
+  background: rgba(0,0,0,0.96);
+  border-radius: 3px;
+  border: 0.5px solid rgba(120,80,210,0.32);
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.95), 0 0 6px rgba(110,55,210,0.18);
+}
+#usbc-port::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px; height: 2px;
+  background: repeating-linear-gradient(90deg, rgba(155,115,245,0.42) 0px, rgba(155,115,245,0.42) 1.5px, transparent 1.5px, transparent 3px);
+}
+
+/* ── Button hover tooltips ── */
+.btn-tooltip {
+  position: absolute;
+  background: rgba(10,3,24,0.96);
+  border: 1px solid rgba(196,168,245,0.3);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(218,196,255,0.92);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s;
+  z-index: 200;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.65);
+  top: 50%; transform: translateY(-50%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+}
+#btn-vol-up .btn-tooltip,
+#btn-vol-down .btn-tooltip { left: 14px; }
+#btn-power   .btn-tooltip  { right: 14px; }
+.side-btn:hover .btn-tooltip { opacity: 1; }
+
+/* ── Volume HUD ── */
+#vol-hud {
+  position: absolute;
+  top: 130px; right: 18px;
+  z-index: 9900;
+  background: rgba(10,3,24,0.94);
+  border: 1px solid rgba(196,168,245,0.2);
+  border-radius: 18px;
+  padding: 14px 10px;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 44px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.75), 0 0 0 0.5px rgba(196,168,245,0.06), 0 0 20px rgba(100,50,210,0.1);
+}
+#vol-hud.show { display: flex; animation: volHudIn 0.22s cubic-bezier(0.34,1.56,0.64,1) both; }
+@keyframes volHudIn {
+  from { opacity: 0; transform: scale(0.82) translateX(10px); }
+  to   { opacity: 1; transform: scale(1)    translateX(0);    }
+}
+.vol-hud-icon { font-size: 15px; line-height: 1; }
+.vol-hud-bar {
+  width: 5px; height: 90px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  border: 0.5px solid rgba(196,168,245,0.08);
+}
+.vol-hud-fill {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(0deg, #4a18a8, #9b6de0, #c4a8f5);
+  border-radius: 3px;
+  transition: height 0.18s ease;
+}
+.vol-hud-pct { font-size: 9px; font-weight: 800; color: rgba(196,168,245,0.8); letter-spacing: -0.2px; }
 
 /* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 430px) {
@@ -477,7 +475,12 @@ button, a { touch-action: manipulation; }
     overflow: hidden;
   }
   .aurora-bg, #bg-stars { display: none; }
+  #phone-shell-wrap {
+    width: 100vw !important;
+    height: 100dvh !important;
+  }
   #phone {
+    left: 0 !important;
     width: 100vw !important;
     height: 100dvh !important;
     border-radius: 0 !important;
@@ -490,6 +493,7 @@ button, a { touch-action: manipulation; }
     height: 100dvh !important;
     border-radius: 0 !important;
   }
+  .side-btn, #usbc-port { display: none !important; }
   #expand-btn { display: none !important; }
   #fb-login-overlay { position: fixed !important; }
   .fb-login-card { width: 90vw !important; }
@@ -20735,7 +20739,12 @@ let isExpanded = false;
 function toggleExpand() {
   isExpanded = !isExpanded;
   const phone = document.getElementById('phone');
+  const wrap  = document.getElementById('phone-shell-wrap');
   phone.classList.toggle('expanded', isExpanded);
+  if (wrap) {
+    wrap.style.width  = isExpanded ? '700px' : '406px';
+    wrap.style.height = isExpanded ? '900px' : '844px';
+  }
 }
 
 // ============================================================
@@ -26990,77 +26999,158 @@ function _chargingScreenUpdate() {
 
 function _buildChargingHTML() {
   var minsLeft = Math.round((100 - _battLevel) * 1.2);
+  var fillH    = _battLevel + '%';
+  var isFullyCharged = _battLevel >= 100;
+
+  // 5 segment indicators
   var segs = '';
   for (var i = 0; i < 5; i++) {
     var lit = _battLevel >= (i + 1) * 20;
     segs += '<div class="chg-seg' + (lit ? ' lit' : '') + '"></div>';
   }
-  var fillH = _battLevel + '%';
+
+  // Time string
+  var now  = new Date();
+  var hh   = now.getHours() % 12 || 12;
+  var mm   = ('0' + now.getMinutes()).slice(-2);
+  var ampm = now.getHours() >= 12 ? 'PM' : 'AM';
 
   return [
-    // ── Ambient green glow ──
-    '<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 65%,rgba(30,180,80,0.14),transparent 65%);pointer-events:none"></div>',
-    // ── Top shimmer line ──
-    '<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(60,220,120,0.35),transparent);pointer-events:none"></div>',
+    /* ── Full-screen background ── */
+    '<div style="position:absolute;inset:0;background:#000;z-index:0"></div>',
 
-    // CHARGING LABEL
-    '<div style="font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:rgba(60,220,120,0.65);margin-bottom:8px">Charging</div>',
+    /* ── Radial ambient glow at bottom ── */
+    '<div style="position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:500px;height:340px;border-radius:50%;background:radial-gradient(ellipse,rgba(20,200,80,0.18) 0%,transparent 70%);filter:blur(30px);pointer-events:none;z-index:1"></div>',
 
-    // BIG PERCENTAGE
-    '<div id="chg-big-pct" style="font-size:96px;font-weight:100;color:#fff;letter-spacing:-6px;line-height:1;text-shadow:0 0 60px rgba(60,220,120,0.35);margin-bottom:4px">' + _battLevel + '%</div>',
+    /* ── Top purple aurora accent ── */
+    '<div style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:380px;height:200px;border-radius:50%;background:radial-gradient(ellipse,rgba(120,50,220,0.22) 0%,transparent 70%);filter:blur(40px);pointer-events:none;z-index:1"></div>',
 
-    // ETA
-    '<div id="chg-eta" style="font-size:14px;color:rgba(60,220,120,0.55);margin-bottom:36px">About ' + minsLeft + ' min remaining</div>',
+    /* ── Shimmer top line ── */
+    '<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(60,220,120,0.4),transparent);z-index:2;pointer-events:none"></div>',
 
-    // CRYSTAL BATTERY GRAPHIC
-    '<div style="position:relative;width:140px">',
-      // Nub / tip
-      '<div style="width:44px;height:13px;border-radius:4px 4px 0 0;border:1.5px solid rgba(60,220,120,0.38);border-bottom:none;background:rgba(0,0,0,0.6);margin:0 auto;position:relative;z-index:2"></div>',
-      // Body
-      '<div style="width:140px;height:228px;border-radius:0 0 18px 18px;border:1.5px solid rgba(60,220,120,0.38);border-top:none;position:relative;overflow:hidden;background:rgba(0,0,0,0.55)">',
-        // Fill
-        '<div id="chg-batt-fill" style="position:absolute;bottom:0;left:0;right:0;height:' + fillH + ';background:linear-gradient(180deg,rgba(40,220,100,0.5),rgba(20,180,70,0.75));transition:height 0.8s ease">',
-          // Wave ripple on top of fill
-          '<div style="position:absolute;top:0;left:0;right:0;height:20px;overflow:hidden">',
-            '<svg style="width:300%;display:block;animation:cbattWave 1.8s linear infinite" viewBox="0 0 300 20" preserveAspectRatio="none">',
-              '<path d="M0 10 Q25 0 50 10 Q75 20 100 10 Q125 0 150 10 Q175 20 200 10 Q225 0 250 10 Q275 20 300 10 L300 20 L0 20Z" fill="rgba(60,220,100,0.35)"/>',
+    /* ── Content layer ── */
+    '<div style="position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;width:100%;padding:0 28px;box-sizing:border-box">',
+
+      /* Status area — top */
+      '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;padding-top:60px;margin-bottom:32px">',
+        '<div style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.28);letter-spacing:-0.2px">' + hh + ':' + mm + ' ' + ampm + '</div>',
+        '<div style="font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:rgba(60,220,120,0.7)">',
+          isFullyCharged ? '✦ CHARGED' : '⚡ CHARGING',
+        '</div>',
+        '<div style="font-size:11px;color:rgba(255,255,255,0.2)">' + _battLevel + '%</div>',
+      '</div>',
+
+      /* Giant percentage */
+      '<div id="chg-big-pct" style="',
+        'font-size:108px;',
+        'font-weight:100;',
+        'color:#fff;',
+        'letter-spacing:-8px;',
+        'line-height:1;',
+        'text-shadow:0 0 80px rgba(60,220,120,0.4),0 0 160px rgba(60,220,120,0.1);',
+        'margin-bottom:6px;',
+        'font-family:-apple-system,BlinkMacSystemFont,sans-serif;',
+      '">' + _battLevel + '%</div>',
+
+      /* ETA */
+      '<div id="chg-eta" style="font-size:13px;color:rgba(60,220,120,0.55);margin-bottom:44px;font-weight:400;letter-spacing:-0.1px">',
+        isFullyCharged ? 'Fully charged ✦' : 'About ' + minsLeft + ' min remaining',
+      '</div>',
+
+      /* ── Crystal Battery Body ── */
+      '<div style="position:relative;width:128px;margin-bottom:20px">',
+
+        /* Tip / nub */
+        '<div style="',
+          'width:40px;height:12px;',
+          'border-radius:5px 5px 0 0;',
+          'border:1.5px solid rgba(50,210,110,0.4);',
+          'border-bottom:none;',
+          'background:rgba(0,0,0,0.7);',
+          'margin:0 auto;',
+          'box-shadow:0 -2px 8px rgba(40,200,90,0.1);',
+        '"></div>',
+
+        /* Main body */
+        '<div style="',
+          'width:128px;height:220px;',
+          'border-radius:0 0 20px 20px;',
+          'border:1.5px solid rgba(50,210,110,0.4);',
+          'border-top:none;',
+          'position:relative;overflow:hidden;',
+          'background:rgba(2,8,4,0.7);',
+          'box-shadow:0 0 30px rgba(40,200,90,0.08),inset 0 0 20px rgba(40,200,90,0.04);',
+        '">',
+
+          /* Fill */
+          '<div id="chg-batt-fill" style="',
+            'position:absolute;bottom:0;left:0;right:0;',
+            'height:' + fillH + ';',
+            'background:linear-gradient(180deg,rgba(30,200,90,0.55) 0%,rgba(15,170,65,0.8) 100%);',
+            'transition:height 0.8s ease;',
+          '">',
+            /* Wave on fill surface */
+            '<div style="position:absolute;top:0;left:0;right:0;height:22px;overflow:hidden">',
+              '<svg style="width:300%;display:block;animation:chgWaveAnim 1.6s linear infinite" viewBox="0 0 300 22" preserveAspectRatio="none">',
+                '<path d="M0 11 Q37.5 0 75 11 Q112.5 22 150 11 Q187.5 0 225 11 Q262.5 22 300 11 L300 22 L0 22Z" fill="rgba(50,230,110,0.3)"/>',
+              '</svg>',
+            '</div>',
+            /* Shimmer sweep on fill */
+            '<div style="position:absolute;inset:0;background:linear-gradient(135deg,transparent 30%,rgba(140,255,180,0.12) 50%,transparent 70%);animation:chgFillShimmer 2.8s ease-in-out infinite;pointer-events:none"></div>',
+          '</div>',
+
+          /* Crystal facet lines over everything */
+          '<div style="position:absolute;inset:0;background:repeating-linear-gradient(155deg,transparent 0px,transparent 22px,rgba(180,255,210,0.025) 22px,rgba(180,255,210,0.025) 23px);pointer-events:none;z-index:2"></div>',
+
+          /* Top-glass gloss */
+          '<div style="position:absolute;top:0;left:0;right:0;height:30%;background:linear-gradient(180deg,rgba(255,255,255,0.07),transparent);pointer-events:none;z-index:3"></div>',
+
+          /* Border inner glow */
+          '<div style="position:absolute;inset:0;border-radius:0 0 19px 19px;box-shadow:inset 0 0 12px rgba(40,200,90,0.06);pointer-events:none;z-index:4"></div>',
+
+          /* Lightning bolt */
+          '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:5">',
+            '<svg width="34" height="56" viewBox="0 0 34 56" fill="none">',
+              '<defs>',
+                '<filter id="boltBlur" x="-60%" y="-60%" width="220%" height="220%">',
+                  '<feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b"/>',
+                  '<feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>',
+                '</filter>',
+              '</defs>',
+              '<path d="M20 2L3 30h13L11 54l20-30H18L20 2z" fill="rgba(255,255,255,0.82)" filter="url(#boltBlur)"/>',
             '</svg>',
           '</div>',
-        '</div>',
-        // Crystal refraction lines
-        '<div style="position:absolute;inset:0;background:repeating-linear-gradient(160deg,transparent 0px,transparent 18px,rgba(140,255,180,0.03) 18px,rgba(140,255,180,0.03) 19px);pointer-events:none"></div>',
-        // Top gloss
-        '<div style="position:absolute;top:0;left:0;right:0;height:35%;background:linear-gradient(180deg,rgba(255,255,255,0.06),transparent);pointer-events:none"></div>',
-        // Lightning bolt
-        '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:4">',
-          '<svg width="38" height="60" viewBox="0 0 38 60" fill="none">',
-            '<path d="M22 2L4 34h14L12 58l22-32H20L22 2z" fill="rgba(255,255,255,0.75)" filter="url(#bolt-glow)"/>',
-            '<defs><filter id="bolt-glow" x="-50%" y="-50%" width="200%" height="200%">',
-              '<feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>',
-              '<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>',
-            '</filter></defs>',
-          '</svg>',
+
         '</div>',
       '</div>',
+
+      /* ── Segment strip ── */
+      '<div style="display:flex;gap:6px;margin-bottom:14px">' + segs + '</div>',
+
+      /* ── USB-C status ── */
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:28px;background:rgba(40,200,90,0.06);border:1px solid rgba(40,200,90,0.14);border-radius:99px;padding:6px 14px">',
+        /* USB-C icon */
+        '<svg width="18" height="11" viewBox="0 0 18 11" fill="none">',
+          '<rect x="0.5" y="0.5" width="15" height="10" rx="3" stroke="rgba(50,220,110,0.65)" stroke-width="1"/>',
+          '<rect x="15.5" y="3.5" width="2" height="4" rx="1" fill="rgba(50,220,110,0.55)"/>',
+          '<rect x="2.5" y="3" width="10" height="5" rx="1.5" fill="rgba(50,220,110,0.25)"/>',
+          '<circle cx="9" cy="5.5" r="1" fill="rgba(50,220,110,0.5)"/>',
+        '</svg>',
+        '<span style="font-size:11px;font-weight:600;color:rgba(50,220,110,0.6);letter-spacing:0.2px">USB-C Connected</span>',
+      '</div>',
+
+      /* ── Dismiss ── */
+      '<div id="chg-stop-btn" style="font-size:12px;color:rgba(255,255,255,0.2);cursor:pointer;letter-spacing:0.3px;padding:10px 20px">Tap anywhere to dismiss</div>',
+
     '</div>',
 
-    // SEGMENT DOTS
-    '<div style="display:flex;gap:5px;margin-top:14px">' + segs + '</div>',
-
-    // USB-C CONNECTED
-    '<div style="display:flex;align-items:center;gap:7px;margin-top:12px;color:rgba(60,220,120,0.5);font-size:12px">',
-      '<svg width="16" height="10" viewBox="0 0 16 10" fill="none"><rect x="0.5" y="0.5" width="13" height="9" rx="2.5" stroke="rgba(60,220,120,0.6)" stroke-width="1"/><rect x="13.5" y="3" width="2" height="4" rx="1" fill="rgba(60,220,120,0.6)"/><rect x="2" y="3" width="9" height="4" rx="1" fill="rgba(60,220,120,0.3)"/></svg>',
-      'USB-C · Crystal Charger',
-    '</div>',
-
-    // DISMISS BUTTON
-    '<div id="chg-stop-btn" style="margin-top:32px;font-size:13px;color:rgba(255,255,255,0.25);cursor:pointer;letter-spacing:0.3px">Tap to dismiss</div>',
-
-    // Keyframes scoped here
+    /* ── Keyframes ── */
     '<style>',
-      '.chg-seg{width:22px;height:7px;border-radius:3px;background:rgba(60,220,120,0.12);border:1px solid rgba(60,220,120,0.2);transition:all 0.4s}',
-      '.chg-seg.lit{background:rgba(60,220,120,0.55);border-color:rgba(60,220,120,0.7);box-shadow:0 0 8px rgba(60,220,120,0.4)}',
-      '@keyframes cbattWave{0%{transform:translateX(0)}100%{transform:translateX(-33.33%)}}',
+      '.chg-seg{width:20px;height:6px;border-radius:3px;background:rgba(40,200,90,0.1);border:1px solid rgba(40,200,90,0.18);transition:all 0.45s}',
+      '.chg-seg.lit{background:rgba(40,200,90,0.5);border-color:rgba(40,200,90,0.65);box-shadow:0 0 8px rgba(40,200,90,0.45),0 0 16px rgba(40,200,90,0.15)}',
+      '@keyframes chgWaveAnim{0%{transform:translateX(0)}100%{transform:translateX(-33.33%)}}',
+      '@keyframes chgFillShimmer{0%{opacity:0;transform:translateX(-100%)}40%{opacity:1}60%{opacity:1}100%{opacity:0;transform:translateX(100%)}}',
+      '#charging-overlay{cursor:pointer}',
     '</style>',
   ].join('');
 }
