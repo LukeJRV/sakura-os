@@ -1444,8 +1444,11 @@ input[type=number] { -moz-appearance:textfield; }
   background:#0a0812;
   display:none; flex-direction:column;
   overflow:hidden;
+  border-radius: 48px;
 }
 #admin-panel-overlay.open { display:flex; }
+/* Match expanded phone */
+#phone.expanded #admin-panel-overlay { border-radius: 24px; }
 .adm-header {
   background:rgba(20,8,40,0.96);
   backdrop-filter:blur(40px);
@@ -1885,9 +1888,10 @@ input[type=number] { -moz-appearance:textfield; }
   flex-direction:column;
   gap:22px;
   overflow:hidden;
-  border-radius:inherit;
+  border-radius: 48px;
 }
 #power-screen.on { display:flex; }
+#phone.expanded #power-screen { border-radius: 24px; }
 
 /* Boot ambient blobs */
 .boot-blob {
@@ -20983,7 +20987,7 @@ function powerOffApp() {
   if (ov) ov.remove();
   ov = document.createElement('div');
   ov.id = 'ios-pow-ov';
-  ov.style.cssText = 'position:absolute;inset:0;z-index:99999;background:rgba(0,0,0,0.88);backdrop-filter:blur(24px);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:52px 24px 40px;border-radius:inherit';
+  ov.style.cssText = 'position:absolute;inset:0;z-index:99999;background:rgba(0,0,0,0.88);backdrop-filter:blur(24px);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:52px 24px 40px;border-radius:48px;overflow:hidden';
   ov.innerHTML = `
     <div style="text-align:center">
       <div style="font-size:48px;margin-bottom:14px;filter:drop-shadow(0 0 24px rgba(255,255,255,0.25))">⏻</div>
@@ -27117,6 +27121,8 @@ function _showPowerMenu() {
     '-webkit-backdrop-filter:blur(28px)',
     'display:flex;flex-direction:column;align-items:center;justify-content:space-between',
     'padding:52px 24px 44px',
+    'border-radius:48px',
+    'overflow:hidden',
   ].join(';');
 
   ov.innerHTML = [
@@ -27246,6 +27252,8 @@ function _startCharging() {
   _chargingEl.style.cssText = [
     'position:absolute;inset:0;z-index:99998',
     'background:#000',
+    'border-radius:48px',
+    'overflow:hidden',
     'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0',
   ].join(';');
 
