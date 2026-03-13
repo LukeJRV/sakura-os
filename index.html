@@ -4439,7 +4439,8 @@ const DEFAULT_STATE = {
     uiScale: 1,
     fontRainbow: false,
     fontGlow: false,
-    theme: 'default'
+    theme: 'default',
+    phoneOutline: true
   },
   purchasedThemes: ['default'],
   activeTheme: 'default',
@@ -19926,7 +19927,7 @@ function toggleGlow() {
 }
 
 function togglePhoneOutline() {
-  S.settings.phoneOutline = !(S.settings.phoneOutline !== false);
+  S.settings.phoneOutline = !S.settings.phoneOutline;
   applyPhoneOutline();
   saveState(); renderSettings();
 }
