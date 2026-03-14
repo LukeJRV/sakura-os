@@ -3013,21 +3013,62 @@ input[type=number] { -moz-appearance:textfield; }
 }
 
 /* ===== NOTES ===== */
-.notes-sidebar {
-  width:140px; min-width:140px;
-  border-right:1px solid rgba(255,255,255,0.06);
-  overflow-y:auto;
-  display:flex; flex-direction:column;
-}
-.note-item {
-  padding:12px;
-  cursor:pointer;
-  border-bottom:1px solid rgba(255,255,255,0.04);
-  transition:background 0.15s;
-}
-.note-item:hover, .note-item.active { background:rgba(160,136,250,0.1); }
-.note-item-title { font-size:12px; font-weight:600; color:var(--fg); }
-.note-item-preview { font-size:10px; color:rgba(255,255,255,0.4); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#notes-list-view { display:flex; flex-direction:column; flex:1; overflow:hidden; min-height:0; }
+#notes-editor-view { display:none; flex-direction:column; flex:1; overflow:hidden; min-height:0; }
+.nt-topnav { display:flex; align-items:center; justify-content:space-between; padding:10px 14px 12px; border-bottom:1px solid rgba(124,58,237,0.15); flex-shrink:0; }
+.nt-back { width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,0.06); border:1px solid rgba(124,58,237,0.25); display:flex; align-items:center; justify-content:center; font-size:16px; color:#c4b5fd; cursor:pointer; transition:all .18s; }
+.nt-back:hover { background:rgba(124,58,237,0.18); }
+.nt-title-row { display:flex; align-items:center; gap:7px; font-size:15px; font-weight:800; color:#fff; }
+.nt-icon { width:28px; height:28px; border-radius:9px; background:linear-gradient(135deg,#7c3aed,#a855f7); display:flex; align-items:center; justify-content:center; font-size:14px; box-shadow:0 2px 12px rgba(124,58,237,0.5); }
+.nt-new-btn { background:linear-gradient(135deg,#7c3aed,#a855f7); border-radius:20px; padding:7px 14px; font-size:11px; font-weight:700; color:#fff; cursor:pointer; border:none; box-shadow:0 3px 12px rgba(124,58,237,0.4); transition:all .2s; }
+.nt-new-btn:hover { transform:scale(1.06); }
+.nt-new-btn:active { transform:scale(.94); }
+.nt-filter-row { display:flex; align-items:center; justify-content:space-between; padding:10px 14px 0; flex-shrink:0; }
+.nt-tabs { display:flex; gap:4px; }
+.nt-tab { padding:5px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; border:none; transition:all .18s; color:#7c6aaa; background:rgba(255,255,255,0.05); }
+.nt-tab.on { background:rgba(124,58,237,0.2); color:#c4b5fd; border:1px solid rgba(124,58,237,0.35); }
+.nt-count { font-size:10px; color:#7c6aaa; font-weight:500; }
+.nt-search-wrap { padding:10px 14px 0; flex-shrink:0; }
+.nt-search-pill { display:flex; align-items:center; gap:8px; background:#0f0d22; border:1px solid rgba(124,58,237,0.18); border-radius:14px; padding:9px 14px; transition:border-color .2s; }
+.nt-search-pill:focus-within { border-color:rgba(168,85,247,0.5); box-shadow:0 0 0 3px rgba(124,58,237,0.1); }
+.nt-search-ico { font-size:13px; color:#7c6aaa; }
+.nt-search-inp { flex:1; background:transparent; border:none; outline:none; font-size:12px; color:#fff; font-family:inherit; }
+.nt-search-inp::placeholder { color:#7c6aaa; }
+.nt-notes-wrap { flex:1; overflow-y:auto; padding:12px 14px; display:flex; flex-direction:column; gap:8px; scrollbar-width:none; }
+.nt-notes-wrap::-webkit-scrollbar { display:none; }
+.nt-card { background:#0e0b20; border:1px solid rgba(124,58,237,0.18); border-radius:18px; padding:13px 14px; cursor:pointer; transition:all .22s cubic-bezier(.34,1.56,.64,1); position:relative; overflow:hidden; }
+.nt-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--ns,#7c3aed); border-radius:3px 0 0 3px; }
+.nt-card:hover { transform:translateX(4px) scale(1.01); border-color:rgba(168,85,247,0.35); background:#140e28; }
+.nt-card:active { transform:scale(.97); }
+.nt-card-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:5px; }
+.nt-card-title { font-size:13px; font-weight:700; color:#fff; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.nt-card-time { font-size:9px; color:#7c6aaa; flex-shrink:0; margin-top:1px; }
+.nt-card-body { font-size:11px; color:#7c6aaa; line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.nt-card-tags { display:flex; gap:5px; margin-top:7px; flex-wrap:wrap; }
+.nt-card-tag { font-size:9px; font-weight:700; border-radius:20px; padding:2px 8px; }
+.nt-card-pin { position:absolute; top:10px; right:10px; font-size:11px; }
+@keyframes ntCardIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+.nt-card { animation:ntCardIn .28s ease both; }
+.nt-editor-topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 14px 8px; border-bottom:1px solid rgba(124,58,237,0.12); flex-shrink:0; }
+.nt-etb-left { display:flex; align-items:center; gap:8px; }
+.nt-etb-back { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.06); border:1px solid rgba(124,58,237,0.2); display:flex; align-items:center; justify-content:center; font-size:14px; color:#c4b5fd; cursor:pointer; transition:all .18s; }
+.nt-etb-back:hover { background:rgba(124,58,237,0.2); }
+.nt-etb-label { font-size:12px; font-weight:700; color:#7c6aaa; }
+.nt-etb-right { display:flex; gap:6px; }
+.nt-etb-btn { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.06); border:1px solid rgba(124,58,237,0.18); display:flex; align-items:center; justify-content:center; font-size:13px; cursor:pointer; transition:all .18s; color:#c4b5fd; }
+.nt-etb-btn:hover { background:rgba(124,58,237,0.2); transform:scale(1.1); }
+.nt-fmt-bar { display:flex; align-items:center; gap:4px; padding:7px 14px; background:#0c0a1e; border-bottom:1px solid rgba(124,58,237,0.1); overflow-x:auto; flex-shrink:0; }
+.nt-fmt-bar::-webkit-scrollbar { display:none; }
+.nt-fmt-btn { min-width:30px; height:28px; border-radius:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(124,58,237,0.15); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#c4b5fd; cursor:pointer; padding:0 8px; transition:all .15s; white-space:nowrap; flex-shrink:0; }
+.nt-fmt-btn:hover { background:rgba(124,58,237,0.2); }
+.nt-fmt-sep { width:1px; height:18px; background:rgba(124,58,237,0.18); flex-shrink:0; margin:0 2px; }
+.nt-title-inp { width:100%; background:transparent; border:none; outline:none; font-size:20px; font-weight:800; color:#fff; font-family:inherit; padding:14px 16px 6px; letter-spacing:-.4px; border-bottom:1px solid rgba(124,58,237,0.1); flex-shrink:0; }
+.nt-title-inp::placeholder { color:#3d2a5a; }
+.nt-body-area { flex:1; padding:12px 16px; outline:none; color:#d4bbff; font-size:13px; line-height:1.7; overflow-y:auto; word-break:break-word; scrollbar-width:none; }
+.nt-body-area::-webkit-scrollbar { display:none; }
+.nt-word-count { padding:6px 16px 10px; font-size:9px; color:#7c6aaa; font-weight:500; letter-spacing:.04em; text-transform:uppercase; text-align:right; border-top:1px solid rgba(124,58,237,0.1); flex-shrink:0; }
+.notes-sidebar { display:none; }
+.note-item { display:none; }
 
 /* ===== ACHIEVEMENTS ===== */
 .achievement-bubble {
@@ -3956,39 +3997,70 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== NOTES SCREEN ===== -->
-    <div id="screen-notes" class="screen" style="padding:0;flex-direction:column;overflow:hidden">
-      <div class="screen-header" style="flex-shrink:0">
-        <button class="back-btn" onclick="openScreen('home')">←</button>
-        <span class="screen-title">📝 Notes</span>
-        <button class="btn btn-primary btn-sm" onclick="newNote()">+ New</button>
-      </div>
-      <div style="display:flex;flex:1;overflow:hidden;min-height:0;min-width:0">
-        <div class="notes-sidebar" id="notes-sidebar" style="flex-shrink:0"></div>
-        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
-          <div style="padding:6px 8px;display:flex;gap:4px;background:var(--card);border-bottom:1px solid rgba(255,255,255,0.06);flex-wrap:wrap;flex-shrink:0">
-            <button class="btn btn-ghost btn-sm" onclick="noteFormat('bold')" title="Bold"><b>B</b></button>
-            <button class="btn btn-ghost btn-sm" onclick="noteFormat('italic')" title="Italic"><i>I</i></button>
-            <button class="btn btn-ghost btn-sm" onclick="noteFormat('underline')" title="Underline"><u>U</u></button>
-            <button class="btn btn-ghost btn-sm" onclick="noteFormat('strikethrough')" title="Strike"><s>S</s></button>
-            <button class="btn btn-ghost btn-sm" onclick="noteFormat('h1')" style="font-size:10px;font-weight:800">H1</button>
-            <button class="btn btn-ghost btn-sm" onclick="noteFormat('h2')" style="font-size:10px;font-weight:700">H2</button>
-            <select class="input" style="width:72px;padding:3px 4px;font-size:10px;height:28px" onchange="noteColor(this.value);this.value=''">
-              <option value="">🎨</option>
-              <option value="#a088fa">Purple</option>
-              <option value="#fc7790">Pink</option>
-              <option value="#f6bb4e">Gold</option>
-              <option value="#4caf6e">Green</option>
-              <option value="#6f96ff">Blue</option>
-              <option value="#e78161">Orange</option>
-              <option value="#4edfd0">Teal</option>
-            </select>
+    <div id="screen-notes" class="screen" style="padding:0;flex-direction:column;overflow:hidden;background:#06040f">
+
+      <!-- Hidden sidebar kept for JS compatibility -->
+      <div class="notes-sidebar" id="notes-sidebar" style="display:none"></div>
+
+      <!-- ── LIST VIEW ── -->
+      <div id="notes-list-view">
+        <div class="nt-topnav">
+          <div class="nt-back" onclick="openScreen('home')">‹</div>
+          <div class="nt-title-row">
+            <div class="nt-icon">📝</div>
+            Notes
           </div>
-          <div id="note-editor" contenteditable="true" 
-            style="flex:1;padding:14px;outline:none;color:var(--fg);font-size:14px;line-height:1.7;overflow-y:auto;min-height:0;word-break:break-word" 
-            oninput="saveCurrentNote()"></div>
-          <div id="note-wordcount" style="padding:4px 12px;font-size:10px;color:rgba(255,255,255,0.3);border-top:1px solid rgba(255,255,255,0.04);flex-shrink:0">Ready to write...</div>
+          <button class="nt-new-btn" id="nt-new-btn">+ New</button>
         </div>
+        <div class="nt-filter-row">
+          <div class="nt-tabs" id="nt-tabs">
+            <div class="nt-tab on" data-f="all">All</div>
+            <div class="nt-tab" data-f="pinned">Pinned</div>
+            <div class="nt-tab" data-f="recent">Recent</div>
+          </div>
+          <div class="nt-count" id="nt-count">0 notes</div>
+        </div>
+        <div class="nt-search-wrap">
+          <div class="nt-search-pill">
+            <span class="nt-search-ico">🔍</span>
+            <input class="nt-search-inp" id="nt-search-inp" placeholder="Search notes…" />
+          </div>
+        </div>
+        <div class="nt-notes-wrap" id="nt-notes-wrap"></div>
       </div>
+
+      <!-- ── EDITOR VIEW ── -->
+      <div id="notes-editor-view">
+        <div class="nt-editor-topbar">
+          <div class="nt-etb-left">
+            <div class="nt-etb-back" id="nt-ed-back">‹</div>
+            <div class="nt-etb-label">Editing</div>
+          </div>
+          <div class="nt-etb-right">
+            <div class="nt-etb-btn" id="nt-pin-btn" title="Pin">📌</div>
+            <div class="nt-etb-btn" id="nt-del-btn" title="Delete">🗑️</div>
+            <div class="nt-etb-btn" id="nt-share-btn" title="Share">↗️</div>
+          </div>
+        </div>
+        <div class="nt-fmt-bar">
+          <div class="nt-fmt-btn" onclick="ntFmt('bold')"><b>B</b></div>
+          <div class="nt-fmt-btn" onclick="ntFmt('italic')"><i>I</i></div>
+          <div class="nt-fmt-btn" onclick="ntFmt('underline')"><u>U</u></div>
+          <div class="nt-fmt-btn" onclick="ntFmt('strikeThrough')">S̶</div>
+          <div class="nt-fmt-sep"></div>
+          <div class="nt-fmt-btn" onclick="ntFmtBlock('h1')">H1</div>
+          <div class="nt-fmt-btn" onclick="ntFmtBlock('h2')">H2</div>
+          <div class="nt-fmt-sep"></div>
+          <div class="nt-fmt-btn" onclick="ntFmt('insertUnorderedList')">• List</div>
+          <div class="nt-fmt-btn" onclick="ntFmt('insertOrderedList')">1. List</div>
+          <div class="nt-fmt-sep"></div>
+          <div class="nt-fmt-btn" id="nt-color-btn" onclick="ntCycleColor()">🎨</div>
+        </div>
+        <input class="nt-title-inp" id="nt-title-inp" placeholder="Note title…" />
+        <div class="nt-body-area" id="note-editor" contenteditable="true" oninput="saveCurrentNote()"></div>
+        <div class="nt-word-count" id="note-wordcount">0 words · 0 chars</div>
+      </div>
+
     </div>
 
     <!-- ===== REMINDERS SCREEN ===== -->
@@ -9472,21 +9544,92 @@ setInterval(() => {
 // NOTES
 // ============================================================
 let activeNoteId = null;
+let _ntFilter = 'all';
+const _NT_STRIPES = ['#a855f7','#e879f9','#6366f1','#06b6d4','#22c55e','#f59e0b','#f43f5e','#c084fc'];
+const _NT_TEXT_COLORS = ['#d4bbff','#67e8f9','#86efac','#fcd34d','#fda4af'];
+let _ntColorIdx = 0;
+const _NT_TAG_PRESETS = [
+  {tag:'Notes',   tagColor:'#c4b5fd', tagBg:'#7c3aed18', tagBorder:'#7c3aed33'},
+  {tag:'Ideas',   tagColor:'#c4b5fd', tagBg:'#7c3aed18', tagBorder:'#7c3aed33'},
+  {tag:'Personal',tagColor:'#fae8ff', tagBg:'#e879f918', tagBorder:'#e879f933'},
+  {tag:'Work',    tagColor:'#a5b4fc', tagBg:'#6366f118', tagBorder:'#6366f133'},
+  {tag:'Journal', tagColor:'#67e8f9', tagBg:'#06b6d418', tagBorder:'#06b6d433'},
+];
+
+function _ntEsc(t) { return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function _ntNowTime() {
+  const d = new Date();
+  return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
 
 function renderNotes() {
+  // Keep old sidebar hidden but populated for any external references
   const sidebar = document.getElementById('notes-sidebar');
-  if (!sidebar) return;
-  sidebar.innerHTML = S.notes.map((n,i) => `
-    <div class="note-item ${activeNoteId === n.id ? 'active' : ''}" onclick="openNote('${n.id}')">
-      <div class="note-item-title">${n.title||'Untitled'}</div>
-      <div class="note-item-preview">${n.content ? n.content.replace(/<[^>]*>/g,'').slice(0,30) : ''}</div>
-      ${isAdmin() ? '<button onclick="deleteNote(\'${n.id}\',event)" style="background:none;border:none;color:var(--pink);cursor:pointer;font-size:10px;margin-top:4px">delete</button>' : ''}
-    </div>`).join('');
+  if (sidebar) sidebar.innerHTML = '';
+
+  const wrap = document.getElementById('nt-notes-wrap');
+  const countEl = document.getElementById('nt-count');
+  if (!wrap) return;
+
+  const search = (document.getElementById('nt-search-inp') || {}).value || '';
+  const q = search.toLowerCase();
+
+  let list = (S.notes || []).slice();
+  if (_ntFilter === 'pinned') list = list.filter(n => n.pinned);
+  if (_ntFilter === 'recent') list = list.slice(0, 3);
+  if (q) list = list.filter(n =>
+    (n.title||'').toLowerCase().includes(q) ||
+    (n.content ? n.content.replace(/<[^>]*>/g,'') : '').toLowerCase().includes(q)
+  );
+
+  if (countEl) countEl.textContent = list.length + ' note' + (list.length !== 1 ? 's' : '');
+
+  if (!list.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:48px 20px 20px"><div style="font-size:36px;margin-bottom:10px;opacity:0.3">📝</div><div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.25)">No notes yet</div><div style="font-size:11px;color:rgba(255,255,255,0.14);margin-top:4px">Tap + New to create one</div></div>';
+    return;
+  }
+
+  wrap.innerHTML = '';
+  list.forEach((n, idx) => {
+    const stripe = n.stripe || _NT_STRIPES[idx % _NT_STRIPES.length];
+    const tp = n.tagPreset !== undefined ? _NT_TAG_PRESETS[n.tagPreset % _NT_TAG_PRESETS.length] : (n.tagColor ? n : _NT_TAG_PRESETS[0]);
+    const preview = (n.content || '').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0, 80);
+    const timeStr = n.created ? new Date(n.created).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : (_ntNowTime());
+
+    const card = document.createElement('div');
+    card.className = 'nt-card';
+    card.style.setProperty('--ns', stripe);
+    card.style.animationDelay = (idx * 40) + 'ms';
+    card.innerHTML = `
+      ${n.pinned ? '<div class="nt-card-pin">📌</div>' : ''}
+      <div class="nt-card-top">
+        <div class="nt-card-title">${_ntEsc(n.title || 'Untitled')}</div>
+        <div class="nt-card-time">${timeStr}</div>
+      </div>
+      <div class="nt-card-body">${_ntEsc(preview || 'No content yet…')}</div>
+      <div class="nt-card-tags">
+        <span class="nt-card-tag" style="background:${tp.tagBg};border:1px solid ${tp.tagBorder};color:${tp.tagColor}">${tp.tag}</span>
+      </div>`;
+    card.addEventListener('click', () => openNote(n.id));
+    wrap.appendChild(card);
+  });
+}
+
+function _ntShowEditor() {
+  document.getElementById('notes-list-view').style.display = 'none';
+  document.getElementById('notes-editor-view').style.display = 'flex';
+}
+
+function _ntShowList() {
+  document.getElementById('notes-editor-view').style.display = 'none';
+  document.getElementById('notes-list-view').style.display = 'flex';
+  renderNotes();
 }
 
 function newNote() {
   const id = 'note_' + Date.now();
-  S.notes.push({ id, title:'Untitled', content:'', created: new Date().toISOString() });
+  const stripe = _NT_STRIPES[Math.floor(Math.random() * _NT_STRIPES.length)];
+  S.notes.unshift({ id, title:'Untitled', content:'', created: new Date().toISOString(), stripe, pinned: false, tagPreset: 0 });
   saveState(); playSound('click');
   openNote(id);
 }
@@ -9495,35 +9638,56 @@ function openNote(id) {
   activeNoteId = id;
   const note = S.notes.find(n => n.id === id);
   const editor = document.getElementById('note-editor');
-  if (editor && note) editor.innerHTML = note.content || '';
-  renderNotes();
+  const titleInp = document.getElementById('nt-title-inp');
+  if (editor && note) {
+    editor.innerHTML = note.content || '';
+    if (titleInp) titleInp.value = note.title && note.title !== 'Untitled' ? note.title : '';
+  }
+  const wc = document.getElementById('note-wordcount');
+  if (wc) {
+    const text = editor ? (editor.innerText || '') : '';
+    const words = text.trim().split(/\s+/).filter(Boolean).length;
+    wc.textContent = words + ' word' + (words!==1?'s':'') + ' · ' + text.length + ' chars';
+  }
+  _ntShowEditor();
 }
 
 function saveCurrentNote() {
   if (!activeNoteId) return;
   const editor = document.getElementById('note-editor');
+  const titleInp = document.getElementById('nt-title-inp');
   const note = S.notes.find(n => n.id === activeNoteId);
   if (note && editor) {
     note.content = editor.innerHTML;
     const text = editor.innerText || '';
-    note.title = text.slice(0,30).trim() || 'Untitled';
+    // Title: use the title input if filled, else derive from body
+    if (titleInp && titleInp.value.trim()) {
+      note.title = titleInp.value.trim().slice(0, 60);
+    } else {
+      note.title = text.slice(0, 30).trim() || 'Untitled';
+    }
     const words = text.trim().split(/\s+/).filter(Boolean).length;
     const wc = document.getElementById('note-wordcount');
-    if (wc) wc.textContent = `${words} word${words!==1?'s':''} · ${text.length} chars`;
+    if (wc) wc.textContent = words + ' word' + (words!==1?'s':'') + ' · ' + text.length + ' chars';
     saveState();
-    renderNotes();
   }
 }
 
 function deleteNote(id, e) {
-  e.stopPropagation();
+  if (e) e.stopPropagation();
   S.notes = S.notes.filter(n => n.id !== id);
-  if (activeNoteId === id) { activeNoteId = null; document.getElementById('note-editor').innerHTML = ''; }
-  saveState(); renderNotes();
+  if (activeNoteId === id) {
+    activeNoteId = null;
+    const editor = document.getElementById('note-editor');
+    if (editor) editor.innerHTML = '';
+  }
+  saveState();
+  _ntShowList();
 }
 
 function noteFormat(cmd) {
   const editor = document.getElementById('note-editor');
+  if (!editor) return;
   editor.focus();
   if (cmd === 'h1') document.execCommand('formatBlock', false, 'H1');
   else if (cmd === 'h2') document.execCommand('formatBlock', false, 'H2');
@@ -9531,12 +9695,91 @@ function noteFormat(cmd) {
   saveCurrentNote();
 }
 
+// New format functions for the new UI buttons (delegate to noteFormat)
+function ntFmt(cmd) { noteFormat(cmd); }
+function ntFmtBlock(tag) { noteFormat(tag); }
+
+function ntCycleColor() {
+  _ntColorIdx = (_ntColorIdx + 1) % _NT_TEXT_COLORS.length;
+  const col = _NT_TEXT_COLORS[_ntColorIdx];
+  const btn = document.getElementById('nt-color-btn');
+  if (btn) btn.style.color = col;
+  noteColor(col);
+}
+
 function noteColor(color) {
   if (!color) return;
-  document.getElementById('note-editor').focus();
+  const editor = document.getElementById('note-editor');
+  if (!editor) return;
+  editor.focus();
   document.execCommand('foreColor', false, color);
   saveCurrentNote();
 }
+
+// Wire up new notes UI once DOM is ready
+(function _ntInit() {
+  function _wire() {
+    // New button
+    const nb = document.getElementById('nt-new-btn');
+    if (nb) nb.onclick = newNote;
+
+    // Back button in editor
+    const eb = document.getElementById('nt-ed-back');
+    if (eb) eb.onclick = () => {
+      saveCurrentNote();
+      activeNoteId = null;
+      _ntShowList();
+    };
+
+    // Pin button
+    const pb = document.getElementById('nt-pin-btn');
+    if (pb) pb.onclick = () => {
+      if (!activeNoteId) return;
+      const note = S.notes.find(n => n.id === activeNoteId);
+      if (note) { note.pinned = !note.pinned; saveState(); showNotif('📌', note.pinned ? 'Pinned' : 'Unpinned', note.title || ''); }
+    };
+
+    // Delete button
+    const db = document.getElementById('nt-del-btn');
+    if (db) db.onclick = () => {
+      if (!activeNoteId) return;
+      deleteNote(activeNoteId, null);
+      showNotif('🗑️', 'Deleted', '');
+    };
+
+    // Share button
+    const sb = document.getElementById('nt-share-btn');
+    if (sb) sb.onclick = () => showNotif('↗️', 'Shared', 'Note shared');
+
+    // Title input saves
+    const ti = document.getElementById('nt-title-inp');
+    if (ti) ti.oninput = saveCurrentNote;
+
+    // Filter tabs
+    document.querySelectorAll('.nt-tab').forEach(btn => {
+      btn.onclick = function() {
+        document.querySelectorAll('.nt-tab').forEach(b => b.classList.remove('on'));
+        this.classList.add('on');
+        _ntFilter = this.dataset.f;
+        renderNotes();
+      };
+    });
+
+    // Search
+    const si = document.getElementById('nt-search-inp');
+    if (si) si.oninput = renderNotes;
+  }
+
+  // Try immediately, retry after screens load
+  if (document.readyState !== 'loading') _wire();
+  else document.addEventListener('DOMContentLoaded', _wire);
+  // Also re-wire when notes screen opens (screens may not exist yet)
+  const _origOpenScreen = window.openScreen;
+  window.openScreen = function(id) {
+    if (_origOpenScreen) _origOpenScreen.apply(this, arguments);
+    if (id === 'notes') { setTimeout(_wire, 80); }
+  };
+})();
 
 // ============================================================
 // REMINDERS
