@@ -1456,12 +1456,11 @@ input[type=number] { -moz-appearance:textfield; }
   background:#0a0812;
   display:none; flex-direction:column;
   overflow:hidden;
-  border-radius:48px;
   will-change: transform;
 }
 #admin-panel-overlay.open { display:flex; }
-#phone.expanded #admin-panel-overlay { border-radius: 24px; }
-#phone.expanded .adm-header { border-radius: 24px 24px 0 0; }
+#phone.expanded #admin-panel-overlay { }
+#phone.expanded .adm-header { border-radius: 0; }
 .adm-header {
   background:rgba(14,5,30,0.98);
   padding:14px 16px 0;
@@ -1470,7 +1469,6 @@ input[type=number] { -moz-appearance:textfield; }
   position:relative;
   overflow:hidden;
   box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
-  border-radius: 48px 48px 0 0;
 }
 /* Rotating conic gradient — same as dock, boosted for visibility */
 .adm-header::before {
@@ -3256,7 +3254,7 @@ input[type=number] { -moz-appearance:textfield; }
   <div id="notif-drag-zone" style="position:absolute;top:0;left:0;width:100%;height:56px;z-index:9000;cursor:pointer;touch-action:none" onmousedown="notifPanelDragStart(event)"></div>
 
   <!-- Notification Panel — full-screen iOS 15-style -->
-  <div id="notif-panel" style="position:absolute;inset:0;z-index:8900;transform:translateY(-100%);transition:transform 0.48s cubic-bezier(0.32,0,0.15,1);will-change:transform;overflow:hidden;border-radius:48px;">
+  <div id="notif-panel" style="position:absolute;inset:0;z-index:8900;transform:translateY(-100%);transition:transform 0.48s cubic-bezier(0.32,0,0.15,1);will-change:transform;overflow:hidden;">
     <!-- Wallpaper blur layer — filter:blur on child is always clipped by parent overflow:hidden, unlike backdrop-filter -->
     <div id="notif-panel-wallpaper" style="position:absolute;inset:-40px;background:radial-gradient(ellipse at 20% 20%,#2a1a4e 0%,#000 50%,#1a0a2e 100%);filter:blur(32px) saturate(160%);"></div>
     <!-- Dark overlay -->
@@ -20922,7 +20920,8 @@ function notifPanelDragStart(e) {
     const y  = (e2.touches ? e2.touches[0].clientY : e2.clientY);
     const dy = y - _notifPanelDragStartY;
     if (dy > 0) {
-      const pct  = Math.min(dy / 280, 1);
+      const phoneH = (document.getElementById('phone') || {}).getBoundingClientRect ? document.getElementById('phone').getBoundingClientRect().height : 844;
+      const pct  = Math.min(dy / phoneH, 1);
       const ease = 1 - Math.pow(1 - pct, 2.2);
       if (panel) panel.style.transform = 'translateY(calc(-100% + ' + (ease * 100) + '%))';
     }
@@ -27161,7 +27160,6 @@ function _showPowerMenu() {
     '-webkit-backdrop-filter:blur(28px)',
     'display:flex;flex-direction:column;align-items:center;justify-content:space-between',
     'padding:52px 24px 44px',
-    'border-radius:48px',
     'overflow:hidden',
   ].join(';');
 
@@ -27292,7 +27290,6 @@ function _startCharging() {
   _chargingEl.style.cssText = [
     'position:absolute;inset:0;z-index:99998',
     'background:#000',
-    'border-radius:48px',
     'overflow:hidden',
     'will-change:transform',
     'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0',
