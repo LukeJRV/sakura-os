@@ -5937,6 +5937,8 @@ function updateBadges() {
     b.textContent = c > 0 ? (c > 99 ? '99+' : c) : '';
     b.style.display = c > 0 ? 'flex' : 'none';
   });
+  // Also update calendar badge (has its own logic based on today's events)
+  if (typeof _updateCalBadge === 'function') _updateCalBadge();
 }
 
 // Context Menu (hold)
