@@ -25690,6 +25690,9 @@ window._fbApplyBroadcast = function(d, docId) {
       if (S.events && d.title) {
         S.events = S.events.filter(e => e.title !== d.title);
         saveState();
+        // Real-time: re-render calendar immediately if it's open, and update badge
+        if (typeof renderCalendar === 'function' && document.getElementById('calendar-content')) renderCalendar();
+        if (typeof updateBadges === 'function') updateBadges();
         showNotif('📅','Event removed', d.title);
       }
       break;
@@ -25697,6 +25700,8 @@ window._fbApplyBroadcast = function(d, docId) {
       if (S.shopItems && d.name) {
         S.shopItems = S.shopItems.filter(i => i.name !== d.name);
         saveState();
+        // Real-time: re-render shop immediately if open
+        if (typeof renderShopContent === 'function' && document.getElementById('screen-shop')?.classList.contains('active')) renderShopContent();
         showNotif('🛒','Shop item removed', d.name);
       }
       break;
@@ -25712,6 +25717,9 @@ window._fbApplyBroadcast = function(d, docId) {
         bubbleColor: d.bubbleColor || '',
       });
       saveState();
+      // Real-time: re-render calendar immediately if it's open, and update badge
+      if (typeof renderCalendar === 'function' && document.getElementById('calendar-content')) renderCalendar();
+      if (typeof updateBadges === 'function') updateBadges();
       showBroadcastNotif(d.emoji||'📅', 'New Event Added!', d.title||'Check your calendar');
       break;
     case 'add_shop_item':
@@ -25725,6 +25733,8 @@ window._fbApplyBroadcast = function(d, docId) {
         tag: d.tag || '',
       });
       saveState();
+      // Real-time: re-render shop immediately if open
+      if (typeof renderShopContent === 'function' && document.getElementById('screen-shop')?.classList.contains('active')) renderShopContent();
       showBroadcastNotif(d.emoji||'🛒', 'New Shop Item!', d.name||'Check the shop');
       break;
     case 'live_update':
@@ -25744,6 +25754,9 @@ window._fbApplyBroadcast = function(d, docId) {
         S.achievements.push({ emoji: d.emoji||'🏆', title: d.title, desc: d.desc||'', tickets: d.tickets||0, earned: new Date().toISOString() });
         if (d.tickets > 0) addTickets(d.tickets, 'Achievement: '+d.title);
         saveState();
+        // Real-time: re-render achievements screen if open
+        if (typeof renderAchievements === 'function' && document.getElementById('screen-achievements')?.classList.contains('active')) renderAchievements();
+        if (typeof updateBadges === 'function') updateBadges();
         showBroadcastNotif(d.emoji||'🏆', 'Achievement Unlocked!', d.title);
         launchConfetti();
       }
@@ -25872,6 +25885,8 @@ window._fbApplyBroadcast = function(d, docId) {
         S.bpPass.rotation = d.seasonIndex;
       }
       saveState();
+      // Real-time: re-render battle pass screen if open
+      if (typeof renderBattlepass === 'function' && document.getElementById('screen-battlepass')?.classList.contains('active')) renderBattlepass();
       showBroadcastNotif('🏆', 'New Season Pass Season!', d.seasonName || 'Check Season Pass');
       break;
   }
@@ -28438,6 +28453,13 @@ window._admUndoBroadcast = async function(docId) {
           batch.update(doc.ref, { 'state.events': events });
         });
         await batch.commit();
+        // Real-time: also remove from admin's own local S and re-render calendar immediately
+        if (typeof S !== 'undefined' && S.events) {
+          S.events = S.events.filter(e => e.title !== data.title);
+          if (typeof saveState === 'function') saveState();
+          if (typeof renderCalendar === 'function' && document.getElementById('calendar-content')) renderCalendar();
+          if (typeof updateBadges === 'function') updateBadges();
+        }
 
       } else if (type === 'add_shop_item' && data.name) {
         const players = await fbDb.collection('players').get();
@@ -28448,6 +28470,12 @@ window._admUndoBroadcast = async function(docId) {
           batch.update(doc.ref, { 'state.shopItems': items });
         });
         await batch.commit();
+        // Real-time: update admin's own local S and re-render shop immediately
+        if (typeof S !== 'undefined' && S.shopItems) {
+          S.shopItems = S.shopItems.filter(i => i.name !== data.name);
+          if (typeof saveState === 'function') saveState();
+          if (typeof renderShopContent === 'function' && document.getElementById('screen-shop')?.classList.contains('active')) renderShopContent();
+        }
 
       } else if (type === 'add_achievement' && data.title) {
         const players = await fbDb.collection('players').get();
@@ -28458,6 +28486,13 @@ window._admUndoBroadcast = async function(docId) {
           batch.update(doc.ref, { 'state.achievements': achs });
         });
         await batch.commit();
+        // Real-time: update admin's own local S and re-render achievements immediately
+        if (typeof S !== 'undefined' && S.achievements) {
+          S.achievements = S.achievements.filter(a => a.title !== data.title);
+          if (typeof saveState === 'function') saveState();
+          if (typeof renderAchievements === 'function' && document.getElementById('screen-achievements')?.classList.contains('active')) renderAchievements();
+          if (typeof updateBadges === 'function') updateBadges();
+        }
 
       } else if (type === 'set_cp_prizes') {
         const players = await fbDb.collection('players').get();
@@ -28466,6 +28501,11 @@ window._admUndoBroadcast = async function(docId) {
           batch.update(doc.ref, { 'state.cpPrizes': [] });
         });
         await batch.commit();
+        // Real-time: clear admin's own local custom prizes
+        if (typeof S !== 'undefined') {
+          S.cpCustomPrizes = [];
+          if (typeof saveState === 'function') saveState();
+        }
       }
       // For announcements, fullscreen_alert, update_message, live_update:
       // marking active:false is sufficient — they're display-only, nothing to reverse.
