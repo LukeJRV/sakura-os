@@ -516,6 +516,29 @@ button, a { touch-action: manipulation; }
 }
 #phone.expanded { margin-left: 0; width: 700px; height: 900px; border-radius: 24px; clip-path: inset(0 round 24px); }
 
+/* ── Firefox-only fixes — other browsers ignore this entire block ── */
+@-moz-document url-prefix() {
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #phone-shell-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 390 / 844;
+  }
+  #phone {
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 390 / 844;
+    transform: translateZ(0);
+  }
+}
+
 /* ── USB-C Port (bottom of phone) ── */
 #usbc-port {
   position: absolute;
