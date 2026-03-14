@@ -26713,9 +26713,24 @@ window._renderAdminPanel = async function() {
 // ── Clear Undone History entries ──────────────────────────────
 window._admClearUndoneHistory = async function() {
   const data = window._admHistoryData || {};
-  const undoneIds = Object.entries(data)
+
+  // Collect IDs from cache (active===false) AND from any row that visually shows "✓ Undone"
+  // This catches cases where cache was updated but also rows that were just undone this session
+  const undoneIdsFromCache = Object.entries(data)
     .filter(([, d]) => d.active === false)
     .map(([id]) => id);
+
+  // Also scan DOM for any row showing the teal Undone span (belt-and-braces)
+  const undoneIdsFromDom = [];
+  document.querySelectorAll('[data-broadcast-id]').forEach(row => {
+    const span = row.querySelector('span');
+    if (span && span.textContent.includes('Undone')) {
+      const id = row.getAttribute('data-broadcast-id');
+      if (id && !undoneIdsFromCache.includes(id)) undoneIdsFromDom.push(id);
+    }
+  });
+
+  const undoneIds = [...new Set([...undoneIdsFromCache, ...undoneIdsFromDom])];
 
   if (!undoneIds.length) {
     showNotif('ℹ️','Nothing to clear','No undone entries found');
@@ -26728,7 +26743,7 @@ window._admClearUndoneHistory = async function() {
       undoneIds.forEach(id => batch.delete(fbDb.collection('broadcasts').doc(id)));
       await batch.commit();
 
-      // Animate out then remove from DOM
+      // Animate rows out and remove from DOM immediately (real-time)
       undoneIds.forEach(id => {
         const row = document.querySelector(`[data-broadcast-id="${id}"]`);
         if (row) {
@@ -26743,8 +26758,7 @@ window._admClearUndoneHistory = async function() {
             row.style.overflow = 'hidden';
           }, 280);
           setTimeout(() => {
-            row.remove();
-            // Real-time: check if list is now empty and show empty state
+            if (row.parentNode) row.remove();
             const list = document.getElementById('adm-history-list');
             if (list && list.querySelectorAll('[data-broadcast-id]').length === 0) {
               list.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.3);font-size:12px;padding:16px">All undone entries cleared</div>';
@@ -28419,21 +28433,23 @@ window._admUndoBroadcast = async function(docId) {
   const type = data ? data.type : null;
 
   showCustomConfirm('Undo this broadcast?\nThis will reverse its effects for all players and mark it as undone.', async function() {
-    // Capture row + button references BEFORE any awaits so they stay valid
+    // Capture row + button references BEFORE any awaits
     const row = document.querySelector('[data-broadcast-id="' + docId + '"]');
     const undoBtn = row ? row.querySelector('button') : null;
 
-    // Helper: stamp the row as Undone in the DOM right now
+    // Stamp the row as Undone in the DOM
     function _markRowUndone() {
       if (!row) return;
       row.style.transition = 'opacity 0.3s, border-color 0.3s';
       row.style.opacity = '0.4';
       row.style.borderColor = 'rgba(255,255,255,0.03)';
-      if (undoBtn && undoBtn.parentNode) {
+      // Find the button or already-disabled button by any means
+      const anyBtn = row.querySelector('button');
+      if (anyBtn) {
         const span = document.createElement('span');
         span.style.cssText = 'font-size:10px;color:rgba(78,223,208,0.6);padding:5px 10px;flex-shrink:0;font-weight:700';
         span.textContent = '✓ Undone';
-        undoBtn.replaceWith(span);
+        anyBtn.replaceWith(span);
       }
     }
 
@@ -28441,107 +28457,96 @@ window._admUndoBroadcast = async function(docId) {
       // 1. Immediately disable the Undo button to prevent double-clicks
       if (undoBtn) { undoBtn.disabled = true; undoBtn.style.opacity = '0.4'; undoBtn.textContent = 'Working…'; }
 
-      // 2. Mark broadcast as inactive in Firestore — this stops new players
-      //    from ever receiving it, and keeps the history row visible as "Undone".
-      //    We do NOT delete it (deletion re-triggers the broadcast listener).
+      // 2. Mark broadcast as inactive in Firestore
       await fbDb.collection('broadcasts').doc(docId).update({ active: false, undoneAt: firebase.firestore.FieldValue.serverTimestamp() });
 
-      // 3. Directly reverse effects on ALL player documents — no new broadcast needed.
-      //    This applies the reversal in real-time to every user's Firestore state.
-      if (type === 'give_tickets' && data.amount) {
-        const players = await fbDb.collection('players').get();
-        const batch = fbDb.batch();
-        players.docs.forEach(doc => {
-          batch.update(doc.ref, {
-            'state.tickets': firebase.firestore.FieldValue.increment(-(data.amount)),
-            '_adminLiveWrite': true,
-          });
-        });
-        await batch.commit();
-
-      } else if (type === 'add_event' && data.title) {
-        // Batch-write removal directly to all player docs (reliable, no listener tricks)
-        const players = await fbDb.collection('players').get();
-        const batch = fbDb.batch();
-        players.docs.forEach(doc => {
-          const st = doc.data().state || {};
-          const events = (st.events || []).filter(e => e.title !== data.title);
-          batch.update(doc.ref, { 'state.events': events, '_adminLiveWrite': true });
-        });
-        await batch.commit();
-        // Real-time: also remove from admin's own local S and re-render calendar immediately
-        if (typeof S !== 'undefined' && S.events) {
-          S.events = S.events.filter(e => e.title !== data.title);
-          if (typeof saveState === 'function') saveState();
-          if (typeof renderCalendar === 'function' && document.getElementById('calendar-content')) renderCalendar();
-          if (typeof updateBadges === 'function') updateBadges();
-        }
-
-      } else if (type === 'add_shop_item' && data.name) {
-        const players = await fbDb.collection('players').get();
-        const batch = fbDb.batch();
-        players.docs.forEach(doc => {
-          const st = doc.data().state || {};
-          const items = (st.shopItems || []).filter(i => i.name !== data.name);
-          batch.update(doc.ref, { 'state.shopItems': items, '_adminLiveWrite': true });
-        });
-        await batch.commit();
-        // Real-time: update admin's own local S and re-render shop immediately
-        if (typeof S !== 'undefined' && S.shopItems) {
-          S.shopItems = S.shopItems.filter(i => i.name !== data.name);
-          if (typeof saveState === 'function') saveState();
-          if (typeof renderShopContent === 'function' && document.getElementById('screen-shop')?.classList.contains('active')) renderShopContent();
-        }
-
-      } else if (type === 'add_achievement' && data.title) {
-        const players = await fbDb.collection('players').get();
-        const batch = fbDb.batch();
-        players.docs.forEach(doc => {
-          const st = doc.data().state || {};
-          const achs = (st.achievements || []).filter(a => a.title !== data.title);
-          batch.update(doc.ref, { 'state.achievements': achs, '_adminLiveWrite': true });
-        });
-        await batch.commit();
-        // Real-time: update admin's own local S and re-render achievements immediately
-        if (typeof S !== 'undefined' && S.achievements) {
-          S.achievements = S.achievements.filter(a => a.title !== data.title);
-          if (typeof saveState === 'function') saveState();
-          if (typeof renderAchievements === 'function' && document.getElementById('screen-achievements')?.classList.contains('active')) renderAchievements();
-          if (typeof updateBadges === 'function') updateBadges();
-        }
-
-      } else if (type === 'set_cp_prizes') {
-        const players = await fbDb.collection('players').get();
-        const batch = fbDb.batch();
-        players.docs.forEach(doc => {
-          batch.update(doc.ref, { 'state.cpPrizes': [], '_adminLiveWrite': true });
-        });
-        await batch.commit();
-        // Real-time: clear admin's own local custom prizes
-        if (typeof S !== 'undefined') {
-          S.cpCustomPrizes = [];
-          if (typeof saveState === 'function') saveState();
-        }
-      }
-      // For announcements, fullscreen_alert, update_message, live_update:
-      // marking active:false is sufficient — they're display-only, nothing to reverse.
-
-      // 4. Clear the seen-key from admin's own localStorage
-      try { localStorage.removeItem('fbseen_' + docId); } catch(e2) {}
-
-      // 5. Stamp the row as Undone immediately — uses captured reference, always reliable
+      // 3. Update the row UI immediately after the first write succeeds — 
+      //    this guarantees "✓ Undone" shows right away no matter what happens next
       _markRowUndone();
-
-      // 6. Update local S for admin's own session (give_tickets case)
-      if (type === 'give_tickets' && data.amount && typeof S !== 'undefined') {
-        S.tickets = Math.max(0, (S.tickets || 0) - data.amount);
-        if (typeof saveState === 'function') saveState();
-        if (typeof updateTicketDisplay === 'function') updateTicketDisplay(0);
-      }
-
-      // 7. Update local cache: mark as undone (active:false) so Clear Undone picks it up immediately
       if (window._admHistoryData && window._admHistoryData[docId]) {
         window._admHistoryData[docId].active = false;
+      }
+      try { localStorage.removeItem('fbseen_' + docId); } catch(e2) {}
+
+      // 4. Reverse effects on all player docs via _adminLiveWrite so their onSnapshot re-renders
+      try {
+        const players = await fbDb.collection('players').get();
+        const batch = fbDb.batch();
+
+        if (type === 'give_tickets' && data.amount) {
+          players.docs.forEach(doc => {
+            batch.update(doc.ref, {
+              'state.tickets': firebase.firestore.FieldValue.increment(-(data.amount)),
+              '_adminLiveWrite': true,
+            });
+          });
+          await batch.commit();
+          // Admin's own session
+          if (typeof S !== 'undefined') {
+            S.tickets = Math.max(0, (S.tickets || 0) - data.amount);
+            if (typeof saveState === 'function') saveState();
+            if (typeof updateTicketDisplay === 'function') updateTicketDisplay(0);
+          }
+
+        } else if (type === 'add_event' && data.title) {
+          players.docs.forEach(doc => {
+            const st = doc.data().state || {};
+            const events = (st.events || []).filter(e => e.title !== data.title);
+            batch.update(doc.ref, { 'state.events': events, '_adminLiveWrite': true });
+          });
+          await batch.commit();
+          // Admin's own session
+          if (typeof S !== 'undefined' && S.events) {
+            S.events = S.events.filter(e => e.title !== data.title);
+            if (typeof saveState === 'function') saveState();
+            if (typeof renderCalendar === 'function' && document.getElementById('calendar-content')) renderCalendar();
+            if (typeof updateBadges === 'function') updateBadges();
+          }
+
+        } else if (type === 'add_shop_item' && data.name) {
+          players.docs.forEach(doc => {
+            const st = doc.data().state || {};
+            const items = (st.shopItems || []).filter(i => i.name !== data.name);
+            batch.update(doc.ref, { 'state.shopItems': items, '_adminLiveWrite': true });
+          });
+          await batch.commit();
+          // Admin's own session
+          if (typeof S !== 'undefined' && S.shopItems) {
+            S.shopItems = S.shopItems.filter(i => i.name !== data.name);
+            if (typeof saveState === 'function') saveState();
+            if (typeof renderShopContent === 'function' && document.getElementById('screen-shop')?.classList.contains('active')) renderShopContent();
+          }
+
+        } else if (type === 'add_achievement' && data.title) {
+          players.docs.forEach(doc => {
+            const st = doc.data().state || {};
+            const achs = (st.achievements || []).filter(a => a.title !== data.title);
+            batch.update(doc.ref, { 'state.achievements': achs, '_adminLiveWrite': true });
+          });
+          await batch.commit();
+          // Admin's own session
+          if (typeof S !== 'undefined' && S.achievements) {
+            S.achievements = S.achievements.filter(a => a.title !== data.title);
+            if (typeof saveState === 'function') saveState();
+            if (typeof renderAchievements === 'function' && document.getElementById('screen-achievements')?.classList.contains('active')) renderAchievements();
+            if (typeof updateBadges === 'function') updateBadges();
+          }
+
+        } else if (type === 'set_cp_prizes') {
+          players.docs.forEach(doc => {
+            batch.update(doc.ref, { 'state.cpPrizes': [], '_adminLiveWrite': true });
+          });
+          await batch.commit();
+          if (typeof S !== 'undefined') {
+            S.cpCustomPrizes = [];
+            if (typeof saveState === 'function') saveState();
+          }
+        }
+      } catch(batchErr) {
+        // Player batch failed — row is already marked Undone, log the error visibly
+        console.error('Undo batch write failed:', batchErr);
+        showNotif('⚠️', 'Partial undo', 'Marked undone but player data may not have updated: ' + batchErr.message);
+        return;
       }
 
       playSound('success');
