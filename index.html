@@ -28453,7 +28453,8 @@ window._admUndoBroadcast = async function(docId) {
         const batch = fbDb.batch();
         players.docs.forEach(doc => {
           batch.update(doc.ref, {
-            'state.tickets': firebase.firestore.FieldValue.increment(-(data.amount))
+            'state.tickets': firebase.firestore.FieldValue.increment(-(data.amount)),
+            '_adminLiveWrite': true,
           });
         });
         await batch.commit();
@@ -28465,7 +28466,7 @@ window._admUndoBroadcast = async function(docId) {
         players.docs.forEach(doc => {
           const st = doc.data().state || {};
           const events = (st.events || []).filter(e => e.title !== data.title);
-          batch.update(doc.ref, { 'state.events': events });
+          batch.update(doc.ref, { 'state.events': events, '_adminLiveWrite': true });
         });
         await batch.commit();
         // Real-time: also remove from admin's own local S and re-render calendar immediately
@@ -28482,7 +28483,7 @@ window._admUndoBroadcast = async function(docId) {
         players.docs.forEach(doc => {
           const st = doc.data().state || {};
           const items = (st.shopItems || []).filter(i => i.name !== data.name);
-          batch.update(doc.ref, { 'state.shopItems': items });
+          batch.update(doc.ref, { 'state.shopItems': items, '_adminLiveWrite': true });
         });
         await batch.commit();
         // Real-time: update admin's own local S and re-render shop immediately
@@ -28498,7 +28499,7 @@ window._admUndoBroadcast = async function(docId) {
         players.docs.forEach(doc => {
           const st = doc.data().state || {};
           const achs = (st.achievements || []).filter(a => a.title !== data.title);
-          batch.update(doc.ref, { 'state.achievements': achs });
+          batch.update(doc.ref, { 'state.achievements': achs, '_adminLiveWrite': true });
         });
         await batch.commit();
         // Real-time: update admin's own local S and re-render achievements immediately
@@ -28513,7 +28514,7 @@ window._admUndoBroadcast = async function(docId) {
         const players = await fbDb.collection('players').get();
         const batch = fbDb.batch();
         players.docs.forEach(doc => {
-          batch.update(doc.ref, { 'state.cpPrizes': [] });
+          batch.update(doc.ref, { 'state.cpPrizes': [], '_adminLiveWrite': true });
         });
         await batch.commit();
         // Real-time: clear admin's own local custom prizes
