@@ -536,18 +536,22 @@ button, a { touch-action: manipulation; }
     height: auto;
     aspect-ratio: 390 / 844;
     transform: translateZ(0);
-    isolation: isolate;
   }
   #power-screen,
   #admin-panel-overlay,
-  #notif-panel {
-    transform: translateZ(0);
-    isolation: isolate;
-  }
+  #notif-panel,
   #charging-overlay,
   #ios-pow-ov {
-    transform: translateZ(0);
-    isolation: isolate;
+    clip-path: inset(0 round 48px);
+    border-radius: 0;
+    overflow: visible;
+  }
+  #phone.expanded #power-screen,
+  #phone.expanded #admin-panel-overlay,
+  #phone.expanded #notif-panel,
+  #phone.expanded #charging-overlay,
+  #phone.expanded #ios-pow-ov {
+    clip-path: inset(0 round 24px);
   }
 }
 
