@@ -3089,14 +3089,166 @@ input[type=number] { -moz-appearance:textfield; }
   0%,100% { box-shadow:0 0 0 rgba(246,187,78,0); }
   50%      { box-shadow:0 0 16px rgba(246,187,78,0.7); }
 }
-/* ===== PLINKO ===== */
-#plinko-canvas {
-  border-radius:12px;
-  display:block;
-  margin:0 auto;
-  background:var(--card);
-  border:1px solid rgba(255,255,255,0.1);
+/* ===== PLINKO REDESIGN ===== */
+#screen-plinko {
+  background: #09061f;
+  overflow-y: auto;
+  padding: 0;
+  scrollbar-width: none;
 }
+#screen-plinko::-webkit-scrollbar { display: none; }
+
+/* Header */
+.pk-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px 0; position: relative; z-index: 10;
+}
+.pk-hdr-back {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(168,85,247,0.2);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: background .2s;
+}
+.pk-hdr-back:hover { background: rgba(168,85,247,0.15); }
+.pk-hdr-center { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.pk-hdr-title { font-size: 17px; font-weight: 900; color: #fff; letter-spacing: -.3px; }
+.pk-hdr-sub { font-size: 10px; color: #7c5faa; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.pk-hdr-btn {
+  width: 34px; height: 34px; border-radius: 12px;
+  background: rgba(168,85,247,0.09); border: 1px solid rgba(168,85,247,0.22);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: background .2s;
+}
+.pk-hdr-btn:hover { background: rgba(168,85,247,0.22); }
+
+/* Score row */
+.pk-score-row {
+  display: flex; align-items: stretch; gap: 8px;
+  padding: 10px 14px 0; position: relative; z-index: 10;
+}
+.pk-sc {
+  flex: 1; background: #100c2a; border: 1px solid rgba(168,85,247,0.13);
+  border-radius: 16px; padding: 9px 10px; text-align: center;
+}
+.pk-sc-v { font-size: 18px; font-weight: 900; letter-spacing: -.4px; line-height: 1; }
+.pk-sc-l { font-size: 9px; color: #5a4a7a; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-top: 4px; }
+.pk-sc-main {
+  flex: 1.6; background: linear-gradient(145deg, #1a0d5a, #2d1580);
+  border: 1px solid rgba(124,58,237,0.33); border-radius: 16px;
+  padding: 9px 12px; text-align: center; position: relative; overflow: hidden;
+}
+.pk-sc-main::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(168,85,247,0.13), transparent 70%);
+}
+.pk-sc-main .pk-sc-v { font-size: 24px; color: #fff; position: relative; z-index: 1; }
+.pk-sc-main .pk-sc-l { position: relative; z-index: 1; color: #7c5faa; }
+
+/* Toolbar */
+.pk-tbar {
+  display: flex; gap: 5px; padding: 9px 14px 0;
+  position: relative; z-index: 10; flex-wrap: wrap;
+}
+.pk-tc {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 11px; border-radius: 20px; font-size: 10px;
+  font-weight: 800; cursor: pointer; border: 1px solid transparent;
+  white-space: nowrap; font-family: inherit; transition: opacity .15s;
+}
+.pk-tc:active { opacity: .75; }
+.pk-tc.pk-act { background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff; }
+.pk-tc.pk-dim { background: rgba(255,255,255,0.05); border-color: rgba(168,85,247,0.15); color: #8b73c4; }
+.pk-tc.pk-grn { background: #0d3a1a; border-color: rgba(34,197,94,0.27); color: #4ade80; }
+.pk-tc.pk-blu { background: #071e3a; border-color: rgba(59,130,246,0.27); color: #60a5fa; }
+.pk-tc.pk-yel { background: #2a1c00; border-color: rgba(246,187,78,0.27); color: #f6bb4e; }
+
+/* Board wrapper */
+.pk-board-wrap {
+  margin: 9px 14px 0; border-radius: 20px; overflow: hidden;
+  position: relative; background: #070516;
+  border: 1px solid rgba(61,31,136,0.27);
+}
+#plinko-canvas {
+  display: block; width: 100%; border-radius: 0;
+  background: #070516; border: none;
+}
+
+/* Slots row */
+.pk-slots {
+  display: flex; margin: 0 14px;
+  border-radius: 0 0 16px 16px; overflow: hidden;
+  border: 1px solid rgba(61,31,136,0.27); border-top: none;
+}
+.pk-slot {
+  flex: 1; padding: 6px 0 5px; text-align: center;
+  cursor: pointer; transition: filter .15s; position: relative;
+}
+.pk-slot:hover { filter: brightness(1.3); }
+.pk-slot-lbl { font-size: 10px; font-weight: 900; letter-spacing: -.2px; }
+.pk-slot-ico { font-size: 10px; margin-top: 1px; }
+
+/* Legend */
+.pk-legend {
+  display: flex; flex-wrap: wrap; gap: 5px 12px;
+  padding: 8px 16px 0; position: relative; z-index: 10;
+}
+.pk-li { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #5a4a7a; font-weight: 700; }
+.pk-ld { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* Drop button */
+.pk-drop-area { padding: 10px 14px 0; position: relative; z-index: 10; }
+.pk-drop-btn {
+  width: 100%; background: linear-gradient(135deg, #6d28d9, #a855f7, #d946ef);
+  border-radius: 20px; padding: 13px; display: flex; align-items: center;
+  justify-content: center; gap: 10px; font-size: 14px; font-weight: 900;
+  color: #fff; cursor: pointer; letter-spacing: .02em; position: relative;
+  overflow: hidden; border: none; font-family: inherit;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.4); transition: opacity .15s;
+}
+.pk-drop-btn:active { opacity: .82; }
+.pk-drop-btn::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent, rgba(255,255,255,0.13), transparent);
+  transform: skewX(-25deg) translateX(-150%);
+  animation: pkSheen 3s ease-in-out infinite;
+}
+@keyframes pkSheen {
+  0%,70%{transform:skewX(-25deg) translateX(-150%)}
+  80%{transform:skewX(-25deg) translateX(250%)}
+  100%{transform:skewX(-25deg) translateX(250%)}
+}
+.pk-drop-icon {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(255,255,255,0.18); display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+/* Result */
+.pk-result {
+  text-align: center; padding: 6px 14px 0;
+  font-size: 14px; font-weight: 800; min-height: 24px;
+  position: relative; z-index: 10;
+}
+
+/* Bottom dock */
+.pk-dock {
+  margin: 10px 14px 14px; background: #100c2a;
+  border: 1px solid rgba(168,85,247,0.1); border-radius: 20px;
+  padding: 8px 4px; display: flex; justify-content: space-around;
+  position: relative; z-index: 10;
+}
+.pk-dk {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px; padding: 3px 10px; cursor: pointer;
+}
+.pk-dk-i {
+  width: 34px; height: 34px; border-radius: 12px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(168,85,247,0.1);
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
+}
+.pk-dk:hover .pk-dk-i { background: rgba(168,85,247,0.12); }
+.pk-dk-l { font-size: 8px; color: #5a4a7a; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
 
 /* ===== SPIN WHEEL ===== */
 .sw-screen { background:#0b0820; overflow-y:auto; padding:0; }
@@ -4359,12 +4511,8 @@ input[type=number] { -moz-appearance:textfield; }
 
     <!-- ===== PLINKO SCREEN ===== -->
     <div id="screen-plinko" class="screen">
-      <div class="screen-header">
-        <button class="back-btn" onclick="openScreen('home')">←</button>
-        <span class="screen-title">🎯 Plinko</span>
-        <button class="btn btn-ghost btn-sm" class="admin-only" onclick="openModal('plinko-settings-modal')">⚙️</button>
-      </div>
-      <div id="plinko-content" style="padding:16px"></div>
+      <!-- Header + all content injected by renderPlinko() -->
+      <div id="plinko-content"></div>
     </div>
 
     <!-- ===== SPIN WHEEL SCREEN ===== -->
@@ -11110,24 +11258,136 @@ function _plinkoStopLiveBroadcast() {
 function renderPlinko() {
   const c = document.getElementById('plinko-content');
   const rows = S.plinkoRows || 10;
+  const fps  = S.plinkoFPS  || 60;
+
+  // Build slot definitions matching bucket values
+  const buckets = buildPlinkoBuckets();
+  const SLOT_DEFS = buckets.map(b => {
+    if (b.value >= 20) return { lbl: '+20', bg: '#1f0d00', light: '#f59e0b', ico: '🏆' };
+    if (b.value >= 12) return { lbl: '+12', bg: '#1a1000', light: '#fbbf24', ico: '🏆' };
+    if (b.value >= 6)  return { lbl: '+6',  bg: '#0e2016', light: '#a088fa', ico: '' };
+    if (b.value >= 3)  return { lbl: '+3',  bg: '#0d2a1a', light: '#4ade80', ico: '' };
+    if (b.value >= 1)  return { lbl: '+1',  bg: '#0a2218', light: '#34d399', ico: '' };
+    if (b.value >= -3) return { lbl: b.value.toString(), bg: '#1a0a14', light: '#f87171', ico: '' };
+    return { lbl: b.value.toString(), bg: '#3b0a0a', light: '#ef4444', ico: '☠' };
+  });
+
   c.innerHTML = `
-    <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
-      <button class="btn btn-primary btn-sm" title="5 tickets per drop" onclick="dropPlinko()">🎯 Drop</button>
-      <button class="btn btn-ghost btn-sm" title="15 tickets (3 drops)" onclick="for(let i=0;i<3;i++)setTimeout(dropPlinko,i*300)">×3</button>
-      <button class="btn btn-ghost btn-sm" onclick="plinkoOpenSettings()">⚙️ ${rows}r · ${S.plinkoFPS||60}fps</button>
-      <button class="btn btn-ghost btn-sm" onclick="rebuildPlinkoBoard()">🔀</button>
-      <button class="btn btn-sm${plinkoCameraFollow?' btn-primary':' btn-ghost'}" onclick="plinkoCameraFollow=!plinkoCameraFollow;this.className='btn btn-sm '+(plinkoCameraFollow?'btn-primary':'btn-ghost')">📷 Cam</button>
-      ${isAdmin() ? '<button class="btn btn-ghost btn-sm" onclick="openPlinkoEditor()" style="color:#f6bb4e;border-color:rgba(246,187,78,0.4)">🗺️ Edit</button>' : ''}
+    <!-- NEW REDESIGN HEADER -->
+    <div class="pk-hdr">
+      <button class="pk-hdr-back" onclick="openScreen('home')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="pk-hdr-center">
+        <div class="pk-hdr-title">Plinko</div>
+        <div class="pk-hdr-sub" id="pk-sub-label">Round 1 · ${fps}fps</div>
+      </div>
+      <button class="pk-hdr-btn" onclick="plinkoOpenSettings()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
     </div>
-    <div style="display:flex;gap:6px;font-size:9px;margin-bottom:6px;flex-wrap:wrap;color:rgba(255,255,255,0.6)">
-      <span>⚪ Normal</span><span style="color:#f6bb4e">🟡 Bumper</span><span style="color:#fc7790">🔴 Penalty</span>
-      <span style="color:#4edfd0">🔵 Moving</span><span style="color:#b2f2ff">❄️ Freeze</span><span style="color:#f5e982">⭐ 2×</span><span style="color:#ca7ced">🌀 Warp</span>
+
+    <!-- SCORE ROW -->
+    <div class="pk-score-row">
+      <div class="pk-sc">
+        <div class="pk-sc-v" id="pk-last-hit" style="color:#a088fa">—</div>
+        <div class="pk-sc-l">Last Hit</div>
+      </div>
+      <div class="pk-sc-main">
+        <div class="pk-sc-v" id="pk-total-score">${S.tickets || 0}</div>
+        <div class="pk-sc-l">Tickets</div>
+      </div>
+      <div class="pk-sc">
+        <div class="pk-sc-v" style="color:#fbbf24">×5</div>
+        <div class="pk-sc-l">Cost</div>
+      </div>
     </div>
-    <div style="overflow:hidden;border-radius:12px;border:1px solid rgba(255,255,255,0.1);position:relative">
-      <canvas id="plinko-canvas" width="${PK_W}" height="500" style="display:block"></canvas>
+
+    <!-- TOOLBAR -->
+    <div class="pk-tbar">
+      <button class="pk-tc pk-act" onclick="dropPlinko()">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="6" r="3" fill="#fff" stroke="none"/><path d="M12 9v11"/></svg>
+        Drop (5🎟)
+      </button>
+      <button class="pk-tc pk-dim" onclick="for(let i=0;i<3;i++)setTimeout(dropPlinko,i*350)">×3</button>
+      <button class="pk-tc pk-dim" onclick="rebuildPlinkoBoard(); playSound('click')">🔀</button>
+      <button class="pk-tc pk-blu${plinkoCameraFollow ? ' pk-act' : ''}" id="pk-cam-btn" onclick="plinkoCameraFollow=!plinkoCameraFollow; document.getElementById('pk-cam-btn').className='pk-tc pk-blu'+(plinkoCameraFollow?' pk-act':'')">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+        Cam
+      </button>
+      ${isAdmin() ? `<button class="pk-tc pk-yel" onclick="openPlinkoEditor()">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit
+      </button>` : ''}
     </div>
-    <div id="plinko-result" style="text-align:center;margin-top:6px;font-size:15px;font-weight:700;min-height:22px"></div>
+
+    <!-- BOARD CANVAS -->
+    <div class="pk-board-wrap">
+      <canvas id="plinko-canvas" width="${PK_W}" height="460" style="display:block;width:100%"></canvas>
+    </div>
+
+    <!-- SLOTS ROW -->
+    <div class="pk-slots" id="pk-slots-row"></div>
+
+    <!-- LEGEND -->
+    <div class="pk-legend">
+      <div class="pk-li"><div class="pk-ld" style="background:#4a3080;border:1.5px solid #a855f7"></div>Normal</div>
+      <div class="pk-li"><div class="pk-ld" style="background:#ca8a04;border:1.5px solid #fbbf24"></div>Bumper</div>
+      <div class="pk-li"><div class="pk-ld" style="background:#0891b2;border:1.5px solid #22d3ee"></div>Moving</div>
+      <div class="pk-li"><div class="pk-ld" style="background:#7c3aed;border:1.5px solid #e879f9"></div>×2 Multi</div>
+      <div class="pk-li"><div class="pk-ld" style="background:#dc2626;border:1.5px solid #f87171"></div>Penalty</div>
+      <div class="pk-li"><div class="pk-ld" style="background:#2563eb;border:1.5px solid #91c7ff"></div>Freeze</div>
+      <div class="pk-li"><div class="pk-ld" style="background:#7e22ce;border:1.5px solid #ca7ced"></div>Warp</div>
+    </div>
+
+    <!-- DROP BUTTON -->
+    <div class="pk-drop-area">
+      <button class="pk-drop-btn" onclick="dropPlinko()">
+        <div class="pk-drop-icon">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14m-5-5l5 5 5-5"/></svg>
+        </div>
+        Drop Ball · 5 Tickets
+      </button>
+    </div>
+
+    <!-- RESULT -->
+    <div class="pk-result" id="plinko-result"></div>
+
+    <!-- DOCK -->
+    <div class="pk-dock">
+      <div class="pk-dk" onclick="openScreen('home')">
+        <div class="pk-dk-i"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7c5faa" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+        <div class="pk-dk-l">Home</div>
+      </div>
+      <div class="pk-dk" onclick="rebuildPlinkoBoard(); playSound('click')">
+        <div class="pk-dk-i"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7c5faa" stroke-width="1.8" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg></div>
+        <div class="pk-dk-l">New Board</div>
+      </div>
+      <div class="pk-dk" onclick="plinkoOpenSettings()">
+        <div class="pk-dk-i"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7c5faa" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <div class="pk-dk-l">Settings</div>
+      </div>
+    </div>
   `;
+
+  // Populate slots row
+  const slotsEl = document.getElementById('pk-slots-row');
+  if (slotsEl) {
+    SLOT_DEFS.forEach((s, i) => {
+      const d = document.createElement('div');
+      d.className = 'pk-slot';
+      d.id = 'pk-sl' + i;
+      d.style.cssText = `background:${s.bg};border-right:1px solid rgba(255,255,255,0.04)`;
+      d.innerHTML = `<div class="pk-slot-lbl" style="color:${s.light}">${s.lbl}</div>${s.ico ? `<div class="pk-slot-ico">${s.ico}</div>` : ''}`;
+      slotsEl.appendChild(d);
+    });
+  }
+
+  // Round counter
+  if (!window._plinkoRound) window._plinkoRound = 1;
+  const subEl = document.getElementById('pk-sub-label');
+  if (subEl) subEl.textContent = `Round ${window._plinkoRound} · ${fps}fps`;
+
   buildPlinkoBoard();
   plinkoBalls = [];
   plinkoCamY = 0; plinkoCamSmooth = 0;
@@ -11135,7 +11395,13 @@ function renderPlinko() {
   _plinkoStartLiveBroadcast();
 }
 
-function rebuildPlinkoBoard() { buildPlinkoBoard(); playSound('click'); }
+function rebuildPlinkoBoard() {
+  buildPlinkoBoard();
+  window._plinkoRound = 1;
+  const subEl = document.getElementById('pk-sub-label');
+  if (subEl) subEl.textContent = 'Round 1 · ' + (S.plinkoFPS || 60) + 'fps';
+  playSound('click');
+}
 
 function plinkoOpenSettings() {
   playSound('click');
@@ -11151,6 +11417,7 @@ function plinkoOpenSettings() {
 
 function applyPlinkoSettings() {
   S.plinkoRows = Math.min(32, Math.max(4, parseInt(document.getElementById('plinko-rows').value) || 10));
+  window._plinkoRound = 1;
   saveState(); playSound('success'); closeModal('plinko-settings-modal'); renderPlinko();
 }
 
@@ -11366,6 +11633,29 @@ function plinkoStep(canvas) {
       const bucket = buckets[slot];
       const val = Math.round(bucket.value * ball.multiplier);
       addTickets(val);
+
+      // Update new redesigned UI elements
+      const lastHitEl = document.getElementById('pk-last-hit');
+      if (lastHitEl) {
+        lastHitEl.textContent = (val >= 0 ? '+' : '') + val;
+        lastHitEl.style.color = val >= 0 ? '#4ade80' : '#f87171';
+      }
+      const totalEl = document.getElementById('pk-total-score');
+      if (totalEl) totalEl.textContent = S.tickets || 0;
+
+      // Flash the landing slot
+      const slotEl = document.getElementById('pk-sl' + slot);
+      if (slotEl) {
+        slotEl.style.filter = 'brightness(2)';
+        setTimeout(() => { if (slotEl) slotEl.style.filter = ''; }, 350);
+      }
+
+      // Round counter
+      if (!window._plinkoRound) window._plinkoRound = 1;
+      window._plinkoRound++;
+      const subEl = document.getElementById('pk-sub-label');
+      if (subEl) subEl.textContent = `Round ${window._plinkoRound} · ${S.plinkoFPS || 60}fps`;
+
       const resultEl = document.getElementById('plinko-result');
       if (resultEl) {
         resultEl.style.color = val >= 0 ? 'var(--gold)' : 'var(--pink)';
@@ -11415,20 +11705,28 @@ function plinkoStep(canvas) {
   }
 
   // Background
-  ctx.fillStyle = '#0a0b14';
+  ctx.fillStyle = '#070516';
   ctx.fillRect(0, 0, PK_W, WH);
 
-  // Subtle grid
-  ctx.strokeStyle = 'rgba(255,255,255,0.02)';
-  ctx.lineWidth = 1;
-  for (let gx = 0; gx < PK_W; gx += 20) { ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,WH); ctx.stroke(); }
-  for (let gy = 0; gy < WH; gy += 20) { ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(PK_W,gy); ctx.stroke(); }
+  // Subtle grid matching new design palette
+  ctx.strokeStyle = 'rgba(168,85,247,0.04)';
+  ctx.lineWidth = 0.5;
+  for (let gx = 0; gx < PK_W; gx += 28) { ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,WH); ctx.stroke(); }
+  ctx.strokeStyle = 'rgba(124,58,237,0.03)';
+  for (let gy = 0; gy < WH; gy += 28) { ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(PK_W,gy); ctx.stroke(); }
 
-  // Buckets
+  // Buckets — new design palette
   buckets.forEach((b, i) => {
     const by = bucketWorldY;
     const isNeg = b.value < 0;
-    const col = isNeg ? '#fc7790' : (b.value >= 12 ? '#f6bb4e' : b.value >= 6 ? '#a088fa' : '#4edfd0');
+    let col;
+    if (b.value >= 20)      col = '#f59e0b';
+    else if (b.value >= 12) col = '#fbbf24';
+    else if (b.value >= 6)  col = '#a855f7';
+    else if (b.value >= 3)  col = '#4ade80';
+    else if (b.value >= 1)  col = '#34d399';
+    else if (b.value >= -3) col = '#f87171';
+    else                    col = '#ef4444';
     const grad = ctx.createLinearGradient(b.x, by, b.x, by + PK_BUCKET_H);
     grad.addColorStop(0, col + 'cc');
     grad.addColorStop(1, col + '22');
@@ -11438,11 +11736,11 @@ function plinkoStep(canvas) {
     ctx.strokeRect(b.x + 1, by, b.w - 2, PK_BUCKET_H);
     const label = b.value > 0 ? `+${b.value}` : `${b.value}`;
     ctx.fillStyle = '#fff';
-    ctx.font = `bold ${b.w > 26 ? 11 : 9}px Inter`;
+    ctx.font = `bold ${b.w > 26 ? 11 : 9}px Inter, sans-serif`;
     ctx.textAlign = 'center';
     ctx.fillText(label, b.x + b.w / 2, by + 18);
     if (b.value >= 12) ctx.fillText('🏆', b.x + b.w / 2, by + 36);
-    else if (isNeg)    ctx.fillText('💀', b.x + b.w / 2, by + 36);
+    else if (isNeg)    ctx.fillText('☠', b.x + b.w / 2, by + 36);
   });
 
   // Barriers (above buckets)
@@ -11630,13 +11928,13 @@ function plinkoStep(canvas) {
     const flash = peg.hitFlash > 0;
 
     const pegColors = {
-      [PEG_TYPES.normal]:     ['#c0b9f5','#7d65d6'],
-      [PEG_TYPES.bumper]:     ['#fff7aa','#f6bb4e'],
-      [PEG_TYPES.penalty]:    ['#ff8fa0','#aa617c'],
-      [PEG_TYPES.moving]:     ['#9fffff','#2cb1b1'],
-      [PEG_TYPES.freeze]:     ['#e0f8ff','#6f96ff'],
-      [PEG_TYPES.multiplier]: ['#fffaaa','#f5e982'],
-      [PEG_TYPES.warp]:       ['#f0c0ff','#ca7ced'],
+      [PEG_TYPES.normal]:     ['#c084fc', '#6d28d9'],
+      [PEG_TYPES.bumper]:     ['#fde68a', '#d97706'],
+      [PEG_TYPES.penalty]:    ['#fca5a5', '#dc2626'],
+      [PEG_TYPES.moving]:     ['#67e8f9', '#0891b2'],
+      [PEG_TYPES.freeze]:     ['#bfdbfe', '#2563eb'],
+      [PEG_TYPES.multiplier]: ['#f0abfc', '#7c3aed'],
+      [PEG_TYPES.warp]:       ['#e9d5ff', '#7e22ce'],
     };
     const cols = pegColors[peg.type] || pegColors[PEG_TYPES.normal];
     const g = ctx.createRadialGradient(peg.x - PR*0.3, peg.y - PR*0.3, PR*0.1, peg.x, peg.y, PR);
@@ -11644,15 +11942,20 @@ function plinkoStep(canvas) {
     g.addColorStop(1, flash ? cols[0]   : cols[1]);
     ctx.beginPath(); ctx.arc(peg.x, peg.y, PR, 0, Math.PI*2);
     ctx.fillStyle = g; ctx.fill();
+    ctx.strokeStyle = flash ? cols[0] : cols[0] + '66'; ctx.lineWidth = 1.2; ctx.stroke();
 
-    // Glow on bumpers/multipliers
-    if (peg.type === PEG_TYPES.bumper || peg.type === PEG_TYPES.multiplier) {
+    // Glow ring on bumpers / multipliers / hit flash
+    if (peg.type === PEG_TYPES.bumper || peg.type === PEG_TYPES.multiplier || flash) {
       ctx.beginPath(); ctx.arc(peg.x, peg.y, PR + 5, 0, Math.PI*2);
-      ctx.strokeStyle = cols[1] + '50'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.strokeStyle = cols[1] + (flash ? '99' : '44'); ctx.lineWidth = flash ? 2 : 1.5; ctx.stroke();
+      if (flash) {
+        ctx.beginPath(); ctx.arc(peg.x, peg.y, PR + 9, 0, Math.PI*2);
+        ctx.strokeStyle = cols[1] + '22'; ctx.lineWidth = 1; ctx.stroke();
+      }
     }
     // Label for special pegs
     if (peg.type === PEG_TYPES.multiplier) {
-      ctx.fillStyle = '#333'; ctx.font = 'bold 7px Inter'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 7px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText('×2', peg.x, peg.y); ctx.textBaseline = 'alphabetic';
     } else if (peg.type === PEG_TYPES.freeze) {
       ctx.font = '8px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -11666,14 +11969,13 @@ function plinkoStep(canvas) {
 
   // Balls
   plinkoBalls.forEach(ball => {
-    // Trail
+    // Trail — purple tinted per mockup
     ball.trail.forEach((pt, ti) => {
       if (ti === 0) return;
-      const a = (ti / ball.trail.length) * 0.35;
+      const a = (ti / ball.trail.length) * 0.45;
       const r2 = ball.r * (ti / ball.trail.length) * 0.75;
       ctx.beginPath(); ctx.arc(pt.x, pt.y, r2, 0, Math.PI*2);
-      const hex = Math.floor(a * 255).toString(16).padStart(2,'0');
-      ctx.fillStyle = ball.color + hex;
+      ctx.fillStyle = '#c084fc' + Math.floor(a * 255).toString(16).padStart(2,'0');
       ctx.fill();
     });
 
@@ -11683,33 +11985,38 @@ function plinkoStep(canvas) {
     ctx.beginPath(); ctx.arc(ball.x + 2, ball.y + 3, ball.r, 0, Math.PI*2);
     ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fill();
 
-    // Ball with spin highlight
+    // Ball — new design: white → color → dark purple, specular dot
     const gr = ctx.createRadialGradient(
-      ball.x + Math.cos(ball.spinAngle) * ball.r * 0.4,
-      ball.y + Math.sin(ball.spinAngle) * ball.r * 0.4,
-      ball.r * 0.1,
+      ball.x - ball.r * 0.35, ball.y - ball.r * 0.35, 0,
       ball.x, ball.y, ball.r
     );
-    gr.addColorStop(0, '#ffffff');
-    gr.addColorStop(0.4, ball.color);
-    gr.addColorStop(1, ball.color + '66');
+    gr.addColorStop(0,    '#ffffff');
+    gr.addColorStop(0.25, '#f0abfc');
+    gr.addColorStop(0.7,  ball.color);
+    gr.addColorStop(1,    '#4c1d95');
     ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
     ctx.fillStyle = gr; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 1; ctx.stroke();
 
-    // Glow
-    ctx.shadowBlur = 10; ctx.shadowColor = ball.color;
-    ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 1.2; ctx.stroke();
+    // Glow ring
+    ctx.shadowBlur = ball.r * 2.2; ctx.shadowColor = ball.color;
+    ctx.strokeStyle = ball.color + '55'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r + 2, 0, Math.PI*2); ctx.stroke();
     ctx.shadowBlur = 0;
+
+    // Specular highlight dot
+    ctx.beginPath(); ctx.arc(ball.x - ball.r * 0.32, ball.y - ball.r * 0.32, ball.r * 0.28, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.62)'; ctx.fill();
 
     // Multiplier badge
     if (ball.multiplier > 1) {
-      ctx.fillStyle = '#f5e982'; ctx.font = 'bold 8px Inter'; ctx.textAlign = 'center';
+      ctx.fillStyle = '#fde68a'; ctx.font = 'bold 8px Inter, sans-serif'; ctx.textAlign = 'center';
       ctx.fillText(`×${ball.multiplier}`, ball.x, ball.y - ball.r - 2);
     }
 
     // Frozen indicator
     if (ball.frozen > 0) {
-      ctx.fillStyle = 'rgba(145,199,255,0.5)';
+      ctx.fillStyle = 'rgba(145,199,255,0.38)';
       ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.r + 3, 0, Math.PI*2); ctx.fill();
     }
   });
