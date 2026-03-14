@@ -530,9 +530,10 @@ button, a { touch-action: manipulation; }
     justify-content: center;
     max-width: 100vw;
     max-height: 100vh;
-    width: auto;
-    height: auto;
+    width: min(406px, calc(100vh * 406 / 844));
+    height: min(844px, 100vh);
     flex-shrink: 1;
+    position: relative;
   }
   #phone {
     width: min(390px, calc(100vh * 390 / 844));
@@ -541,6 +542,22 @@ button, a { touch-action: manipulation; }
     transform: translateZ(0);
     border-radius: min(48px, calc(100vh * 48 / 844));
     clip-path: none;
+  }
+  /* Scale side button positions proportionally with phone */
+  #btn-mute  { top: min(142px, calc(100vh * 142 / 844)); }
+  #btn-vol-up   { top: min(192px, calc(100vh * 192 / 844)); }
+  #btn-vol-down { top: min(264px, calc(100vh * 264 / 844)); }
+  #btn-power    { top: min(200px, calc(100vh * 200 / 844)); }
+  #btn-mute, #btn-vol-up, #btn-vol-down {
+    height: min(34px, calc(100vh * 34 / 844));
+    left: 0;
+  }
+  #btn-vol-up, #btn-vol-down {
+    height: min(60px, calc(100vh * 60 / 844));
+  }
+  #btn-power {
+    height: min(80px, calc(100vh * 80 / 844));
+    right: 0;
   }
   #power-screen,
   #admin-panel-overlay,
