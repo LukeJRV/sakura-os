@@ -1565,7 +1565,7 @@ input[type=number] { -moz-appearance:textfield; }
   padding:3px 8px; border-radius:99px;
   background:rgba(78,223,208,0.12); color:#4edfd0;
   border:1px solid rgba(78,223,208,0.2);
-  z-index:200; opacity:0; transition:opacity 0.4s;
+  z-index:999; opacity:0; transition:opacity 0.4s;
   pointer-events:none;
 }
 .fb-sync-indicator.show { opacity:1; }
@@ -3172,20 +3172,6 @@ input[type=number] { -moz-appearance:textfield; }
   display: block; width: 100%; border-radius: 0;
   background: #070516; border: none;
 }
-
-/* Slots row */
-.pk-slots {
-  display: flex; margin: 0 14px;
-  border-radius: 0 0 16px 16px; overflow: hidden;
-  border: 1px solid rgba(61,31,136,0.27); border-top: none;
-}
-.pk-slot {
-  flex: 1; padding: 6px 0 5px; text-align: center;
-  cursor: pointer; transition: filter .15s; position: relative;
-}
-.pk-slot:hover { filter: brightness(1.3); }
-.pk-slot-lbl { font-size: 10px; font-weight: 900; letter-spacing: -.2px; }
-.pk-slot-ico { font-size: 10px; margin-top: 1px; }
 
 /* Legend */
 .pk-legend {
@@ -11321,13 +11307,10 @@ function renderPlinko() {
       </button>` : ''}
     </div>
 
-    <!-- BOARD CANVAS -->
+    <!-- BOARD CANVAS (height set dynamically after render) -->
     <div class="pk-board-wrap">
-      <canvas id="plinko-canvas" width="${PK_W}" height="460" style="display:block;width:100%"></canvas>
+      <canvas id="plinko-canvas" width="${PK_W}" height="${getPlinkoWorldHeight()}" style="display:block;width:100%"></canvas>
     </div>
-
-    <!-- SLOTS ROW -->
-    <div class="pk-slots" id="pk-slots-row"></div>
 
     <!-- LEGEND -->
     <div class="pk-legend">
@@ -11369,19 +11352,6 @@ function renderPlinko() {
       </div>
     </div>
   `;
-
-  // Populate slots row
-  const slotsEl = document.getElementById('pk-slots-row');
-  if (slotsEl) {
-    SLOT_DEFS.forEach((s, i) => {
-      const d = document.createElement('div');
-      d.className = 'pk-slot';
-      d.id = 'pk-sl' + i;
-      d.style.cssText = `background:${s.bg};border-right:1px solid rgba(255,255,255,0.04)`;
-      d.innerHTML = `<div class="pk-slot-lbl" style="color:${s.light}">${s.lbl}</div>${s.ico ? `<div class="pk-slot-ico">${s.ico}</div>` : ''}`;
-      slotsEl.appendChild(d);
-    });
-  }
 
   // Round counter
   if (!window._plinkoRound) window._plinkoRound = 1;
@@ -11643,12 +11613,7 @@ function plinkoStep(canvas) {
       const totalEl = document.getElementById('pk-total-score');
       if (totalEl) totalEl.textContent = S.tickets || 0;
 
-      // Flash the landing slot
-      const slotEl = document.getElementById('pk-sl' + slot);
-      if (slotEl) {
-        slotEl.style.filter = 'brightness(2)';
-        setTimeout(() => { if (slotEl) slotEl.style.filter = ''; }, 350);
-      }
+      // Flash the landing slot — handled by canvas flashSlot in plinkoStep
 
       // Round counter
       if (!window._plinkoRound) window._plinkoRound = 1;
