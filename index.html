@@ -19872,7 +19872,7 @@ function renderSettings() {
         + '<div style="' + ROW + '" onclick="togglePhoneOutline()" onmouseover="this.style.background=\'rgba(255,255,255,0.04)\'" onmouseout="this.style.background=\'transparent\'">'
         + ico('linear-gradient(135deg,#0e2a1a,#14532d)', '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>')
         + '<div style="' + TXT + '"><div style="' + T1 + '">Phone Outline</div><div style="' + T2 + '">Show frame & glow ring</div></div>'
-        + '<div style="' + RHS + '">' + tog(S.settings.phoneOutline !== false, 'togglePhoneOutline()') + '</div>'
+        + '<div style="' + RHS + '">' + tog(S.settings.phoneOutline !== false, 'event.stopPropagation();togglePhoneOutline()') + '</div>'
         + '</div>'
 
         // Wallpaper
@@ -19905,13 +19905,13 @@ function renderSettings() {
         + '<div style="' + ROW + '" onclick="S.settings.notifEnabled=!(S.settings.notifEnabled!==false);saveState();renderSettings()" onmouseover="this.style.background=\'rgba(255,255,255,0.04)\'" onmouseout="this.style.background=\'transparent\'">'
         + ico('linear-gradient(135deg,#7c1d1d,#b91c1c)', '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fca5a5" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>')
         + '<div style="' + TXT + '"><div style="' + T1 + '">Reminder Notifications</div><div style="' + T2 + '">Pop-up alerts for reminders</div></div>'
-        + '<div style="' + RHS + '">' + tog(S.settings.notifEnabled !== false, 'S.settings.notifEnabled=!(S.settings.notifEnabled!==false);saveState();renderSettings()') + '</div>'
+        + '<div style="' + RHS + '">' + tog(S.settings.notifEnabled !== false, 'event.stopPropagation();S.settings.notifEnabled=!(S.settings.notifEnabled!==false);saveState();renderSettings()') + '</div>'
         + '</div>'
 
         + '<div style="' + RLST + '" onclick="S.settings.confettiEnabled=!(S.settings.confettiEnabled!==false);saveState();renderSettings()" onmouseover="this.style.background=\'rgba(255,255,255,0.04)\'" onmouseout="this.style.background=\'transparent\'">'
         + ico('linear-gradient(135deg,#0c2a1a,#065f46)', '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>')
         + '<div style="' + TXT + '"><div style="' + T1 + '">Event Confetti</div><div style="' + T2 + '">Celebration animations</div></div>'
-        + '<div style="' + RHS + '">' + tog(S.settings.confettiEnabled !== false, 'S.settings.confettiEnabled=!(S.settings.confettiEnabled!==false);saveState();renderSettings()') + '</div>'
+        + '<div style="' + RHS + '">' + tog(S.settings.confettiEnabled !== false, 'event.stopPropagation();S.settings.confettiEnabled=!(S.settings.confettiEnabled!==false);saveState();renderSettings()') + '</div>'
         + '</div>'
         + '</div>'; // end notifications group
 
