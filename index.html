@@ -2224,38 +2224,36 @@ input[type=number] { -moz-appearance:textfield; }
 .cal-grid {
   display:grid;
   grid-template-columns:repeat(7,1fr);
-  gap:3px;
+  gap:2px;
 }
 .cal-day {
   aspect-ratio:1;
   display:flex; align-items:center; justify-content:center;
-  border-radius:12px;
+  border-radius:8px;
   font-size:12px; font-weight:600;
+  font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
   cursor:pointer;
-  transition:all 0.22s cubic-bezier(.34,1.56,.64,1);
-  color:rgba(255,255,255,0.72);
+  transition:all 0.15s;
+  color:var(--fg);
   position:relative;
   line-height:1;
 }
-.cal-day:hover { background:rgba(109,40,217,0.22); color:#e9d5ff; transform:scale(1.08); }
+.cal-day:hover { background:rgba(160,136,250,0.2); }
 .cal-day.today {
-  background:linear-gradient(135deg,#6d28d9,#8b5cf6);
+  background:var(--accent1);
   color:#fff;
-  font-weight:800;
-  box-shadow:0 4px 16px rgba(109,40,217,0.55),0 0 0 1px rgba(255,255,255,0.1) inset;
+  font-weight:400;
+  box-shadow:0 0 10px rgba(160,136,250,0.5);
 }
-.cal-day.today:hover { transform:scale(1.1); }
 .cal-day.has-event::after {
-  content:''; position:absolute; bottom:3px; left:50%; transform:translateX(-50%);
+  content:''; position:absolute; bottom:2px; left:50%; transform:translateX(-50%);
   width:4px; height:4px; border-radius:50%;
-  background:var(--dot-c, #a78bfa);
-  box-shadow:0 0 5px var(--dot-c, #a78bfa);
+  background:var(--gold);
 }
-.cal-day.other-month { color:rgba(255,255,255,0.14); cursor:default; }
-.cal-day.other-month:hover { background:none; transform:none; color:rgba(255,255,255,0.14); }
+.cal-day.other-month { color:rgba(255,255,255,0.18); }
 @keyframes calRing {
-  0%,100%{box-shadow:0 0 0 2.5px var(--cal-ring,#f6bb4e),0 0 10px var(--cal-ring,#f6bb4e);}
-  50%{box-shadow:0 0 0 4px var(--cal-ring,#f6bb4e),0 0 20px var(--cal-ring,#f6bb4e);}
+  0%,100%{box-shadow:0 0 0 2.5px var(--cal-ring,#f6bb4e),0 0 8px var(--cal-ring,#f6bb4e);}
+  50%{box-shadow:0 0 0 4px var(--cal-ring,#f6bb4e),0 0 18px var(--cal-ring,#f6bb4e);}
 }
 .cal-day.ev-ring { border-radius:50%!important; animation:calRing 2.2s ease-in-out infinite; font-weight:800; }
 /* Glowing event in upcoming list */
@@ -2634,6 +2632,180 @@ input[type=number] { -moz-appearance:textfield; }
   text-transform:uppercase; letter-spacing:0.8px;
   padding:8px 14px 4px;
 }
+/* ===== BACKPACK CRYSTAL VIEW ===== */
+.bp-crystal-container { padding:0 2px; }
+
+.bp-crystal-header {
+  padding:14px 16px 8px;
+  border-bottom:1px solid rgba(139,92,246,0.12);
+  background:rgba(6,3,16,0.6);
+}
+.bp-crystal-title {
+  font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px;margin-bottom:2px;
+}
+.bp-crystal-subtitle {
+  font-size:11px;color:rgba(255,255,255,0.3);font-weight:500;
+}
+.bp-crystal-actions { display:flex;gap:7px; }
+.bp-crystal-btn {
+  border-radius:20px;padding:7px 13px;font-size:11px;font-weight:700;
+  cursor:pointer;border:none;transition:all .2s;
+  display:flex;align-items:center;gap:5px;
+}
+.bp-crystal-btn:active{transform:scale(0.93)}
+.bp-crystal-btn.opt {
+  background:rgba(255,255,255,0.07);border:1px solid rgba(139,92,246,0.25);color:#c4b5fd;
+}
+.bp-crystal-btn.opt:hover{background:rgba(109,40,217,0.2);border-color:rgba(139,92,246,0.45)}
+.bp-crystal-btn.clr {
+  background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.25);color:#fda4af;
+}
+.bp-crystal-btn.clr:hover{background:rgba(244,63,94,0.18)}
+
+.bp-crystal-capbar {
+  padding:10px 16px 0;
+}
+.bp-crystal-track {
+  height:5px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;
+  border:1px solid rgba(139,92,246,0.08);
+}
+.bp-crystal-fill {
+  height:100%;border-radius:99px;
+  background:linear-gradient(90deg,#6d28d9,#a78bfa,#e879f9);
+  box-shadow:0 0 10px rgba(139,92,246,0.5);
+  transition:width .5s cubic-bezier(.34,1.56,.64,1);
+}
+.bp-crystal-cap-labels {
+  display:flex;justify-content:space-between;margin-top:5px;
+  font-size:9px;color:rgba(255,255,255,0.25);font-weight:600;
+  letter-spacing:0.3px;text-transform:uppercase;
+}
+
+.bp-crystal-section-head {
+  padding:14px 16px 6px;
+  display:flex;align-items:center;gap:8px;
+}
+.bp-crystal-section-label {
+  font-size:9px;font-weight:800;color:rgba(139,92,246,0.55);
+  letter-spacing:1px;text-transform:uppercase;white-space:nowrap;
+}
+.bp-crystal-section-line {
+  flex:1;height:1px;background:rgba(139,92,246,0.1);
+}
+
+.bp-crystal-grid {
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:9px;padding:2px 16px 14px;
+}
+
+.bp-cslot {
+  aspect-ratio:1;border-radius:20px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;cursor:pointer;overflow:hidden;
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);
+  -webkit-tap-highlight-color:transparent;
+}
+.bp-cslot.filled {
+  background:linear-gradient(145deg,#0e0b20,#160e2e);
+  border:1px solid rgba(139,92,246,0.3);
+  box-shadow:0 4px 20px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.bp-cslot.filled:hover {
+  transform:scale(1.09) translateY(-2px);
+  border-color:rgba(167,139,250,0.55);
+  box-shadow:0 10px 28px rgba(109,40,217,0.35);
+}
+.bp-cslot.filled:active{transform:scale(0.91)}
+.bp-cslot.empty {
+  background:rgba(255,255,255,0.025);
+  border:1.5px dashed rgba(139,92,246,0.18);
+}
+.bp-cslot.empty:hover{border-color:rgba(167,139,250,0.35);background:rgba(109,40,217,0.06)}
+
+/* rarity tiers */
+.bp-cslot.rare  { border-color:rgba(192,132,252,0.45); }
+.bp-cslot.epic  { border-color:rgba(232,121,249,0.5); }
+.bp-cslot.legendary { border-color:rgba(251,191,36,0.5); animation:bpLegBorder 2s ease-in-out infinite alternate; }
+@keyframes bpLegBorder {
+  0%{box-shadow:0 0 8px rgba(251,191,36,0.2),inset 0 0 8px rgba(251,191,36,0.05)}
+  100%{box-shadow:0 0 20px rgba(251,191,36,0.4),inset 0 0 16px rgba(251,191,36,0.1)}
+}
+
+.bp-cslot-shine {
+  position:absolute;top:0;left:0;right:0;height:45%;
+  background:linear-gradient(180deg,rgba(255,255,255,0.07),transparent);
+  border-radius:20px 20px 0 0;pointer-events:none;
+}
+.bp-cslot-glow {
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 50% 70%,var(--csg,rgba(139,92,246,0.15)),transparent 70%);
+  border-radius:20px;pointer-events:none;opacity:0;transition:opacity .3s;
+}
+.bp-cslot.filled:hover .bp-cslot-glow{opacity:1}
+
+.bp-cslot-rarity {
+  position:absolute;top:5px;right:5px;
+  width:14px;height:14px;border-radius:50%;
+  background:var(--rarity-c,#8b5cf6);
+  box-shadow:0 0 6px var(--rarity-c,#8b5cf6);
+  font-size:7px;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:800;
+}
+.bp-cslot-emoji {
+  font-size:28px;
+  filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+  transition:transform .2s;line-height:1;
+}
+.bp-cslot.filled:hover .bp-cslot-emoji{transform:scale(1.15) rotate(-5deg)}
+.bp-cslot-name {
+  font-size:8px;color:rgba(255,255,255,0.35);font-weight:600;
+  margin-top:4px;letter-spacing:0.3px;text-align:center;
+  padding:0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
+}
+.bp-cslot-badge {
+  position:absolute;top:5px;right:5px;
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(167,139,250,0.9);
+  box-shadow:0 0 6px rgba(139,92,246,0.7);
+}
+.bp-cslot-empty-ico { font-size:18px;opacity:0.15; }
+
+/* Temp storage crystal */
+.bp-crystal-temp-wrap { padding:0 16px 14px; }
+.bp-crystal-temp-card {
+  background:rgba(255,255,255,0.025);
+  border:1px solid rgba(139,92,246,0.2);
+  border-radius:22px;padding:14px;
+  position:relative;overflow:hidden;
+}
+.bp-crystal-temp-card::before {
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 20% 50%,rgba(109,40,217,0.07),transparent 60%);
+  pointer-events:none;
+}
+.bp-crystal-tgrid {
+  display:grid;grid-template-columns:repeat(6,1fr);gap:7px;
+}
+.bp-cts {
+  aspect-ratio:1;border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;cursor:pointer;
+  transition:all .22s cubic-bezier(.34,1.56,.64,1);
+}
+.bp-cts.filled{background:linear-gradient(135deg,#0e0b20,#160e2e);border:1px solid rgba(139,92,246,0.3)}
+.bp-cts.filled:hover{transform:scale(1.12);border-color:rgba(167,139,250,0.5)}
+.bp-cts.empty{background:rgba(255,255,255,0.02);border:1px dashed rgba(139,92,246,0.12)}
+.bp-cts-emoji{font-size:20px}
+.bp-cts-plus{
+  position:absolute;bottom:-2px;right:-2px;
+  width:14px;height:14px;border-radius:50%;
+  background:linear-gradient(135deg,#6d28d9,#8b5cf6);
+  font-size:9px;font-weight:900;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  border:1.5px solid #060310;
+  box-shadow:0 0 6px rgba(109,40,217,0.5);
+}
+
 /* Bottom-sheet tooltip for mobile */
 .bp-mobile-sheet {
   position:absolute; bottom:0; left:0; right:0;
@@ -2658,6 +2830,8 @@ input[type=number] { -moz-appearance:textfield; }
   0%{transform:scale(1)} 40%{transform:scale(0.87)} 70%{transform:scale(1.08)} 100%{transform:scale(1)}
 }
 .bp-new-slot.pop { animation:bpSlotPop 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+.bp-cslot.pop    { animation:bpSlotPop 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes bpTimerDot { 0%,100%{opacity:1} 50%{opacity:0.25} }
 
 /* ===== UPDATE LOGS ===== */
 .update-log-card {
@@ -2840,62 +3014,20 @@ input[type=number] { -moz-appearance:textfield; }
 
 /* ===== NOTES ===== */
 .notes-sidebar {
-  width:148px; min-width:148px;
-  border-right:1px solid rgba(139,92,246,0.1);
+  width:140px; min-width:140px;
+  border-right:1px solid rgba(255,255,255,0.06);
   overflow-y:auto;
   display:flex; flex-direction:column;
-  background:rgba(6,3,16,0.6);
 }
-.notes-sidebar::-webkit-scrollbar { display:none; }
-.notes-sidebar { scrollbar-width:none; }
-
 .note-item {
-  padding:13px 12px 11px;
+  padding:12px;
   cursor:pointer;
-  border-bottom:1px solid rgba(139,92,246,0.07);
-  transition:all 0.2s;
-  position:relative;
-  overflow:hidden;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  transition:background 0.15s;
 }
-.note-item::before {
-  content:'';
-  position:absolute;left:0;top:15%;bottom:15%;
-  width:2.5px;
-  background:var(--note-stripe, #8b5cf6);
-  border-radius:0 2px 2px 0;
-  opacity:0;
-  transition:opacity 0.2s;
-  box-shadow:0 0 6px var(--note-stripe, #8b5cf6);
-}
-.note-item:hover::before, .note-item.active::before { opacity:0.8; }
-.note-item:hover { background:rgba(109,40,217,0.1); }
-.note-item.active {
-  background:linear-gradient(135deg,rgba(109,40,217,0.18),rgba(139,92,246,0.1));
-  border-color:rgba(139,92,246,0.15);
-}
-.note-item-title {
-  font-size:11px; font-weight:700;
-  color:rgba(255,255,255,0.88);
-  letter-spacing:-0.1px;
-  margin-bottom:3px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.note-item.active .note-item-title { color:#e9d5ff; }
-.note-item-preview {
-  font-size:9px; color:rgba(255,255,255,0.3);
-  margin-top:0; overflow:hidden; text-overflow:ellipsis;
-  white-space:nowrap; line-height:1.4; font-weight:400;
-}
-.note-item-time {
-  font-size:8px; color:rgba(139,92,246,0.5);
-  margin-top:5px; font-weight:600; letter-spacing:0.3px;
-  text-transform:uppercase;
-}
-@keyframes noteItemIn {
-  from{opacity:0;transform:translateX(-8px)}
-  to{opacity:1;transform:translateX(0)}
-}
-.note-item { animation:noteItemIn 0.25s ease both; }
+.note-item:hover, .note-item.active { background:rgba(160,136,250,0.1); }
+.note-item-title { font-size:12px; font-weight:600; color:var(--fg); }
+.note-item-preview { font-size:10px; color:rgba(255,255,255,0.4); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 /* ===== ACHIEVEMENTS ===== */
 .achievement-bubble {
@@ -3679,16 +3811,13 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== CALENDAR SCREEN ===== -->
-    <div id="screen-calendar" class="screen" style="background:#06030e">
-      <div class="screen-header" style="background:rgba(6,3,14,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(139,92,246,0.12)">
-        <button class="back-btn" onclick="openScreen('home')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.2);color:#c4b5fd">←</button>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div style="width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#6d28d9,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 3px 12px rgba(109,40,217,0.5)">📅</div>
-          <span class="screen-title" style="font-size:16px;font-weight:800;letter-spacing:-0.3px">Calendar</span>
-        </div>
-        <button style="background:linear-gradient(135deg,#6d28d9,#8b5cf6);border:none;border-radius:20px;padding:7px 14px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 3px 12px rgba(109,40,217,0.45)" class="admin-only" onclick="openModal('add-event-modal')">+ Event</button>
+    <div id="screen-calendar" class="screen">
+      <div class="screen-header">
+        <button class="back-btn" onclick="openScreen('home')">←</button>
+        <span class="screen-title">📅 Calendar</span>
+        <button class="btn btn-primary btn-sm" class="admin-only" onclick="openModal('add-event-modal')">+ Event</button>
       </div>
-      <div id="calendar-content" style="padding:18px 16px;overflow-y:auto;flex:1"></div>
+      <div id="calendar-content" style="padding:16px"></div>
     </div>
 
     <!-- ===== SHOP SCREEN ===== -->
@@ -3827,47 +3956,37 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== NOTES SCREEN ===== -->
-    <div id="screen-notes" class="screen" style="padding:0;flex-direction:column;overflow:hidden;background:#06030e">
-      <!-- Notes header -->
-      <div style="flex-shrink:0;background:rgba(6,3,14,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(139,92,246,0.12)">
-        <div class="screen-header" style="background:transparent;border:none;padding-bottom:0">
-          <button class="back-btn" onclick="openScreen('home')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.2);color:#c4b5fd">←</button>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#6d28d9,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 3px 12px rgba(109,40,217,0.5)">📝</div>
-            <span class="screen-title" style="font-size:16px;font-weight:800;letter-spacing:-0.3px">Notes</span>
-          </div>
-          <button style="background:linear-gradient(135deg,#6d28d9,#8b5cf6);border:none;border-radius:20px;padding:7px 14px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 3px 12px rgba(109,40,217,0.45)" onclick="newNote()">+ New</button>
-        </div>
-        <!-- Format toolbar -->
-        <div style="padding:6px 10px 10px;display:flex;gap:4px;flex-wrap:wrap">
-          <button style="min-width:30px;height:26px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.15);color:#a78bfa;font-size:11px;font-weight:800;cursor:pointer;padding:0 8px;transition:all .15s" onclick="noteFormat('bold')" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'"><b>B</b></button>
-          <button style="min-width:30px;height:26px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.15);color:#a78bfa;font-size:11px;font-weight:800;cursor:pointer;padding:0 8px;transition:all .15s" onclick="noteFormat('italic')" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'"><i>I</i></button>
-          <button style="min-width:30px;height:26px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.15);color:#a78bfa;font-size:11px;font-weight:800;cursor:pointer;padding:0 8px;transition:all .15s" onclick="noteFormat('underline')" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'"><u>U</u></button>
-          <button style="min-width:30px;height:26px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.15);color:#a78bfa;font-size:11px;font-weight:800;cursor:pointer;padding:0 8px;transition:all .15s" onclick="noteFormat('strikethrough')" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'"><s>S</s></button>
-          <div style="width:1px;height:20px;background:rgba(139,92,246,0.15);margin:3px 2px;align-self:center"></div>
-          <button style="min-width:30px;height:26px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.15);color:#a78bfa;font-size:9px;font-weight:900;cursor:pointer;padding:0 8px;transition:all .15s" onclick="noteFormat('h1')" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">H1</button>
-          <button style="min-width:30px;height:26px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.15);color:#a78bfa;font-size:9px;font-weight:800;cursor:pointer;padding:0 8px;transition:all .15s" onclick="noteFormat('h2')" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">H2</button>
-          <div style="width:1px;height:20px;background:rgba(139,92,246,0.15);margin:3px 2px;align-self:center"></div>
-          <select class="input" style="width:68px;padding:3px 6px;font-size:9px;height:26px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.15);color:#a78bfa" onchange="noteColor(this.value);this.value=''">
-            <option value="">🎨 Color</option>
-            <option value="#a78bfa">Purple</option>
-            <option value="#f472b6">Pink</option>
-            <option value="#fbbf24">Gold</option>
-            <option value="#4ade80">Green</option>
-            <option value="#60a5fa">Blue</option>
-            <option value="#fb923c">Orange</option>
-            <option value="#34d399">Teal</option>
-          </select>
-        </div>
+    <div id="screen-notes" class="screen" style="padding:0;flex-direction:column;overflow:hidden">
+      <div class="screen-header" style="flex-shrink:0">
+        <button class="back-btn" onclick="openScreen('home')">←</button>
+        <span class="screen-title">📝 Notes</span>
+        <button class="btn btn-primary btn-sm" onclick="newNote()">+ New</button>
       </div>
       <div style="display:flex;flex:1;overflow:hidden;min-height:0;min-width:0">
         <div class="notes-sidebar" id="notes-sidebar" style="flex-shrink:0"></div>
-        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;background:rgba(8,4,18,0.8)">
-          <div id="note-editor" contenteditable="true"
-            style="flex:1;padding:16px 14px;outline:none;color:rgba(233,213,255,0.88);font-size:13px;line-height:1.75;overflow-y:auto;min-height:0;word-break:break-word;font-weight:400"
-            oninput="saveCurrentNote()"
-            data-placeholder="Start writing…"></div>
-          <div id="note-wordcount" style="padding:5px 14px 8px;font-size:9px;color:rgba(139,92,246,0.45);border-top:1px solid rgba(139,92,246,0.08);flex-shrink:0;font-weight:600;letter-spacing:0.4px;text-transform:uppercase">Ready to write…</div>
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
+          <div style="padding:6px 8px;display:flex;gap:4px;background:var(--card);border-bottom:1px solid rgba(255,255,255,0.06);flex-wrap:wrap;flex-shrink:0">
+            <button class="btn btn-ghost btn-sm" onclick="noteFormat('bold')" title="Bold"><b>B</b></button>
+            <button class="btn btn-ghost btn-sm" onclick="noteFormat('italic')" title="Italic"><i>I</i></button>
+            <button class="btn btn-ghost btn-sm" onclick="noteFormat('underline')" title="Underline"><u>U</u></button>
+            <button class="btn btn-ghost btn-sm" onclick="noteFormat('strikethrough')" title="Strike"><s>S</s></button>
+            <button class="btn btn-ghost btn-sm" onclick="noteFormat('h1')" style="font-size:10px;font-weight:800">H1</button>
+            <button class="btn btn-ghost btn-sm" onclick="noteFormat('h2')" style="font-size:10px;font-weight:700">H2</button>
+            <select class="input" style="width:72px;padding:3px 4px;font-size:10px;height:28px" onchange="noteColor(this.value);this.value=''">
+              <option value="">🎨</option>
+              <option value="#a088fa">Purple</option>
+              <option value="#fc7790">Pink</option>
+              <option value="#f6bb4e">Gold</option>
+              <option value="#4caf6e">Green</option>
+              <option value="#6f96ff">Blue</option>
+              <option value="#e78161">Orange</option>
+              <option value="#4edfd0">Teal</option>
+            </select>
+          </div>
+          <div id="note-editor" contenteditable="true" 
+            style="flex:1;padding:14px;outline:none;color:var(--fg);font-size:14px;line-height:1.7;overflow-y:auto;min-height:0;word-break:break-word" 
+            oninput="saveCurrentNote()"></div>
+          <div id="note-wordcount" style="padding:4px 12px;font-size:10px;color:rgba(255,255,255,0.3);border-top:1px solid rgba(255,255,255,0.04);flex-shrink:0">Ready to write...</div>
         </div>
       </div>
     </div>
@@ -4388,10 +4507,11 @@ input[type=number] { -moz-appearance:textfield; }
   <div class="modal-overlay" id="backpack-options-modal">
     <div class="modal">
       <div class="modal-title">🎒 Backpack Options</div>
-      <!-- View toggle -->
-      <div style="display:flex;gap:6px;margin-bottom:12px;background:rgba(255,255,255,0.05);border-radius:12px;padding:4px">
-        <button onclick="S.bpViewMode='new';saveState();closeModal('backpack-options-modal');renderBackpack()" id="bp-toggle-new" style="flex:1;padding:8px;border-radius:9px;border:none;cursor:pointer;font-size:12px;font-weight:700;transition:all 0.15s;background:rgba(160,136,250,0.2);color:#a088fa">✦ New View</button>
-        <button onclick="S.bpViewMode='classic';saveState();closeModal('backpack-options-modal');renderBackpack()" id="bp-toggle-classic" style="flex:1;padding:8px;border-radius:9px;border:none;cursor:pointer;font-size:12px;font-weight:700;transition:all 0.15s;background:transparent;color:rgba(255,255,255,0.4)">Classic View</button>
+      <!-- View toggle — 3 tabs -->
+      <div style="display:flex;gap:5px;margin-bottom:12px;background:rgba(255,255,255,0.05);border-radius:12px;padding:4px">
+        <button onclick="setBpView('new')" id="bp-toggle-new" style="flex:1;padding:7px 4px;border-radius:9px;border:none;cursor:pointer;font-size:10px;font-weight:700;transition:all 0.15s;background:rgba(160,136,250,0.2);color:#a088fa">✦ New View</button>
+        <button onclick="setBpView('classic')" id="bp-toggle-classic" style="flex:1;padding:7px 4px;border-radius:9px;border:none;cursor:pointer;font-size:10px;font-weight:700;transition:all 0.15s;background:transparent;color:rgba(255,255,255,0.4)">Classic View</button>
+        <button onclick="setBpView('crystal')" id="bp-toggle-crystal" style="flex:1;padding:7px 4px;border-radius:9px;border:none;cursor:pointer;font-size:10px;font-weight:700;transition:all 0.15s;background:transparent;color:rgba(255,255,255,0.4)">💎 Crystal</button>
       </div>
       <button class="btn btn-danger btn-sm" style="width:100%;margin-bottom:8px" onclick="clearBackpack()">🗑️ Clear All Items</button>
       <button class="btn btn-ghost btn-sm" style="width:100%;margin-bottom:8px" onclick="resetBackpackSize()">♻️ Reset Space</button>
@@ -7116,38 +7236,24 @@ function renderCalendar() {
   }
   
   c.innerHTML = `
-    <!-- Month nav -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-      <button style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.2);color:#c4b5fd;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'" onclick="calNav(-1)">←</button>
-      <div style="text-align:center">
-        <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px">${monthName}</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.3);font-weight:600;letter-spacing:1.2px;text-transform:uppercase;margin-top:1px">${calYear}</div>
-      </div>
-      <div style="display:flex;gap:6px">
-        <button style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.2);color:#c4b5fd;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s" onclick="openCalSettings()" title="Calendar Settings" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">⚙️</button>
-        <button style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.2);color:#c4b5fd;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'" onclick="calNav(1)">→</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <button class="btn btn-ghost btn-sm" onclick="calNav(-1)">←</button>
+      <div style="font-size:18px;font-weight:700;color:var(--fg)">${monthName} ${calYear}</div>
+      <div style="display:flex;gap:4px">
+        <button class="btn btn-ghost btn-sm" onclick="openCalSettings()" style="padding:5px 8px" title="Calendar Settings">⚙️</button>
+        <button class="btn btn-ghost btn-sm" onclick="calNav(1)">→</button>
       </div>
     </div>
-    <!-- Day headers -->
-    <div class="cal-grid" style="margin-bottom:4px">
-      ${['Su','Mo','Tu','We','Th','Fr','Sa'].map((d,i)=>`<div style="text-align:center;font-size:9px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;padding:5px 0;color:${(i===0||i===6)?'rgba(139,92,246,0.55)':'rgba(255,255,255,0.25)'}">${d}</div>`).join('')}
-    </div>
-    <!-- Calendar grid -->
-    <div class="cal-grid" style="margin-bottom:20px">
+    <div class="cal-grid" style="margin-bottom:8px">
+      ${['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<div style="text-align:center;font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);padding:6px">${d}</div>`).join('')}
       ${days}
     </div>
-    <!-- Upcoming Events -->
-    <div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div style="font-size:14px;font-weight:800;color:#fff;letter-spacing:-0.2px">Upcoming Events</div>
-        <div style="font-size:10px;color:rgba(139,92,246,0.7);background:rgba(109,40,217,0.15);border:1px solid rgba(139,92,246,0.2);border-radius:20px;padding:3px 10px;font-weight:700">${monthName.slice(0,3)}</div>
-      </div>
+    <div style="margin-top:16px">
+      <div style="font-size:14px;font-weight:700;color:var(--fg);margin-bottom:8px">Upcoming Events</div>
       ${(()=>{
         const _now2 = new Date();
         const _todayStr = _now2.toISOString().slice(0,10);
-        const sorted = S.events.sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5);
-        if (!sorted.length) return `<div style="text-align:center;padding:24px 0 8px"><div style="font-size:28px;margin-bottom:8px;opacity:0.3">✦</div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.25)">No events yet</div></div>`;
-        return sorted.map((e,i) => {
+        return S.events.sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5).map((e,i) => {
           const _evDate = new Date(e.date + (e.time ? 'T' + e.time : ''));
           const _evStr  = e.date ? e.date.slice(0,10) : '';
           let _isNow = false;
@@ -7164,24 +7270,22 @@ function renderCalendar() {
             : _dAway === 0 ? '• Today'
             : '• Past';
           const _glowDot = _isNow ? '<div style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:#f6bb4e;box-shadow:0 0 6px #f6bb4e;animation:eventGlow 1.5s ease-in-out infinite"></div>' : '';
-          const _shimmer = _isNow ? '<div style="position:absolute;top:0;right:0;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(246,187,78,0.04));pointer-events:none;border-radius:18px"></div>' : '';
-          const _reward  = e.ticketReward ? '<div style="font-size:10px;color:var(--gold);margin-top:2px">🎟️ ' + e.ticketReward + ' tickets</div>' : '';
+          const _shimmer = _isNow ? '<div style="position:absolute;top:0;right:0;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(246,187,78,0.04));pointer-events:none"></div>' : '';
+          const _reward  = e.ticketReward ? '<div style="font-size:10px;color:var(--gold)">🎟️ ' + e.ticketReward + ' tickets</div>' : '';
           const _bgSt = (e.bubbleColor&&!_isNow)?'background:'+e.bubbleColor+';':'';
           const _canRdm = _isNow && e.ticketReward && !e.redeemed;
           const _rdmBtn = _canRdm
-            ? '<button class="ev-rdm" data-idx="'+i+'" style="position:absolute;bottom:8px;right:48px;font-size:10px;font-weight:800;padding:3px 10px;background:linear-gradient(135deg,#f6bb4e,#e78161);border:none;border-radius:99px;color:#000;cursor:pointer;display:none;white-space:nowrap;z-index:5">🎟️ Redeem '+e.ticketReward+'</button>'
-            : (e.redeemed&&_isNow?'<div style="position:absolute;bottom:8px;right:48px;font-size:9px;color:rgba(246,187,78,0.5);padding:3px 8px;background:rgba(246,187,78,0.1);border-radius:99px">✓ Redeemed</div>':'');
-          const evColor = e.ringColor || '#a78bfa';
-          return '<div class="ev-wrap '+(_isNow?'event-now':'')+'" style="margin-bottom:9px;display:flex;align-items:center;gap:12px;padding:12px 14px;position:relative;border-radius:18px;background:'+(_isNow?'linear-gradient(135deg,rgba(246,187,78,0.14),rgba(252,119,144,0.08))':'rgba(255,255,255,0.03)')+';border:1px solid '+(_isNow?'rgba(246,187,78,0.4)':evColor+'22')+';overflow:hidden;transition:all .22s cubic-bezier(.34,1.56,.64,1);cursor:pointer;'+_bgSt+'">'
-            + '<div style="position:absolute;left:0;top:15%;bottom:15%;width:3px;background:'+evColor+';border-radius:0 3px 3px 0;box-shadow:0 0 8px '+evColor+'88"></div>'
+            ? '<button class="ev-rdm" data-idx="'+i+'" style="position:absolute;bottom:6px;right:44px;font-size:10px;font-weight:800;padding:3px 10px;background:linear-gradient(135deg,#f6bb4e,#e78161);border:none;border-radius:99px;color:#000;cursor:pointer;display:none;white-space:nowrap;z-index:5">🎟️ Redeem '+e.ticketReward+'</button>'
+            : (e.redeemed&&_isNow?'<div style="position:absolute;bottom:6px;right:44px;font-size:9px;color:rgba(246,187,78,0.5);padding:3px 8px;background:rgba(246,187,78,0.1);border-radius:99px">✓ Redeemed</div>':'');
+          return '<div class="ev-wrap '+(_isNow?'event-now':'card2')+'" style="margin-bottom:8px;display:flex;align-items:center;gap:10px;padding:10px 12px;position:relative;'+_bgSt+'">'
             + _shimmer + _rdmBtn
-            + '<div style="position:relative;width:40px;height:40px;border-radius:13px;background:'+evColor+'18;border:1px solid '+evColor+'33;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;transition:transform .2s">' + (e.emoji||'📅') + _glowDot + '</div>'
+            + '<div style="position:relative"><span style="font-size:24px">' + (e.emoji||'📅') + '</span>' + _glowDot + '</div>'
             + '<div style="flex:1;min-width:0">'
-            + '<div style="font-size:12px;font-weight:700;color:' + (_isNow?'#f6bb4e':'rgba(255,255,255,0.9)') + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-0.1px">' + e.title + '</div>'
-            + '<div style="font-size:10px;color:' + (_isNow?'rgba(246,187,78,0.7)':'rgba(255,255,255,0.35)') + ';margin-top:2px">' + _evDate.toLocaleDateString() + (e.time ? ' · ' + e.time : '') + ' <span style="color:'+(_isNow?'#f6bb4e':evColor)+';font-weight:700">' + _tlabel + '</span></div>'
+            + '<div style="font-size:13px;font-weight:700;color:' + (_isNow?'#f6bb4e':'var(--fg)') + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + e.title + '</div>'
+            + '<div style="font-size:11px;color:' + (_isNow?'rgba(246,187,78,0.8)':'rgba(255,255,255,0.4)') + '">' + _evDate.toLocaleDateString() + (e.time ? ' ' + e.time : '') + ' ' + _tlabel + '</div>'
             + _reward
             + '</div>'
-            + '<button style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:rgba(252,119,144,0.1);border:1px solid rgba(252,119,144,0.2);color:rgba(252,119,144,0.6);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s" onclick="removeEvent(' + i + ')" onmouseover="this.style.background=\'rgba(252,119,144,0.25)\'" onmouseout="this.style.background=\'rgba(252,119,144,0.1)\'">✕</button>'
+            + '<button class="btn btn-danger btn-sm" onclick="removeEvent(' + i + ')" style="flex-shrink:0">✕</button>'
             + '</div>';
         }).join('');
       })()}
@@ -7929,14 +8033,236 @@ function moveOverflowToBackpack(storeId, itemIdx) {
   saveState(); playSound('success'); renderBackpack();
 }
 
+function setBpView(mode) {
+  S.bpViewMode = mode;
+  saveState();
+  // Update tab highlight in modal
+  ['new','classic','crystal'].forEach(m => {
+    const btn = document.getElementById('bp-toggle-' + m);
+    if (!btn) return;
+    if (m === mode) {
+      btn.style.background = m === 'crystal'
+        ? 'linear-gradient(135deg,rgba(109,40,217,0.35),rgba(139,92,246,0.25))'
+        : 'rgba(160,136,250,0.2)';
+      btn.style.color = m === 'crystal' ? '#c4b5fd' : '#a088fa';
+    } else {
+      btn.style.background = 'transparent';
+      btn.style.color = 'rgba(255,255,255,0.4)';
+    }
+  });
+  closeModal('backpack-options-modal');
+  renderBackpack();
+}
+
 function renderBackpack() {
   if (!S.bpViewMode) S.bpViewMode = 'new';
-  if (S.bpViewMode === 'new') {
+  // Sync tab buttons when modal re-opens
+  setTimeout(() => {
+    ['new','classic','crystal'].forEach(m => {
+      const btn = document.getElementById('bp-toggle-' + m);
+      if (!btn) return;
+      if (m === S.bpViewMode) {
+        btn.style.background = m === 'crystal'
+          ? 'linear-gradient(135deg,rgba(109,40,217,0.35),rgba(139,92,246,0.25))'
+          : 'rgba(160,136,250,0.2)';
+        btn.style.color = m === 'crystal' ? '#c4b5fd' : '#a088fa';
+      } else {
+        btn.style.background = 'transparent';
+        btn.style.color = 'rgba(255,255,255,0.4)';
+      }
+    });
+  }, 0);
+  if (S.bpViewMode === 'crystal') {
+    renderBackpackCrystal();
+  } else if (S.bpViewMode === 'new') {
     renderBackpackNew();
   } else {
     renderBackpackClassic();
   }
 }
+
+function renderBackpackCrystal() {
+  const c = document.getElementById('backpack-content');
+  const itemCount = Object.values(S.backpackItems).filter(Boolean).length;
+  const pct = S.backpackSlots > 0 ? Math.round(itemCount / S.backpackSlots * 100) : 0;
+
+  c.innerHTML = `
+    <div class="bp-crystal-container" id="bp-crystal-root">
+      <!-- Header -->
+      <div class="bp-crystal-header">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+          <div>
+            <div class="bp-crystal-title">My Backpack</div>
+            <div class="bp-crystal-subtitle">${itemCount} of ${S.backpackSlots} slots used · ${S.backpackSlots - itemCount} free</div>
+          </div>
+          <div class="bp-crystal-actions">
+            <button class="bp-crystal-btn opt" onclick="openModal('backpack-options-modal')">⚙ Options</button>
+            <button class="bp-crystal-btn clr" onclick="clearBackpack()">🗑</button>
+          </div>
+        </div>
+        <!-- Capacity bar -->
+        <div class="bp-crystal-track">
+          <div class="bp-crystal-fill" style="width:${pct}%"></div>
+        </div>
+        <div class="bp-crystal-cap-labels">
+          <span>${itemCount} / ${S.backpackSlots} slots</span>
+          <span>${pct}% full</span>
+        </div>
+      </div>
+
+      <!-- Section label -->
+      <div class="bp-crystal-section-head">
+        <div class="bp-crystal-section-label">Equipped Items</div>
+        <div class="bp-crystal-section-line"></div>
+      </div>
+
+      <!-- Main slot grid -->
+      <div class="bp-crystal-grid" id="bp-crystal-grid"></div>
+    </div>
+  `;
+
+  const grid = document.getElementById('bp-crystal-grid');
+  const isMobile = 'ontouchstart' in window;
+
+  // Rarity detection from tooltip text
+  const RARITY_MAP = {
+    'legendary': { cls:'legendary', dot:'★', col:'#fbbf24' },
+    'epic':      { cls:'epic',      dot:'E', col:'#e879f9' },
+    'rare':      { cls:'rare',      dot:'R', col:'#c084fc' },
+    'common':    { cls:'',          dot:'',  col:'#8b5cf6' },
+  };
+
+  for (let i = 0; i < S.backpackSlots; i++) {
+    const item = S.backpackItems[i];
+    const tip  = (S.backpackTooltips || {})[i] || '';
+    const slot = document.createElement('div');
+
+    // Detect rarity from tooltip
+    const tipLower = tip.toLowerCase();
+    let rar = Object.keys(RARITY_MAP).find(r => tipLower.includes(r)) || '';
+    const rarInfo = RARITY_MAP[rar] || { cls:'', dot:'', col:'#8b5cf6' };
+
+    // Item name from tooltip
+    const itemName = tip ? (tip.split(' · ')[0] || tip).slice(0, 8) : '';
+
+    slot.className = 'bp-cslot ' + (item ? ('filled ' + rarInfo.cls) : 'empty');
+    slot.dataset.slot = i;
+
+    if (item) {
+      slot.style.setProperty('--csg', rarInfo.col + '1a');
+      slot.innerHTML = `
+        <div class="bp-cslot-shine"></div>
+        <div class="bp-cslot-glow"></div>
+        ${rarInfo.dot ? `<div class="bp-cslot-rarity" style="--rarity-c:${rarInfo.col}">${rarInfo.dot}</div>` : `<div class="bp-cslot-badge"></div>`}
+        <div class="bp-cslot-emoji">${item}</div>
+        ${itemName ? `<div class="bp-cslot-name">${itemName}</div>` : ''}
+      `;
+      slot.addEventListener('click', () => {
+        slot.classList.add('pop');
+        slot.addEventListener('animationend', () => slot.classList.remove('pop'), {once:true});
+        bpShowItemSheet(i);
+      });
+      slot.draggable = true;
+      slot.addEventListener('dragstart', e => { e.dataTransfer.setData('slot', i); playSound('click'); });
+      if (isMobile && tip) {
+        let pressTimer;
+        slot.addEventListener('touchstart', () => { pressTimer = setTimeout(() => bpShowTooltipSheet(i), 450); }, {passive:true});
+        slot.addEventListener('touchend', () => clearTimeout(pressTimer), {passive:true});
+      }
+      if (!isMobile && tip) {
+        slot.addEventListener('mouseenter', () => bpShowHoverTooltip(slot, i));
+        slot.addEventListener('mouseleave', () => { const t = document.getElementById('bp-tooltip-overlay'); if(t) t.style.display='none'; });
+      }
+      slot.addEventListener('contextmenu', e => {
+        e.preventDefault();
+        const menu = document.getElementById('context-menu');
+        const pr = document.getElementById('phone').getBoundingClientRect();
+        menu.style.display = 'block';
+        menu.style.left = Math.max(4, Math.min(e.clientX-pr.left, pr.width-160)) + 'px';
+        menu.style.top  = Math.max(4, Math.min(e.clientY-pr.top,  pr.height-180)) + 'px';
+        menu.innerHTML = `
+          <div style="padding:8px 12px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(255,255,255,0.06)">${item} · Slot ${i+1}</div>
+          <button onclick="document.getElementById('context-menu').style.display='none';bpEditTooltip(${i})">✏️ Edit Tooltip</button>
+          <button onclick="document.getElementById('context-menu').style.display='none';bpViewTooltip(${i})">💬 View Tooltip</button>
+          <button onclick="document.getElementById('context-menu').style.display='none';bpClearTooltip(${i})">🗑️ Clear Tooltip</button>
+          <button onclick="document.getElementById('context-menu').style.display='none';bpRemoveItem(${i})">❌ Remove Item</button>
+          <button onclick="document.getElementById('context-menu').style.display='none'">✕ Close</button>
+        `;
+      });
+    } else {
+      slot.innerHTML = `<div class="bp-cslot-empty-ico">＋</div>`;
+    }
+
+    // Drag-over reordering (same logic as other views)
+    slot.addEventListener('dragover', e => { e.preventDefault(); slot.style.borderColor='rgba(246,187,78,0.5)'; });
+    slot.addEventListener('dragleave', () => { slot.style.borderColor=''; });
+    slot.addEventListener('drop', e => {
+      e.preventDefault(); slot.style.borderColor='';
+      const from = parseInt(e.dataTransfer.getData('slot'));
+      const tmp = S.backpackItems[i];
+      S.backpackItems[i] = S.backpackItems[from];
+      S.backpackItems[from] = tmp;
+      if (!S.backpackItems[i]) delete S.backpackItems[i];
+      if (!S.backpackItems[from]) delete S.backpackItems[from];
+      const tFrom = (S.backpackTooltips||{})[from];
+      const tTo   = (S.backpackTooltips||{})[i];
+      if (!S.backpackTooltips) S.backpackTooltips = {};
+      if (tFrom) S.backpackTooltips[i] = tFrom; else delete S.backpackTooltips[i];
+      if (tTo) S.backpackTooltips[from] = tTo; else delete S.backpackTooltips[from];
+      saveState(); renderBackpack();
+    });
+
+    grid.appendChild(slot);
+  }
+
+  // Overflow / temp storage — crystal styled
+  cleanExpiredOverflows();
+  const _ovStores = getBpActiveOverflows();
+  const root = document.getElementById('bp-crystal-root');
+
+  if (_ovStores.length > 0) {
+    const ovWrap = document.createElement('div');
+    ovWrap.innerHTML = `
+      <div class="bp-crystal-section-head">
+        <div class="bp-crystal-section-label">📦 Temp Storage</div>
+        <div class="bp-crystal-section-line"></div>
+        <div style="font-size:9px;color:rgba(139,92,246,0.4);font-weight:500;white-space:nowrap;margin-left:4px">tap to move in</div>
+      </div>`;
+    _ovStores.forEach(store => {
+      const minsLeft = Math.max(0, Math.round((store.expiresAt - Date.now()) / 60000));
+      const pct2 = Math.max(0, Math.min(100, (store.expiresAt - Date.now()) / 3600000 * 100));
+      const card = document.createElement('div');
+      card.className = 'bp-crystal-temp-wrap';
+      let slotsHtml = store.items.map((it, ii) =>
+        `<div class="bp-cts filled" onclick="moveOverflowToBackpack(${store.id},${ii})" title="${it.tip||it.emoji}">
+          <div class="bp-cts-emoji">${it.emoji}</div>
+          <div class="bp-cts-plus">+</div>
+        </div>`
+      ).join('');
+      for (let e = store.items.length; e < 6; e++)
+        slotsHtml += `<div class="bp-cts empty"></div>`;
+      card.innerHTML = `<div class="bp-crystal-temp-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;position:relative;z-index:1">
+          <div style="display:flex;align-items:center;gap:7px">
+            <span style="font-size:12px;font-weight:700;color:#a78bfa">${store.items.length}<span style="color:rgba(255,255,255,0.25);font-weight:500"> / 6 items</span></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="width:6px;height:6px;border-radius:50%;background:#f59e0b;animation:bpTimerDot 1s ease-in-out infinite;box-shadow:0 0 5px #f59e0b"></div>
+            <span style="font-size:10px;font-weight:700;color:#f59e0b">⏱ ${minsLeft}m</span>
+            <div style="width:44px;height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden">
+              <div style="height:100%;width:${pct2}%;background:linear-gradient(90deg,#f59e0b,#fbbf24);border-radius:99px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="bp-crystal-tgrid" style="position:relative;z-index:1">${slotsHtml}</div>
+      </div>`;
+      ovWrap.appendChild(card);
+    });
+    root.appendChild(ovWrap);
+  }
+}
+
+
 
 function renderBackpackNew() {
   const c = document.getElementById('backpack-content');
@@ -9150,21 +9476,12 @@ let activeNoteId = null;
 function renderNotes() {
   const sidebar = document.getElementById('notes-sidebar');
   if (!sidebar) return;
-  const STRIPES = ['#8b5cf6','#e879f9','#6366f1','#06b6d4','#22c55e','#f59e0b','#f43f5e','#c084fc','#a78bfa'];
-  sidebar.innerHTML = S.notes.map((n,i) => {
-    const stripe = n.stripe || STRIPES[i % STRIPES.length];
-    const preview = n.content ? n.content.replace(/<[^>]*>/g,'').slice(0,35) : '';
-    const timeStr = n.created ? new Date(n.created).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
-    const isActive = activeNoteId === n.id;
-    return `<div class="note-item ${isActive ? 'active' : ''}" style="--note-stripe:${stripe};animation-delay:${i*40}ms" onclick="openNote('${n.id}')">
+  sidebar.innerHTML = S.notes.map((n,i) => `
+    <div class="note-item ${activeNoteId === n.id ? 'active' : ''}" onclick="openNote('${n.id}')">
       <div class="note-item-title">${n.title||'Untitled'}</div>
-      <div class="note-item-preview">${preview || 'No content yet…'}</div>
-      <div class="note-item-time">${timeStr}</div>
-      ${isAdmin() ? `<button onclick="deleteNote('${n.id}',event)" style="background:none;border:none;color:rgba(252,119,144,0.6);cursor:pointer;font-size:9px;margin-top:5px;padding:0;font-weight:700;letter-spacing:0.3px">✕ delete</button>` : ''}
-    </div>`;
-  }).join('');
-  // Assign stripe to note if missing
-  S.notes.forEach((n,i) => { if (!n.stripe) n.stripe = STRIPES[i % STRIPES.length]; });
+      <div class="note-item-preview">${n.content ? n.content.replace(/<[^>]*>/g,'').slice(0,30) : ''}</div>
+      ${isAdmin() ? '<button onclick="deleteNote(\'${n.id}\',event)" style="background:none;border:none;color:var(--pink);cursor:pointer;font-size:10px;margin-top:4px">delete</button>' : ''}
+    </div>`).join('');
 }
 
 function newNote() {
