@@ -2224,36 +2224,38 @@ input[type=number] { -moz-appearance:textfield; }
 .cal-grid {
   display:grid;
   grid-template-columns:repeat(7,1fr);
-  gap:2px;
+  gap:3px;
 }
 .cal-day {
   aspect-ratio:1;
   display:flex; align-items:center; justify-content:center;
-  border-radius:8px;
+  border-radius:12px;
   font-size:12px; font-weight:600;
-  font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
   cursor:pointer;
-  transition:all 0.15s;
-  color:var(--fg);
+  transition:all 0.22s cubic-bezier(.34,1.56,.64,1);
+  color:rgba(255,255,255,0.72);
   position:relative;
   line-height:1;
 }
-.cal-day:hover { background:rgba(160,136,250,0.2); }
+.cal-day:hover { background:rgba(109,40,217,0.22); color:#e9d5ff; transform:scale(1.08); }
 .cal-day.today {
-  background:var(--accent1);
+  background:linear-gradient(135deg,#6d28d9,#8b5cf6);
   color:#fff;
-  font-weight:400;
-  box-shadow:0 0 10px rgba(160,136,250,0.5);
+  font-weight:800;
+  box-shadow:0 4px 16px rgba(109,40,217,0.55),0 0 0 1px rgba(255,255,255,0.1) inset;
 }
+.cal-day.today:hover { transform:scale(1.1); }
 .cal-day.has-event::after {
-  content:''; position:absolute; bottom:2px; left:50%; transform:translateX(-50%);
+  content:''; position:absolute; bottom:3px; left:50%; transform:translateX(-50%);
   width:4px; height:4px; border-radius:50%;
-  background:var(--gold);
+  background:var(--dot-c, #a78bfa);
+  box-shadow:0 0 5px var(--dot-c, #a78bfa);
 }
-.cal-day.other-month { color:rgba(255,255,255,0.18); }
+.cal-day.other-month { color:rgba(255,255,255,0.14); cursor:default; }
+.cal-day.other-month:hover { background:none; transform:none; color:rgba(255,255,255,0.14); }
 @keyframes calRing {
-  0%,100%{box-shadow:0 0 0 2.5px var(--cal-ring,#f6bb4e),0 0 8px var(--cal-ring,#f6bb4e);}
-  50%{box-shadow:0 0 0 4px var(--cal-ring,#f6bb4e),0 0 18px var(--cal-ring,#f6bb4e);}
+  0%,100%{box-shadow:0 0 0 2.5px var(--cal-ring,#f6bb4e),0 0 10px var(--cal-ring,#f6bb4e);}
+  50%{box-shadow:0 0 0 4px var(--cal-ring,#f6bb4e),0 0 20px var(--cal-ring,#f6bb4e);}
 }
 .cal-day.ev-ring { border-radius:50%!important; animation:calRing 2.2s ease-in-out infinite; font-weight:800; }
 /* Glowing event in upcoming list */
@@ -2838,20 +2840,62 @@ input[type=number] { -moz-appearance:textfield; }
 
 /* ===== NOTES ===== */
 .notes-sidebar {
-  width:140px; min-width:140px;
-  border-right:1px solid rgba(255,255,255,0.06);
+  width:148px; min-width:148px;
+  border-right:1px solid rgba(139,92,246,0.1);
   overflow-y:auto;
   display:flex; flex-direction:column;
+  background:rgba(6,3,16,0.6);
 }
+.notes-sidebar::-webkit-scrollbar { display:none; }
+.notes-sidebar { scrollbar-width:none; }
+
 .note-item {
-  padding:12px;
+  padding:13px 12px 11px;
   cursor:pointer;
-  border-bottom:1px solid rgba(255,255,255,0.04);
-  transition:background 0.15s;
+  border-bottom:1px solid rgba(139,92,246,0.07);
+  transition:all 0.2s;
+  position:relative;
+  overflow:hidden;
 }
-.note-item:hover, .note-item.active { background:rgba(160,136,250,0.1); }
-.note-item-title { font-size:12px; font-weight:600; color:var(--fg); }
-.note-item-preview { font-size:10px; color:rgba(255,255,255,0.4); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.note-item::before {
+  content:'';
+  position:absolute;left:0;top:15%;bottom:15%;
+  width:2.5px;
+  background:var(--note-stripe, #8b5cf6);
+  border-radius:0 2px 2px 0;
+  opacity:0;
+  transition:opacity 0.2s;
+  box-shadow:0 0 6px var(--note-stripe, #8b5cf6);
+}
+.note-item:hover::before, .note-item.active::before { opacity:0.8; }
+.note-item:hover { background:rgba(109,40,217,0.1); }
+.note-item.active {
+  background:linear-gradient(135deg,rgba(109,40,217,0.18),rgba(139,92,246,0.1));
+  border-color:rgba(139,92,246,0.15);
+}
+.note-item-title {
+  font-size:11px; font-weight:700;
+  color:rgba(255,255,255,0.88);
+  letter-spacing:-0.1px;
+  margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.note-item.active .note-item-title { color:#e9d5ff; }
+.note-item-preview {
+  font-size:9px; color:rgba(255,255,255,0.3);
+  margin-top:0; overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; line-height:1.4; font-weight:400;
+}
+.note-item-time {
+  font-size:8px; color:rgba(139,92,246,0.5);
+  margin-top:5px; font-weight:600; letter-spacing:0.3px;
+  text-transform:uppercase;
+}
+@keyframes noteItemIn {
+  from{opacity:0;transform:translateX(-8px)}
+  to{opacity:1;transform:translateX(0)}
+}
+.note-item { animation:noteItemIn 0.25s ease both; }
 
 /* ===== ACHIEVEMENTS ===== */
 .achievement-bubble {
@@ -3635,13 +3679,16 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== CALENDAR SCREEN ===== -->
-    <div id="screen-calendar" class="screen">
-      <div class="screen-header">
-        <button class="back-btn" onclick="openScreen('home')">←</button>
-        <span class="screen-title">📅 Calendar</span>
-        <button class="btn btn-primary btn-sm" class="admin-only" onclick="openModal('add-event-modal')">+ Event</button>
+    <div id="screen-calendar" class="screen" style="background:#06030e">
+      <div class="screen-header" style="background:rgba(6,3,14,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(139,92,246,0.12)">
+        <button class="back-btn" onclick="openScreen('home')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.2);color:#c4b5fd">←</button>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#6d28d9,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 3px 12px rgba(109,40,217,0.5)">📅</div>
+          <span class="screen-title" style="font-size:16px;font-weight:800;letter-spacing:-0.3px">Calendar</span>
+        </div>
+        <button style="background:linear-gradient(135deg,#6d28d9,#8b5cf6);border:none;border-radius:20px;padding:7px 14px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 3px 12px rgba(109,40,217,0.45)" class="admin-only" onclick="openModal('add-event-modal')">+ Event</button>
       </div>
-      <div id="calendar-content" style="padding:16px"></div>
+      <div id="calendar-content" style="padding:18px 16px;overflow-y:auto;flex:1"></div>
     </div>
 
     <!-- ===== SHOP SCREEN ===== -->
@@ -3780,37 +3827,47 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== NOTES SCREEN ===== -->
-    <div id="screen-notes" class="screen" style="padding:0;flex-direction:column;overflow:hidden">
-      <div class="screen-header" style="flex-shrink:0">
-        <button class="back-btn" onclick="openScreen('home')">←</button>
-        <span class="screen-title">📝 Notes</span>
-        <button class="btn btn-primary btn-sm" onclick="newNote()">+ New</button>
+    <div id="screen-notes" class="screen" style="padding:0;flex-direction:column;overflow:hidden;background:#06030e">
+      <!-- Notes header -->
+      <div style="flex-shrink:0;background:rgba(6,3,14,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(139,92,246,0.12)">
+        <div class="screen-header" style="background:transparent;border:none;padding-bottom:0">
+          <button class="back-btn" onclick="openScreen('home')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.2);color:#c4b5fd">←</button>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#6d28d9,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 3px 12px rgba(109,40,217,0.5)">📝</div>
+            <span class="screen-title" style="font-size:16px;font-weight:800;letter-spacing:-0.3px">Notes</span>
+          </div>
+          <button style="background:linear-gradient(135deg,#6d28d9,#8b5cf6);border:none;border-radius:20px;padding:7px 14px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 3px 12px rgba(109,40,217,0.45)" onclick="newNote()">+ New</button>
+        </div>
+        <!-- Format toolbar -->
+        <div style="padding:6px 10px 10px;display:flex;gap:4px;flex-wrap:wrap">
+          <button style="min-width:30px;height:26px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.15);color:#a78bfa;font-size:11px;font-weight:800;cursor:pointer;padding:0 8px;transition:all .15s" onclick="noteFormat('bold')" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'"><b>B</b></button>
+          <button style="min-width:30px;height:26px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.15);color:#a78bfa;font-size:11px;font-weight:800;cursor:pointer;padding:0 8px;transition:all .15s" onclick="noteFormat('italic')" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'"><i>I</i></button>
+          <button style="min-width:30px;height:26px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.15);color:#a78bfa;font-size:11px;font-weight:800;cursor:pointer;padding:0 8px;transition:all .15s" onclick="noteFormat('underline')" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'"><u>U</u></button>
+          <button style="min-width:30px;height:26px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.15);color:#a78bfa;font-size:11px;font-weight:800;cursor:pointer;padding:0 8px;transition:all .15s" onclick="noteFormat('strikethrough')" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'"><s>S</s></button>
+          <div style="width:1px;height:20px;background:rgba(139,92,246,0.15);margin:3px 2px;align-self:center"></div>
+          <button style="min-width:30px;height:26px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.15);color:#a78bfa;font-size:9px;font-weight:900;cursor:pointer;padding:0 8px;transition:all .15s" onclick="noteFormat('h1')" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">H1</button>
+          <button style="min-width:30px;height:26px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.15);color:#a78bfa;font-size:9px;font-weight:800;cursor:pointer;padding:0 8px;transition:all .15s" onclick="noteFormat('h2')" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">H2</button>
+          <div style="width:1px;height:20px;background:rgba(139,92,246,0.15);margin:3px 2px;align-self:center"></div>
+          <select class="input" style="width:68px;padding:3px 6px;font-size:9px;height:26px;border-radius:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.15);color:#a78bfa" onchange="noteColor(this.value);this.value=''">
+            <option value="">🎨 Color</option>
+            <option value="#a78bfa">Purple</option>
+            <option value="#f472b6">Pink</option>
+            <option value="#fbbf24">Gold</option>
+            <option value="#4ade80">Green</option>
+            <option value="#60a5fa">Blue</option>
+            <option value="#fb923c">Orange</option>
+            <option value="#34d399">Teal</option>
+          </select>
+        </div>
       </div>
       <div style="display:flex;flex:1;overflow:hidden;min-height:0;min-width:0">
         <div class="notes-sidebar" id="notes-sidebar" style="flex-shrink:0"></div>
-        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0">
-          <div style="padding:6px 8px;display:flex;gap:4px;background:var(--card);border-bottom:1px solid rgba(255,255,255,0.06);flex-wrap:wrap;flex-shrink:0">
-            <button class="btn btn-ghost btn-sm" onclick="noteFormat('bold')" title="Bold"><b>B</b></button>
-            <button class="btn btn-ghost btn-sm" onclick="noteFormat('italic')" title="Italic"><i>I</i></button>
-            <button class="btn btn-ghost btn-sm" onclick="noteFormat('underline')" title="Underline"><u>U</u></button>
-            <button class="btn btn-ghost btn-sm" onclick="noteFormat('strikethrough')" title="Strike"><s>S</s></button>
-            <button class="btn btn-ghost btn-sm" onclick="noteFormat('h1')" style="font-size:10px;font-weight:800">H1</button>
-            <button class="btn btn-ghost btn-sm" onclick="noteFormat('h2')" style="font-size:10px;font-weight:700">H2</button>
-            <select class="input" style="width:72px;padding:3px 4px;font-size:10px;height:28px" onchange="noteColor(this.value);this.value=''">
-              <option value="">🎨</option>
-              <option value="#a088fa">Purple</option>
-              <option value="#fc7790">Pink</option>
-              <option value="#f6bb4e">Gold</option>
-              <option value="#4caf6e">Green</option>
-              <option value="#6f96ff">Blue</option>
-              <option value="#e78161">Orange</option>
-              <option value="#4edfd0">Teal</option>
-            </select>
-          </div>
-          <div id="note-editor" contenteditable="true" 
-            style="flex:1;padding:14px;outline:none;color:var(--fg);font-size:14px;line-height:1.7;overflow-y:auto;min-height:0;word-break:break-word" 
-            oninput="saveCurrentNote()"></div>
-          <div id="note-wordcount" style="padding:4px 12px;font-size:10px;color:rgba(255,255,255,0.3);border-top:1px solid rgba(255,255,255,0.04);flex-shrink:0">Ready to write...</div>
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;background:rgba(8,4,18,0.8)">
+          <div id="note-editor" contenteditable="true"
+            style="flex:1;padding:16px 14px;outline:none;color:rgba(233,213,255,0.88);font-size:13px;line-height:1.75;overflow-y:auto;min-height:0;word-break:break-word;font-weight:400"
+            oninput="saveCurrentNote()"
+            data-placeholder="Start writing…"></div>
+          <div id="note-wordcount" style="padding:5px 14px 8px;font-size:9px;color:rgba(139,92,246,0.45);border-top:1px solid rgba(139,92,246,0.08);flex-shrink:0;font-weight:600;letter-spacing:0.4px;text-transform:uppercase">Ready to write…</div>
         </div>
       </div>
     </div>
@@ -5562,53 +5619,27 @@ function openWalletCardCustomize() {
     document.getElementById('phone').appendChild(ov);
   }
   const presets=[
-    ['linear-gradient(145deg,#1c0850,#340e90,#1a0648,#0d0328)','Purple','#a855f7'],
-    ['linear-gradient(145deg,#1c2e4a,#0d1b2e,#0a1525,#050e1a)','Navy','#6f96ff'],
-    ['linear-gradient(135deg,#1a0a2e,#2d0a50,#0a051a,#150630)','Deep Purple','#c084fc'],
-    ['linear-gradient(135deg,#0a1a10,#0f2d18,#051208,#081a0d)','Forest','#4caf6e'],
-    ['linear-gradient(135deg,#1a0808,#2e1010,#0a0202,#1a0505)','Crimson','#fc7790'],
-    ['linear-gradient(135deg,#0a0a10,#181820,#050505,#101015)','Onyx','#c0b9f5'],
-    ['linear-gradient(135deg,#1a1000,#2e1e00,#0a0800,#1a1200)','Gold','#f6bb4e'],
-    ['linear-gradient(135deg,#050f1a,#0a1e30,#020810,#071525)','Ocean','#4edfd0'],
-    ['linear-gradient(135deg,#0d0018,#1a0030,#050010,#100020)','Midnight','#e879f9'],
-    ['linear-gradient(135deg,#001a1a,#003030,#000e0e,#001a20)','Teal','#2dd4bf'],
-    ['linear-gradient(135deg,#1a0d00,#2e1800,#0a0600,#1a0e00)','Ember','#f97316'],
-    ['linear-gradient(135deg,#0a0a0a,#1a1a1a,#050505,#111111)','Carbon','#ffffff'],
+    ['linear-gradient(145deg,#1c2e4a,#0d1b2e)','Navy'],
+    ['linear-gradient(135deg,#1a0a2e,#0a051a)','Deep Purple'],
+    ['linear-gradient(135deg,#0a1a10,#051208)','Forest'],
+    ['linear-gradient(135deg,#1a0808,#0a0202)','Crimson'],
+    ['linear-gradient(135deg,#0a0a10,#050505)','Onyx'],
+    ['linear-gradient(135deg,#1a1000,#0a0800)','Gold Rush'],
+    ['linear-gradient(135deg,#050f1a,#020810)','Ocean'],
+    ['linear-gradient(135deg,#0d0018,#050010)','Midnight'],
   ];
-  const cur = S.walletCardGradient||presets[0][0];
-  const curAccent = S.walletCardAccent||'#a855f7';
-  const curStyle = S.walletCardStyle||'default';
-
-  ov.innerHTML='<div class="modal" style="max-height:88vh;overflow-y:auto">'
+  const cur = S.walletCardGradient||'linear-gradient(145deg,#1c2e4a,#0d1b2e)';
+  ov.innerHTML='<div class="modal">'
     +'<div class="modal-title">💳 Customize Card</div>'
-
-    // Bank name
-    +'<div style="margin-bottom:14px"><label style="font-size:10px;color:rgba(255,255,255,0.4);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Bank Name</label>'
+    +'<div style="margin-bottom:12px"><label style="font-size:10px;color:rgba(255,255,255,0.4);display:block;margin-bottom:6px">Bank Name</label>'
     +'<input class="input" id="wc-name" value="'+(S.bankDisplayName||'Sakura Bank')+'" placeholder="Sakura Bank" maxlength="28"></div>'
-
-    // Card background presets
-    +'<div style="margin-bottom:14px"><label style="font-size:10px;color:rgba(255,255,255,0.4);display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Card Background</label>'
+    +'<div style="margin-bottom:12px"><label style="font-size:10px;color:rgba(255,255,255,0.4);display:block;margin-bottom:8px">Card Background</label>'
     +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px">'
-    +presets.map(([g,n,ac])=>'<div onclick="document.getElementById(\'wc-grad\').value=\''+g+'\';document.getElementById(\'wc-accent\').value=\''+ac+'\';this.parentElement.querySelectorAll(\'.wcp\').forEach(x=>x.style.outline=\'none\');this.style.outline=\'2.5px solid #a855f7\'" class="wcp" title="'+n+'" style="height:44px;border-radius:12px;background:'+g+';cursor:pointer;border:1px solid rgba(255,255,255,0.1);position:relative;outline:'+(cur===g?'2.5px solid #a855f7':'none')+';transition:outline 0.15s">'
-      +'<div style="position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:7px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:0.3px">'+n+'</div>'
-      +'</div>').join('')
+    +presets.map(([g,n])=>'<div onclick="document.getElementById(\'wc-grad\').value=\''+g+'\';this.parentElement.querySelectorAll(\'.wcp\').forEach(x=>x.style.outline=\'none\');this.style.outline=\'2px solid var(--accent1)\'" class="wcp" title="'+n+'" style="height:40px;border-radius:10px;background:'+g+';cursor:pointer;border:1px solid rgba(255,255,255,0.1);outline:'+(cur===g?'2px solid var(--accent1)':'none')+'"></div>').join('')
     +'</div>'
     +'<input type="hidden" id="wc-grad" value="'+cur+'"></div>'
-
-    // Accent colour
-    +'<div style="margin-bottom:14px"><label style="font-size:10px;color:rgba(255,255,255,0.4);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Accent Colour</label>'
-    +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">'
-    +['#a855f7','#6f96ff','#4ade80','#fc7790','#f6bb4e','#4edfd0','#f97316','#e879f9','#ffffff','#2dd4bf'].map(c=>'<div onclick="document.getElementById(\'wc-accent\').value=\''+c+'\';this.parentElement.querySelectorAll(\'.wca\').forEach(x=>x.style.outline=\'none\');this.style.outline=\'2.5px solid #fff\'" class="wca" style="width:28px;height:28px;border-radius:50%;background:'+c+';cursor:pointer;border:1px solid rgba(255,255,255,0.15);outline:'+(curAccent===c?'2.5px solid #fff':'none')+';transition:outline 0.15s"></div>').join('')
-    +'</div>'
-    +'<input type="color" id="wc-accent" value="'+curAccent+'" style="width:100%;height:32px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);cursor:pointer"></div>'
-
-    // Card style (pattern)
-    +'<div style="margin-bottom:16px"><label style="font-size:10px;color:rgba(255,255,255,0.4);display:block;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Card Style</label>'
-    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">'
-    +[['default','Default','Grid lines'],['holo','Holographic','Rainbow sheen'],['minimal','Minimal','Clean & flat'],['circuit','Circuit','Tech grid'],['waves','Waves','Flowing lines'],['aurora','Aurora','Northern lights']].map(([v,n,d])=>'<div onclick="this.parentElement.querySelectorAll(\'.wcs\').forEach(x=>{x.style.background=\'rgba(255,255,255,0.03)\';x.style.borderColor=\'rgba(255,255,255,0.08)\'});this.style.background=\'rgba(160,136,250,0.15)\';this.style.borderColor=\'rgba(160,136,250,0.45)\';document.getElementById(\'wc-style\').value=\''+v+'\'" class="wcs" style="padding:8px 6px;border-radius:10px;background:'+(curStyle===v?'rgba(160,136,250,0.15)':'rgba(255,255,255,0.03)')+';border:1px solid '+(curStyle===v?'rgba(160,136,250,0.45)':'rgba(255,255,255,0.08)')+';cursor:pointer;text-align:center;transition:all 0.15s"><div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.8)">'+n+'</div><div style="font-size:8px;color:rgba(255,255,255,0.3);margin-top:2px">'+d+'</div></div>').join('')
-    +'</div>'
-    +'<input type="hidden" id="wc-style" value="'+curStyle+'"></div>'
-
+    +'<div style="margin-bottom:14px"><label style="font-size:10px;color:rgba(255,255,255,0.4);display:block;margin-bottom:6px">Border Accent</label>'
+    +'<input type="color" id="wc-border" value="'+(S.walletCardBorder||'rgba(111,150,255,0.2)').replace(/rgba?\(.+\)/,'#6f96ff')+'" style="width:100%;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);cursor:pointer"></div>'
     +'<div class="modal-row">'
     +'<button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeModal(\'wallet-card-cust\')">Cancel</button>'
     +'<button class="btn btn-primary btn-sm" style="flex:1" onclick="saveWalletCard()">Save</button>'
@@ -5631,9 +5662,7 @@ function renameBankHeader() {
 function saveWalletCard() {
   S.bankDisplayName=document.getElementById('wc-name').value||'Sakura Bank';
   S.walletCardGradient=document.getElementById('wc-grad').value;
-  S.walletCardAccent=document.getElementById('wc-accent').value||'#a855f7';
-  S.walletCardStyle=document.getElementById('wc-style').value||'default';
-  const bc=S.walletCardAccent;
+  const bc=document.getElementById('wc-border').value;
   S.walletCardBorder=bc+'44';
   saveState(); closeModal('wallet-card-cust');
   renderWalletContent(); showNotif('💳','Card updated!','');
@@ -5680,8 +5709,6 @@ function walletOverviewHTML() {
   const budgetPct  = totalBudget>0 ? Math.min((totalExp/totalBudget)*100,100) : 0;
   const diff       = S.income - totalExp;
   const cardGrad   = S.walletCardGradient||'linear-gradient(145deg,#1c0850,#340e90,#1a0648,#0d0328)';
-  const cardAccent = S.walletCardAccent||'#a855f7';
-  const cardStyle  = S.walletCardStyle||'default';
   const bankName   = S.bankDisplayName||'Sakura Bank';
 
   // 7-day spend data (last 7 expenses spread across week)
@@ -5742,7 +5769,7 @@ function walletOverviewHTML() {
           <div style="display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;margin-bottom:16px;background:${diff>=0?'rgba(34,197,94,0.12)':'rgba(244,63,94,0.12)'};border:1px solid ${diff>=0?'rgba(34,197,94,0.3)':'rgba(244,63,94,0.3)'};color:${diff>=0?'#4ade80':'#fb7185'}">${diff>=0?'↑':'↓'} £${Math.abs(diff).toFixed(2)} this month</div>
           <!-- Stats bar -->
           <div style="display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr;background:rgba(255,255,255,0.05);border-radius:16px;border:1px solid rgba(124,58,237,0.18)">
-            <div onclick="event.stopPropagation();openModal('wallet-income-modal');_walletPlaySound('income')" style="padding:11px 6px;text-align:center;cursor:pointer;border-radius:16px 0 0 16px;transition:background 0.18s" onmouseover="this.style.background='rgba(124,58,237,0.12)'" onmouseout="this.style.background='transparent'">
+            <div onclick="event.stopPropagation();openModal('add-income-modal');_walletPlaySound('income')" style="padding:11px 6px;text-align:center;cursor:pointer;border-radius:16px 0 0 16px;transition:background 0.18s" onmouseover="this.style.background='rgba(124,58,237,0.12)'" onmouseout="this.style.background='transparent'">
               <div style="width:26px;height:26px;border-radius:8px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.25);margin:0 auto 5px;display:flex;align-items:center;justify-content:center">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.2" stroke-linecap="round"><path d="M12 20V4m0 0l-6 6m6-6l6 6"/></svg>
               </div>
@@ -5775,7 +5802,7 @@ function walletOverviewHTML() {
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
         ${[
           {svg:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M12 10V4m0 0L8 8m4-4l4 4"/><circle cx="12" cy="18" r="1.2" fill="#c4b5fd" stroke="none"/></svg>`,label:'Pay',ag:'#7c3aed',abg:'rgba(124,58,237,0.12)',ab:'rgba(124,58,237,0.3)',fn:"openModal('add-expense-modal');_walletPlaySound('expense')"},
-          {svg:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="17" rx="8" ry="3"/><path d="M4 17v-2c0-1.66 3.58-3 8-3s8 1.34 8 3v2"/><path d="M12 8V3m0 0L9 6m3-3l3 3"/></svg>`,label:'Income',ag:'#22c55e',abg:'rgba(34,197,94,0.12)',ab:'rgba(34,197,94,0.3)',fn:"openModal('wallet-income-modal');_walletPlaySound('income')"},
+          {svg:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="17" rx="8" ry="3"/><path d="M4 17v-2c0-1.66 3.58-3 8-3s8 1.34 8 3v2"/><path d="M12 8V3m0 0L9 6m3-3l3 3"/></svg>`,label:'Income',ag:'#22c55e',abg:'rgba(34,197,94,0.12)',ab:'rgba(34,197,94,0.3)',fn:"openModal('add-income-modal');_walletPlaySound('income')"},
           {svg:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>`,label:'Budgets',ag:'#f59e0b',abg:'rgba(245,158,11,0.12)',ab:'rgba(245,158,11,0.3)',fn:"switchWalletTab('budgets',document.querySelectorAll('.wallet-tab')[5])"},
           {svg:`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#67e8f9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h11a3 3 0 0 1 0 6H5"/><path d="M8 5l-3 3 3 3"/><path d="M19 16H8a3 3 0 0 1 0-6h11"/><path d="M16 13l3 3-3 3"/></svg>`,label:'Cards',ag:'#06b6d4',abg:'rgba(6,182,212,0.12)',ab:'rgba(6,182,212,0.3)',fn:"switchWalletTab('cards',document.querySelectorAll('.wallet-tab')[6]);_walletPlaySound('swipe')"},
         ].map(a=>`<div class="w-quick-btn" onclick="${a.fn}" style="background:${a.abg};border-color:${a.ab}" onmouseover="this.style.borderColor='${a.ag}'" onmouseout="this.style.borderColor='${a.ab}'">
@@ -5792,32 +5819,23 @@ function walletOverviewHTML() {
         <button onclick="openWalletCardCustomize()" style="background:none;border:none;font-size:11px;color:#a855f7;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:3px">Manage <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
       </div>
       <!-- Virtual card -->
-      <div onclick="showNotif('💳','Card','•••• 4291')" style="border-radius:26px;position:relative;overflow:hidden;cursor:pointer;border:1px solid ${cardAccent}33;box-shadow:0 20px 60px ${cardAccent}55,0 0 0 1px rgba(255,255,255,0.06) inset;transition:all 0.32s cubic-bezier(.34,1.56,.64,1);height:186px" onmouseover="this.style.transform='scale(1.02) rotate(0.3deg) translateY(-4px)';this.style.boxShadow='0 30px 80px ${cardAccent}77'" onmouseout="this.style.transform='';this.style.boxShadow='0 20px 60px ${cardAccent}55,0 0 0 1px rgba(255,255,255,0.06) inset'">
+      <div onclick="showNotif('💳','Card','•••• 4291')" style="border-radius:26px;position:relative;overflow:hidden;cursor:pointer;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 60px rgba(124,58,237,0.4),0 0 0 1px rgba(255,255,255,0.06) inset;transition:all 0.32s cubic-bezier(.34,1.56,.64,1);height:186px" onmouseover="this.style.transform='scale(1.02) rotate(0.3deg) translateY(-4px)';this.style.boxShadow='0 30px 80px rgba(168,85,247,0.5)'" onmouseout="this.style.transform='';this.style.boxShadow='0 20px 60px rgba(124,58,237,0.4),0 0 0 1px rgba(255,255,255,0.06) inset'">
         <!-- Animated bg -->
         <div style="position:absolute;inset:0;background:${cardGrad};background-size:400% 400%;animation:wVcAnim 12s ease infinite;border-radius:26px"></div>
         <!-- Noise -->
         <div style="position:absolute;inset:0;opacity:.04;background-image:url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\");border-radius:26px"></div>
-        <!-- Style layer -->
-        ${cardStyle==='holo'
-          ? `<div style="position:absolute;inset:0;background:linear-gradient(108deg,rgba(255,100,100,0.12) 0%,rgba(255,200,50,0.1) 20%,rgba(100,255,100,0.1) 40%,rgba(50,150,255,0.12) 60%,rgba(200,50,255,0.1) 80%,rgba(255,100,150,0.12) 100%);animation:wHoloSheen 3s ease-in-out infinite;border-radius:26px"></div>`
-          : cardStyle==='minimal'
-          ? `<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.04) 0%,transparent 100%);border-radius:26px"></div>`
-          : cardStyle==='circuit'
-          ? `<div style="position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 18px,${cardAccent}0a 18px,${cardAccent}0a 19px),repeating-linear-gradient(90deg,transparent,transparent 18px,${cardAccent}0a 18px,${cardAccent}0a 19px);border-radius:26px"></div><div style="position:absolute;width:60px;height:60px;border:1.5px solid ${cardAccent}20;border-radius:50%;top:20px;left:50%;transform:translateX(-50%);pointer-events:none"></div>`
-          : cardStyle==='waves'
-          ? `<div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent,transparent 12px,${cardAccent}08 12px,${cardAccent}08 13px);border-radius:26px;animation:wHoloSheen 8s linear infinite"></div>`
-          : cardStyle==='aurora'
-          ? `<div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 50%,${cardAccent}22,transparent 60%),radial-gradient(ellipse 60% 80% at 80% 30%,${cardAccent}18,transparent 60%);border-radius:26px;animation:wBlobDrift 6s ease-in-out infinite alternate"></div>`
-          : `<div style="position:absolute;inset:0;background:linear-gradient(108deg,transparent 25%,rgba(255,255,255,0.07) 46%,${cardAccent}12 50%,rgba(255,255,255,0.04) 54%,transparent 75%);animation:wHoloSheen 5s ease-in-out infinite;border-radius:26px"></div><div style="position:absolute;inset:0;background:repeating-linear-gradient(108deg,transparent,transparent 24px,rgba(255,255,255,0.02) 24px,rgba(255,255,255,0.02) 25px);border-radius:26px"></div>`
-        }
+        <!-- Holo sheen -->
+        <div style="position:absolute;inset:0;background:linear-gradient(108deg,transparent 25%,rgba(255,255,255,0.08) 46%,rgba(192,132,252,0.08) 50%,rgba(124,58,237,0.06) 54%,transparent 75%);animation:wHoloSheen 5s ease-in-out infinite;border-radius:26px"></div>
+        <!-- Grid lines -->
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(108deg,transparent,transparent 24px,rgba(255,255,255,0.02) 24px,rgba(255,255,255,0.02) 25px);border-radius:26px"></div>
         <!-- Rings -->
-        <div style="position:absolute;width:240px;height:240px;border-radius:50%;border:1px solid ${cardAccent}12;top:-100px;right:-80px;pointer-events:none"></div>
-        <div style="position:absolute;width:180px;height:180px;border-radius:50%;border:1px solid ${cardAccent}18;top:-60px;right:-40px;pointer-events:none"></div>
+        <div style="position:absolute;width:240px;height:240px;border-radius:50%;border:1px solid rgba(255,255,255,0.05);top:-100px;right:-80px;pointer-events:none"></div>
+        <div style="position:absolute;width:180px;height:180px;border-radius:50%;border:1px solid rgba(168,85,247,0.08);top:-60px;right:-40px;pointer-events:none"></div>
         <!-- Card content -->
         <div style="position:absolute;inset:0;padding:20px 20px 18px;display:flex;flex-direction:column;justify-content:space-between;z-index:3">
           <div style="display:flex;align-items:center;justify-content:space-between">
             <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:28px;height:28px;border-radius:8px;background:${cardAccent}33;border:1px solid ${cardAccent}55;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px ${cardAccent}66">
+              <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a855f7,#e879f9);display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(168,85,247,0.6)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M6 3h12l4 6-10 13L2 9z"/></svg>
               </div>
               <div style="font-size:11px;font-weight:800;color:#e9d5ff;letter-spacing:.09em;text-transform:uppercase">${bankName}</div>
@@ -5836,11 +5854,11 @@ function walletOverviewHTML() {
               <div style="width:12px;height:18px;border-radius:0 10px 10px 0;border:1.5px solid rgba(255,255,255,0.2);border-left:none"></div>
               <div style="width:16px;height:24px;border-radius:0 12px 12px 0;border:1.5px solid rgba(255,255,255,0.1);border-left:none"></div>
             </div>
-            <div style="font-size:15px;font-weight:700;color:#e9d5ff;letter-spacing:.28em;text-shadow:0 0 20px ${cardAccent}88">•••• &thinsp;•••• &thinsp;•••• &thinsp;4291</div>
+            <div style="font-size:15px;font-weight:700;color:#e9d5ff;letter-spacing:.28em;text-shadow:0 0 20px rgba(168,85,247,0.6)">•••• &thinsp;•••• &thinsp;•••• &thinsp;4291</div>
           </div>
           <div style="display:flex;align-items:flex-end;justify-content:space-between">
-            <div><div style="font-size:8px;font-weight:700;color:${cardAccent}88;letter-spacing:.09em;text-transform:uppercase;margin-bottom:2px">Card Holder</div><div style="font-size:13px;font-weight:700;color:#e9d5ff">${S.profileName||'Luka'}</div></div>
-            <div><div style="font-size:8px;font-weight:700;color:${cardAccent}88;letter-spacing:.09em;text-transform:uppercase;margin-bottom:2px">Expires</div><div style="font-size:13px;font-weight:700;color:#e9d5ff">03 / 29</div></div>
+            <div><div style="font-size:8px;font-weight:700;color:rgba(168,85,247,0.5);letter-spacing:.09em;text-transform:uppercase;margin-bottom:2px">Card Holder</div><div style="font-size:13px;font-weight:700;color:#e9d5ff">${S.profileName||'Luka'}</div></div>
+            <div><div style="font-size:8px;font-weight:700;color:rgba(168,85,247,0.5);letter-spacing:.09em;text-transform:uppercase;margin-bottom:2px">Expires</div><div style="font-size:13px;font-weight:700;color:#e9d5ff">03 / 29</div></div>
             <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
               <div style="display:flex;align-items:center"><div style="width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 65%,rgba(255,95,0,0.8),#eb001b);margin-right:-10px;z-index:1"></div><div style="width:28px;height:28px;border-radius:50%;background:radial-gradient(circle at 35%,rgba(255,95,0,0.8),#f79e1b)"></div></div>
               <div style="font-size:7px;font-weight:800;color:rgba(255,255,255,0.35);letter-spacing:.08em;text-transform:uppercase">Mastercard</div>
@@ -6308,17 +6326,17 @@ function walletActivityHTML() {
 
     <!-- ── Summary Pills ─────────────────────────── -->
     <div style="padding:12px 16px;display:flex;gap:8px">
-      <div style="flex:1;padding:14px 12px;border-radius:18px;background:linear-gradient(135deg,rgba(76,175,110,0.13),rgba(78,223,208,0.07));border:1px solid rgba(76,175,110,0.2);text-align:center">
+      <div style="flex:1;padding:14px 12px;border-radius:18px;background:linear-gradient(135deg,rgba(76,175,110,0.13),rgba(78,223,208,0.07));border:1px solid rgba(76,175,110,0.2)">
         <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Income</div>
         <div style="font-size:20px;font-weight:900;color:#4caf6e;letter-spacing:-0.5px">+£${totalIn.toFixed(2)}</div>
       </div>
-      <div style="flex:1;padding:14px 12px;border-radius:18px;background:linear-gradient(135deg,rgba(252,119,144,0.13),rgba(231,129,97,0.07));border:1px solid rgba(252,119,144,0.2);text-align:center">
+      <div style="flex:1;padding:14px 12px;border-radius:18px;background:linear-gradient(135deg,rgba(252,119,144,0.13),rgba(231,129,97,0.07));border:1px solid rgba(252,119,144,0.2)">
         <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Spent</div>
         <div style="font-size:20px;font-weight:900;color:#fc7790;letter-spacing:-0.5px">−£${totalOut.toFixed(2)}</div>
       </div>
-      <div style="flex:1;padding:14px 12px;border-radius:18px;background:linear-gradient(135deg,rgba(160,136,250,0.13),rgba(199,125,255,0.07));border:1px solid rgba(160,136,250,0.2);text-align:center">
+      <div style="flex:1;padding:14px 12px;border-radius:18px;background:linear-gradient(135deg,rgba(160,136,250,0.13),rgba(199,125,255,0.07));border:1px solid rgba(160,136,250,0.2)">
         <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px">Net</div>
-        <div style="font-size:20px;font-weight:900;color:${net>=0?'#a088fa':'#fc7790'};letter-spacing:-0.5px">${net>=0?'+':'−'}£${Math.abs(net).toFixed(2)}</div>
+        <div style="font-size:20px;font-weight:900;color:${net>=0?'#a088fa':'#fc7790'};letter-spacing:-0.5px">${net>=0?'+':''}£${net.toFixed(2)}</div>
       </div>
     </div>
 
@@ -6536,7 +6554,7 @@ function walletGoalsHTML() {
   </div>
 
   <!-- ── Add Goal Modal ─────────────────────────── -->
-  <div id="add-goal-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeGoalModal('add-goal-modal')">
+  <div id="add-goal-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('add-goal-modal')">
     <div class="modal">
       <div class="modal-title">🎯 New Savings Goal</div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
@@ -6559,20 +6577,20 @@ function walletGoalsHTML() {
         <input class="input" id="goal-saved-input" type="number" placeholder="0" min="0">
       </div>
       <div class="modal-row">
-        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeGoalModal('add-goal-modal')">Cancel</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeModal('add-goal-modal')">Cancel</button>
         <button class="btn btn-primary btn-sm" style="flex:1" onclick="saveNewGoal()">Create Goal</button>
       </div>
     </div>
   </div>
 
   <!-- ── Deposit Modal ─────────────────────────── -->
-  <div id="goal-deposit-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeGoalModal('goal-deposit-modal')">
+  <div id="goal-deposit-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('goal-deposit-modal')">
     <div class="modal">
       <div class="modal-title">💰 Add to Goal</div>
       <input type="hidden" id="goal-deposit-idx">
       <input class="input" id="goal-deposit-amount" type="number" placeholder="Amount (£)" min="0.01" step="0.01" style="margin-bottom:16px">
       <div class="modal-row">
-        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeGoalModal('goal-deposit-modal')">Cancel</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeModal('goal-deposit-modal')">Cancel</button>
         <button class="btn btn-primary btn-sm" style="flex:1" onclick="confirmGoalDeposit()">Add</button>
       </div>
     </div>
@@ -6609,13 +6627,7 @@ function renderGoalRings() {
 function openAddGoalModal() {
   _walletPlaySound('swipe');
   const m = document.getElementById('add-goal-modal');
-  if (m) { m.style.display = 'flex'; }
-}
-
-function closeGoalModal(id) {
-  playSound('click');
-  const m = document.getElementById(id);
-  if (m) m.style.display = 'none';
+  if (m) m.style.display = 'flex';
 }
 
 function openGoalDeposit(i) {
@@ -6640,7 +6652,7 @@ function saveNewGoal() {
   S.savingsGoals.push({ name, emoji, target, saved: Math.min(saved, target), deadline });
   saveState();
   _walletPlaySound('income');
-  closeGoalModal('add-goal-modal');
+  closeModal('add-goal-modal');
   switchWalletTab('goals', document.querySelector('.wallet-tab[onclick*="goals"]'));
   showNotif('🎯','Goal created!', name);
 }
@@ -6653,7 +6665,7 @@ function confirmGoalDeposit() {
   S.savingsGoals[i].saved = Math.min(S.savingsGoals[i].saved + amt, S.savingsGoals[i].target);
   saveState();
   _walletPlaySound('income');
-  closeGoalModal('goal-deposit-modal');
+  closeModal('goal-deposit-modal');
   const done = S.savingsGoals[i].saved >= S.savingsGoals[i].target;
   switchWalletTab('goals', document.querySelector('.wallet-tab[onclick*="goals"]'));
   if (done) { showNotif('🎉','Goal complete!', S.savingsGoals[i].name + ' achieved!'); _walletPlaySound('goal_done'); launchConfetti(); }
@@ -7104,24 +7116,38 @@ function renderCalendar() {
   }
   
   c.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <button class="btn btn-ghost btn-sm" onclick="calNav(-1)">←</button>
-      <div style="font-size:18px;font-weight:700;color:var(--fg)">${monthName} ${calYear}</div>
-      <div style="display:flex;gap:4px">
-        <button class="btn btn-ghost btn-sm" onclick="openCalSettings()" style="padding:5px 8px" title="Calendar Settings">⚙️</button>
-        <button class="btn btn-ghost btn-sm" onclick="calNav(1)">→</button>
+    <!-- Month nav -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <button style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.2);color:#c4b5fd;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'" onclick="calNav(-1)">←</button>
+      <div style="text-align:center">
+        <div style="font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px">${monthName}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);font-weight:600;letter-spacing:1.2px;text-transform:uppercase;margin-top:1px">${calYear}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.2);color:#c4b5fd;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s" onclick="openCalSettings()" title="Calendar Settings" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">⚙️</button>
+        <button style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid rgba(139,92,246,0.2);color:#c4b5fd;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s" onmouseover="this.style.background='rgba(109,40,217,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'" onclick="calNav(1)">→</button>
       </div>
     </div>
-    <div class="cal-grid" style="margin-bottom:8px">
-      ${['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<div style="text-align:center;font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);padding:6px">${d}</div>`).join('')}
+    <!-- Day headers -->
+    <div class="cal-grid" style="margin-bottom:4px">
+      ${['Su','Mo','Tu','We','Th','Fr','Sa'].map((d,i)=>`<div style="text-align:center;font-size:9px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;padding:5px 0;color:${(i===0||i===6)?'rgba(139,92,246,0.55)':'rgba(255,255,255,0.25)'}">${d}</div>`).join('')}
+    </div>
+    <!-- Calendar grid -->
+    <div class="cal-grid" style="margin-bottom:20px">
       ${days}
     </div>
-    <div style="margin-top:16px">
-      <div style="font-size:14px;font-weight:700;color:var(--fg);margin-bottom:8px">Upcoming Events</div>
+    <!-- Upcoming Events -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:14px;font-weight:800;color:#fff;letter-spacing:-0.2px">Upcoming Events</div>
+        <div style="font-size:10px;color:rgba(139,92,246,0.7);background:rgba(109,40,217,0.15);border:1px solid rgba(139,92,246,0.2);border-radius:20px;padding:3px 10px;font-weight:700">${monthName.slice(0,3)}</div>
+      </div>
       ${(()=>{
         const _now2 = new Date();
         const _todayStr = _now2.toISOString().slice(0,10);
-        return S.events.sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5).map((e,i) => {
+        const sorted = S.events.sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5);
+        if (!sorted.length) return `<div style="text-align:center;padding:24px 0 8px"><div style="font-size:28px;margin-bottom:8px;opacity:0.3">✦</div><div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.25)">No events yet</div></div>`;
+        return sorted.map((e,i) => {
           const _evDate = new Date(e.date + (e.time ? 'T' + e.time : ''));
           const _evStr  = e.date ? e.date.slice(0,10) : '';
           let _isNow = false;
@@ -7138,22 +7164,24 @@ function renderCalendar() {
             : _dAway === 0 ? '• Today'
             : '• Past';
           const _glowDot = _isNow ? '<div style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:#f6bb4e;box-shadow:0 0 6px #f6bb4e;animation:eventGlow 1.5s ease-in-out infinite"></div>' : '';
-          const _shimmer = _isNow ? '<div style="position:absolute;top:0;right:0;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(246,187,78,0.04));pointer-events:none"></div>' : '';
-          const _reward  = e.ticketReward ? '<div style="font-size:10px;color:var(--gold)">🎟️ ' + e.ticketReward + ' tickets</div>' : '';
+          const _shimmer = _isNow ? '<div style="position:absolute;top:0;right:0;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(246,187,78,0.04));pointer-events:none;border-radius:18px"></div>' : '';
+          const _reward  = e.ticketReward ? '<div style="font-size:10px;color:var(--gold);margin-top:2px">🎟️ ' + e.ticketReward + ' tickets</div>' : '';
           const _bgSt = (e.bubbleColor&&!_isNow)?'background:'+e.bubbleColor+';':'';
           const _canRdm = _isNow && e.ticketReward && !e.redeemed;
           const _rdmBtn = _canRdm
-            ? '<button class="ev-rdm" data-idx="'+i+'" style="position:absolute;bottom:6px;right:44px;font-size:10px;font-weight:800;padding:3px 10px;background:linear-gradient(135deg,#f6bb4e,#e78161);border:none;border-radius:99px;color:#000;cursor:pointer;display:none;white-space:nowrap;z-index:5">🎟️ Redeem '+e.ticketReward+'</button>'
-            : (e.redeemed&&_isNow?'<div style="position:absolute;bottom:6px;right:44px;font-size:9px;color:rgba(246,187,78,0.5);padding:3px 8px;background:rgba(246,187,78,0.1);border-radius:99px">✓ Redeemed</div>':'');
-          return '<div class="ev-wrap '+(_isNow?'event-now':'card2')+'" style="margin-bottom:8px;display:flex;align-items:center;gap:10px;padding:10px 12px;position:relative;'+_bgSt+'">'
+            ? '<button class="ev-rdm" data-idx="'+i+'" style="position:absolute;bottom:8px;right:48px;font-size:10px;font-weight:800;padding:3px 10px;background:linear-gradient(135deg,#f6bb4e,#e78161);border:none;border-radius:99px;color:#000;cursor:pointer;display:none;white-space:nowrap;z-index:5">🎟️ Redeem '+e.ticketReward+'</button>'
+            : (e.redeemed&&_isNow?'<div style="position:absolute;bottom:8px;right:48px;font-size:9px;color:rgba(246,187,78,0.5);padding:3px 8px;background:rgba(246,187,78,0.1);border-radius:99px">✓ Redeemed</div>':'');
+          const evColor = e.ringColor || '#a78bfa';
+          return '<div class="ev-wrap '+(_isNow?'event-now':'')+'" style="margin-bottom:9px;display:flex;align-items:center;gap:12px;padding:12px 14px;position:relative;border-radius:18px;background:'+(_isNow?'linear-gradient(135deg,rgba(246,187,78,0.14),rgba(252,119,144,0.08))':'rgba(255,255,255,0.03)')+';border:1px solid '+(_isNow?'rgba(246,187,78,0.4)':evColor+'22')+';overflow:hidden;transition:all .22s cubic-bezier(.34,1.56,.64,1);cursor:pointer;'+_bgSt+'">'
+            + '<div style="position:absolute;left:0;top:15%;bottom:15%;width:3px;background:'+evColor+';border-radius:0 3px 3px 0;box-shadow:0 0 8px '+evColor+'88"></div>'
             + _shimmer + _rdmBtn
-            + '<div style="position:relative"><span style="font-size:24px">' + (e.emoji||'📅') + '</span>' + _glowDot + '</div>'
+            + '<div style="position:relative;width:40px;height:40px;border-radius:13px;background:'+evColor+'18;border:1px solid '+evColor+'33;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;transition:transform .2s">' + (e.emoji||'📅') + _glowDot + '</div>'
             + '<div style="flex:1;min-width:0">'
-            + '<div style="font-size:13px;font-weight:700;color:' + (_isNow?'#f6bb4e':'var(--fg)') + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + e.title + '</div>'
-            + '<div style="font-size:11px;color:' + (_isNow?'rgba(246,187,78,0.8)':'rgba(255,255,255,0.4)') + '">' + _evDate.toLocaleDateString() + (e.time ? ' ' + e.time : '') + ' ' + _tlabel + '</div>'
+            + '<div style="font-size:12px;font-weight:700;color:' + (_isNow?'#f6bb4e':'rgba(255,255,255,0.9)') + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-0.1px">' + e.title + '</div>'
+            + '<div style="font-size:10px;color:' + (_isNow?'rgba(246,187,78,0.7)':'rgba(255,255,255,0.35)') + ';margin-top:2px">' + _evDate.toLocaleDateString() + (e.time ? ' · ' + e.time : '') + ' <span style="color:'+(_isNow?'#f6bb4e':evColor)+';font-weight:700">' + _tlabel + '</span></div>'
             + _reward
             + '</div>'
-            + '<button class="btn btn-danger btn-sm" onclick="removeEvent(' + i + ')" style="flex-shrink:0">✕</button>'
+            + '<button style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:rgba(252,119,144,0.1);border:1px solid rgba(252,119,144,0.2);color:rgba(252,119,144,0.6);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s" onclick="removeEvent(' + i + ')" onmouseover="this.style.background=\'rgba(252,119,144,0.25)\'" onmouseout="this.style.background=\'rgba(252,119,144,0.1)\'">✕</button>'
             + '</div>';
         }).join('');
       })()}
@@ -9122,12 +9150,21 @@ let activeNoteId = null;
 function renderNotes() {
   const sidebar = document.getElementById('notes-sidebar');
   if (!sidebar) return;
-  sidebar.innerHTML = S.notes.map((n,i) => `
-    <div class="note-item ${activeNoteId === n.id ? 'active' : ''}" onclick="openNote('${n.id}')">
+  const STRIPES = ['#8b5cf6','#e879f9','#6366f1','#06b6d4','#22c55e','#f59e0b','#f43f5e','#c084fc','#a78bfa'];
+  sidebar.innerHTML = S.notes.map((n,i) => {
+    const stripe = n.stripe || STRIPES[i % STRIPES.length];
+    const preview = n.content ? n.content.replace(/<[^>]*>/g,'').slice(0,35) : '';
+    const timeStr = n.created ? new Date(n.created).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
+    const isActive = activeNoteId === n.id;
+    return `<div class="note-item ${isActive ? 'active' : ''}" style="--note-stripe:${stripe};animation-delay:${i*40}ms" onclick="openNote('${n.id}')">
       <div class="note-item-title">${n.title||'Untitled'}</div>
-      <div class="note-item-preview">${n.content ? n.content.replace(/<[^>]*>/g,'').slice(0,30) : ''}</div>
-      ${isAdmin() ? '<button onclick="deleteNote(\'${n.id}\',event)" style="background:none;border:none;color:var(--pink);cursor:pointer;font-size:10px;margin-top:4px">delete</button>' : ''}
-    </div>`).join('');
+      <div class="note-item-preview">${preview || 'No content yet…'}</div>
+      <div class="note-item-time">${timeStr}</div>
+      ${isAdmin() ? `<button onclick="deleteNote('${n.id}',event)" style="background:none;border:none;color:rgba(252,119,144,0.6);cursor:pointer;font-size:9px;margin-top:5px;padding:0;font-weight:700;letter-spacing:0.3px">✕ delete</button>` : ''}
+    </div>`;
+  }).join('');
+  // Assign stripe to note if missing
+  S.notes.forEach((n,i) => { if (!n.stripe) n.stripe = STRIPES[i % STRIPES.length]; });
 }
 
 function newNote() {
