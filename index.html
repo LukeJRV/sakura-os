@@ -752,13 +752,20 @@ button, a { touch-action: manipulation; }
   pointer-events:none;
 }
 #time-display {
-  font-size: calc(15px * var(--ui-scale));
-  font-weight:500;
-  color:var(--fg);
+  font-size: calc(18px * var(--ui-scale));
+  font-weight: 900;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  letter-spacing: -0.8px;
   font-variant-numeric: tabular-nums;
-  text-shadow: var(--font-glow);
-  animation: var(--font-rainbow);
-  letter-spacing:-0.3px;
+  background: linear-gradient(90deg, #ffffff 0%, #f0e0ff 40%, #fbabd8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: timeSubtleGlow 3s ease-in-out infinite;
+}
+@keyframes timeSubtleGlow {
+  0%,100% { filter: drop-shadow(0 0 3px rgba(160,136,250,0.35)) drop-shadow(0 0 1px rgba(251,171,216,0.2)); }
+  50%      { filter: drop-shadow(0 0 6px rgba(160,136,250,0.55)) drop-shadow(0 0 2px rgba(251,171,216,0.3)); }
 }
 #status-right {
   display:flex; align-items:center; gap:5px;
@@ -896,35 +903,66 @@ button, a { touch-action: manipulation; }
   position:absolute;
   top:52px; left:0; right:0;
   height: calc(30px * var(--ui-scale));
-  display:flex; align-items:center; gap:8px;
+  display:flex; align-items:center; gap:7px;
   padding:0 14px;
   z-index:998;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.35), transparent);
+  background: linear-gradient(to bottom, rgba(0,0,0,0.28), transparent);
+}
+/* Ticket icon pill */
+#ticketbar > span:first-child {
+  font-size:12px;
+  animation: ticketIconFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(246,187,78,0.7));
+}
+@keyframes ticketIconFloat {
+  0%,100% { transform: translateY(0px) rotate(-3deg); }
+  50%      { transform: translateY(-2px) rotate(3deg); }
 }
 #ticket-count {
-  font-size: calc(11px * var(--ui-scale));
-  font-weight:800;
-  color:var(--gold);
-  white-space:nowrap;
-  text-shadow: 0 0 10px rgba(246,187,78,0.6), 0 1px 3px rgba(0,0,0,0.8);
-  letter-spacing:0.3px;
+  font-size: calc(12px * var(--ui-scale));
+  font-weight: 900;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+  background: linear-gradient(90deg, #ffffff 0%, #f8f0ff 70%, #f0d8f0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: subtleGlow 3s ease-in-out infinite;
+  display: inline-block;
 }
+@keyframes ticketPopGain {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.5); }
+  60%  { transform: scale(0.9); }
+  80%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+@keyframes ticketShakeLoss {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-4px); }
+  40%     { transform: translateX(4px); }
+  60%     { transform: translateX(-3px); }
+  80%     { transform: translateX(3px); }
+}
+#ticket-count.anim-gain { animation: ticketPopGain 0.5s cubic-bezier(.4,0,.2,1) forwards; }
+#ticket-count.anim-loss { animation: ticketShakeLoss 0.5s ease forwards; }
 #ticket-progress-wrap {
   flex:1;
-  height: calc(10px * var(--ui-scale));
+  height: calc(6px * var(--ui-scale));
   position:relative;
   cursor:pointer;
-  /* overflow must be VISIBLE so tooltip can escape the bar bounds */
   overflow:visible;
+  border-radius:99px;
 }
 /* Inner track clip — keeps the rounded bar look without clipping the tooltip */
 #ticket-progress-wrap::before {
   content:'';
   position:absolute;
   inset:0;
-  background:rgba(0,0,0,0.4);
+  background: linear-gradient(90deg, rgba(246,187,78,0.08), rgba(160,136,250,0.08));
   border-radius:99px;
-  border:1px solid rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
   box-shadow: 0 1px 4px rgba(0,0,0,0.4), inset 0 1px 2px rgba(0,0,0,0.3);
   pointer-events:none;
   z-index:0;
@@ -932,7 +970,7 @@ button, a { touch-action: manipulation; }
 #ticket-progress-fill {
   position:absolute;
   inset:0;
-  right:auto; /* width controlled via JS */
+  right:auto;
   height:100%;
   background: var(--ticket-bar-gradient, linear-gradient(90deg, var(--accent1), var(--pink), var(--gold)));
   border-radius:99px;
@@ -944,8 +982,8 @@ button, a { touch-action: manipulation; }
 #ticket-progress-fill::after {
   content:'';
   position:absolute; top:0; left:-100%; right:0; bottom:0;
-  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.35) 50%,transparent 100%);
-  animation:ticketShimmer 2s infinite linear;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.5) 50%,transparent 100%);
+  animation:ticketShimmer 1.8s infinite linear;
 }
 @keyframes ticketShimmer {
   to { left:200%; }
@@ -3439,7 +3477,10 @@ input[type=number] { -moz-appearance:textfield; }
 
   <!-- Status Bar -->
   <div id="statusbar">
-    <span id="time-display">12:00</span>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span id="day-night-icon" style="font-size:14px;line-height:1;filter:drop-shadow(0 0 6px rgba(255,220,100,0.6))">☀️</span>
+      <span id="time-display">12:00</span>
+    </div>
     <div id="status-right">
       <!-- Signal bars -->
       <div class="sig-bars">
@@ -3448,8 +3489,6 @@ input[type=number] { -moz-appearance:textfield; }
         <div class="sig-bar" style="height:9px;opacity:0.8"></div>
         <div class="sig-bar" style="height:12px"></div>
       </div>
-      <!-- Day/night icon -->
-      <span id="day-night-icon" style="font-size:13px">☀️</span>
       <!-- Crystal Battery -->
       <div class="crystal-battery" id="crystal-battery-wrap">
         <div class="cbatt-body" id="cbatt-body">
@@ -3463,21 +3502,13 @@ input[type=number] { -moz-appearance:textfield; }
         <svg viewBox="0 0 32 32" width="32" height="32" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:100%">
           <circle cx="16" cy="16" r="16" fill="#1e0e3e"/>
           <circle cx="16" cy="16" r="16" fill="none" stroke="rgba(160,136,250,0.3)" stroke-width="0.5"/>
-          <!-- shoulders -->
           <ellipse cx="16" cy="31" rx="12" ry="9" fill="#8060d0"/>
-          <!-- collar shine -->
           <ellipse cx="16" cy="29" rx="6" ry="3.5" fill="rgba(200,175,255,0.3)"/>
-          <!-- neck -->
           <rect x="13.5" y="21" width="5" height="4" rx="2" fill="#cca8f0"/>
-          <!-- head -->
           <circle cx="16" cy="17.5" r="7" fill="#d4b0f0"/>
-          <!-- hair -->
           <path d="M9 16 Q9.5 8.5 16 8.5 Q22.5 8.5 23 16 Q20.5 13 16 13 Q11.5 13 9 16Z" fill="#7050c0"/>
-          <!-- hair highlight -->
           <path d="M10.5 14.5 Q13 10 16 10 Q12.5 11.5 10.5 14.5Z" fill="rgba(255,255,255,0.25)"/>
-          <!-- face shadow -->
           <ellipse cx="16" cy="18.5" rx="5" ry="4" fill="rgba(180,130,240,0.2)"/>
-          <!-- rim -->
           <circle cx="16" cy="16" r="15.5" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>
         </svg>
       </div>
@@ -4806,7 +4837,19 @@ function updateTicketDisplay(delta) {
   const pct = Math.min((S.tickets / S.maxTickets) * 100, 100);
   const prevPct = fill ? parseFloat(fill.style.width||'0') : 0;
   if (fill) fill.style.width = pct + '%';
-  if (count) count.textContent = S.tickets;
+  if (count) {
+    count.textContent = S.tickets;
+    if (typeof delta === 'number' && delta !== 0) {
+      const cls = delta > 0 ? 'anim-gain' : 'anim-loss';
+      count.classList.remove('anim-gain', 'anim-loss');
+      void count.offsetWidth;
+      count.classList.add(cls);
+      count.addEventListener('animationend', function h() {
+        count.classList.remove(cls);
+        count.removeEventListener('animationend', h);
+      }, { once: true });
+    }
+  }
   if (tooltip) {
     tooltip.textContent = `${S.tickets} / ${S.maxTickets} 🎟️`;
     // At 100% clamp to centre; otherwise follow fill end, clamped so tooltip stays on-screen
