@@ -2633,178 +2633,191 @@ input[type=number] { -moz-appearance:textfield; }
   padding:8px 14px 4px;
 }
 /* ===== BACKPACK CRYSTAL VIEW ===== */
-.bp-crystal-container { padding:0 2px; }
+.bp-crystal-container { display:flex;flex-direction:column;min-height:0; }
 
-.bp-crystal-header {
-  padding:14px 16px 8px;
-  border-bottom:1px solid rgba(139,92,246,0.12);
-  background:rgba(6,3,16,0.6);
-}
-.bp-crystal-title {
-  font-size:20px;font-weight:900;color:#fff;letter-spacing:-0.5px;margin-bottom:2px;
-}
-.bp-crystal-subtitle {
-  font-size:11px;color:rgba(255,255,255,0.3);font-weight:500;
-}
-.bp-crystal-actions { display:flex;gap:7px; }
-.bp-crystal-btn {
-  border-radius:20px;padding:7px 13px;font-size:11px;font-weight:700;
-  cursor:pointer;border:none;transition:all .2s;
-  display:flex;align-items:center;gap:5px;
-}
-.bp-crystal-btn:active{transform:scale(0.93)}
-.bp-crystal-btn.opt {
-  background:rgba(255,255,255,0.07);border:1px solid rgba(139,92,246,0.25);color:#c4b5fd;
-}
-.bp-crystal-btn.opt:hover{background:rgba(109,40,217,0.2);border-color:rgba(139,92,246,0.45)}
-.bp-crystal-btn.clr {
-  background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.25);color:#fda4af;
-}
-.bp-crystal-btn.clr:hover{background:rgba(244,63,94,0.18)}
-
-.bp-crystal-capbar {
+/* Top nav */
+.bp-cv-topnav {
+  display:flex;align-items:center;justify-content:space-between;
   padding:10px 16px 0;
 }
-.bp-crystal-track {
-  height:5px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;
-  border:1px solid rgba(139,92,246,0.08);
+.bp-cv-back {
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(124,58,237,0.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:#c4b5fd;cursor:pointer;transition:all .2s;
 }
-.bp-crystal-fill {
+.bp-cv-back:hover{background:rgba(124,58,237,0.18)}
+.bp-cv-title-row{display:flex;align-items:center;gap:7px;font-size:15px;font-weight:800;color:#fff}
+.bp-cv-icon{
+  width:28px;height:28px;border-radius:9px;
+  background:linear-gradient(135deg,#7c3aed,#a855f7);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;box-shadow:0 2px 12px rgba(124,58,237,0.5);
+}
+.bp-cv-settings{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(124,58,237,0.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;color:#7c6aaa;cursor:pointer;transition:all .2s;
+}
+.bp-cv-settings:hover{background:rgba(124,58,237,0.18);transform:rotate(30deg)}
+
+/* XP row */
+.bp-cv-xp{display:flex;align-items:center;gap:8px;padding:8px 16px 0}
+.bp-cv-xp-num{font-size:12px;font-weight:700;color:#c4b5fd}
+.bp-cv-xp-track{flex:1;height:4px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden}
+.bp-cv-xp-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#c084fc);border-radius:99px;box-shadow:0 0 8px rgba(168,85,247,0.4)}
+
+/* Section header */
+.bp-cv-sec-head{padding:14px 16px 0;display:flex;align-items:center;justify-content:space-between}
+.bp-cv-sh-title{font-size:18px;font-weight:900;color:#fff;letter-spacing:-.4px}
+.bp-cv-sh-meta{font-size:11px;color:#7c6aaa;margin-top:2px;font-weight:500}
+.bp-cv-sh-actions{display:flex;gap:7px}
+.bp-cv-sh-btn{border-radius:20px;padding:7px 13px;font-size:11px;font-weight:700;cursor:pointer;border:none;transition:all .2s}
+.bp-cv-sh-btn.opt{background:rgba(255,255,255,0.07);border:1px solid rgba(124,58,237,0.25);color:#c4b5fd}
+.bp-cv-sh-btn.opt:hover{background:rgba(124,58,237,0.2)}
+.bp-cv-sh-btn.clr{background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.25);color:#fda4af}
+.bp-cv-sh-btn.clr:hover{background:rgba(244,63,94,0.18)}
+
+/* Capacity bar */
+.bp-cv-capbar{padding:10px 16px 0}
+.bp-cv-cap-track{height:5px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden}
+.bp-cv-cap-fill{
   height:100%;border-radius:99px;
-  background:linear-gradient(90deg,#6d28d9,#a78bfa,#e879f9);
-  box-shadow:0 0 10px rgba(139,92,246,0.5);
+  background:linear-gradient(90deg,#7c3aed,#c084fc,#e879f9);
+  box-shadow:0 0 10px rgba(168,85,247,0.4);
   transition:width .5s cubic-bezier(.34,1.56,.64,1);
 }
-.bp-crystal-cap-labels {
-  display:flex;justify-content:space-between;margin-top:5px;
-  font-size:9px;color:rgba(255,255,255,0.25);font-weight:600;
-  letter-spacing:0.3px;text-transform:uppercase;
-}
+.bp-cv-cap-labels{display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:#7c6aaa;font-weight:500}
 
-.bp-crystal-section-head {
-  padding:14px 16px 6px;
-  display:flex;align-items:center;gap:8px;
+/* Grid section */
+.bp-cv-grid-wrap{padding:14px 16px 0}
+.bp-cv-grid-label{
+  font-size:10px;font-weight:700;color:#7c6aaa;
+  letter-spacing:.08em;text-transform:uppercase;
+  margin-bottom:9px;display:flex;align-items:center;gap:6px;
 }
-.bp-crystal-section-label {
-  font-size:9px;font-weight:800;color:rgba(139,92,246,0.55);
-  letter-spacing:1px;text-transform:uppercase;white-space:nowrap;
-}
-.bp-crystal-section-line {
-  flex:1;height:1px;background:rgba(139,92,246,0.1);
-}
+.bp-cv-gl-line{flex:1;height:1px;background:rgba(124,58,237,0.15)}
+.bp-cv-item-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
 
-.bp-crystal-grid {
-  display:grid;grid-template-columns:repeat(4,1fr);
-  gap:9px;padding:2px 16px 14px;
-}
-
-.bp-cslot {
-  aspect-ratio:1;border-radius:20px;
+/* Slots */
+.bp-cslot{
+  aspect-ratio:1;border-radius:18px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   position:relative;cursor:pointer;overflow:hidden;
   transition:all .25s cubic-bezier(.34,1.56,.64,1);
   -webkit-tap-highlight-color:transparent;
 }
-.bp-cslot.filled {
-  background:linear-gradient(145deg,#0e0b20,#160e2e);
-  border:1px solid rgba(139,92,246,0.3);
-  box-shadow:0 4px 20px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);
+.bp-cslot.filled{
+  background:linear-gradient(135deg,#0e0b20,#160e2e);
+  border:1px solid rgba(124,58,237,0.25);
 }
-.bp-cslot.filled:hover {
-  transform:scale(1.09) translateY(-2px);
-  border-color:rgba(167,139,250,0.55);
-  box-shadow:0 10px 28px rgba(109,40,217,0.35);
-}
-.bp-cslot.filled:active{transform:scale(0.91)}
-.bp-cslot.empty {
-  background:rgba(255,255,255,0.025);
-  border:1.5px dashed rgba(139,92,246,0.18);
-}
-.bp-cslot.empty:hover{border-color:rgba(167,139,250,0.35);background:rgba(109,40,217,0.06)}
+.bp-cslot.filled:hover{transform:scale(1.08) translateY(-2px);border-color:rgba(168,85,247,0.5);box-shadow:0 8px 24px rgba(124,58,237,0.25)}
+.bp-cslot.filled:active{transform:scale(.93)}
+.bp-cslot.empty{background:#0d0b1c;border:1.5px dashed rgba(124,58,237,0.18)}
+.bp-cslot.empty:hover{border-color:rgba(168,85,247,0.35);background:#100d20}
 
-/* rarity tiers */
-.bp-cslot.rare  { border-color:rgba(192,132,252,0.45); }
+/* Rarity tiers — match reference exactly */
+.bp-cslot.rare  { border-color:rgba(192,132,252,0.4); }
 .bp-cslot.epic  { border-color:rgba(232,121,249,0.5); }
-.bp-cslot.legendary { border-color:rgba(251,191,36,0.5); animation:bpLegBorder 2s ease-in-out infinite alternate; }
+.bp-cslot.legendary { border-color:rgba(251,191,36,0.45); animation:bpLegBorder 2s ease-in-out infinite alternate; }
 @keyframes bpLegBorder {
-  0%{box-shadow:0 0 8px rgba(251,191,36,0.2),inset 0 0 8px rgba(251,191,36,0.05)}
-  100%{box-shadow:0 0 20px rgba(251,191,36,0.4),inset 0 0 16px rgba(251,191,36,0.1)}
+  0%  { border-color:rgba(251,191,36,0.3);box-shadow:0 0 8px rgba(251,191,36,0.15) }
+  100%{ border-color:rgba(251,191,36,0.7);box-shadow:0 0 18px rgba(251,191,36,0.35) }
 }
 
-.bp-cslot-shine {
+.bp-cslot-shine{
   position:absolute;top:0;left:0;right:0;height:45%;
   background:linear-gradient(180deg,rgba(255,255,255,0.07),transparent);
-  border-radius:20px 20px 0 0;pointer-events:none;
+  border-radius:18px 18px 0 0;pointer-events:none;
 }
-.bp-cslot-glow {
+.bp-cslot-glow{
   position:absolute;inset:0;
-  background:radial-gradient(circle at 50% 70%,var(--csg,rgba(139,92,246,0.15)),transparent 70%);
-  border-radius:20px;pointer-events:none;opacity:0;transition:opacity .3s;
+  background:radial-gradient(circle at 50% 70%,var(--csg,rgba(124,58,237,0.12)),transparent 70%);
+  border-radius:18px;pointer-events:none;opacity:0;transition:opacity .3s;
 }
 .bp-cslot.filled:hover .bp-cslot-glow{opacity:1}
 
-.bp-cslot-rarity {
+/* Rarity corner dot */
+.bp-cslot-corner{
   position:absolute;top:5px;right:5px;
   width:14px;height:14px;border-radius:50%;
-  background:var(--rarity-c,#8b5cf6);
-  box-shadow:0 0 6px var(--rarity-c,#8b5cf6);
+  background:var(--sc,#7c3aed);box-shadow:0 0 6px var(--sc,#7c3aed);
   font-size:7px;display:flex;align-items:center;justify-content:center;
   color:#fff;font-weight:800;
 }
-.bp-cslot-emoji {
-  font-size:28px;
-  filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+.bp-cslot.rare .bp-cslot-corner  { background:#c084fc;box-shadow:0 0 8px #c084fc; }
+.bp-cslot.epic .bp-cslot-corner  { background:#e879f9;box-shadow:0 0 10px #e879f9; }
+.bp-cslot.legendary .bp-cslot-corner { background:linear-gradient(135deg,#f59e0b,#fbbf24);box-shadow:0 0 10px #fbbf24; }
+
+/* Tooltip badge dot (no rarity) */
+.bp-cslot-badge{
+  position:absolute;top:5px;right:5px;
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(168,85,247,0.85);box-shadow:0 0 6px rgba(124,58,237,0.6);
+}
+
+.bp-cslot-emoji{
+  font-size:28px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5));
   transition:transform .2s;line-height:1;
 }
 .bp-cslot.filled:hover .bp-cslot-emoji{transform:scale(1.15) rotate(-5deg)}
-.bp-cslot-name {
-  font-size:8px;color:rgba(255,255,255,0.35);font-weight:600;
-  margin-top:4px;letter-spacing:0.3px;text-align:center;
-  padding:0 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
-}
-.bp-cslot-badge {
-  position:absolute;top:5px;right:5px;
-  width:8px;height:8px;border-radius:50%;
-  background:rgba(167,139,250,0.9);
-  box-shadow:0 0 6px rgba(139,92,246,0.7);
-}
-.bp-cslot-empty-ico { font-size:18px;opacity:0.15; }
 
-/* Temp storage crystal */
-.bp-crystal-temp-wrap { padding:0 16px 14px; }
-.bp-crystal-temp-card {
-  background:rgba(255,255,255,0.025);
-  border:1px solid rgba(139,92,246,0.2);
-  border-radius:22px;padding:14px;
+.bp-cslot-name{
+  font-size:8px;color:#7c6aaa;font-weight:600;
+  margin-top:3px;letter-spacing:.03em;text-align:center;
+  padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
+}
+.bp-cslot-empty-ico{font-size:16px;opacity:.22}
+
+/* Temp storage section */
+.bp-cv-temp-wrap{padding:0 16px 14px}
+.bp-cv-temp-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bp-cv-temp-icon{font-size:14px}
+.bp-cv-temp-title{font-size:11px;font-weight:700;color:#7c6aaa;letter-spacing:.04em;text-transform:uppercase}
+.bp-cv-temp-hint{font-size:10px;color:rgba(124,58,237,0.6);font-weight:500}
+.bp-cv-temp-card{
+  background:#0e0b1e;border:1px solid rgba(124,58,237,0.25);
+  border-radius:20px;padding:13px 14px;
   position:relative;overflow:hidden;
 }
-.bp-crystal-temp-card::before {
+.bp-cv-temp-card::before{
   content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at 20% 50%,rgba(109,40,217,0.07),transparent 60%);
+  background:radial-gradient(ellipse at 20% 50%,rgba(124,58,237,0.07),transparent 60%);
   pointer-events:none;
 }
-.bp-crystal-tgrid {
-  display:grid;grid-template-columns:repeat(6,1fr);gap:7px;
-}
-.bp-cts {
-  aspect-ratio:1;border-radius:13px;
+.bp-cv-tc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;position:relative;z-index:1}
+.bp-cv-tc-info{display:flex;align-items:center;gap:6px}
+.bp-cv-tc-count{font-size:12px;font-weight:700;color:#c4b5fd}
+.bp-cv-tc-slots{font-size:10px;color:#7c6aaa;font-weight:500}
+.bp-cv-tc-timer{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#f59e0b}
+.bp-cv-tc-timer-dot{width:6px;height:6px;border-radius:50%;background:#f59e0b;animation:bpTimerDot 1s ease-in-out infinite;box-shadow:0 0 5px rgba(245,158,11,0.6)}
+.bp-cv-tc-timer-bar{flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;margin-left:4px}
+.bp-cv-tc-timer-fill{height:100%;background:linear-gradient(90deg,#f59e0b,#fbbf24);border-radius:99px;box-shadow:0 0 6px rgba(245,158,11,0.4)}
+.bp-cv-temp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;position:relative;z-index:1}
+.bp-cts{
+  aspect-ratio:1;border-radius:12px;
   display:flex;align-items:center;justify-content:center;
   position:relative;cursor:pointer;
-  transition:all .22s cubic-bezier(.34,1.56,.64,1);
+  transition:all .2s cubic-bezier(.34,1.56,.64,1);
 }
-.bp-cts.filled{background:linear-gradient(135deg,#0e0b20,#160e2e);border:1px solid rgba(139,92,246,0.3)}
-.bp-cts.filled:hover{transform:scale(1.12);border-color:rgba(167,139,250,0.5)}
-.bp-cts.empty{background:rgba(255,255,255,0.02);border:1px dashed rgba(139,92,246,0.12)}
-.bp-cts-emoji{font-size:20px}
+.bp-cts.filled{background:linear-gradient(135deg,#0e0b20,#160e2e);border:1px solid rgba(124,58,237,0.25)}
+.bp-cts.filled:hover{transform:scale(1.1);border-color:rgba(168,85,247,0.45)}
+.bp-cts.empty{background:#0a0818;border:1px dashed rgba(124,58,237,0.15)}
+.bp-cts-emoji{font-size:18px}
 .bp-cts-plus{
   position:absolute;bottom:-2px;right:-2px;
   width:14px;height:14px;border-radius:50%;
-  background:linear-gradient(135deg,#6d28d9,#8b5cf6);
-  font-size:9px;font-weight:900;color:#fff;
+  background:linear-gradient(135deg,#7c3aed,#a855f7);
+  font-size:10px;font-weight:900;color:#fff;
   display:flex;align-items:center;justify-content:center;
-  border:1.5px solid #060310;
-  box-shadow:0 0 6px rgba(109,40,217,0.5);
+  border:1.5px solid #06040f;
+  box-shadow:0 0 6px rgba(124,58,237,0.45);
 }
+
+/* legacy aliases kept for compat */
+.bp-crystal-section-head{display:none}
+.bp-crystal-section-line{display:none}
 
 /* Bottom-sheet tooltip for mobile */
 .bp-mobile-sheet {
@@ -8157,94 +8170,75 @@ function renderBackpackCrystal() {
   const c = document.getElementById('backpack-content');
   const itemCount = Object.values(S.backpackItems).filter(Boolean).length;
   const pct = S.backpackSlots > 0 ? Math.round(itemCount / S.backpackSlots * 100) : 0;
+  const ticketCount = S.tickets || 0;
+  const xpPct = Math.min(100, Math.round((ticketCount % 100)));
 
-  c.innerHTML = `
-    <div class="bp-crystal-container" id="bp-crystal-root">
-      <!-- Header -->
-      <div class="bp-crystal-header">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
-          <div>
-            <div class="bp-crystal-title">My Backpack</div>
-            <div class="bp-crystal-subtitle">${itemCount} of ${S.backpackSlots} slots used · ${S.backpackSlots - itemCount} free</div>
-          </div>
-          <div class="bp-crystal-actions">
-            <button class="bp-crystal-btn opt" onclick="openModal('backpack-options-modal')">⚙ Options</button>
-            <button class="bp-crystal-btn clr" onclick="clearBackpack()">🗑</button>
-          </div>
-        </div>
-        <!-- Capacity bar -->
-        <div class="bp-crystal-track">
-          <div class="bp-crystal-fill" style="width:${pct}%"></div>
-        </div>
-        <div class="bp-crystal-cap-labels">
-          <span>${itemCount} / ${S.backpackSlots} slots</span>
-          <span>${pct}% full</span>
-        </div>
-      </div>
-
-      <!-- Section label -->
-      <div class="bp-crystal-section-head">
-        <div class="bp-crystal-section-label">Equipped Items</div>
-        <div class="bp-crystal-section-line"></div>
-      </div>
-
-      <!-- Main slot grid -->
-      <div class="bp-crystal-grid" id="bp-crystal-grid"></div>
-    </div>
-  `;
-
-  const grid = document.getElementById('bp-crystal-grid');
-  const isMobile = 'ontouchstart' in window;
-
-  // Rarity detection from tooltip text
+  // Rarity map
   const RARITY_MAP = {
     'legendary': { cls:'legendary', dot:'★', col:'#fbbf24' },
     'epic':      { cls:'epic',      dot:'E', col:'#e879f9' },
     'rare':      { cls:'rare',      dot:'R', col:'#c084fc' },
-    'common':    { cls:'',          dot:'',  col:'#8b5cf6' },
   };
 
+  // Build slot HTML
+  const isMobile = 'ontouchstart' in window;
+  const slotDivs = [];
   for (let i = 0; i < S.backpackSlots; i++) {
     const item = S.backpackItems[i];
     const tip  = (S.backpackTooltips || {})[i] || '';
-    const slot = document.createElement('div');
-
-    // Detect rarity from tooltip
     const tipLower = tip.toLowerCase();
-    let rar = Object.keys(RARITY_MAP).find(r => tipLower.includes(r)) || '';
-    const rarInfo = RARITY_MAP[rar] || { cls:'', dot:'', col:'#8b5cf6' };
+    const rarKey = Object.keys(RARITY_MAP).find(r => tipLower.includes(r)) || '';
+    const rarInfo = RARITY_MAP[rarKey] || { cls:'', dot:'', col:'#7c3aed' };
 
-    // Item name from tooltip
-    const itemName = tip ? (tip.split(' · ')[0] || tip).slice(0, 8) : '';
+    // Derive item name from tooltip — first segment before ' · '
+    const rawName = tip ? (tip.split(' · ')[0] || tip) : '';
+    // Strip emoji from name for display
+    const itemName = rawName.replace(/[\u{1F300}-\u{1FAFF}]/gu, '').trim().slice(0, 10);
 
+    const slot = document.createElement('div');
     slot.className = 'bp-cslot ' + (item ? ('filled ' + rarInfo.cls) : 'empty');
     slot.dataset.slot = i;
 
     if (item) {
-      slot.style.setProperty('--csg', rarInfo.col + '1a');
+      // Per-item glow colour from rarity
+      slot.style.setProperty('--csg', rarInfo.col + '18');
+      slot.style.setProperty('--sc', rarInfo.col || '#7c3aed');
+
+      const cornerHtml = rarInfo.dot
+        ? `<div class="bp-cslot-corner">${rarInfo.dot}</div>`
+        : (tip ? `<div class="bp-cslot-badge"></div>` : '');
+
       slot.innerHTML = `
         <div class="bp-cslot-shine"></div>
         <div class="bp-cslot-glow"></div>
-        ${rarInfo.dot ? `<div class="bp-cslot-rarity" style="--rarity-c:${rarInfo.col}">${rarInfo.dot}</div>` : `<div class="bp-cslot-badge"></div>`}
+        ${cornerHtml}
         <div class="bp-cslot-emoji">${item}</div>
-        ${itemName ? `<div class="bp-cslot-name">${itemName}</div>` : ''}
+        <div class="bp-cslot-name">${itemName}</div>
       `;
+
+      // Click → item detail sheet
       slot.addEventListener('click', () => {
         slot.classList.add('pop');
         slot.addEventListener('animationend', () => slot.classList.remove('pop'), {once:true});
         bpShowItemSheet(i);
       });
+
+      // Drag
       slot.draggable = true;
       slot.addEventListener('dragstart', e => { e.dataTransfer.setData('slot', i); playSound('click'); });
+
+      // Mobile long-press
       if (isMobile && tip) {
         let pressTimer;
         slot.addEventListener('touchstart', () => { pressTimer = setTimeout(() => bpShowTooltipSheet(i), 450); }, {passive:true});
         slot.addEventListener('touchend', () => clearTimeout(pressTimer), {passive:true});
       }
+      // Desktop hover tooltip
       if (!isMobile && tip) {
         slot.addEventListener('mouseenter', () => bpShowHoverTooltip(slot, i));
         slot.addEventListener('mouseleave', () => { const t = document.getElementById('bp-tooltip-overlay'); if(t) t.style.display='none'; });
       }
+      // Context menu
       slot.addEventListener('contextmenu', e => {
         e.preventDefault();
         const menu = document.getElementById('context-menu');
@@ -8262,10 +8256,10 @@ function renderBackpackCrystal() {
         `;
       });
     } else {
-      slot.innerHTML = `<div class="bp-cslot-empty-ico">＋</div>`;
+      slot.innerHTML = `<div class="bp-cslot-empty-ico">+</div>`;
     }
 
-    // Drag-over reordering (same logic as other views)
+    // Drag-over reordering
     slot.addEventListener('dragover', e => { e.preventDefault(); slot.style.borderColor='rgba(246,187,78,0.5)'; });
     slot.addEventListener('dragleave', () => { slot.style.borderColor=''; });
     slot.addEventListener('drop', e => {
@@ -8280,31 +8274,22 @@ function renderBackpackCrystal() {
       const tTo   = (S.backpackTooltips||{})[i];
       if (!S.backpackTooltips) S.backpackTooltips = {};
       if (tFrom) S.backpackTooltips[i] = tFrom; else delete S.backpackTooltips[i];
-      if (tTo) S.backpackTooltips[from] = tTo; else delete S.backpackTooltips[from];
+      if (tTo)   S.backpackTooltips[from] = tTo; else delete S.backpackTooltips[from];
       saveState(); renderBackpack();
     });
 
-    grid.appendChild(slot);
+    slotDivs.push(slot);
   }
 
-  // Overflow / temp storage — crystal styled
+  // Build overflow / temp storage HTML
   cleanExpiredOverflows();
   const _ovStores = getBpActiveOverflows();
-  const root = document.getElementById('bp-crystal-root');
-
+  let tempSectionHtml = '';
   if (_ovStores.length > 0) {
-    const ovWrap = document.createElement('div');
-    ovWrap.innerHTML = `
-      <div class="bp-crystal-section-head">
-        <div class="bp-crystal-section-label">📦 Temp Storage</div>
-        <div class="bp-crystal-section-line"></div>
-        <div style="font-size:9px;color:rgba(139,92,246,0.4);font-weight:500;white-space:nowrap;margin-left:4px">tap to move in</div>
-      </div>`;
-    _ovStores.forEach(store => {
+    tempSectionHtml = _ovStores.map(store => {
       const minsLeft = Math.max(0, Math.round((store.expiresAt - Date.now()) / 60000));
-      const pct2 = Math.max(0, Math.min(100, (store.expiresAt - Date.now()) / 3600000 * 100));
-      const card = document.createElement('div');
-      card.className = 'bp-crystal-temp-wrap';
+      const timerPct = Math.max(0, Math.min(100, (store.expiresAt - Date.now()) / 3600000 * 100));
+      const itemCount2 = store.items.length;
       let slotsHtml = store.items.map((it, ii) =>
         `<div class="bp-cts filled" onclick="moveOverflowToBackpack(${store.id},${ii})" title="${it.tip||it.emoji}">
           <div class="bp-cts-emoji">${it.emoji}</div>
@@ -8313,25 +8298,97 @@ function renderBackpackCrystal() {
       ).join('');
       for (let e = store.items.length; e < 6; e++)
         slotsHtml += `<div class="bp-cts empty"></div>`;
-      card.innerHTML = `<div class="bp-crystal-temp-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;position:relative;z-index:1">
-          <div style="display:flex;align-items:center;gap:7px">
-            <span style="font-size:12px;font-weight:700;color:#a78bfa">${store.items.length}<span style="color:rgba(255,255,255,0.25);font-weight:500"> / 6 items</span></span>
+      return `<div class="bp-cv-temp-card">
+        <div class="bp-cv-tc-top">
+          <div class="bp-cv-tc-info">
+            <span class="bp-cv-tc-count">${itemCount2}</span>
+            <span class="bp-cv-tc-slots">/ 6 items</span>
           </div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <div style="width:6px;height:6px;border-radius:50%;background:#f59e0b;animation:bpTimerDot 1s ease-in-out infinite;box-shadow:0 0 5px #f59e0b"></div>
-            <span style="font-size:10px;font-weight:700;color:#f59e0b">⏱ ${minsLeft}m</span>
-            <div style="width:44px;height:3px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden">
-              <div style="height:100%;width:${pct2}%;background:linear-gradient(90deg,#f59e0b,#fbbf24);border-radius:99px"></div>
+          <div class="bp-cv-tc-timer">
+            <div class="bp-cv-tc-timer-dot"></div>
+            ⏱ ${minsLeft}m
+            <div class="bp-cv-tc-timer-bar">
+              <div class="bp-cv-tc-timer-fill" style="width:${timerPct}%"></div>
             </div>
           </div>
         </div>
-        <div class="bp-crystal-tgrid" style="position:relative;z-index:1">${slotsHtml}</div>
+        <div class="bp-cv-temp-grid">${slotsHtml}</div>
       </div>`;
-      ovWrap.appendChild(card);
-    });
-    root.appendChild(ovWrap);
+    }).join('');
   }
+
+  // Render full layout
+  c.innerHTML = `
+    <div class="bp-crystal-container" id="bp-crystal-root">
+
+      <!-- Top nav -->
+      <div class="bp-cv-topnav">
+        <div class="bp-cv-back" onclick="openScreen('home')">←</div>
+        <div class="bp-cv-title-row">
+          <div class="bp-cv-icon">🎒</div>
+          Backpack
+        </div>
+        <div class="bp-cv-settings" onclick="openModal('backpack-options-modal')">⚙️</div>
+      </div>
+
+      <!-- XP row -->
+      <div class="bp-cv-xp">
+        <span style="font-size:13px">💎</span>
+        <span class="bp-cv-xp-num">${ticketCount}</span>
+        <div class="bp-cv-xp-track">
+          <div class="bp-cv-xp-fill" style="width:${xpPct}%"></div>
+        </div>
+      </div>
+
+      <!-- Section header -->
+      <div class="bp-cv-sec-head">
+        <div class="bp-cv-sh-left">
+          <div class="bp-cv-sh-title">My Backpack</div>
+          <div class="bp-cv-sh-meta">${itemCount} of ${S.backpackSlots} slots used · ${S.backpackSlots - itemCount} free</div>
+        </div>
+        <div class="bp-cv-sh-actions">
+          <button class="bp-cv-sh-btn opt" onclick="openModal('backpack-options-modal')">⚙ Options</button>
+          <button class="bp-cv-sh-btn clr" onclick="clearBackpack()">🗑 Clear</button>
+        </div>
+      </div>
+
+      <!-- Capacity bar -->
+      <div class="bp-cv-capbar">
+        <div class="bp-cv-cap-track">
+          <div class="bp-cv-cap-fill" id="bp-cv-cap-fill" style="width:${pct}%"></div>
+        </div>
+        <div class="bp-cv-cap-labels">
+          <span id="bp-cv-slots-label">${itemCount} / ${S.backpackSlots} slots</span>
+          <span id="bp-cv-pct-label">${pct}% full</span>
+        </div>
+      </div>
+
+      <!-- Grid section -->
+      <div class="bp-cv-grid-wrap">
+        <div class="bp-cv-grid-label">
+          <span>Equipped Items</span>
+          <div class="bp-cv-gl-line"></div>
+        </div>
+        <div class="bp-cv-item-grid" id="bp-crystal-grid"></div>
+      </div>
+
+      <!-- Temp storage -->
+      ${_ovStores.length > 0 ? `
+      <div class="bp-cv-temp-wrap">
+        <div class="bp-cv-temp-head">
+          <span class="bp-cv-temp-icon">📦</span>
+          <span class="bp-cv-temp-title">Temp Storage</span>
+          <span class="bp-cv-temp-hint">· tap to move in</span>
+        </div>
+        ${tempSectionHtml}
+      </div>` : ''}
+
+    </div>
+  `;
+
+  // Append slots to grid
+  const grid = document.getElementById('bp-crystal-grid');
+  slotDivs.forEach(s => grid.appendChild(s));
 }
 
 
