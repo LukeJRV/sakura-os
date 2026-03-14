@@ -28419,13 +28419,27 @@ window._admUndoBroadcast = async function(docId) {
   const type = data ? data.type : null;
 
   showCustomConfirm('Undo this broadcast?\nThis will reverse its effects for all players and mark it as undone.', async function() {
-    try {
-      // 1. Immediately disable the Undo button on the row to prevent double-clicks
-      const row = document.querySelector('[data-broadcast-id="' + docId + '"]');
-      if (row) {
-        const btn = row.querySelector('button');
-        if (btn) { btn.disabled = true; btn.style.opacity = '0.4'; btn.textContent = 'Working…'; }
+    // Capture row + button references BEFORE any awaits so they stay valid
+    const row = document.querySelector('[data-broadcast-id="' + docId + '"]');
+    const undoBtn = row ? row.querySelector('button') : null;
+
+    // Helper: stamp the row as Undone in the DOM right now
+    function _markRowUndone() {
+      if (!row) return;
+      row.style.transition = 'opacity 0.3s, border-color 0.3s';
+      row.style.opacity = '0.4';
+      row.style.borderColor = 'rgba(255,255,255,0.03)';
+      if (undoBtn && undoBtn.parentNode) {
+        const span = document.createElement('span');
+        span.style.cssText = 'font-size:10px;color:rgba(78,223,208,0.6);padding:5px 10px;flex-shrink:0;font-weight:700';
+        span.textContent = '✓ Undone';
+        undoBtn.replaceWith(span);
       }
+    }
+
+    try {
+      // 1. Immediately disable the Undo button to prevent double-clicks
+      if (undoBtn) { undoBtn.disabled = true; undoBtn.style.opacity = '0.4'; undoBtn.textContent = 'Working…'; }
 
       // 2. Mark broadcast as inactive in Firestore — this stops new players
       //    from ever receiving it, and keeps the history row visible as "Undone".
@@ -28445,15 +28459,15 @@ window._admUndoBroadcast = async function(docId) {
         await batch.commit();
 
       } else if (type === 'add_event' && data.title) {
-        // Push a remove_event_by_title broadcast — each client removes it from their own
-        // state instantly via the listener. Far faster than reading+writing every player doc.
-        await fbDb.collection('broadcasts').add({
-          type: 'remove_event_by_title',
-          active: true,
-          title: data.title,
-          isReversal: true,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        // Batch-write removal directly to all player docs (reliable, no listener tricks)
+        const players = await fbDb.collection('players').get();
+        const batch = fbDb.batch();
+        players.docs.forEach(doc => {
+          const st = doc.data().state || {};
+          const events = (st.events || []).filter(e => e.title !== data.title);
+          batch.update(doc.ref, { 'state.events': events });
         });
+        await batch.commit();
         // Real-time: also remove from admin's own local S and re-render calendar immediately
         if (typeof S !== 'undefined' && S.events) {
           S.events = S.events.filter(e => e.title !== data.title);
@@ -28463,15 +28477,14 @@ window._admUndoBroadcast = async function(docId) {
         }
 
       } else if (type === 'add_shop_item' && data.name) {
-        // Push a remove_shop_item_by_name broadcast — each client removes it from their own
-        // state instantly via the listener. Far faster than reading+writing every player doc.
-        await fbDb.collection('broadcasts').add({
-          type: 'remove_shop_item_by_name',
-          active: true,
-          name: data.name,
-          isReversal: true,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        const players = await fbDb.collection('players').get();
+        const batch = fbDb.batch();
+        players.docs.forEach(doc => {
+          const st = doc.data().state || {};
+          const items = (st.shopItems || []).filter(i => i.name !== data.name);
+          batch.update(doc.ref, { 'state.shopItems': items });
         });
+        await batch.commit();
         // Real-time: update admin's own local S and re-render shop immediately
         if (typeof S !== 'undefined' && S.shopItems) {
           S.shopItems = S.shopItems.filter(i => i.name !== data.name);
@@ -28480,14 +28493,14 @@ window._admUndoBroadcast = async function(docId) {
         }
 
       } else if (type === 'add_achievement' && data.title) {
-        // Push a remove_achievement_by_title broadcast — each client removes it instantly.
-        await fbDb.collection('broadcasts').add({
-          type: 'remove_achievement_by_title',
-          active: true,
-          title: data.title,
-          isReversal: true,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        const players = await fbDb.collection('players').get();
+        const batch = fbDb.batch();
+        players.docs.forEach(doc => {
+          const st = doc.data().state || {};
+          const achs = (st.achievements || []).filter(a => a.title !== data.title);
+          batch.update(doc.ref, { 'state.achievements': achs });
         });
+        await batch.commit();
         // Real-time: update admin's own local S and re-render achievements immediately
         if (typeof S !== 'undefined' && S.achievements) {
           S.achievements = S.achievements.filter(a => a.title !== data.title);
@@ -28515,19 +28528,8 @@ window._admUndoBroadcast = async function(docId) {
       // 4. Clear the seen-key from admin's own localStorage
       try { localStorage.removeItem('fbseen_' + docId); } catch(e2) {}
 
-      // 5. Update the row in real-time — swap Undo button for teal "✓ Undone" label
-      if (row) {
-        row.style.transition = 'opacity 0.3s, border-color 0.3s';
-        row.style.opacity = '0.4';
-        row.style.borderColor = 'rgba(255,255,255,0.03)';
-        const btn2 = row.querySelector('button');
-        if (btn2) {
-          const span = document.createElement('span');
-          span.style.cssText = 'font-size:10px;color:rgba(78,223,208,0.6);padding:5px 10px;flex-shrink:0;font-weight:700';
-          span.textContent = '✓ Undone';
-          btn2.replaceWith(span);
-        }
-      }
+      // 5. Stamp the row as Undone immediately — uses captured reference, always reliable
+      _markRowUndone();
 
       // 6. Update local S for admin's own session (give_tickets case)
       if (type === 'give_tickets' && data.amount && typeof S !== 'undefined') {
@@ -28547,9 +28549,13 @@ window._admUndoBroadcast = async function(docId) {
     } catch(e) {
       showNotif('⚠️', 'Failed', e.message);
       console.error('_admUndoBroadcast error:', e);
-      // Restore row visibility on failure
-      const row2 = document.querySelector('[data-broadcast-id="' + docId + '"]');
-      if (row2) { row2.style.opacity = ''; row2.style.transform = ''; }
+      // Restore button on failure using captured reference
+      if (undoBtn && undoBtn.parentNode) {
+        undoBtn.disabled = false;
+        undoBtn.style.opacity = '1';
+        undoBtn.textContent = '↩ Undo';
+      }
+      if (row) { row.style.opacity = '1'; }
     }
   });
 }
