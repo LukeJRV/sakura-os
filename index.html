@@ -1161,7 +1161,7 @@ button, a { touch-action: manipulation; }
 }
 .badge {
   position:absolute;
-  top:-4px; right:-4px;
+  top:-5px; right:-5px;
   background:var(--pink);
   color:#fff;
   font-size:9px;
@@ -1171,7 +1171,8 @@ button, a { touch-action: manipulation; }
   display:flex; align-items:center; justify-content:center;
   padding:0 4px;
   border:2px solid var(--bg);
-  z-index:2;
+  z-index:10;
+  pointer-events:none;
 }
 .badge:empty, .badge[data-count="0"] { display:none; }
 
@@ -5827,9 +5828,9 @@ function createAppIcon(app, isDock, allGridApps) {
   div.innerHTML = `
     <div class="app-icon-img" style="background:${iconBg};position:relative">
       <span>${iconEmoji}</span>
-      <span class="badge" data-app="${app.id}"></span>
       ${(!isDock && appEditMode) ? `<div class="jiggle-delete" data-del="${app.id}" style="position:absolute;top:-5px;left:-5px;width:18px;height:18px;background:#ff3b30;border-radius:50%;color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;z-index:10;box-shadow:0 2px 4px rgba(0,0,0,0.5);cursor:pointer">✕</div>` : ''}
     </div>
+    <span class="badge" data-app="${app.id}"></span>
     <span class="app-icon-label">${iconLabel}</span>
   `;
 
@@ -10097,16 +10098,17 @@ function renderNotes() {
 
   wrap.innerHTML = '';
   list.forEach((n, idx) => {
-    const stripe = n.stripe || _NT_STRIPES[idx % _NT_STRIPES.length];
     const tagIdx = n.tagPreset !== undefined ? n.tagPreset % _NT_TAG_PRESETS.length : 0;
     const tp = n.tagColor ? n : _NT_TAG_PRESETS[tagIdx];
+    // Stripe colour matches the tag — extract the pure hue from tagBorder (e.g. '#7c3aed33' -> '#7c3aed')
+    const _tagHue = tp.tagBorder ? tp.tagBorder.slice(0, 7) : (n.stripe || _NT_STRIPES[idx % _NT_STRIPES.length]);
     const preview = (n.content || '').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0, 80);
     const timeStr = n.created ? new Date(n.created).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : _ntNowTime();
     const titleCol = n.titleColor || '#fff';
 
     const card = document.createElement('div');
     card.className = 'nt-card';
-    card.style.setProperty('--ns', stripe);
+    card.style.setProperty('--ns', _tagHue);
     card.style.animationDelay = (idx * 40) + 'ms';
     card.innerHTML = `
       ${n.pinned ? '<div class="nt-card-pin">📌</div>' : ''}
@@ -26707,7 +26709,14 @@ window._admClearUndoneHistory = async function() {
             row.style.margin = '0';
             row.style.overflow = 'hidden';
           }, 280);
-          setTimeout(() => row.remove(), 650);
+          setTimeout(() => {
+            row.remove();
+            // Real-time: check if list is now empty and show empty state
+            const list = document.getElementById('adm-history-list');
+            if (list && list.querySelectorAll('[data-broadcast-id]').length === 0) {
+              list.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.3);font-size:12px;padding:16px">All undone entries cleared</div>';
+            }
+          }, 650);
         }
         delete data[id];
       });
@@ -28378,12 +28387,11 @@ window._admUndoBroadcast = async function(docId) {
 
   showCustomConfirm('Undo this broadcast?\nThis will reverse its effects for all players and mark it as undone.', async function() {
     try {
-      // 1. Animate the row out immediately
+      // 1. Immediately disable the Undo button on the row to prevent double-clicks
       const row = document.querySelector('[data-broadcast-id="' + docId + '"]');
       if (row) {
-        row.style.transition = 'opacity 0.25s, transform 0.25s';
-        row.style.opacity = '0';
-        row.style.transform = 'translateX(20px)';
+        const btn = row.querySelector('button');
+        if (btn) { btn.disabled = true; btn.style.opacity = '0.4'; btn.textContent = 'Working…'; }
       }
 
       // 2. Mark broadcast as inactive in Firestore — this stops new players
@@ -28391,9 +28399,9 @@ window._admUndoBroadcast = async function(docId) {
       //    We do NOT delete it (deletion re-triggers the broadcast listener).
       await fbDb.collection('broadcasts').doc(docId).update({ active: false, undoneAt: firebase.firestore.FieldValue.serverTimestamp() });
 
-      // 3. Directly reverse effects on ALL player documents — no new broadcast
+      // 3. Directly reverse effects on ALL player documents — no new broadcast needed.
+      //    This applies the reversal in real-time to every user's Firestore state.
       if (type === 'give_tickets' && data.amount) {
-        // Fetch all players and subtract the tickets directly
         const players = await fbDb.collection('players').get();
         const batch = fbDb.batch();
         players.docs.forEach(doc => {
@@ -28444,34 +28452,35 @@ window._admUndoBroadcast = async function(docId) {
       // For announcements, fullscreen_alert, update_message, live_update:
       // marking active:false is sufficient — they're display-only, nothing to reverse.
 
-      // 4. Also clear the seen-key from admin's own localStorage so the local
-      //    S object gets corrected on their next load (tickets etc.)
+      // 4. Clear the seen-key from admin's own localStorage
       try { localStorage.removeItem('fbseen_' + docId); } catch(e2) {}
 
-      // 5. Update the row in place to show "Undone" instead of removing it
+      // 5. Update the row in real-time — swap Undo button for teal "✓ Undone" label
       if (row) {
-        setTimeout(() => {
-          row.style.opacity = '0.4';
-          row.style.transform = '';
-          // Swap Undo button for Undone label
-          const btn = row.querySelector('button');
-          if (btn) {
-            const span = document.createElement('span');
-            span.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.25);padding:5px 10px;flex-shrink:0';
-            span.textContent = 'Undone';
-            btn.replaceWith(span);
-          }
-        }, 260);
+        row.style.transition = 'opacity 0.3s, border-color 0.3s';
+        row.style.opacity = '0.4';
+        row.style.borderColor = 'rgba(255,255,255,0.03)';
+        const btn2 = row.querySelector('button');
+        if (btn2) {
+          const span = document.createElement('span');
+          span.style.cssText = 'font-size:10px;color:rgba(78,223,208,0.6);padding:5px 10px;flex-shrink:0;font-weight:700';
+          span.textContent = '✓ Undone';
+          btn2.replaceWith(span);
+        }
       }
 
-      // 6. Update local S object for the admin's own session (give_tickets case)
+      // 6. Update local S for admin's own session (give_tickets case)
       if (type === 'give_tickets' && data.amount && typeof S !== 'undefined') {
         S.tickets = Math.max(0, (S.tickets || 0) - data.amount);
         if (typeof saveState === 'function') saveState();
         if (typeof updateTicketDisplay === 'function') updateTicketDisplay(0);
       }
 
-      if (window._admHistoryData) delete window._admHistoryData[docId];
+      // 7. Update local cache: mark as undone (active:false) so Clear Undone picks it up immediately
+      if (window._admHistoryData && window._admHistoryData[docId]) {
+        window._admHistoryData[docId].active = false;
+      }
+
       playSound('success');
       showNotif('↩', 'Undone!', 'Effects reversed for all players');
 
