@@ -27152,9 +27152,23 @@ function _battStartDrain() {
   _battDrainIv = setInterval(function() {
     if (_battCharging) { _battDrainTicks = 0; return; }
     _battDrainTicks++;
-    if (_battDrainTicks >= 20) {  /* 20 × 60s = 20 min per 1% */
+    if (_battDrainTicks >= 30) {  /* 30 × 60s = 30 min per 1% */
       _battDrainTicks = 0;
-      if (_battLevel > 1) _battUpdate(_battLevel - 1, false);
+      if (_battLevel > 0) {
+        _battUpdate(_battLevel - 1, false);
+        if (_battLevel <= 0) {
+          /* Battery dead — power off the phone */
+          var ph = document.getElementById('phone');
+          if (ph) {
+            ph.classList.add('power-off');
+            setTimeout(function() {
+              ph.classList.remove('power-off');
+              var ps = document.getElementById('power-screen');
+              if (ps) ps.classList.add('on');
+            }, 800);
+          }
+        }
+      }
     }
   }, 60000);
 }
@@ -27458,7 +27472,7 @@ function _buildChargingHTML() {
     '<div style="position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;width:90%;margin:0 auto;padding:0 16px;box-sizing:border-box">',
 
       /* Status area — top */
-      '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;padding-top:60px;margin-bottom:32px">',
+      '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;padding-top:16px;margin-bottom:32px">',
         '<div style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.28);letter-spacing:-0.2px">' + hh + ':' + mm + ' ' + ampm + '</div>',
         '<div style="font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:rgba(60,220,120,0.7)">',
           isFullyCharged ? '✦ CHARGED' : '⚡ CHARGING',
