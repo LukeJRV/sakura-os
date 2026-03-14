@@ -522,27 +522,32 @@ button, a { touch-action: manipulation; }
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
   }
   #phone-shell-wrap {
     display: flex;
     align-items: center;
     justify-content: center;
-    max-width: 100%;
+    max-width: 100vw;
+    max-height: 100vh;
+    width: auto;
     height: auto;
-    aspect-ratio: 390 / 844;
+    flex-shrink: 1;
   }
   #phone {
-    max-width: 100%;
-    height: auto;
-    aspect-ratio: 390 / 844;
+    width: min(390px, calc(100vh * 390 / 844));
+    height: min(844px, 100vh);
+    margin-left: 0;
     transform: translateZ(0);
+    border-radius: min(48px, calc(100vh * 48 / 844));
+    clip-path: none;
   }
   #power-screen,
   #admin-panel-overlay,
   #notif-panel,
   #charging-overlay,
   #ios-pow-ov {
-    clip-path: inset(0px round 48px);
+    clip-path: inset(0px round min(48px, calc(100vh * 48 / 844)));
     border-radius: 0;
     overflow: visible;
   }
