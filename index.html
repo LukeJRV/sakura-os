@@ -28445,14 +28445,15 @@ window._admUndoBroadcast = async function(docId) {
         await batch.commit();
 
       } else if (type === 'add_event' && data.title) {
-        const players = await fbDb.collection('players').get();
-        const batch = fbDb.batch();
-        players.docs.forEach(doc => {
-          const st = doc.data().state || {};
-          const events = (st.events || []).filter(e => e.title !== data.title);
-          batch.update(doc.ref, { 'state.events': events });
+        // Push a remove_event_by_title broadcast — each client removes it from their own
+        // state instantly via the listener. Far faster than reading+writing every player doc.
+        await fbDb.collection('broadcasts').add({
+          type: 'remove_event_by_title',
+          active: true,
+          title: data.title,
+          isReversal: true,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         });
-        await batch.commit();
         // Real-time: also remove from admin's own local S and re-render calendar immediately
         if (typeof S !== 'undefined' && S.events) {
           S.events = S.events.filter(e => e.title !== data.title);
@@ -28462,14 +28463,15 @@ window._admUndoBroadcast = async function(docId) {
         }
 
       } else if (type === 'add_shop_item' && data.name) {
-        const players = await fbDb.collection('players').get();
-        const batch = fbDb.batch();
-        players.docs.forEach(doc => {
-          const st = doc.data().state || {};
-          const items = (st.shopItems || []).filter(i => i.name !== data.name);
-          batch.update(doc.ref, { 'state.shopItems': items });
+        // Push a remove_shop_item_by_name broadcast — each client removes it from their own
+        // state instantly via the listener. Far faster than reading+writing every player doc.
+        await fbDb.collection('broadcasts').add({
+          type: 'remove_shop_item_by_name',
+          active: true,
+          name: data.name,
+          isReversal: true,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         });
-        await batch.commit();
         // Real-time: update admin's own local S and re-render shop immediately
         if (typeof S !== 'undefined' && S.shopItems) {
           S.shopItems = S.shopItems.filter(i => i.name !== data.name);
@@ -28478,14 +28480,14 @@ window._admUndoBroadcast = async function(docId) {
         }
 
       } else if (type === 'add_achievement' && data.title) {
-        const players = await fbDb.collection('players').get();
-        const batch = fbDb.batch();
-        players.docs.forEach(doc => {
-          const st = doc.data().state || {};
-          const achs = (st.achievements || []).filter(a => a.title !== data.title);
-          batch.update(doc.ref, { 'state.achievements': achs });
+        // Push a remove_achievement_by_title broadcast — each client removes it instantly.
+        await fbDb.collection('broadcasts').add({
+          type: 'remove_achievement_by_title',
+          active: true,
+          title: data.title,
+          isReversal: true,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         });
-        await batch.commit();
         // Real-time: update admin's own local S and re-render achievements immediately
         if (typeof S !== 'undefined' && S.achievements) {
           S.achievements = S.achievements.filter(a => a.title !== data.title);
