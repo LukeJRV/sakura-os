@@ -3073,7 +3073,8 @@ input[type=number] { -moz-appearance:textfield; }
 .nt-fmt-bar { display:flex; align-items:center; gap:4px; padding:7px 14px; background:#0c0a1e; border-bottom:1px solid rgba(124,58,237,0.1); overflow-x:auto; flex-shrink:0; }
 .nt-fmt-bar::-webkit-scrollbar { display:none; }
 .nt-fmt-btn { min-width:30px; height:28px; border-radius:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(124,58,237,0.15); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#c4b5fd; cursor:pointer; padding:0 8px; transition:all .15s; white-space:nowrap; flex-shrink:0; }
-.nt-fmt-btn:hover { background:rgba(124,58,237,0.2); }
+.nt-fmt-btn:hover { background:rgba(124,58,237,0.22); }
+.nt-fmt-btn.active { background:linear-gradient(135deg,rgba(124,58,237,0.55),rgba(168,85,247,0.4)); border-color:rgba(168,85,247,0.7); color:#fff; box-shadow:0 0 8px rgba(124,58,237,0.45),inset 0 1px 0 rgba(255,255,255,0.12); }
 .nt-fmt-sep { width:1px; height:18px; background:rgba(124,58,237,0.18); flex-shrink:0; margin:0 2px; }
 .nt-title-inp { width:100%; background:transparent; border:none; outline:none; font-size:20px; font-weight:800; font-family:inherit; padding:14px 16px 4px; letter-spacing:-.4px; border-bottom:none; flex-shrink:0; color:var(--nt-title-col,#fff); transition:color .2s; }
 .nt-title-inp::placeholder { color:#3d2a5a; }
@@ -4104,23 +4105,23 @@ input[type=number] { -moz-appearance:textfield; }
 
         <!-- Format bar 1: style, headings, lists, alignment, quote, rule -->
         <div class="nt-fmt-bar" id="nt-fmt-bar-1">
-          <div class="nt-fmt-btn" onclick="ntFmt('bold')" title="Bold"><b>B</b></div>
-          <div class="nt-fmt-btn" onclick="ntFmt('italic')" title="Italic"><i>I</i></div>
-          <div class="nt-fmt-btn" onclick="ntFmt('underline')" title="Underline"><u>U</u></div>
-          <div class="nt-fmt-btn" onclick="ntFmt('strikeThrough')" title="Strikethrough">S̶</div>
+          <div class="nt-fmt-btn" id="ntb-bold"       onclick="ntFmt('bold')"              title="Bold"><b>B</b></div>
+          <div class="nt-fmt-btn" id="ntb-italic"     onclick="ntFmt('italic')"            title="Italic"><i>I</i></div>
+          <div class="nt-fmt-btn" id="ntb-underline"  onclick="ntFmt('underline')"         title="Underline"><u>U</u></div>
+          <div class="nt-fmt-btn" id="ntb-strike"     onclick="ntFmt('strikeThrough')"     title="Strikethrough">S̶</div>
           <div class="nt-fmt-sep"></div>
-          <div class="nt-fmt-btn" onclick="ntFmtBlock('h1')" title="Heading 1">H1</div>
-          <div class="nt-fmt-btn" onclick="ntFmtBlock('h2')" title="Heading 2">H2</div>
+          <div class="nt-fmt-btn" id="ntb-h1"         onclick="ntFmtBlock('h1')"           title="Heading 1">H1</div>
+          <div class="nt-fmt-btn" id="ntb-h2"         onclick="ntFmtBlock('h2')"           title="Heading 2">H2</div>
           <div class="nt-fmt-sep"></div>
-          <div class="nt-fmt-btn" onclick="ntFmt('insertUnorderedList')" title="Bullet list">• List</div>
-          <div class="nt-fmt-btn" onclick="ntFmt('insertOrderedList')" title="Numbered list">1. List</div>
+          <div class="nt-fmt-btn" id="ntb-ul"         onclick="ntFmt('insertUnorderedList')" title="Bullet list">• List</div>
+          <div class="nt-fmt-btn" id="ntb-ol"         onclick="ntFmt('insertOrderedList')" title="Numbered list">1. List</div>
           <div class="nt-fmt-sep"></div>
-          <div class="nt-fmt-btn" onclick="ntAlign('Left')" title="Align left">⬅</div>
-          <div class="nt-fmt-btn" onclick="ntAlign('Center')" title="Align center">☰</div>
-          <div class="nt-fmt-btn" onclick="ntAlign('Right')" title="Align right">➡</div>
+          <div class="nt-fmt-btn" id="ntb-al"         onclick="ntAlign('Left')"            title="Align left">⬅</div>
+          <div class="nt-fmt-btn" id="ntb-ac"         onclick="ntAlign('Center')"          title="Align center">☰</div>
+          <div class="nt-fmt-btn" id="ntb-ar"         onclick="ntAlign('Right')"           title="Align right">➡</div>
           <div class="nt-fmt-sep"></div>
-          <div class="nt-fmt-btn" onclick="ntFmtBlock('blockquote')" title="Quote">"</div>
-          <div class="nt-fmt-btn" onclick="ntInsertHR()" title="Divider">—</div>
+          <div class="nt-fmt-btn" id="ntb-quote"      onclick="ntFmtBlock('blockquote')"   title="Quote">"</div>
+          <div class="nt-fmt-btn"                     onclick="ntInsertHR()"               title="Divider">—</div>
         </div>
 
         <!-- Format bar 2: text colour + highlight + font size + emoji -->
@@ -9943,6 +9944,8 @@ function openNote(id) {
   if (wcEl) wcEl.textContent = words + ' word' + (words!==1?'s':'') + ' · ' + text.length + ' chars';
 
   _ntShowEditor();
+  // Reset toolbar state for freshly-opened note (cursor not yet placed)
+  setTimeout(ntUpdateFormatBar, 80);
 }
 
 function saveCurrentNote() {
@@ -9988,6 +9991,8 @@ function noteFormat(cmd) {
   else if (cmd === 'blockquote') document.execCommand('formatBlock', false, 'BLOCKQUOTE');
   else document.execCommand(cmd);
   saveCurrentNote();
+  // Immediately reflect the new state in the toolbar
+  setTimeout(ntUpdateFormatBar, 0);
 }
 function ntFmt(cmd) { noteFormat(cmd); }
 function ntFmtBlock(tag) { noteFormat(tag); }
@@ -9998,6 +10003,7 @@ function ntAlign(dir) {
   editor.focus();
   document.execCommand('justify' + dir);
   saveCurrentNote();
+  setTimeout(ntUpdateFormatBar, 0);
 }
 
 function ntFontSize(size) {
@@ -10115,6 +10121,50 @@ function ntCycleTagOnCard(id) {
 function ntCycleColor() { ntSetTextColor('#d4bbff'); }
 
 /* ── WIRING ── */
+/* ── Format bar active-state tracker ───────────────────────────────── */
+function ntUpdateFormatBar() {
+  // Toggle states — queryCommandState returns true if the format is active at cursor
+  const toggles = [
+    { id:'ntb-bold',      cmd:'bold' },
+    { id:'ntb-italic',    cmd:'italic' },
+    { id:'ntb-underline', cmd:'underline' },
+    { id:'ntb-strike',    cmd:'strikeThrough' },
+    { id:'ntb-ul',        cmd:'insertUnorderedList' },
+    { id:'ntb-ol',        cmd:'insertOrderedList' },
+  ];
+  toggles.forEach(({ id, cmd }) => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    try {
+      btn.classList.toggle('active', document.queryCommandState(cmd));
+    } catch(e) {}
+  });
+
+  // Block format — queryCommandValue returns tag name
+  let blockVal = '';
+  try { blockVal = (document.queryCommandValue('formatBlock') || '').toLowerCase(); } catch(e) {}
+  const h1Btn = document.getElementById('ntb-h1');
+  const h2Btn = document.getElementById('ntb-h2');
+  const qBtn  = document.getElementById('ntb-quote');
+  if (h1Btn) h1Btn.classList.toggle('active', blockVal === 'h1');
+  if (h2Btn) h2Btn.classList.toggle('active', blockVal === 'h2');
+  if (qBtn)  qBtn.classList.toggle('active',  blockVal === 'blockquote');
+
+  // Alignment
+  let alignVal = 'left';
+  try {
+    if (document.queryCommandState('justifyCenter')) alignVal = 'center';
+    else if (document.queryCommandState('justifyRight')) alignVal = 'right';
+    else if (document.queryCommandState('justifyFull'))  alignVal = 'full';
+  } catch(e) {}
+  const alL = document.getElementById('ntb-al');
+  const alC = document.getElementById('ntb-ac');
+  const alR = document.getElementById('ntb-ar');
+  if (alL) alL.classList.toggle('active', alignVal === 'left');
+  if (alC) alC.classList.toggle('active', alignVal === 'center');
+  if (alR) alR.classList.toggle('active', alignVal === 'right');
+}
+
 (function _ntInit() {
   function _wire() {
     const nb = document.getElementById('nt-new-btn');
@@ -10156,6 +10206,23 @@ function ntCycleColor() { ntSetTextColor('#d4bbff'); }
 
     const ti = document.getElementById('nt-title-inp');
     if (ti) ti.oninput = saveCurrentNote;
+
+    // Wire the format bar state tracker to the editor
+    const editor = document.getElementById('note-editor');
+    if (editor) {
+      // selectionchange fires when cursor moves or selection changes
+      document.addEventListener('selectionchange', () => {
+        // Only update when the active element is inside the notes editor view
+        const edView = document.getElementById('notes-editor-view');
+        if (edView && edView.style.display !== 'none') {
+          ntUpdateFormatBar();
+        }
+      });
+      // Also update after every keypress (catches format changes mid-word)
+      editor.addEventListener('keyup', ntUpdateFormatBar);
+      // And immediately after any format button click (after execCommand runs)
+      editor.addEventListener('input', ntUpdateFormatBar);
+    }
 
     document.querySelectorAll('.nt-tab').forEach(btn => {
       btn.onclick = function() {
