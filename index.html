@@ -3797,21 +3797,18 @@ input[type=number] { -moz-appearance:textfield; }
     <div style="position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(252,119,144,0.08) 0%,transparent 70%);bottom:80px;right:-30px;pointer-events:none"></div>
     <!-- Content -->
     <div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;padding:0;width:90%;margin:0 auto;box-sizing:border-box;padding:0 16px">
-      <!-- Status bar area -->
-      <div style="height:44px;display:flex;align-items:flex-end;justify-content:flex-end;padding:0 20px 6px">
-        <div style="display:flex;align-items:center;gap:8px">
-          <button onclick="notifPanelClearAll()" style="font-size:10px;font-weight:800;color:#a088fa;background:rgba(160,136,250,0.2);border:1px solid rgba(160,136,250,0.3);border-radius:20px;padding:4px 12px;cursor:pointer;letter-spacing:0.2px">Clear All</button>
-        </div>
-      </div>
+      <!-- Status bar area (no button here anymore) -->
+      <div style="height:44px"></div>
       <!-- Time display -->
       <div style="text-align:center;padding:12px 0 6px">
         <div id="notif-panel-big-time" style="font-size:72px;font-weight:200;color:#fff;letter-spacing:-4px;line-height:1;font-family:-apple-system,BlinkMacSystemFont,sans-serif;text-shadow:0 0 40px rgba(160,136,250,0.3)"></div>
         <div id="notif-panel-date" style="font-size:17px;font-weight:500;color:rgba(255,255,255,0.7);margin-top:4px;letter-spacing:0.1px"></div>
       </div>
-      <!-- Notifications header -->
+      <!-- Notifications header — iPhone 16 style: label left, Clear All right -->
       <div style="padding:16px 20px 8px;display:flex;align-items:center;gap:8px">
-        <div style="width:3px;height:16px;border-radius:99px;background:linear-gradient(180deg,#a088fa,#fc7790)"></div>
-        <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,0.5);letter-spacing:1px;text-transform:uppercase">Notifications</div>
+        <div style="width:3px;height:16px;border-radius:99px;background:linear-gradient(180deg,#a088fa,#fc7790);flex-shrink:0"></div>
+        <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,0.5);letter-spacing:1px;text-transform:uppercase;flex:1">Notifications</div>
+        <button onclick="notifPanelClearAll()" style="font-size:10px;font-weight:800;color:#a088fa;background:rgba(160,136,250,0.18);border:1px solid rgba(160,136,250,0.28);border-radius:20px;padding:4px 12px;cursor:pointer;letter-spacing:0.2px;flex-shrink:0;transition:background 0.15s" onmouseenter="this.style.background='rgba(160,136,250,0.3)'" onmouseleave="this.style.background='rgba(160,136,250,0.18)'">Clear All</button>
       </div>
       <!-- Scrollable notification list -->
       <div id="notif-panel-list" style="flex:1;overflow-y:auto;overflow-x:hidden;padding:0 16px 80px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none"></div>
