@@ -2221,41 +2221,100 @@ input[type=number] { -moz-appearance:textfield; }
 .w-budget-card::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 90% 10%,rgba(168,85,247,0.07),transparent 55%); pointer-events:none; }
 
 /* ===== CALENDAR ===== */
+#screen-calendar { background:#06040f; position:relative; overflow:hidden; }
+#cal-bg-canvas { position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0; }
+#calendar-content { position:relative;z-index:1; padding:0; overflow-y:auto; flex:1; scrollbar-width:none; }
+#calendar-content::-webkit-scrollbar { display:none; }
+
+/* Top nav */
+.cal-topnav { display:flex;align-items:center;justify-content:space-between;padding:12px 18px 0;position:relative;z-index:10; }
+.cal-tn-back { width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(124,58,237,0.25);display:flex;align-items:center;justify-content:center;font-size:14px;color:#c4b5fd;cursor:pointer;transition:all .2s; }
+.cal-tn-back:hover { background:rgba(124,58,237,0.18); }
+.cal-tn-title { display:flex;align-items:center;gap:7px;font-size:15px;font-weight:800;color:#fff; }
+.cal-tn-icon { width:28px;height:28px;border-radius:9px;background:linear-gradient(135deg,#7c3aed,#a855f7);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 12px rgba(124,58,237,0.5); }
+.cal-add-btn { background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:20px;padding:7px 14px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 3px 12px rgba(124,58,237,0.4);transition:all .2s;border:none; }
+.cal-add-btn:hover { transform:scale(1.06); }
+.cal-add-btn:active { transform:scale(.94); }
+
+/* Month nav */
+.cal-month-nav { display:flex;align-items:center;justify-content:space-between;padding:14px 18px 0;position:relative;z-index:10; }
+.cal-mn-btn { width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(124,58,237,0.18);display:flex;align-items:center;justify-content:center;font-size:13px;color:#c4b5fd;cursor:pointer;transition:all .2s; }
+.cal-mn-btn:hover { background:rgba(124,58,237,0.18);border-color:rgba(168,85,247,0.35); }
+.cal-mn-center { display:flex;flex-direction:column;align-items:center;gap:2px; }
+.cal-mn-month { font-size:18px;font-weight:800;color:#fff;letter-spacing:-.4px; }
+.cal-mn-year { font-size:11px;color:#7c6aaa;font-weight:500; }
+.cal-mn-settings { width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(124,58,237,0.18);display:flex;align-items:center;justify-content:center;font-size:14px;color:#7c6aaa;cursor:pointer;transition:all .2s; }
+.cal-mn-settings:hover { background:rgba(124,58,237,0.18);transform:rotate(20deg); }
+
+/* Calendar grid */
+.cal-wrap-inner { padding:12px 14px 0;position:relative;z-index:10; }
+.cal-day-headers { display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px; }
+.cal-dh { text-align:center;font-size:10px;font-weight:700;color:#7c6aaa;letter-spacing:.06em;padding:4px 0;text-transform:uppercase; }
+.cal-dh.weekend { color:rgba(168,85,247,0.5); }
 .cal-grid {
   display:grid;
   grid-template-columns:repeat(7,1fr);
-  gap:2px;
+  gap:3px;
 }
 .cal-day {
-  aspect-ratio:1;
-  display:flex; align-items:center; justify-content:center;
-  border-radius:8px;
-  font-size:12px; font-weight:600;
-  font-family:-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
-  cursor:pointer;
-  transition:all 0.15s;
-  color:var(--fg);
-  position:relative;
+  aspect-ratio:1;border-radius:12px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s cubic-bezier(.34,1.56,.64,1);
+  position:relative;font-size:13px;font-weight:600;color:rgba(255,255,255,0.7);
   line-height:1;
 }
-.cal-day:hover { background:rgba(160,136,250,0.2); }
+.cal-day:hover { background:rgba(124,58,237,0.18);color:#c4b5fd;transform:scale(1.1); }
+.cal-day.other-month { color:rgba(255,255,255,0.14);cursor:default; }
+.cal-day.other-month:hover { background:none;transform:none;color:rgba(255,255,255,0.14); }
 .cal-day.today {
-  background:var(--accent1);
-  color:#fff;
-  font-weight:400;
-  box-shadow:0 0 10px rgba(160,136,250,0.5);
+  background:linear-gradient(135deg,#7c3aed,#a855f7);
+  color:#fff;font-weight:800;
+  box-shadow:0 4px 16px rgba(124,58,237,0.5),inset 0 1px 0 rgba(255,255,255,0.12);
 }
+.cal-day.today:hover { transform:scale(1.1); }
+.cal-day.selected { background:rgba(124,58,237,0.2);border:1px solid rgba(168,85,247,0.4);color:#e9d5ff; }
 .cal-day.has-event::after {
-  content:''; position:absolute; bottom:2px; left:50%; transform:translateX(-50%);
-  width:4px; height:4px; border-radius:50%;
-  background:var(--gold);
+  content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);
+  width:4px;height:4px;border-radius:50%;
+  background:var(--dot-c,#a855f7);box-shadow:0 0 4px var(--dot-c,#a855f7);
 }
-.cal-day.other-month { color:rgba(255,255,255,0.18); }
+.cal-day.weekend-col { color:rgba(168,85,247,0.6); }
+.cal-day.weekend-col:hover { color:#c4b5fd; }
 @keyframes calRing {
   0%,100%{box-shadow:0 0 0 2.5px var(--cal-ring,#f6bb4e),0 0 8px var(--cal-ring,#f6bb4e);}
   50%{box-shadow:0 0 0 4px var(--cal-ring,#f6bb4e),0 0 18px var(--cal-ring,#f6bb4e);}
 }
-.cal-day.ev-ring { border-radius:50%!important; animation:calRing 2.2s ease-in-out infinite; font-weight:800; }
+.cal-day.ev-ring { border-radius:50%!important;animation:calRing 2.2s ease-in-out infinite;font-weight:800; }
+
+/* Upcoming events section */
+.cal-upcoming-head { padding:16px 18px 10px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:10; }
+.cal-uh-title { font-size:14px;font-weight:800;color:#fff; }
+.cal-uh-sub { font-size:10px;color:#7c6aaa;font-weight:500; }
+.cal-events-list { padding:0 18px;display:flex;flex-direction:column;gap:8px;padding-bottom:18px;position:relative;z-index:10; }
+
+.cal-event-card {
+  border-radius:18px;padding:12px 14px;
+  display:flex;align-items:center;gap:11px;
+  background:#0e0b1e;border:1px solid rgba(124,58,237,0.15);
+  cursor:pointer;transition:all .22s cubic-bezier(.34,1.56,.64,1);
+  position:relative;overflow:hidden;
+}
+.cal-event-card::before { content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ev-stripe,#a855f7);border-radius:3px 0 0 3px; }
+.cal-event-card:hover { transform:translateX(4px);border-color:rgba(168,85,247,0.3);background:#120e28; }
+.cal-ev-icon {
+  width:40px;height:40px;flex-shrink:0;border-radius:13px;
+  background:var(--ev-icon-bg,rgba(168,85,247,0.1));border:1px solid var(--ev-icon-b,rgba(168,85,247,0.2));
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  transition:transform .2s;
+}
+.cal-event-card:hover .cal-ev-icon { transform:scale(1.1) rotate(-5deg); }
+.cal-ev-info { flex:1;min-width:0; }
+.cal-ev-name { font-size:12px;font-weight:700;color:#fff;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.cal-ev-time { font-size:10px;color:#7c6aaa;font-weight:500; }
+.cal-ev-right { display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0; }
+.cal-ev-tag { font-size:9px;font-weight:700;border-radius:20px;padding:3px 8px;letter-spacing:.04em;white-space:nowrap; }
+.cal-ev-empty { text-align:center;padding:20px 18px;color:#7c6aaa;font-size:12px;font-weight:500; }
+.cal-ev-empty-icon { font-size:28px;margin-bottom:6px;opacity:.5; }
 /* Glowing event in upcoming list */
 @keyframes eventGlow {
   0%,100% { box-shadow:0 0 8px rgba(246,187,78,0.3), inset 0 0 8px rgba(246,187,78,0.06); }
@@ -3959,12 +4018,8 @@ input[type=number] { -moz-appearance:textfield; }
 
     <!-- ===== CALENDAR SCREEN ===== -->
     <div id="screen-calendar" class="screen">
-      <div class="screen-header">
-        <button class="back-btn" onclick="openScreen('home')">←</button>
-        <span class="screen-title">📅 Calendar</span>
-        <button class="btn btn-primary btn-sm" class="admin-only" onclick="openModal('add-event-modal')">+ Event</button>
-      </div>
-      <div id="calendar-content" style="padding:16px"></div>
+      <canvas id="cal-bg-canvas"></canvas>
+      <div id="calendar-content"></div>
     </div>
 
     <!-- ===== SHOP SCREEN ===== -->
@@ -5500,6 +5555,8 @@ function openScreen(id) {
     const prevScreen = document.querySelector('.screen.active');
     if (prevScreen && prevScreen.id === 'screen-coinpusher') cpStopAutoSave();
   }
+  // Stop calendar background animation when navigating away
+  if (id !== 'calendar' && typeof _calStopBg === 'function') _calStopBg();
   // Stop claw live broadcast when navigating away
   if (id !== 'claw') _clawStopLiveBroadcast();
   // Stop plinko live broadcast when navigating away
@@ -7455,21 +7512,97 @@ function addChartDataPoint() {
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
 
+// ── Calendar animated background ─────────────────────────────────────────
+let _calBgAnimId = null;
+let _calBgStars = null;
+let _calBgParticles = null;
+
+function _calStartBg() {
+  const canvas = document.getElementById('cal-bg-canvas');
+  if (!canvas) return;
+  const screen = document.getElementById('screen-calendar');
+  canvas.width = 340;
+  canvas.height = (screen && screen.offsetHeight) || 700;
+  canvas.style.display = 'block';
+  const ctx = canvas.getContext('2d');
+
+  if (!_calBgStars) {
+    _calBgStars = Array.from({length:120}, () => ({
+      x:Math.random()*340, y:Math.random()*850,
+      r:Math.random()*1.4+.2, phase:Math.random()*Math.PI*2,
+      speed:Math.random()*.005+.002, base:Math.random()*.4+.05,
+      col:Math.random()>.7?'#c4b5fd':'#fff'
+    }));
+  }
+  if (!_calBgParticles) {
+    _calBgParticles = Array.from({length:14}, () => ({
+      x:Math.random()*340, y:Math.random()*850,
+      vy:-(Math.random()*.25+.08), size:Math.random()*1.8+.8,
+      phase:Math.random()*Math.PI*2,
+      col:['#a855f7','#c084fc','#7c3aed','#e879f9'][Math.floor(Math.random()*4)]
+    }));
+  }
+
+  if (_calBgAnimId) { cancelAnimationFrame(_calBgAnimId); _calBgAnimId = null; }
+
+  let fr = 0;
+  function draw() {
+    if (canvas.style.display === 'none') { _calBgAnimId = null; return; }
+    const ch = canvas.height;
+    ctx.clearRect(0, 0, 340, ch);
+    // Deep base
+    ctx.fillStyle = '#06040f'; ctx.fillRect(0, 0, 340, ch);
+    // Radial blobs — exactly matching reference
+    [[60,100,100,'rgba(124,58,237,0.063)'],[280,200,80,'rgba(168,85,247,0.047)'],
+     [150,60,60,'rgba(192,132,252,0.031)'],[80,500,90,'rgba(124,58,237,0.031)'],
+     [250,650,70,'rgba(147,51,234,0.031)']].forEach(([x,y,r,c]) => {
+      const g = ctx.createRadialGradient(x,y,0,x,y,r);
+      g.addColorStop(0,c); g.addColorStop(1,'transparent');
+      ctx.fillStyle=g; ctx.fillRect(0,0,340,ch);
+    });
+    // Stars
+    _calBgStars.forEach(s => {
+      const a = s.base + Math.sin(fr*s.speed+s.phase)*.3;
+      ctx.globalAlpha = Math.max(0,Math.min(1,a));
+      ctx.fillStyle = s.col; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+    });
+    // Floating particles
+    _calBgParticles.forEach(p => {
+      p.y += p.vy; if (p.y < -5) p.y = ch+5;
+      ctx.globalAlpha = .3+Math.sin(fr*.05+p.phase)*.2;
+      ctx.fillStyle = p.col; ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
+    });
+    ctx.globalAlpha = 1; fr += .04;
+    _calBgAnimId = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function _calStopBg() {
+  if (_calBgAnimId) { cancelAnimationFrame(_calBgAnimId); _calBgAnimId = null; }
+  const canvas = document.getElementById('cal-bg-canvas');
+  if (canvas) canvas.style.display = 'none';
+}
+
 function renderCalendar() {
   const c = document.getElementById('calendar-content');
+  if (!c) return;
   const today = new Date();
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
   const monthName = new Date(calYear, calMonth).toLocaleString('default',{month:'long'});
-  
+  // Start animated background
+  _calStartBg();
+
+  // Build event date keys for dot indicators
   const eventDates = S.events.map(e => {
     const d = new Date(e.date);
     return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
   });
-  
+
+  // Build day cells
   let days = '';
   for (let i = 0; i < firstDay; i++) days += `<div class="cal-day other-month"></div>`;
-  const _todayISO = today.toISOString().slice(0,10);
   for (let d = 1; d <= daysInMonth; d++) {
     const isToday = today.getDate()===d && today.getMonth()===calMonth && today.getFullYear()===calYear;
     const key = `${calYear}-${calMonth}-${d}`;
@@ -7479,83 +7612,139 @@ function renderCalendar() {
     const showRing = isToday && dayEvs.length > 0;
     const ringCol = dayEvs.find(e=>e.ringColor)?.ringColor || S.calRingColor || '#f6bb4e';
     const ringStyle = showRing ? ` style="--cal-ring:${ringCol}"` : '';
-    days += `<div class="cal-day${isToday?' today':''}${hasEvent?' has-event':''}${showRing?' ev-ring':''}"${ringStyle} onclick="showDayEvents(${d})">${d}</div>`;
+    const isWeekend = new Date(calYear,calMonth,d).getDay()===0||new Date(calYear,calMonth,d).getDay()===6;
+    const dotCol = hasEvent ? (dayEvs[0]?.ringColor||'#a855f7') : '#a855f7';
+    let cls = 'cal-day';
+    if (isToday) cls += ' today';
+    if (hasEvent && !isToday) cls += ' has-event';
+    if (showRing) cls += ' ev-ring';
+    if (isWeekend && !isToday) cls += ' weekend-col';
+    days += `<div class="${cls}" style="--dot-c:${dotCol}${showRing?';--cal-ring:'+ringCol:''}" onclick="showDayEvents(${d})">${d}</div>`;
   }
-  
+  const total = firstDay + daysInMonth;
+  const rem = total%7===0 ? 0 : 7-(total%7);
+  for (let i = 1; i <= rem; i++) days += `<div class="cal-day other-month"></div>`;
+
+  // Build upcoming events HTML — reference-style event cards, preserving all OS logic
+  const _now2 = new Date();
+  const _todayStr = _now2.toISOString().slice(0,10);
+  const eventsHtml = S.events.length === 0
+    ? `<div class="cal-ev-empty"><div class="cal-ev-empty-icon">✦</div>No events yet · tap + Event to add one</div>`
+    : S.events.sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5).map((e,i) => {
+        const _evDate = new Date(e.date + (e.time ? 'T'+e.time : ''));
+        const _evStr  = e.date ? e.date.slice(0,10) : '';
+        let _isNow = false;
+        if (e.time) {
+          _isNow = _evStr===_todayStr && Math.abs(_evDate-_now2)<2*60*60*1000;
+        } else {
+          _isNow = _evStr===_todayStr;
+        }
+        const _diff  = _evDate - _now2;
+        const _dAway = Math.ceil(_diff/(1000*60*60*24));
+        const _tlabel = _isNow ? '✨ Now!'
+          : _dAway===1 ? '• Tomorrow'
+          : _dAway>1  ? '• '+_dAway+'d away'
+          : _dAway===0 ? '• Today'
+          : '• Past';
+        const evColor = e.ringColor || '#a855f7';
+        const _glowDot = _isNow ? `<div style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:#f6bb4e;box-shadow:0 0 6px #f6bb4e;animation:eventGlow 1.5s ease-in-out infinite"></div>` : '';
+        const _shimmer = _isNow ? `<div style="position:absolute;top:0;right:0;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(246,187,78,0.04));pointer-events:none"></div>` : '';
+        const _reward = e.ticketReward ? `<div style="font-size:10px;color:var(--gold);margin-top:2px">🎟️ ${e.ticketReward} tickets</div>` : '';
+        const _bgSt = (e.bubbleColor&&!_isNow) ? `background:${e.bubbleColor};` : '';
+        const _canRdm = _isNow && e.ticketReward && !e.redeemed;
+        const _rdmBtn = _canRdm
+          ? `<button class="ev-rdm" data-idx="${i}" style="position:absolute;bottom:8px;right:48px;font-size:10px;font-weight:800;padding:3px 10px;background:linear-gradient(135deg,#f6bb4e,#e78161);border:none;border-radius:99px;color:#000;cursor:pointer;display:none;white-space:nowrap;z-index:5">🎟️ Redeem ${e.ticketReward}</button>`
+          : (e.redeemed&&_isNow ? `<div style="position:absolute;bottom:8px;right:48px;font-size:9px;color:rgba(246,187,78,0.5);padding:3px 8px;background:rgba(246,187,78,0.1);border-radius:99px">✓ Redeemed</div>` : '');
+        if (_isNow) {
+          // "Now" events keep existing event-now style inside the new card wrapper
+          return `<div class="ev-wrap event-now" style="position:relative;overflow:hidden;border-radius:18px;${_bgSt}">
+            ${_shimmer}${_rdmBtn}
+            <div style="display:flex;align-items:center;gap:11px;padding:12px 14px">
+              <div style="position:relative;width:40px;height:40px;flex-shrink:0;border-radius:13px;background:rgba(246,187,78,0.15);border:1px solid rgba(246,187,78,0.3);display:flex;align-items:center;justify-content:center;font-size:18px">${e.emoji||'📅'}${_glowDot}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:700;color:#f6bb4e;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.title}</div>
+                <div style="font-size:10px;color:rgba(246,187,78,0.7);margin-top:2px">${_evDate.toLocaleDateString()}${e.time?' · '+e.time:''} ${_tlabel}</div>
+                ${_reward}
+              </div>
+              <button onclick="removeEvent(${i})" style="flex-shrink:0;width:26px;height:26px;border-radius:8px;background:rgba(252,119,144,0.1);border:1px solid rgba(252,119,144,0.2);color:rgba(252,119,144,0.6);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+            </div>
+          </div>`;
+        }
+        return `<div class="cal-event-card ev-wrap" style="--ev-stripe:${evColor};--ev-icon-bg:${evColor}18;--ev-icon-b:${evColor}33;${_bgSt}" >
+          ${_shimmer}${_rdmBtn}
+          <div class="cal-ev-icon">${e.emoji||'📅'}</div>
+          <div class="cal-ev-info">
+            <div class="cal-ev-name">${e.title}</div>
+            <div class="cal-ev-time">📅 ${_evDate.toLocaleDateString()}${e.time?' · '+e.time:''} <span style="color:${evColor};font-weight:700">${_tlabel}</span></div>
+            ${_reward}
+          </div>
+          <div class="cal-ev-right">
+            <span class="cal-ev-tag" style="background:${evColor}18;border:1px solid ${evColor}33;color:${evColor}">Event</span>
+            <button onclick="removeEvent(${i})" style="width:24px;height:24px;border-radius:7px;background:rgba(252,119,144,0.1);border:1px solid rgba(252,119,144,0.18);color:rgba(252,119,144,0.6);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s">✕</button>
+          </div>
+        </div>`;
+      }).join('');
+
   c.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <button class="btn btn-ghost btn-sm" onclick="calNav(-1)">←</button>
-      <div style="font-size:18px;font-weight:700;color:var(--fg)">${monthName} ${calYear}</div>
-      <div style="display:flex;gap:4px">
-        <button class="btn btn-ghost btn-sm" onclick="openCalSettings()" style="padding:5px 8px" title="Calendar Settings">⚙️</button>
-        <button class="btn btn-ghost btn-sm" onclick="calNav(1)">→</button>
+    <!-- Top nav -->
+    <div class="cal-topnav">
+      <div class="cal-tn-back" onclick="openScreen('home')">←</div>
+      <div class="cal-tn-title"><div class="cal-tn-icon">📅</div>Calendar</div>
+      <button class="cal-add-btn admin-only" onclick="openModal('add-event-modal')">+ Event</button>
+    </div>
+
+    <!-- Month navigation -->
+    <div class="cal-month-nav">
+      <div class="cal-mn-btn" onclick="calNav(-1)">←</div>
+      <div class="cal-mn-center">
+        <div class="cal-mn-month">${monthName}</div>
+        <div class="cal-mn-year">${calYear}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <div class="cal-mn-settings" onclick="openCalSettings()" title="Calendar Settings">⚙️</div>
+        <div class="cal-mn-btn" onclick="calNav(1)">→</div>
       </div>
     </div>
-    <div class="cal-grid" style="margin-bottom:8px">
-      ${['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<div style="text-align:center;font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);padding:6px">${d}</div>`).join('')}
-      ${days}
+
+    <!-- Grid -->
+    <div class="cal-wrap-inner">
+      <div class="cal-day-headers">
+        <div class="cal-dh weekend">Su</div>
+        <div class="cal-dh">Mo</div>
+        <div class="cal-dh">Tu</div>
+        <div class="cal-dh">We</div>
+        <div class="cal-dh">Th</div>
+        <div class="cal-dh">Fr</div>
+        <div class="cal-dh weekend">Sa</div>
+      </div>
+      <div class="cal-grid">${days}</div>
     </div>
-    <div style="margin-top:16px">
-      <div style="font-size:14px;font-weight:700;color:var(--fg);margin-bottom:8px">Upcoming Events</div>
-      ${(()=>{
-        const _now2 = new Date();
-        const _todayStr = _now2.toISOString().slice(0,10);
-        return S.events.sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5).map((e,i) => {
-          const _evDate = new Date(e.date + (e.time ? 'T' + e.time : ''));
-          const _evStr  = e.date ? e.date.slice(0,10) : '';
-          let _isNow = false;
-          if (e.time) {
-            _isNow = _evStr === _todayStr && Math.abs(_evDate - _now2) < 2*60*60*1000;
-          } else {
-            _isNow = _evStr === _todayStr;
-          }
-          const _diff   = _evDate - _now2;
-          const _dAway  = Math.ceil(_diff / (1000*60*60*24));
-          const _tlabel = _isNow ? '✨ Happening Now!'
-            : _dAway === 1 ? '• Tomorrow'
-            : _dAway > 1 ? '• ' + _dAway + 'd away'
-            : _dAway === 0 ? '• Today'
-            : '• Past';
-          const _glowDot = _isNow ? '<div style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:#f6bb4e;box-shadow:0 0 6px #f6bb4e;animation:eventGlow 1.5s ease-in-out infinite"></div>' : '';
-          const _shimmer = _isNow ? '<div style="position:absolute;top:0;right:0;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(246,187,78,0.04));pointer-events:none"></div>' : '';
-          const _reward  = e.ticketReward ? '<div style="font-size:10px;color:var(--gold)">🎟️ ' + e.ticketReward + ' tickets</div>' : '';
-          const _bgSt = (e.bubbleColor&&!_isNow)?'background:'+e.bubbleColor+';':'';
-          const _canRdm = _isNow && e.ticketReward && !e.redeemed;
-          const _rdmBtn = _canRdm
-            ? '<button class="ev-rdm" data-idx="'+i+'" style="position:absolute;bottom:6px;right:44px;font-size:10px;font-weight:800;padding:3px 10px;background:linear-gradient(135deg,#f6bb4e,#e78161);border:none;border-radius:99px;color:#000;cursor:pointer;display:none;white-space:nowrap;z-index:5">🎟️ Redeem '+e.ticketReward+'</button>'
-            : (e.redeemed&&_isNow?'<div style="position:absolute;bottom:6px;right:44px;font-size:9px;color:rgba(246,187,78,0.5);padding:3px 8px;background:rgba(246,187,78,0.1);border-radius:99px">✓ Redeemed</div>':'');
-          return '<div class="ev-wrap '+(_isNow?'event-now':'card2')+'" style="margin-bottom:8px;display:flex;align-items:center;gap:10px;padding:10px 12px;position:relative;'+_bgSt+'">'
-            + _shimmer + _rdmBtn
-            + '<div style="position:relative"><span style="font-size:24px">' + (e.emoji||'📅') + '</span>' + _glowDot + '</div>'
-            + '<div style="flex:1;min-width:0">'
-            + '<div style="font-size:13px;font-weight:700;color:' + (_isNow?'#f6bb4e':'var(--fg)') + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + e.title + '</div>'
-            + '<div style="font-size:11px;color:' + (_isNow?'rgba(246,187,78,0.8)':'rgba(255,255,255,0.4)') + '">' + _evDate.toLocaleDateString() + (e.time ? ' ' + e.time : '') + ' ' + _tlabel + '</div>'
-            + _reward
-            + '</div>'
-            + '<button class="btn btn-danger btn-sm" onclick="removeEvent(' + i + ')" style="flex-shrink:0">✕</button>'
-            + '</div>';
-        }).join('');
-      })()}
+
+    <!-- Upcoming events -->
+    <div class="cal-upcoming-head">
+      <div class="cal-uh-title">Upcoming Events</div>
+      <div class="cal-uh-sub">${S.events.length} this month</div>
     </div>
+    <div class="cal-events-list">${eventsHtml}</div>
   `;
 
-  // Refresh upcoming events list every 60s so "now" status stays live
+  // 60s auto-refresh for "now" detection
   clearTimeout(window._calRefresh);
   window._calRefresh = setTimeout(() => {
     if (document.getElementById('calendar-content')) renderCalendar();
   }, 60000);
-  // Wire up redeem hover
-  setTimeout(()=>{
-    document.querySelectorAll('.ev-wrap').forEach(w=>{
-      w.addEventListener('mouseenter',()=>calEvHover(w,true));
-      w.addEventListener('mouseleave',()=>calEvHover(w,false));
-    });
-    document.querySelectorAll('.ev-rdm').forEach(btn=>{
-      btn.addEventListener('click',()=>redeemEventTickets(parseInt(btn.dataset.idx)));
-    });
-  },50);
-}
 
+  // Wire redeem hover buttons
+  setTimeout(() => {
+    document.querySelectorAll('.ev-wrap').forEach(w => {
+      w.addEventListener('mouseenter', () => calEvHover(w, true));
+      w.addEventListener('mouseleave', () => calEvHover(w, false));
+    });
+    document.querySelectorAll('.ev-rdm').forEach(btn => {
+      btn.addEventListener('click', () => redeemEventTickets(parseInt(btn.dataset.idx)));
+    });
+  }, 50);
+}
 function calNav(dir) {
   playSound('click');
   calMonth += dir;
