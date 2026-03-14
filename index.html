@@ -505,7 +505,6 @@ button, a { touch-action: manipulation; }
   overflow: hidden;
   clip-path: inset(0 round 48px);
   isolation: isolate;
-  contain: paint;
   box-shadow:
     0 0 0 2.5px rgba(180,140,255,0.5),
     0 0 0 4px rgba(80,20,160,0.4),
@@ -1910,8 +1909,8 @@ input[type=number] { -moz-appearance:textfield; }
   animation:auroraPulse 8s ease-in-out infinite;
   pointer-events:none;
 }
-.boot-blob-1 { width:400px;height:250px;background:radial-gradient(ellipse,rgba(120,50,230,0.5) 0%,rgba(120,50,230,0.15) 40%,transparent 70%);top:-60px;left:-80px; }
-.boot-blob-2 { width:300px;height:200px;background:radial-gradient(ellipse,rgba(180,80,255,0.3) 0%,rgba(180,80,255,0.1) 40%,transparent 70%);bottom:80px;right:-60px;animation-delay:-3s; }
+.boot-blob-1 { width:400px;height:250px;background:radial-gradient(ellipse,rgba(120,50,230,0.5) 0%,rgba(120,50,230,0.1) 50%,transparent 70%);top:-60px;left:-80px; }
+.boot-blob-2 { width:300px;height:200px;background:radial-gradient(ellipse,rgba(180,80,255,0.3) 0%,rgba(180,80,255,0.08) 50%,transparent 70%);bottom:80px;right:-60px;animation-delay:-3s; }
 
 /* Floating particles */
 .boot-particle {
@@ -3000,14 +2999,14 @@ input[type=number] { -moz-appearance:textfield; }
 
 /* ===== POWER ANIMATION ===== */
 @keyframes powerOff {
-  0%{opacity:1;filter:brightness(1) blur(0)}
-  60%{opacity:1;filter:brightness(0.2) blur(2px)}
-  100%{opacity:0;filter:brightness(0) blur(4px)}
+  0%{opacity:1}
+  60%{opacity:0.2}
+  100%{opacity:0}
 }
 @keyframes powerOn {
-  0%{opacity:0;filter:brightness(0) blur(4px)}
-  60%{opacity:1;filter:brightness(1.4) blur(0)}
-  100%{opacity:1;filter:brightness(1) blur(0)}
+  0%{opacity:0}
+  60%{opacity:1}
+  100%{opacity:1}
 }
 #phone.power-off { animation:powerOff 0.8s forwards; }
 #phone.power-on { animation:powerOn 0.8s forwards; }
@@ -3255,7 +3254,7 @@ input[type=number] { -moz-appearance:textfield; }
 
   <!-- Notification Panel — full-screen iOS 15-style -->
   <div id="notif-panel" style="position:absolute;inset:0;z-index:8900;transform:translateY(-100%);transition:transform 0.48s cubic-bezier(0.32,0,0.15,1);overflow:hidden;border-radius:48px;">
-    <!-- Wallpaper blur layer wrapped in overflow:hidden so filter:blur cannot escape -->
+    <!-- Wallpaper blur layer — wrapped in overflow:hidden so filter:blur cannot escape -->
     <div style="position:absolute;inset:0;overflow:hidden;border-radius:48px;">
       <div id="notif-panel-wallpaper" style="position:absolute;inset:-40px;background:radial-gradient(ellipse at 20% 20%,#2a1a4e 0%,#000 50%,#1a0a2e 100%);filter:blur(32px) saturate(160%);"></div>
     </div>
@@ -21026,7 +21025,7 @@ function powerOffApp() {
   if (ov) ov.remove();
   ov = document.createElement('div');
   ov.id = 'ios-pow-ov';
-  ov.style.cssText = 'position:absolute;inset:0;z-index:99999;background:rgba(0,0,0,0.96);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:52px 24px 40px;border-radius:48px;overflow:hidden';
+  ov.style.cssText = 'position:absolute;inset:0;z-index:99999;background:rgba(0,0,0,0.97);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:52px 24px 40px;border-radius:48px;overflow:hidden';
   ov.innerHTML = `
     <div style="text-align:center">
       <div style="font-size:48px;margin-bottom:14px;filter:drop-shadow(0 0 24px rgba(255,255,255,0.25))">⏻</div>
@@ -27139,9 +27138,9 @@ function sidePowerUp() {
     playSound('click');
     var phone = document.getElementById('phone');
     if (phone) {
-      phone.style.transition = 'filter 0.08s';
-      phone.style.filter = 'brightness(1.18)';
-      setTimeout(function() { phone.style.filter = ''; }, 120);
+      phone.style.transition = 'opacity 0.08s';
+      phone.style.opacity = '0.7';
+      setTimeout(function() { phone.style.opacity = ''; }, 120);
     }
   }
 }
@@ -27156,7 +27155,7 @@ function _showPowerMenu() {
   ov.id = 'ios-pow-ov';
   ov.style.cssText = [
     'position:absolute;inset:0;z-index:99999',
-    'background:rgba(4,1,16,0.96)',
+    'background:rgba(4,1,16,0.97)',
     'display:flex;flex-direction:column;align-items:center;justify-content:space-between',
     'padding:52px 24px 44px',
     'border-radius:48px',
@@ -27290,8 +27289,8 @@ function _startCharging() {
   _chargingEl.style.cssText = [
     'position:absolute;inset:0;z-index:99998',
     'background:#000',
-    'overflow:hidden',
     'border-radius:48px',
+    'overflow:hidden',
     'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0',
   ].join(';');
 
@@ -27372,11 +27371,11 @@ function _buildChargingHTML() {
     /* ── Full-screen background ── */
     '<div style="position:absolute;inset:0;background:#000;z-index:0;pointer-events:none"></div>',
 
-    /* ── Radial ambient glow at bottom — no filter:blur, uses radial-gradient directly ── */
-    '<div style="position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:500px;height:340px;background:radial-gradient(ellipse,rgba(20,200,80,0.22) 0%,rgba(20,200,80,0.08) 40%,transparent 70%);pointer-events:none;z-index:1"></div>',
+    /* ── Radial ambient glow at bottom ── */
+    '<div style="position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:500px;height:340px;border-radius:50%;background:radial-gradient(ellipse,rgba(20,200,80,0.22) 0%,rgba(20,200,80,0.06) 50%,transparent 70%);pointer-events:none;z-index:1"></div>',
 
-    /* ── Top purple aurora accent — no filter:blur ── */
-    '<div style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:380px;height:200px;background:radial-gradient(ellipse,rgba(120,50,220,0.28) 0%,rgba(120,50,220,0.08) 40%,transparent 70%);pointer-events:none;z-index:1"></div>',
+    /* ── Top purple aurora accent ── */
+    '<div style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:380px;height:200px;border-radius:50%;background:radial-gradient(ellipse,rgba(120,50,220,0.25) 0%,rgba(120,50,220,0.06) 50%,transparent 70%);pointer-events:none;z-index:1"></div>',
 
     /* ── Shimmer top line ── */
     '<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(60,220,120,0.4),transparent);z-index:2;pointer-events:none"></div>',
