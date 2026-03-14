@@ -3940,13 +3940,15 @@ input[type=number] { -moz-appearance:textfield; }
     </div>
 
     <!-- ===== BACKPACK SCREEN ===== -->
-    <div id="screen-backpack" class="screen">
-      <div class="screen-header">
+    <div id="screen-backpack" class="screen" style="position:relative;background:#06040f;overflow:hidden">
+      <!-- Canvas for Crystal View animated background -->
+      <canvas id="bp-crystal-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;display:none"></canvas>
+      <div class="screen-header" id="bp-default-header">
         <button class="back-btn" onclick="openScreen('home')">←</button>
         <span class="screen-title">🎒 Backpack</span>
         <button class="btn btn-sm btn-ghost" onclick="openModal('backpack-options-modal')">⚙️</button>
       </div>
-      <div id="backpack-content" style="padding:16px"></div>
+      <div id="backpack-content" style="padding:16px;position:relative;z-index:1;overflow-y:auto;flex:1"></div>
     </div>
 
     <!-- ===== TASKS SCREEN ===== -->
@@ -8233,9 +8235,12 @@ function moveOverflowToBackpack(storeId, itemIdx) {
 }
 
 function setBpView(mode) {
+  // If leaving crystal view, clean it up first
+  if (S.bpViewMode === 'crystal' && mode !== 'crystal') {
+    _bpCrystalStopCanvas();
+  }
   S.bpViewMode = mode;
   saveState();
-  // Update tab highlight in modal
   ['new','classic','crystal'].forEach(m => {
     const btn = document.getElementById('bp-toggle-' + m);
     if (!btn) return;
@@ -8274,27 +8279,38 @@ function renderBackpack() {
   if (S.bpViewMode === 'crystal') {
     renderBackpackCrystal();
   } else if (S.bpViewMode === 'new') {
+    _bpCrystalStopCanvas();
     renderBackpackNew();
   } else {
+    _bpCrystalStopCanvas();
     renderBackpackClassic();
   }
 }
 
 function renderBackpackCrystal() {
   const c = document.getElementById('backpack-content');
+  if (!c) return;
+
+  // ── Crystal mode: hide default header, remove padding, show canvas ──
+  const defaultHeader = document.getElementById('bp-default-header');
+  if (defaultHeader) defaultHeader.style.display = 'none';
+  c.style.padding = '0';
+  c.style.overflowY = 'auto';
+
+  // ── Animated canvas background ──
+  _bpCrystalStartCanvas();
+
   const itemCount = Object.values(S.backpackItems).filter(Boolean).length;
   const pct = S.backpackSlots > 0 ? Math.round(itemCount / S.backpackSlots * 100) : 0;
   const ticketCount = S.tickets || 0;
-  const xpPct = Math.min(100, Math.round((ticketCount % 100)));
+  const xpPct = Math.min(100, Math.round(ticketCount % 100));
 
-  // Rarity map
   const RARITY_MAP = {
     'legendary': { cls:'legendary', dot:'★', col:'#fbbf24' },
     'epic':      { cls:'epic',      dot:'E', col:'#e879f9' },
     'rare':      { cls:'rare',      dot:'R', col:'#c084fc' },
   };
 
-  // Build slot HTML
   const isMobile = 'ontouchstart' in window;
   const slotDivs = [];
   for (let i = 0; i < S.backpackSlots; i++) {
@@ -8303,10 +8319,7 @@ function renderBackpackCrystal() {
     const tipLower = tip.toLowerCase();
     const rarKey = Object.keys(RARITY_MAP).find(r => tipLower.includes(r)) || '';
     const rarInfo = RARITY_MAP[rarKey] || { cls:'', dot:'', col:'#7c3aed' };
-
-    // Derive item name from tooltip — first segment before ' · '
     const rawName = tip ? (tip.split(' · ')[0] || tip) : '';
-    // Strip emoji from name for display
     const itemName = rawName.replace(/[\u{1F300}-\u{1FAFF}]/gu, '').trim().slice(0, 10);
 
     const slot = document.createElement('div');
@@ -8314,14 +8327,11 @@ function renderBackpackCrystal() {
     slot.dataset.slot = i;
 
     if (item) {
-      // Per-item glow colour from rarity
       slot.style.setProperty('--csg', rarInfo.col + '18');
       slot.style.setProperty('--sc', rarInfo.col || '#7c3aed');
-
       const cornerHtml = rarInfo.dot
         ? `<div class="bp-cslot-corner">${rarInfo.dot}</div>`
         : (tip ? `<div class="bp-cslot-badge"></div>` : '');
-
       slot.innerHTML = `
         <div class="bp-cslot-shine"></div>
         <div class="bp-cslot-glow"></div>
@@ -8329,30 +8339,22 @@ function renderBackpackCrystal() {
         <div class="bp-cslot-emoji">${item}</div>
         <div class="bp-cslot-name">${itemName}</div>
       `;
-
-      // Click → item detail sheet
       slot.addEventListener('click', () => {
         slot.classList.add('pop');
         slot.addEventListener('animationend', () => slot.classList.remove('pop'), {once:true});
         bpShowItemSheet(i);
       });
-
-      // Drag
       slot.draggable = true;
       slot.addEventListener('dragstart', e => { e.dataTransfer.setData('slot', i); playSound('click'); });
-
-      // Mobile long-press
       if (isMobile && tip) {
         let pressTimer;
         slot.addEventListener('touchstart', () => { pressTimer = setTimeout(() => bpShowTooltipSheet(i), 450); }, {passive:true});
         slot.addEventListener('touchend', () => clearTimeout(pressTimer), {passive:true});
       }
-      // Desktop hover tooltip
       if (!isMobile && tip) {
         slot.addEventListener('mouseenter', () => bpShowHoverTooltip(slot, i));
         slot.addEventListener('mouseleave', () => { const t = document.getElementById('bp-tooltip-overlay'); if(t) t.style.display='none'; });
       }
-      // Context menu
       slot.addEventListener('contextmenu', e => {
         e.preventDefault();
         const menu = document.getElementById('context-menu');
@@ -8373,7 +8375,6 @@ function renderBackpackCrystal() {
       slot.innerHTML = `<div class="bp-cslot-empty-ico">+</div>`;
     }
 
-    // Drag-over reordering
     slot.addEventListener('dragover', e => { e.preventDefault(); slot.style.borderColor='rgba(246,187,78,0.5)'; });
     slot.addEventListener('dragleave', () => { slot.style.borderColor=''; });
     slot.addEventListener('drop', e => {
@@ -8391,11 +8392,10 @@ function renderBackpackCrystal() {
       if (tTo)   S.backpackTooltips[from] = tTo; else delete S.backpackTooltips[from];
       saveState(); renderBackpack();
     });
-
     slotDivs.push(slot);
   }
 
-  // Build overflow / temp storage HTML
+  // Overflow / temp storage
   cleanExpiredOverflows();
   const _ovStores = getBpActiveOverflows();
   let tempSectionHtml = '';
@@ -8431,9 +8431,8 @@ function renderBackpackCrystal() {
     }).join('');
   }
 
-  // Render full layout
   c.innerHTML = `
-    <div class="bp-crystal-container" id="bp-crystal-root">
+    <div class="bp-crystal-container" id="bp-crystal-root" style="padding-bottom:20px">
 
       <!-- Top nav -->
       <div class="bp-cv-topnav">
@@ -8445,9 +8444,9 @@ function renderBackpackCrystal() {
         <div class="bp-cv-settings" onclick="openModal('backpack-options-modal')">⚙️</div>
       </div>
 
-      <!-- XP row -->
+      <!-- Tickets / XP row -->
       <div class="bp-cv-xp">
-        <span style="font-size:13px">💎</span>
+        <span style="font-size:14px">🎟️</span>
         <span class="bp-cv-xp-num">${ticketCount}</span>
         <div class="bp-cv-xp-track">
           <div class="bp-cv-xp-fill" style="width:${xpPct}%"></div>
@@ -8469,15 +8468,15 @@ function renderBackpackCrystal() {
       <!-- Capacity bar -->
       <div class="bp-cv-capbar">
         <div class="bp-cv-cap-track">
-          <div class="bp-cv-cap-fill" id="bp-cv-cap-fill" style="width:${pct}%"></div>
+          <div class="bp-cv-cap-fill" style="width:${pct}%"></div>
         </div>
         <div class="bp-cv-cap-labels">
-          <span id="bp-cv-slots-label">${itemCount} / ${S.backpackSlots} slots</span>
-          <span id="bp-cv-pct-label">${pct}% full</span>
+          <span>${itemCount} / ${S.backpackSlots} slots</span>
+          <span>${pct}% full</span>
         </div>
       </div>
 
-      <!-- Grid section -->
+      <!-- Equipped Items -->
       <div class="bp-cv-grid-wrap">
         <div class="bp-cv-grid-label">
           <span>Equipped Items</span>
@@ -8500,11 +8499,115 @@ function renderBackpackCrystal() {
     </div>
   `;
 
-  // Append slots to grid
   const grid = document.getElementById('bp-crystal-grid');
   slotDivs.forEach(s => grid.appendChild(s));
 }
 
+// ── Crystal View canvas background engine ──────────────────────────────────
+let _bpCvAnimId = null;
+let _bpCvStars = null;
+let _bpCvFloats = null;
+
+function _bpCrystalStartCanvas() {
+  const canvas = document.getElementById('bp-crystal-canvas');
+  if (!canvas) return;
+
+  const screen = document.getElementById('screen-backpack');
+  const h = (screen && screen.offsetHeight) || 700;
+  canvas.width = 340;
+  canvas.height = h;
+  canvas.style.display = 'block';
+
+  const ctx = canvas.getContext('2d');
+
+  // Initialise particles only once (so they don't reset on re-render)
+  if (!_bpCvStars) {
+    _bpCvStars = Array.from({length:110}, () => ({
+      x: Math.random()*340, y: Math.random()*850,
+      r: Math.random()*1.4+.2,
+      phase: Math.random()*Math.PI*2,
+      speed: Math.random()*.005+.002,
+      base: Math.random()*.4+.05,
+      col: Math.random()>.7 ? '#c4b5fd' : '#fff'
+    }));
+  }
+  if (!_bpCvFloats) {
+    _bpCvFloats = Array.from({length:12}, () => ({
+      x: Math.random()*340, y: Math.random()*850,
+      vy: -(Math.random()*.2+.08),
+      size: Math.random()*1.6+.8,
+      phase: Math.random()*Math.PI*2,
+      col: ['#a855f7','#c084fc','#7c3aed','#e879f9'][Math.floor(Math.random()*4)]
+    }));
+  }
+
+  // Cancel any existing animation loop
+  if (_bpCvAnimId) { cancelAnimationFrame(_bpCvAnimId); _bpCvAnimId = null; }
+
+  let fr = 0;
+  function draw() {
+    // Stop if canvas is hidden (view changed)
+    if (canvas.style.display === 'none') { _bpCvAnimId = null; return; }
+
+    const ch = canvas.height;
+    ctx.clearRect(0, 0, 340, ch);
+
+    // Deep dark base
+    ctx.fillStyle = '#06040f';
+    ctx.fillRect(0, 0, 340, ch);
+
+    // Radial purple glow blobs — exactly matching the reference
+    [
+      [60,  100, 100, 'rgba(124,58,237,0.063)'],
+      [280, 180, 80,  'rgba(168,85,247,0.047)'],
+      [150, 60,  60,  'rgba(192,132,252,0.031)'],
+      [80,  500, 90,  'rgba(124,58,237,0.031)'],
+    ].forEach(([x, y, r, col]) => {
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, col);
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 340, ch);
+    });
+
+    // Twinkling stars
+    _bpCvStars.forEach(s => {
+      const a = s.base + Math.sin(fr * s.speed + s.phase) * .3;
+      ctx.globalAlpha = Math.max(0, Math.min(1, a));
+      ctx.fillStyle = s.col;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Floating particles drifting upward
+    _bpCvFloats.forEach(p => {
+      p.y += p.vy;
+      if (p.y < -5) p.y = ch + 5;
+      ctx.globalAlpha = .25 + Math.sin(fr * .05 + p.phase) * .15;
+      ctx.fillStyle = p.col;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.globalAlpha = 1;
+    fr += .04;
+    _bpCvAnimId = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+function _bpCrystalStopCanvas() {
+  if (_bpCvAnimId) { cancelAnimationFrame(_bpCvAnimId); _bpCvAnimId = null; }
+  const canvas = document.getElementById('bp-crystal-canvas');
+  if (canvas) canvas.style.display = 'none';
+  // Restore default header and padding
+  const h = document.getElementById('bp-default-header');
+  if (h) h.style.display = '';
+  const bc = document.getElementById('backpack-content');
+  if (bc) bc.style.padding = '16px';
+}
 
 
 function renderBackpackNew() {
