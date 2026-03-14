@@ -536,6 +536,18 @@ button, a { touch-action: manipulation; }
     height: auto;
     aspect-ratio: 390 / 844;
     transform: translateZ(0);
+    isolation: isolate;
+  }
+  #power-screen,
+  #admin-panel-overlay,
+  #notif-panel {
+    transform: translateZ(0);
+    isolation: isolate;
+  }
+  #charging-overlay,
+  #ios-pow-ov {
+    transform: translateZ(0);
+    isolation: isolate;
   }
 }
 
