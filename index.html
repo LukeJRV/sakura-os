@@ -1456,11 +1456,11 @@ input[type=number] { -moz-appearance:textfield; }
   background:#0a0812;
   display:none; flex-direction:column;
   overflow:hidden;
-  clip-path:inset(0);
+  clip-path:inset(0 round 48px);
   will-change: transform;
 }
 #admin-panel-overlay.open { display:flex; }
-#phone.expanded #admin-panel-overlay { border-radius: 24px; }
+#phone.expanded #admin-panel-overlay { clip-path:inset(0 round 24px); }
 #phone.expanded .adm-header { border-radius: 24px 24px 0 0; }
 .adm-header {
   background:rgba(14,5,30,0.98);
@@ -1900,11 +1900,11 @@ input[type=number] { -moz-appearance:textfield; }
   flex-direction:column;
   gap:22px;
   overflow:hidden;
-  border-radius:48px;
+  clip-path:inset(0 round 48px);
   will-change: transform;
 }
 #power-screen.on { display:flex; }
-#phone.expanded #power-screen { border-radius: 24px; }
+#phone.expanded #power-screen { clip-path:inset(0 round 24px); }
 
 /* Boot ambient blobs */
 .boot-blob {
@@ -3256,7 +3256,7 @@ input[type=number] { -moz-appearance:textfield; }
   <div id="notif-drag-zone" style="position:absolute;top:0;left:0;width:100%;height:56px;z-index:9000;cursor:pointer;touch-action:none" onmousedown="notifPanelDragStart(event)"></div>
 
   <!-- Notification Panel — full-screen iOS 15-style -->
-  <div id="notif-panel" style="position:absolute;inset:0;z-index:8900;transform:translateY(-100%);transition:transform 0.48s cubic-bezier(0.32,0,0.15,1);will-change:transform;overflow:hidden;clip-path:inset(0);">
+  <div id="notif-panel" style="position:absolute;inset:0;z-index:8900;transform:translateY(-100%);transition:transform 0.48s cubic-bezier(0.32,0,0.15,1);will-change:transform;overflow:hidden;clip-path:inset(0 round 48px);">
     <!-- Wallpaper blur layer — filter:blur on child is always clipped by parent overflow:hidden, unlike backdrop-filter -->
     <div id="notif-panel-wallpaper" style="position:absolute;inset:-40px;background:radial-gradient(ellipse at 20% 20%,#2a1a4e 0%,#000 50%,#1a0a2e 100%);filter:blur(32px) saturate(160%);"></div>
     <!-- Dark overlay -->
@@ -21032,7 +21032,7 @@ function powerOffApp() {
   if (ov) ov.remove();
   ov = document.createElement('div');
   ov.id = 'ios-pow-ov';
-  ov.style.cssText = 'position:absolute;inset:0;z-index:99999;background:rgba(0,0,0,0.88);backdrop-filter:blur(24px);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:52px 24px 40px;border-radius:48px;overflow:hidden';
+  ov.style.cssText = 'position:absolute;inset:0;z-index:99999;background:rgba(0,0,0,0.88);backdrop-filter:blur(24px);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:52px 24px 40px;overflow:hidden;clip-path:inset(0 round 48px)';
   ov.innerHTML = `
     <div style="text-align:center">
       <div style="font-size:48px;margin-bottom:14px;filter:drop-shadow(0 0 24px rgba(255,255,255,0.25))">⏻</div>
@@ -27167,9 +27167,8 @@ function _showPowerMenu() {
     '-webkit-backdrop-filter:blur(28px)',
     'display:flex;flex-direction:column;align-items:center;justify-content:space-between',
     'padding:52px 24px 44px',
-    'border-radius:48px',
     'overflow:hidden',
-    'clip-path:inset(0)',
+    'clip-path:inset(0 round 48px)',
   ].join(';');
 
   ov.innerHTML = [
@@ -27299,9 +27298,8 @@ function _startCharging() {
   _chargingEl.style.cssText = [
     'position:absolute;inset:0;z-index:99998',
     'background:#000',
-    'border-radius:48px',
     'overflow:hidden',
-    'clip-path:inset(0)',
+    'clip-path:inset(0 round 48px)',
     'will-change:transform',
     'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0',
   ].join(';');
