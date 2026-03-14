@@ -3075,11 +3075,53 @@ input[type=number] { -moz-appearance:textfield; }
 .nt-fmt-btn { min-width:30px; height:28px; border-radius:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(124,58,237,0.15); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#c4b5fd; cursor:pointer; padding:0 8px; transition:all .15s; white-space:nowrap; flex-shrink:0; }
 .nt-fmt-btn:hover { background:rgba(124,58,237,0.2); }
 .nt-fmt-sep { width:1px; height:18px; background:rgba(124,58,237,0.18); flex-shrink:0; margin:0 2px; }
-.nt-title-inp { width:100%; background:transparent; border:none; outline:none; font-size:20px; font-weight:800; color:#fff; font-family:inherit; padding:14px 16px 6px; letter-spacing:-.4px; border-bottom:1px solid rgba(124,58,237,0.1); flex-shrink:0; }
+.nt-title-inp { width:100%; background:transparent; border:none; outline:none; font-size:20px; font-weight:800; font-family:inherit; padding:14px 16px 4px; letter-spacing:-.4px; border-bottom:none; flex-shrink:0; color:var(--nt-title-col,#fff); transition:color .2s; }
 .nt-title-inp::placeholder { color:#3d2a5a; }
+
+/* Title colour strip */
+.nt-title-color-row { display:flex; align-items:center; gap:5px; padding:6px 16px 8px; border-bottom:1px solid rgba(124,58,237,0.1); flex-shrink:0; overflow-x:auto; scrollbar-width:none; }
+.nt-title-color-row::-webkit-scrollbar { display:none; }
+.nt-tcol { width:18px; height:18px; border-radius:50%; cursor:pointer; transition:transform .15s; border:2px solid transparent; flex-shrink:0; }
+.nt-tcol:hover { transform:scale(1.25); }
+.nt-tcol.active { border-color:#fff; transform:scale(1.15); }
+.nt-tcol-clear { width:18px; height:18px; border-radius:50%; cursor:pointer; background:rgba(255,255,255,0.06); border:1.5px dashed rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:9px; color:rgba(255,255,255,0.35); flex-shrink:0; transition:all .15s; }
+.nt-tcol-clear:hover { background:rgba(255,255,255,0.12); }
+
+/* Second format bar row */
+.nt-fmt-bar2 { display:flex; align-items:center; gap:4px; padding:5px 14px 6px; background:#0c0a1e; border-bottom:1px solid rgba(124,58,237,0.08); overflow-x:auto; flex-shrink:0; }
+.nt-fmt-bar2::-webkit-scrollbar { display:none; }
+
+/* Colour swatches in format bar */
+.nt-col-swatch { width:20px; height:20px; border-radius:50%; cursor:pointer; flex-shrink:0; border:2px solid transparent; transition:all .15s; position:relative; }
+.nt-col-swatch:hover { transform:scale(1.2); }
+.nt-col-swatch.active { border-color:#fff; transform:scale(1.15); }
+.nt-col-swatch.clear { background:rgba(255,255,255,0.06); border:1.5px dashed rgba(255,255,255,0.2); }
+
+/* Highlight swatches */
+.nt-hl-swatch { width:20px; height:20px; border-radius:5px; cursor:pointer; flex-shrink:0; border:1.5px solid rgba(255,255,255,0.1); transition:all .15s; }
+.nt-hl-swatch:hover { transform:scale(1.15); border-color:rgba(255,255,255,0.35); }
+
+/* Tag picker in cards */
+.nt-card-tag { cursor:pointer; transition:all .15s; }
+.nt-card-tag:hover { transform:scale(1.05); opacity:0.85; }
+
+/* Coloured card title */
+.nt-card-title-coloured { color:var(--nt-tc,#fff); }
+
 .nt-body-area { flex:1; padding:12px 16px; outline:none; color:#d4bbff; font-size:13px; line-height:1.7; overflow-y:auto; word-break:break-word; scrollbar-width:none; }
 .nt-body-area::-webkit-scrollbar { display:none; }
-.nt-word-count { padding:6px 16px 10px; font-size:9px; color:#7c6aaa; font-weight:500; letter-spacing:.04em; text-transform:uppercase; text-align:right; border-top:1px solid rgba(124,58,237,0.1); flex-shrink:0; }
+.nt-body-area blockquote { border-left:3px solid rgba(168,85,247,0.5); margin:6px 0; padding:4px 12px; color:rgba(196,181,253,0.7); font-style:italic; background:rgba(124,58,237,0.06); border-radius:0 8px 8px 0; }
+.nt-body-area h1 { font-size:18px; font-weight:800; color:#e9d5ff; margin:8px 0 4px; letter-spacing:-.3px; }
+.nt-body-area h2 { font-size:15px; font-weight:700; color:#c4b5fd; margin:6px 0 3px; }
+.nt-body-area hr { border:none; border-top:1px solid rgba(124,58,237,0.25); margin:10px 0; }
+.nt-body-area ul { padding-left:20px; margin:4px 0; }
+.nt-body-area ol { padding-left:20px; margin:4px 0; }
+.nt-body-area li { margin:2px 0; }
+
+.nt-word-count { padding:5px 16px 8px; font-size:9px; color:#7c6aaa; font-weight:500; letter-spacing:.04em; text-transform:uppercase; display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(124,58,237,0.08); flex-shrink:0; }
+.nt-wc-tag-row { display:flex; align-items:center; gap:5px; }
+.nt-wc-tag-lbl { font-size:8px; color:rgba(124,58,237,0.5); font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
+
 .notes-sidebar { display:none; }
 .note-item { display:none; }
 
@@ -4044,6 +4086,8 @@ input[type=number] { -moz-appearance:textfield; }
 
       <!-- ── EDITOR VIEW ── -->
       <div id="notes-editor-view">
+
+        <!-- Top bar -->
         <div class="nt-editor-topbar">
           <div class="nt-etb-left">
             <div class="nt-etb-back" id="nt-ed-back">‹</div>
@@ -4055,23 +4099,93 @@ input[type=number] { -moz-appearance:textfield; }
             <div class="nt-etb-btn" id="nt-share-btn" title="Share">↗️</div>
           </div>
         </div>
-        <div class="nt-fmt-bar">
-          <div class="nt-fmt-btn" onclick="ntFmt('bold')"><b>B</b></div>
-          <div class="nt-fmt-btn" onclick="ntFmt('italic')"><i>I</i></div>
-          <div class="nt-fmt-btn" onclick="ntFmt('underline')"><u>U</u></div>
-          <div class="nt-fmt-btn" onclick="ntFmt('strikeThrough')">S̶</div>
+
+        <!-- Format bar 1: style, headings, lists, alignment, quote, rule -->
+        <div class="nt-fmt-bar" id="nt-fmt-bar-1">
+          <div class="nt-fmt-btn" onclick="ntFmt('bold')" title="Bold"><b>B</b></div>
+          <div class="nt-fmt-btn" onclick="ntFmt('italic')" title="Italic"><i>I</i></div>
+          <div class="nt-fmt-btn" onclick="ntFmt('underline')" title="Underline"><u>U</u></div>
+          <div class="nt-fmt-btn" onclick="ntFmt('strikeThrough')" title="Strikethrough">S̶</div>
           <div class="nt-fmt-sep"></div>
-          <div class="nt-fmt-btn" onclick="ntFmtBlock('h1')">H1</div>
-          <div class="nt-fmt-btn" onclick="ntFmtBlock('h2')">H2</div>
+          <div class="nt-fmt-btn" onclick="ntFmtBlock('h1')" title="Heading 1">H1</div>
+          <div class="nt-fmt-btn" onclick="ntFmtBlock('h2')" title="Heading 2">H2</div>
           <div class="nt-fmt-sep"></div>
-          <div class="nt-fmt-btn" onclick="ntFmt('insertUnorderedList')">• List</div>
-          <div class="nt-fmt-btn" onclick="ntFmt('insertOrderedList')">1. List</div>
+          <div class="nt-fmt-btn" onclick="ntFmt('insertUnorderedList')" title="Bullet list">• List</div>
+          <div class="nt-fmt-btn" onclick="ntFmt('insertOrderedList')" title="Numbered list">1. List</div>
           <div class="nt-fmt-sep"></div>
-          <div class="nt-fmt-btn" id="nt-color-btn" onclick="ntCycleColor()">🎨</div>
+          <div class="nt-fmt-btn" onclick="ntAlign('Left')" title="Align left">⬅</div>
+          <div class="nt-fmt-btn" onclick="ntAlign('Center')" title="Align center">☰</div>
+          <div class="nt-fmt-btn" onclick="ntAlign('Right')" title="Align right">➡</div>
+          <div class="nt-fmt-sep"></div>
+          <div class="nt-fmt-btn" onclick="ntFmtBlock('blockquote')" title="Quote">"</div>
+          <div class="nt-fmt-btn" onclick="ntInsertHR()" title="Divider">—</div>
         </div>
-        <input class="nt-title-inp" id="nt-title-inp" placeholder="Note title…" />
+
+        <!-- Format bar 2: text colour + highlight + font size + emoji -->
+        <div class="nt-fmt-bar2" id="nt-fmt-bar-2">
+          <!-- Text colours -->
+          <span style="font-size:8px;color:rgba(124,58,237,0.55);font-weight:700;letter-spacing:.5px;text-transform:uppercase;flex-shrink:0;margin-right:2px">A</span>
+          <div class="nt-col-swatch clear" onclick="ntSetTextColor(null)" title="Default colour" style="font-size:9px;color:rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center">✕</div>
+          <div class="nt-col-swatch" style="background:#d4bbff" onclick="ntSetTextColor('#d4bbff')" title="Lavender"></div>
+          <div class="nt-col-swatch" style="background:#fc7790" onclick="ntSetTextColor('#fc7790')" title="Pink"></div>
+          <div class="nt-col-swatch" style="background:#f6bb4e" onclick="ntSetTextColor('#f6bb4e')" title="Gold"></div>
+          <div class="nt-col-swatch" style="background:#67e8f9" onclick="ntSetTextColor('#67e8f9')" title="Teal"></div>
+          <div class="nt-col-swatch" style="background:#86efac" onclick="ntSetTextColor('#86efac')" title="Green"></div>
+          <div class="nt-col-swatch" style="background:#fda4af" onclick="ntSetTextColor('#fda4af')" title="Rose"></div>
+          <div class="nt-col-swatch" style="background:#a5f3fc" onclick="ntSetTextColor('#a5f3fc')" title="Sky"></div>
+          <div class="nt-col-swatch" style="background:#e879f9" onclick="ntSetTextColor('#e879f9')" title="Fuchsia"></div>
+          <div class="nt-fmt-sep"></div>
+          <!-- Highlight colours -->
+          <span style="font-size:8px;color:rgba(124,58,237,0.55);font-weight:700;letter-spacing:.5px;text-transform:uppercase;flex-shrink:0;margin-right:2px">HL</span>
+          <div class="nt-hl-swatch" style="background:rgba(168,85,247,0.3)" onclick="ntSetHighlight('rgba(124,58,237,0.35)')" title="Purple highlight"></div>
+          <div class="nt-hl-swatch" style="background:rgba(252,119,144,0.3)" onclick="ntSetHighlight('rgba(252,119,144,0.3)')" title="Pink highlight"></div>
+          <div class="nt-hl-swatch" style="background:rgba(246,187,78,0.3)" onclick="ntSetHighlight('rgba(246,187,78,0.3)')" title="Gold highlight"></div>
+          <div class="nt-hl-swatch" style="background:rgba(103,232,249,0.25)" onclick="ntSetHighlight('rgba(103,232,249,0.25)')" title="Teal highlight"></div>
+          <div class="nt-hl-swatch" style="background:rgba(134,239,172,0.25)" onclick="ntSetHighlight('rgba(134,239,172,0.25)')" title="Green highlight"></div>
+          <div class="nt-hl-swatch" style="background:rgba(255,255,255,0.06);border:1.5px dashed rgba(255,255,255,0.2)" onclick="ntClearHighlight()" title="Clear highlight" style="font-size:8px"></div>
+          <div class="nt-fmt-sep"></div>
+          <!-- Font size -->
+          <div class="nt-fmt-btn" onclick="ntFontSize(1)" style="font-size:9px" title="Small">S</div>
+          <div class="nt-fmt-btn" onclick="ntFontSize(3)" style="font-size:11px" title="Normal">M</div>
+          <div class="nt-fmt-btn" onclick="ntFontSize(5)" style="font-size:13px" title="Large">L</div>
+          <div class="nt-fmt-btn" onclick="ntFontSize(7)" style="font-size:15px" title="XL">XL</div>
+          <div class="nt-fmt-sep"></div>
+          <!-- Quick emoji -->
+          <div class="nt-fmt-btn" onclick="ntInsertEmoji('⭐')" title="Star">⭐</div>
+          <div class="nt-fmt-btn" onclick="ntInsertEmoji('✅')" title="Check">✅</div>
+          <div class="nt-fmt-btn" onclick="ntInsertEmoji('💡')" title="Idea">💡</div>
+          <div class="nt-fmt-btn" onclick="ntInsertEmoji('🔥')" title="Fire">🔥</div>
+          <div class="nt-fmt-btn" onclick="ntInsertEmoji('❤️')" title="Heart">❤️</div>
+          <div class="nt-fmt-btn" onclick="ntInsertEmoji('🎯')" title="Target">🎯</div>
+        </div>
+
+        <!-- Title + title colour row -->
+        <input class="nt-title-inp" id="nt-title-inp" placeholder="Note title…" oninput="saveCurrentNote()" />
+        <div class="nt-title-color-row" id="nt-title-color-row">
+          <span style="font-size:8px;color:rgba(124,58,237,0.5);font-weight:700;letter-spacing:.5px;text-transform:uppercase;flex-shrink:0">Title colour:</span>
+          <div class="nt-tcol-clear" id="nt-tcol-clear" onclick="ntSetTitleColor(null)" title="Default">✕</div>
+          <div class="nt-tcol" style="background:#fff" onclick="ntSetTitleColor('#ffffff')" data-col="#ffffff"></div>
+          <div class="nt-tcol" style="background:#d4bbff" onclick="ntSetTitleColor('#d4bbff')" data-col="#d4bbff"></div>
+          <div class="nt-tcol" style="background:#fc7790" onclick="ntSetTitleColor('#fc7790')" data-col="#fc7790"></div>
+          <div class="nt-tcol" style="background:#f6bb4e" onclick="ntSetTitleColor('#f6bb4e')" data-col="#f6bb4e"></div>
+          <div class="nt-tcol" style="background:#67e8f9" onclick="ntSetTitleColor('#67e8f9')" data-col="#67e8f9"></div>
+          <div class="nt-tcol" style="background:#86efac" onclick="ntSetTitleColor('#86efac')" data-col="#86efac"></div>
+          <div class="nt-tcol" style="background:#e879f9" onclick="ntSetTitleColor('#e879f9')" data-col="#e879f9"></div>
+          <div class="nt-tcol" style="background:#fbbf24" onclick="ntSetTitleColor('#fbbf24')" data-col="#fbbf24"></div>
+          <div class="nt-tcol" style="background:#a78bfa" onclick="ntSetTitleColor('#a78bfa')" data-col="#a78bfa"></div>
+        </div>
+
+        <!-- Body -->
         <div class="nt-body-area" id="note-editor" contenteditable="true" oninput="saveCurrentNote()"></div>
-        <div class="nt-word-count" id="note-wordcount">0 words · 0 chars</div>
+
+        <!-- Footer: word count + tag picker -->
+        <div class="nt-word-count" id="note-wordcount">
+          <span id="nt-wc-text">0 words · 0 chars</span>
+          <div class="nt-wc-tag-row">
+            <span class="nt-wc-tag-lbl">Tag:</span>
+            <span id="nt-tag-picker" onclick="ntCycleTag()" style="font-size:9px;font-weight:700;border-radius:20px;padding:2px 8px;cursor:pointer;transition:all .15s;border:1px solid rgba(124,58,237,0.3);color:#c4b5fd;background:rgba(124,58,237,0.12)">Notes</span>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -9603,14 +9717,13 @@ setInterval(() => {
 let activeNoteId = null;
 let _ntFilter = 'all';
 const _NT_STRIPES = ['#a855f7','#e879f9','#6366f1','#06b6d4','#22c55e','#f59e0b','#f43f5e','#c084fc'];
-const _NT_TEXT_COLORS = ['#d4bbff','#67e8f9','#86efac','#fcd34d','#fda4af'];
-let _ntColorIdx = 0;
 const _NT_TAG_PRESETS = [
   {tag:'Notes',   tagColor:'#c4b5fd', tagBg:'#7c3aed18', tagBorder:'#7c3aed33'},
   {tag:'Ideas',   tagColor:'#c4b5fd', tagBg:'#7c3aed18', tagBorder:'#7c3aed33'},
   {tag:'Personal',tagColor:'#fae8ff', tagBg:'#e879f918', tagBorder:'#e879f933'},
   {tag:'Work',    tagColor:'#a5b4fc', tagBg:'#6366f118', tagBorder:'#6366f133'},
   {tag:'Journal', tagColor:'#67e8f9', tagBg:'#06b6d418', tagBorder:'#06b6d433'},
+  {tag:'Idea 💡', tagColor:'#fbbf24', tagBg:'#f59e0b18', tagBorder:'#f59e0b33'},
 ];
 
 function _ntEsc(t) { return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -9619,8 +9732,8 @@ function _ntNowTime() {
   return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
 }
 
+/* ── RENDER LIST ── */
 function renderNotes() {
-  // Keep old sidebar hidden but populated for any external references
   const sidebar = document.getElementById('notes-sidebar');
   if (sidebar) sidebar.innerHTML = '';
 
@@ -9628,9 +9741,7 @@ function renderNotes() {
   const countEl = document.getElementById('nt-count');
   if (!wrap) return;
 
-  const search = (document.getElementById('nt-search-inp') || {}).value || '';
-  const q = search.toLowerCase();
-
+  const q = ((document.getElementById('nt-search-inp') || {}).value || '').toLowerCase();
   let list = (S.notes || []).slice();
   if (_ntFilter === 'pinned') list = list.filter(n => n.pinned);
   if (_ntFilter === 'recent') list = list.slice(0, 3);
@@ -9649,9 +9760,11 @@ function renderNotes() {
   wrap.innerHTML = '';
   list.forEach((n, idx) => {
     const stripe = n.stripe || _NT_STRIPES[idx % _NT_STRIPES.length];
-    const tp = n.tagPreset !== undefined ? _NT_TAG_PRESETS[n.tagPreset % _NT_TAG_PRESETS.length] : (n.tagColor ? n : _NT_TAG_PRESETS[0]);
+    const tagIdx = n.tagPreset !== undefined ? n.tagPreset % _NT_TAG_PRESETS.length : 0;
+    const tp = n.tagColor ? n : _NT_TAG_PRESETS[tagIdx];
     const preview = (n.content || '').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim().slice(0, 80);
-    const timeStr = n.created ? new Date(n.created).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : (_ntNowTime());
+    const timeStr = n.created ? new Date(n.created).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : _ntNowTime();
+    const titleCol = n.titleColor || '#fff';
 
     const card = document.createElement('div');
     card.className = 'nt-card';
@@ -9660,33 +9773,34 @@ function renderNotes() {
     card.innerHTML = `
       ${n.pinned ? '<div class="nt-card-pin">📌</div>' : ''}
       <div class="nt-card-top">
-        <div class="nt-card-title">${_ntEsc(n.title || 'Untitled')}</div>
+        <div class="nt-card-title" style="color:${titleCol}">${_ntEsc(n.title || 'Untitled')}</div>
         <div class="nt-card-time">${timeStr}</div>
       </div>
       <div class="nt-card-body">${_ntEsc(preview || 'No content yet…')}</div>
       <div class="nt-card-tags">
-        <span class="nt-card-tag" style="background:${tp.tagBg};border:1px solid ${tp.tagBorder};color:${tp.tagColor}">${tp.tag}</span>
+        <span class="nt-card-tag" style="background:${tp.tagBg};border:1px solid ${tp.tagBorder};color:${tp.tagColor}" onclick="event.stopPropagation();ntCycleTagOnCard('${n.id}')">${tp.tag}</span>
       </div>`;
     card.addEventListener('click', () => openNote(n.id));
     wrap.appendChild(card);
   });
 }
 
+/* ── VIEW SWITCHING ── */
 function _ntShowEditor() {
   document.getElementById('notes-list-view').style.display = 'none';
   document.getElementById('notes-editor-view').style.display = 'flex';
 }
-
 function _ntShowList() {
   document.getElementById('notes-editor-view').style.display = 'none';
   document.getElementById('notes-list-view').style.display = 'flex';
   renderNotes();
 }
 
+/* ── CRUD ── */
 function newNote() {
   const id = 'note_' + Date.now();
   const stripe = _NT_STRIPES[Math.floor(Math.random() * _NT_STRIPES.length)];
-  S.notes.unshift({ id, title:'Untitled', content:'', created: new Date().toISOString(), stripe, pinned: false, tagPreset: 0 });
+  S.notes.unshift({ id, title:'Untitled', content:'', created: new Date().toISOString(), stripe, pinned:false, tagPreset:0, titleColor:null });
   saveState(); playSound('click');
   openNote(id);
 }
@@ -9696,16 +9810,35 @@ function openNote(id) {
   const note = S.notes.find(n => n.id === id);
   const editor = document.getElementById('note-editor');
   const titleInp = document.getElementById('nt-title-inp');
-  if (editor && note) {
-    editor.innerHTML = note.content || '';
-    if (titleInp) titleInp.value = note.title && note.title !== 'Untitled' ? note.title : '';
+  if (!note || !editor) return;
+
+  editor.innerHTML = note.content || '';
+  if (titleInp) {
+    titleInp.value = note.title && note.title !== 'Untitled' ? note.title : '';
+    titleInp.style.setProperty('--nt-title-col', note.titleColor || '#fff');
+    titleInp.style.color = note.titleColor || '#fff';
   }
-  const wc = document.getElementById('note-wordcount');
-  if (wc) {
-    const text = editor ? (editor.innerText || '') : '';
-    const words = text.trim().split(/\s+/).filter(Boolean).length;
-    wc.textContent = words + ' word' + (words!==1?'s':'') + ' · ' + text.length + ' chars';
+
+  // Restore title colour swatch active state
+  _ntSyncTitleColorUI(note.titleColor || null);
+
+  // Restore tag picker
+  const tagPicker = document.getElementById('nt-tag-picker');
+  if (tagPicker) {
+    const tagIdx = (note.tagPreset || 0) % _NT_TAG_PRESETS.length;
+    const tp = _NT_TAG_PRESETS[tagIdx];
+    tagPicker.textContent = tp.tag;
+    tagPicker.style.color = tp.tagColor;
+    tagPicker.style.background = tp.tagBg;
+    tagPicker.style.borderColor = tp.tagBorder;
   }
+
+  // Word count
+  const text = editor.innerText || '';
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  const wcEl = document.getElementById('nt-wc-text');
+  if (wcEl) wcEl.textContent = words + ' word' + (words!==1?'s':'') + ' · ' + text.length + ' chars';
+
   _ntShowEditor();
 }
 
@@ -9714,20 +9847,20 @@ function saveCurrentNote() {
   const editor = document.getElementById('note-editor');
   const titleInp = document.getElementById('nt-title-inp');
   const note = S.notes.find(n => n.id === activeNoteId);
-  if (note && editor) {
-    note.content = editor.innerHTML;
-    const text = editor.innerText || '';
-    // Title: use the title input if filled, else derive from body
-    if (titleInp && titleInp.value.trim()) {
-      note.title = titleInp.value.trim().slice(0, 60);
-    } else {
-      note.title = text.slice(0, 30).trim() || 'Untitled';
-    }
-    const words = text.trim().split(/\s+/).filter(Boolean).length;
-    const wc = document.getElementById('note-wordcount');
-    if (wc) wc.textContent = words + ' word' + (words!==1?'s':'') + ' · ' + text.length + ' chars';
-    saveState();
+  if (!note || !editor) return;
+
+  note.content = editor.innerHTML;
+  const text = editor.innerText || '';
+  if (titleInp && titleInp.value.trim()) {
+    note.title = titleInp.value.trim().slice(0, 60);
+  } else {
+    note.title = text.slice(0, 30).trim() || 'Untitled';
   }
+
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  const wcEl = document.getElementById('nt-wc-text');
+  if (wcEl) wcEl.textContent = words + ' word' + (words!==1?'s':'') + ' · ' + text.length + ' chars';
+  saveState();
 }
 
 function deleteNote(id, e) {
@@ -9742,45 +9875,148 @@ function deleteNote(id, e) {
   _ntShowList();
 }
 
+/* ── FORMATTING ── */
 function noteFormat(cmd) {
   const editor = document.getElementById('note-editor');
   if (!editor) return;
   editor.focus();
   if (cmd === 'h1') document.execCommand('formatBlock', false, 'H1');
   else if (cmd === 'h2') document.execCommand('formatBlock', false, 'H2');
+  else if (cmd === 'blockquote') document.execCommand('formatBlock', false, 'BLOCKQUOTE');
   else document.execCommand(cmd);
   saveCurrentNote();
 }
-
-// New format functions for the new UI buttons (delegate to noteFormat)
 function ntFmt(cmd) { noteFormat(cmd); }
 function ntFmtBlock(tag) { noteFormat(tag); }
 
-function ntCycleColor() {
-  _ntColorIdx = (_ntColorIdx + 1) % _NT_TEXT_COLORS.length;
-  const col = _NT_TEXT_COLORS[_ntColorIdx];
-  const btn = document.getElementById('nt-color-btn');
-  if (btn) btn.style.color = col;
-  noteColor(col);
+function ntAlign(dir) {
+  const editor = document.getElementById('note-editor');
+  if (!editor) return;
+  editor.focus();
+  document.execCommand('justify' + dir);
+  saveCurrentNote();
+}
+
+function ntFontSize(size) {
+  // size: 1=tiny 2=small 3=normal 4=medium 5=large 6=xl 7=xxl
+  const editor = document.getElementById('note-editor');
+  if (!editor) return;
+  editor.focus();
+  document.execCommand('fontSize', false, size);
+  saveCurrentNote();
+}
+
+function ntInsertHR() {
+  const editor = document.getElementById('note-editor');
+  if (!editor) return;
+  editor.focus();
+  document.execCommand('insertHTML', false, '<hr>');
+  saveCurrentNote();
+}
+
+function ntInsertEmoji(emoji) {
+  const editor = document.getElementById('note-editor');
+  if (!editor) return;
+  editor.focus();
+  document.execCommand('insertText', false, emoji);
+  saveCurrentNote();
+}
+
+/* ── TEXT COLOUR ── */
+function ntSetTextColor(color) {
+  const editor = document.getElementById('note-editor');
+  if (!editor) return;
+  editor.focus();
+  if (!color) {
+    document.execCommand('removeFormat');
+  } else {
+    document.execCommand('foreColor', false, color);
+  }
+  // Update active swatch
+  document.querySelectorAll('.nt-col-swatch').forEach(s => {
+    s.classList.toggle('active', s.onclick && s.getAttribute('onclick') && s.getAttribute('onclick').includes(color));
+  });
+  saveCurrentNote();
 }
 
 function noteColor(color) {
   if (!color) return;
+  ntSetTextColor(color);
+}
+
+/* ── HIGHLIGHT ── */
+function ntSetHighlight(color) {
   const editor = document.getElementById('note-editor');
   if (!editor) return;
   editor.focus();
-  document.execCommand('foreColor', false, color);
+  document.execCommand('backColor', false, color);
+  saveCurrentNote();
+}
+function ntClearHighlight() {
+  const editor = document.getElementById('note-editor');
+  if (!editor) return;
+  editor.focus();
+  document.execCommand('backColor', false, 'transparent');
   saveCurrentNote();
 }
 
-// Wire up new notes UI once DOM is ready
+/* ── TITLE COLOUR ── */
+function ntSetTitleColor(color) {
+  if (!activeNoteId) return;
+  const note = S.notes.find(n => n.id === activeNoteId);
+  if (!note) return;
+  note.titleColor = color;
+  const inp = document.getElementById('nt-title-inp');
+  if (inp) {
+    inp.style.color = color || '#fff';
+    inp.style.setProperty('--nt-title-col', color || '#fff');
+  }
+  _ntSyncTitleColorUI(color);
+  saveState();
+}
+
+function _ntSyncTitleColorUI(color) {
+  document.querySelectorAll('.nt-tcol').forEach(s => {
+    s.classList.toggle('active', color && s.dataset.col === color);
+  });
+  const clearBtn = document.getElementById('nt-tcol-clear');
+  if (clearBtn) clearBtn.style.borderColor = !color ? '#a855f7' : 'rgba(255,255,255,0.2)';
+}
+
+/* ── TAG ── */
+function ntCycleTag() {
+  if (!activeNoteId) return;
+  const note = S.notes.find(n => n.id === activeNoteId);
+  if (!note) return;
+  note.tagPreset = ((note.tagPreset || 0) + 1) % _NT_TAG_PRESETS.length;
+  const tp = _NT_TAG_PRESETS[note.tagPreset];
+  const tagPicker = document.getElementById('nt-tag-picker');
+  if (tagPicker) {
+    tagPicker.textContent = tp.tag;
+    tagPicker.style.color = tp.tagColor;
+    tagPicker.style.background = tp.tagBg;
+    tagPicker.style.borderColor = tp.tagBorder;
+  }
+  saveState();
+}
+
+function ntCycleTagOnCard(id) {
+  const note = S.notes.find(n => n.id === id);
+  if (!note) return;
+  note.tagPreset = ((note.tagPreset || 0) + 1) % _NT_TAG_PRESETS.length;
+  saveState();
+  renderNotes();
+}
+
+// Kept for compatibility
+function ntCycleColor() { ntSetTextColor('#d4bbff'); }
+
+/* ── WIRING ── */
 (function _ntInit() {
   function _wire() {
-    // New button
     const nb = document.getElementById('nt-new-btn');
     if (nb) nb.onclick = newNote;
 
-    // Back button in editor
     const eb = document.getElementById('nt-ed-back');
     if (eb) eb.onclick = () => {
       saveCurrentNote();
@@ -9788,15 +10024,17 @@ function noteColor(color) {
       _ntShowList();
     };
 
-    // Pin button
     const pb = document.getElementById('nt-pin-btn');
     if (pb) pb.onclick = () => {
       if (!activeNoteId) return;
       const note = S.notes.find(n => n.id === activeNoteId);
-      if (note) { note.pinned = !note.pinned; saveState(); showNotif('📌', note.pinned ? 'Pinned' : 'Unpinned', note.title || ''); }
+      if (note) {
+        note.pinned = !note.pinned;
+        saveState();
+        showNotif('📌', note.pinned ? 'Pinned' : 'Unpinned', note.title || '');
+      }
     };
 
-    // Delete button
     const db = document.getElementById('nt-del-btn');
     if (db) db.onclick = () => {
       if (!activeNoteId) return;
@@ -9804,15 +10042,18 @@ function noteColor(color) {
       showNotif('🗑️', 'Deleted', '');
     };
 
-    // Share button
     const sb = document.getElementById('nt-share-btn');
-    if (sb) sb.onclick = () => showNotif('↗️', 'Shared', 'Note shared');
+    if (sb) sb.onclick = () => {
+      const note = S.notes.find(n => n.id === activeNoteId);
+      if (!note) return;
+      const text = (note.title || 'Note') + '\n\n' + (note.content || '').replace(/<[^>]*>/g,'');
+      if (navigator.share) navigator.share({ title: note.title || 'Note', text }).catch(()=>{});
+      else showNotif('↗️', 'Shared', note.title || 'Note');
+    };
 
-    // Title input saves
     const ti = document.getElementById('nt-title-inp');
     if (ti) ti.oninput = saveCurrentNote;
 
-    // Filter tabs
     document.querySelectorAll('.nt-tab').forEach(btn => {
       btn.onclick = function() {
         document.querySelectorAll('.nt-tab').forEach(b => b.classList.remove('on'));
@@ -9822,15 +10063,13 @@ function noteColor(color) {
       };
     });
 
-    // Search
     const si = document.getElementById('nt-search-inp');
     if (si) si.oninput = renderNotes;
   }
 
-  // Try immediately, retry after screens load
   if (document.readyState !== 'loading') _wire();
   else document.addEventListener('DOMContentLoaded', _wire);
-  // Also re-wire when notes screen opens (screens may not exist yet)
+
   const _origOpenScreen = window.openScreen;
   window.openScreen = function(id) {
     if (_origOpenScreen) _origOpenScreen.apply(this, arguments);
