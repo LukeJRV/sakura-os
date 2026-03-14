@@ -1906,12 +1906,12 @@ input[type=number] { -moz-appearance:textfield; }
 
 /* Boot ambient blobs */
 .boot-blob {
-  position:absolute; border-radius:50%; filter:blur(50px);
+  position:absolute; border-radius:50%;
   animation:auroraPulse 8s ease-in-out infinite;
   pointer-events:none;
 }
-.boot-blob-1 { width:400px;height:250px;background:radial-gradient(ellipse,rgba(120,50,230,0.5),transparent 70%);top:-60px;left:-80px; }
-.boot-blob-2 { width:300px;height:200px;background:radial-gradient(ellipse,rgba(180,80,255,0.3),transparent 70%);bottom:80px;right:-60px;animation-delay:-3s; }
+.boot-blob-1 { width:400px;height:250px;background:radial-gradient(ellipse,rgba(120,50,230,0.5) 0%,rgba(120,50,230,0.15) 40%,transparent 70%);top:-60px;left:-80px; }
+.boot-blob-2 { width:300px;height:200px;background:radial-gradient(ellipse,rgba(180,80,255,0.3) 0%,rgba(180,80,255,0.1) 40%,transparent 70%);bottom:80px;right:-60px;animation-delay:-3s; }
 
 /* Floating particles */
 .boot-particle {
@@ -3162,11 +3162,9 @@ input[type=number] { -moz-appearance:textfield; }
 
   <!-- Power / Boot Screen — inside #phone so it's clipped by phone's rounded corners -->
   <div id="power-screen">
-    <div style="position:absolute;inset:0;overflow:hidden;border-radius:48px;pointer-events:none;">
-      <div class="boot-blob boot-blob-1"></div>
-      <div class="boot-blob boot-blob-2"></div>
-      <div id="boot-parts"></div>
-    </div>
+    <div class="boot-blob boot-blob-1"></div>
+    <div class="boot-blob boot-blob-2"></div>
+    <div id="boot-parts"></div>
     <div class="boot-gem-wrap">
       <div class="boot-gem-halo2"></div>
       <div class="boot-gem-halo"></div>
@@ -3256,8 +3254,8 @@ input[type=number] { -moz-appearance:textfield; }
   <div id="notif-drag-zone" style="position:absolute;top:0;left:0;width:100%;height:56px;z-index:9000;cursor:pointer;touch-action:none" onmousedown="notifPanelDragStart(event)"></div>
 
   <!-- Notification Panel — full-screen iOS 15-style -->
-  <div id="notif-panel" style="position:absolute;inset:0;z-index:8900;transform:translateY(-100%);transition:transform 0.48s cubic-bezier(0.32,0,0.15,1);will-change:transform;overflow:hidden;border-radius:48px;">
-    <!-- Wallpaper blur layer — wrapped in overflow:hidden so blur cannot escape panel bounds -->
+  <div id="notif-panel" style="position:absolute;inset:0;z-index:8900;transform:translateY(-100%);transition:transform 0.48s cubic-bezier(0.32,0,0.15,1);overflow:hidden;border-radius:48px;">
+    <!-- Wallpaper blur layer wrapped in overflow:hidden so filter:blur cannot escape -->
     <div style="position:absolute;inset:0;overflow:hidden;border-radius:48px;">
       <div id="notif-panel-wallpaper" style="position:absolute;inset:-40px;background:radial-gradient(ellipse at 20% 20%,#2a1a4e 0%,#000 50%,#1a0a2e 100%);filter:blur(32px) saturate(160%);"></div>
     </div>
@@ -21028,7 +21026,7 @@ function powerOffApp() {
   if (ov) ov.remove();
   ov = document.createElement('div');
   ov.id = 'ios-pow-ov';
-  ov.style.cssText = 'position:absolute;inset:0;z-index:99999;background:rgba(0,0,0,0.88);backdrop-filter:blur(24px);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:52px 24px 40px;border-radius:48px;overflow:hidden';
+  ov.style.cssText = 'position:absolute;inset:0;z-index:99999;background:rgba(0,0,0,0.96);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:52px 24px 40px;border-radius:48px;overflow:hidden';
   ov.innerHTML = `
     <div style="text-align:center">
       <div style="font-size:48px;margin-bottom:14px;filter:drop-shadow(0 0 24px rgba(255,255,255,0.25))">⏻</div>
@@ -27158,9 +27156,7 @@ function _showPowerMenu() {
   ov.id = 'ios-pow-ov';
   ov.style.cssText = [
     'position:absolute;inset:0;z-index:99999',
-    'background:rgba(4,1,16,0.88)',
-    'backdrop-filter:blur(28px)',
-    '-webkit-backdrop-filter:blur(28px)',
+    'background:rgba(4,1,16,0.96)',
     'display:flex;flex-direction:column;align-items:center;justify-content:space-between',
     'padding:52px 24px 44px',
     'border-radius:48px',
@@ -27373,12 +27369,14 @@ function _buildChargingHTML() {
   var ampm = now.getHours() >= 12 ? 'PM' : 'AM';
 
   return [
-    /* ── Blur layers wrapped so filter cannot escape border-radius clip ── */
-    '<div style="position:absolute;inset:0;overflow:hidden;border-radius:48px;pointer-events:none">',
-      '<div style="position:absolute;inset:0;background:#000;z-index:0;pointer-events:none"></div>',
-      '<div style="position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:500px;height:340px;border-radius:50%;background:radial-gradient(ellipse,rgba(20,200,80,0.18) 0%,transparent 70%);filter:blur(30px);pointer-events:none;z-index:1"></div>',
-      '<div style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:380px;height:200px;border-radius:50%;background:radial-gradient(ellipse,rgba(120,50,220,0.22) 0%,transparent 70%);filter:blur(40px);pointer-events:none;z-index:1"></div>',
-    '</div>',
+    /* ── Full-screen background ── */
+    '<div style="position:absolute;inset:0;background:#000;z-index:0;pointer-events:none"></div>',
+
+    /* ── Radial ambient glow at bottom — no filter:blur, uses radial-gradient directly ── */
+    '<div style="position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:500px;height:340px;background:radial-gradient(ellipse,rgba(20,200,80,0.22) 0%,rgba(20,200,80,0.08) 40%,transparent 70%);pointer-events:none;z-index:1"></div>',
+
+    /* ── Top purple aurora accent — no filter:blur ── */
+    '<div style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:380px;height:200px;background:radial-gradient(ellipse,rgba(120,50,220,0.28) 0%,rgba(120,50,220,0.08) 40%,transparent 70%);pointer-events:none;z-index:1"></div>',
 
     /* ── Shimmer top line ── */
     '<div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(60,220,120,0.4),transparent);z-index:2;pointer-events:none"></div>',
